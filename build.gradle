@@ -29,6 +29,11 @@ dependencies {
     // DEVELOP
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //확장자 변경 라이브러리
+    // https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi
+    implementation 'com.googlecode.soundlibs:mp3spi:1.9.5-1'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
@@ -65,6 +70,8 @@ dependencies {
     // LOGGER
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     testImplementation 'ch.qos.logback:logback-classic:1.5.6'
+
+
 }
 
 tasks.named('test') {
