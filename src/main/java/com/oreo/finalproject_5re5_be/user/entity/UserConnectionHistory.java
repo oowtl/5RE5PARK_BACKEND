@@ -1,6 +1,6 @@
 package com.oreo.finalproject_5re5_be.user.entity;
 
-import com.oreo.finalproject_5re5_be.utils.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.modelmapper.internal.bytebuddy.asm.Advice.Local;
 
 
 @Entity
@@ -28,7 +27,7 @@ public class UserConnectionHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long connSeq;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_seq")
     private User user;
 

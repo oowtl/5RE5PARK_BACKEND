@@ -1,7 +1,7 @@
 package com.oreo.finalproject_5re5_be.project.entity;
 
 
-import com.oreo.finalproject_5re5_be.utils.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

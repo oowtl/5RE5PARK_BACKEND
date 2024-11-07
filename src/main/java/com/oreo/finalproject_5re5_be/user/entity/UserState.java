@@ -1,6 +1,6 @@
 package com.oreo.finalproject_5re5_be.user.entity;
 
-import com.oreo.finalproject_5re5_be.utils.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,11 +27,11 @@ public class UserState extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long StateSeq;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_seq")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "state_code")
     private UserCategory stateCode;
 

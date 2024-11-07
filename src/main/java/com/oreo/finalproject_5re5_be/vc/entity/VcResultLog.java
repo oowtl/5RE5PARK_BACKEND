@@ -1,0 +1,37 @@
+package com.oreo.finalproject_5re5_be.vc.entity;
+
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "vc_resultlog")
+@Getter
+@Setter
+@ToString
+public class VcResultLog extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "vrl_seq")
+    private long vrlSeq;
+
+    @Column(nullable = false, name = "vrl_reg_date")
+    @CreatedDate
+    private LocalDateTime date;
+
+    @Column(nullable = false, name = "cc_seq")
+    private long ccSeq;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "vc_seq")
+    private Vc vcSeq;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pro_seq")
+    private Project proSeq;
+}
