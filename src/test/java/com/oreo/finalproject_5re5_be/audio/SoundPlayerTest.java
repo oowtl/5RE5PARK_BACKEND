@@ -1,7 +1,8 @@
 package com.oreo.finalproject_5re5_be.audio;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sound.sampled.*;
@@ -14,7 +15,7 @@ public class SoundPlayerTest {
     private final SoundPlayer soundPlayer = new SoundPlayer();
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")//테스코드가 CI 환경에서 돌아가지 않게 해주는 어노테이션
+    @DisabledOnOs({OS.LINUX}) //테스코드가 LINUX 환경에서 돌아가지 않게 해주는 어노테이션
     void soundPlayerTest() {
 //        File file = new File("");
 //        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
