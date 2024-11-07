@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - main  # main 브랜치로의 PR일 때 실행
+      - develop
 
   # develop 브랜치에 push가 되면 자동 배포 실행
   push:
