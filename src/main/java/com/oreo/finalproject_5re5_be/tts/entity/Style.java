@@ -23,7 +23,7 @@ public class Style {
     @Column(name = "contents")
     private String contents;
 
-    @Column(name = "desc")
+    @Column(name = "dscp")
     private String description;
 
     @Column(name = "use_cnt")
@@ -31,12 +31,4 @@ public class Style {
 
     @Column(name = "recm")
     private char isRecommend;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "voice_seq")
-//    private Voice voice;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "smpl_aud_seq")
-//    private SampleAudio sampleAudio;
 }

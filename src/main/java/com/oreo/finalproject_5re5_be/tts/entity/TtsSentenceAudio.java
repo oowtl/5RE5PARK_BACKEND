@@ -20,8 +20,8 @@ public class TtsSentenceAudio {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @Column(name = "order", nullable = false)
-    private Integer order;
+    @Column(name = "sort_ord", nullable = false)
+    private Integer sortOrder;
 
     @Column(name = "volume")
     private Integer volume;

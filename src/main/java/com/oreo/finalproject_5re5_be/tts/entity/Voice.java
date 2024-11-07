@@ -23,6 +23,9 @@ public class Voice {
     @Column(name = "age")
     private Integer age;
 
+    @Column(name = "dscp")
+    private String description;
+
     @Column(name = "enabled")
     private char enabled;
 
