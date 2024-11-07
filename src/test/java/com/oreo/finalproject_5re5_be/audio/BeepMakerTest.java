@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.audio;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sound.sampled.*;
@@ -15,6 +16,7 @@ public class BeepMakerTest {
     private SoundPlayer soundPlayer = new SoundPlayer();
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     void makeBeepSectionTest() throws IOException {
         float duration = 0.3f;//오디오 길이 설정
         byte[] audioData = BeepMaker.makeBeep(100, duration);//오디오 생성
@@ -37,6 +39,7 @@ public class BeepMakerTest {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     void makeSilenceSectionTest() throws IOException {
         float duration = 0.3f;
         byte[] audioData = BeepMaker.makeSilence(duration);
