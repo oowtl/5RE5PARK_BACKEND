@@ -24,7 +24,7 @@ public class UserState extends BaseEntity {
 
     @Id
     @Column(name = "state_code")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long StateSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)

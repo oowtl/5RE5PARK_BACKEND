@@ -24,7 +24,7 @@ public class UserTermsHistory extends BaseEntity {
 
     @Id
     @Column(name = "term_hist_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long termHistSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)

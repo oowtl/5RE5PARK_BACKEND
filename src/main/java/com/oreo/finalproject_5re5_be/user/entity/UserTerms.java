@@ -24,7 +24,7 @@ public class UserTerms extends BaseEntity  {
 
     @Id
     @Column(name = "terms_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long termsSeq;
     private String name;
 

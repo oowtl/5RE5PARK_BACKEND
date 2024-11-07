@@ -21,7 +21,7 @@ public class UserTermsCondition extends BaseEntity  {
 
     @Id
     @Column(name = "terms_cond_code")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long termCondCode;
     private String name;
     private String shortCont;

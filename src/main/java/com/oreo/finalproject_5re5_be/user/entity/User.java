@@ -24,7 +24,7 @@ public class User extends BaseEntity {
 
     @Id
     @Column(name = "user_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userSeq;
     private String id;
     private String email;

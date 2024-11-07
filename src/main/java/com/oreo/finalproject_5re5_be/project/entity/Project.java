@@ -25,7 +25,7 @@ public class Project extends BaseEntity {
 
     @Id
     @Column(name = "pro_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long proSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -24,7 +24,7 @@ import lombok.ToString;
 public class UserChangeHistory extends BaseEntity {
     @Id
     @Column(name = "chng_hist_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chngHistSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)

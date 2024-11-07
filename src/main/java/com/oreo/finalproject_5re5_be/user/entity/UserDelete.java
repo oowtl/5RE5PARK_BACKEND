@@ -24,7 +24,7 @@ public class UserDelete extends BaseEntity {
 
     @Id
     @Column(name = "user_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userSeq;
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -24,7 +24,7 @@ public class UserRoles extends BaseEntity {
 
     @Id
     @Column(name = "poli_code")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long poliCode;
 
     @OneToOne(fetch = FetchType.LAZY)

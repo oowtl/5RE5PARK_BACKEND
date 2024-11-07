@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -23,11 +24,11 @@ public class ProjectStatus extends BaseEntity {
 
     @Id
     @Column(name = "ps_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long psSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "pro_seq")
+    @JoinColumn(name = "pro_seq")
     private Project project;
 
     /** 추후에 통합 코드 엔티티와 연관관계 맺기 **/

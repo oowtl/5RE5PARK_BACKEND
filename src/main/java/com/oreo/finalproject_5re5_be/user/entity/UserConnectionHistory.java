@@ -25,7 +25,7 @@ public class UserConnectionHistory extends BaseEntity {
 
     @Id
     @Column(name = "conn_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long connSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)
