@@ -14,7 +14,7 @@ public class SoundPlayerTest {
     private final SoundPlayer soundPlayer = new SoundPlayer();
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")//테스코드가 CI 환경에서 돌아가지 않게 해주는 어노테이션
     void soundPlayerTest() {
 //        File file = new File("");
 //        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
