@@ -32,4 +32,18 @@ public class User extends BaseEntity {
     private String passAddr;
     private String locaAddr;
     private String detailAddr;
+
+    // 유저 상태
+
+    // 유저 약관 이력 내용
+
+    // 유저 변경 내역
+
+    // 회원 접속 이력
+
+    // 회원 탈퇴 이력
+
+    // 회원 프로젝트 내역
+
+
 }

@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.user.dto.request;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,5 +24,6 @@ public class UserRegisterRequest {
     private String passAddr;
     private Character chkValid;
     private LocalDateTime userRegDate;
+    private List<UserTerm> userTerms;
 
 }
