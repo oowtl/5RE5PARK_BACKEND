@@ -1,9 +1,13 @@
 package com.oreo.finalproject_5re5_be.tts.client;
 
 import com.google.api.gax.rpc.InvalidArgumentException;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.texttospeech.v1.*;
 import com.google.protobuf.ByteString;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import java.io.IOException;
 import java.util.Arrays;
 
 @Getter
@@ -17,6 +21,7 @@ public class GoogleTTSClient {
     private final static double MAX_VOLUME = 16.0;
     private final static double MIN_VOLUME = -96.0;
 
+    TextToSpeechSettings ttsSettings;
 
     // 필수 입력
     private String text = "";
@@ -31,11 +36,24 @@ public class GoogleTTSClient {
     private double volume = 0.0;
     private int samplingRate = 0;
 
-    public GoogleTTSClient(String text, String languageCode, String voiceName) {
+
+    public GoogleTTSClient(String text, String languageCode, String voiceName) throws IOException {
         this.text = text;
         this.languageCode = languageCode;
         this.voiceName = voiceName;
+        init();
     }
+
+    private void init() throws IOException {
+        // 인증 정보 설정
+        ClassPathResource resource = new ClassPathResource("tts.json");
+        this.ttsSettings =
+                TextToSpeechSettings.newBuilder()
+                        .setCredentialsProvider(() -> GoogleCredentials.fromStream(resource.getInputStream()))
+                        .build();
+
+    }
+
 
     public void setVoiceGender(String gender) throws IllegalArgumentException {
         // voice 성별(string)을 SsmlVoiceGender 객체로 변환
@@ -77,7 +95,7 @@ public class GoogleTTSClient {
         TextToSpeechClient textToSpeechClient = null;
         try {
             // TTS 클라이언트 객체화
-            textToSpeechClient = TextToSpeechClient.create();
+             textToSpeechClient = TextToSpeechClient.create(ttsSettings);
 
             // 합성할 text 입력 객체 생성
             SynthesisInput input = getInput();
