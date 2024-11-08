@@ -19,7 +19,7 @@ public class Vc extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, name = "vc_seq")
-    private long vcSeq;
+    private Long vcSeq;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")

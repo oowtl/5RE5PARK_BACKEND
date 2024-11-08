@@ -20,7 +20,7 @@ public class VcText extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vt_seq")
-    private long vtSeq;
+    private Long vtSeq;
 
     @Column(nullable = false, name = "comment")
     private String comment;

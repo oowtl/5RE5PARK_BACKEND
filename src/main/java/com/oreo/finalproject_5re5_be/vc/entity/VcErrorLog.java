@@ -19,7 +19,7 @@ public class VcErrorLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ver_seq")
-    private long verSeq;
+    private Long verSeq;
 
     @Column(nullable = false, name = "message")
     private String message;

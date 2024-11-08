@@ -20,6 +20,8 @@ jobs:
     if: github.event_name == 'push'
 
     runs-on: ubuntu-latest
+#    env:
+#      MYSQL: ${{ secrets.MYSQL}}
 
     steps:
       # 코드 체크아웃

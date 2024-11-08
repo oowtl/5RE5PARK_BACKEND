@@ -15,7 +15,7 @@ public class VcSrcFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, name = "src_seq")
-    private long srcSeq;
+    private Long srcSeq;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vc_seq")

@@ -19,14 +19,14 @@ public class VcResultLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vrl_seq")
-    private long vrlSeq;
+    private Long vrlSeq;
 
     @Column(nullable = false, name = "vrl_reg_date")
     @CreatedDate
     private LocalDateTime date;
 
     @Column(nullable = false, name = "cc_seq")
-    private long ccSeq;
+    private Long ccSeq;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vc_seq")

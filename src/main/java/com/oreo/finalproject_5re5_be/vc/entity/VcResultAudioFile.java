@@ -18,7 +18,7 @@ public class VcResultAudioFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, name = "res_seq")
-    private long resSeq;
+    private Long resSeq;
 
     @Column(nullable = false, name = "name")
     private String fileName;

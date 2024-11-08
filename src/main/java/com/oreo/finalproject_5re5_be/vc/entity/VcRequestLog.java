@@ -19,7 +19,7 @@ public class VcRequestLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vcrl_seq")
-    private long vcrlSeq;
+    private Long vcrlSeq;
 
     @Column(nullable = false, name = "ch_date")
     @CreatedDate
@@ -28,7 +28,7 @@ public class VcRequestLog extends BaseEntity {
     private LocalDateTime SuccessDate;
 
     @Column(nullable = false, name = "cc_seq")
-    private long ccSeq;
+    private Long ccSeq;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "src_seq")
