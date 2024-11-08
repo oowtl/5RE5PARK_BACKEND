@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.entity;
 
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 @Table(name = "sample_audio")
 @Getter
 @Setter
-public class SampleAudio {
+public class SampleAudio extends BaseEntity {
     @Id
     @Column(name = "smpl_aud_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

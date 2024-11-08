@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.entity;
 
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "tts_audio_file")
 @Getter
 @Setter
-public class TtsAudiofile {
+public class TtsAudiofile extends BaseEntity {
     @Id
     @Column(name = "tts_aud_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

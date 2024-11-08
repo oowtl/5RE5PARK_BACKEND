@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.entity;
 
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "tts_progress_status")
 @Getter
 @Setter
-public class TtsProgressStatus {
+public class TtsProgressStatus extends BaseEntity {
     @Id
     @Column(name = "tps_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

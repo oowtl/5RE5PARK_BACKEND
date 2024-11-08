@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.entity;
 
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Table(name = "style")
 @Getter
 @Setter
-public class Style {
+public class Style extends BaseEntity {
     @Id
     @Column(name = "style_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

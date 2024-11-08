@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.entity;
 
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Table(name = "tts_sentence")
 @Getter
 @Setter
-public class TtsSentence {
+public class TtsSentence extends BaseEntity {
     @Id
     @Column(name = "ts_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +48,7 @@ public class TtsSentence {
     @Column(name = "aud_fmt")
     private String audioFormat;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tts_aud_seq")
     private TtsAudiofile ttsAudiofile;
 
