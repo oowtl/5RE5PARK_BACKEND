@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.utils.config;
+package com.oreo.finalproject_5re5_be.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
