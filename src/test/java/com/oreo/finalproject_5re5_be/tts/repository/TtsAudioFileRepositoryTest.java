@@ -139,18 +139,11 @@ public class TtsAudioFileRepositoryTest {
                 .downloadCount(1)
                 .build();
 
-        // when
-        // 2. TtsAudioFileRepository.save()
-        TtsAudioFile savedTtsAudioFile = ttsAudioFileRepository.save(createTtsAudioFile);
-
-        // then
-        // 3. 생성된 객체 조회 및 검증
-        Optional<TtsAudioFile> optionalTtsAudioFile = ttsAudioFileRepository.findById(savedTtsAudioFile.getTtsAudioSeq());
-        assertTrue(optionalTtsAudioFile.isPresent());
-
-        // 4. 생성된 객체의 값과 조회된 객체의 값 비교
-        TtsAudioFile searchedTtsAudioFile = optionalTtsAudioFile.get();
-        assertEquals(createTtsAudioFile, searchedTtsAudioFile);
+        // when, then
+        // 2. TtsAudioFileRepository.save() : 데이터 미포함으로 인한 에러 발생
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            TtsAudioFile savedTtsAudioFile = ttsAudioFileRepository.save(createTtsAudioFile);
+        });
     }
 
     // 4. 생성 테스트 - 데이터 미포함
