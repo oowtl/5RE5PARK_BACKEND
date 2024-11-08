@@ -1,4 +1,5 @@
-package com.oreo.finalproject_5re5_be.tts;
+package com.oreo.finalproject_5re5_be.tts.client;
+
 import com.google.cloud.texttospeech.v1.*;
 import com.google.protobuf.ByteString;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,9 @@ public class TtsApiCallTest {
             // 음성 요청 객체 생성
             VoiceSelectionParams voice =
                     VoiceSelectionParams.newBuilder()
-                            .setLanguageCode("en-US")
-//                            .setSsmlGender(SsmlVoiceGender.FEMALE)
-                            .setName("en-US-Journey-D")
-                            .setSsmlGender(SsmlVoiceGender.MALE)
+                            .setLanguageCode("ko-KR")
+                            .setName("ko-KR-Standard-A")
+                            .setSsmlGender(SsmlVoiceGender.FEMALE)
                             .build();
 
 
