@@ -20,8 +20,11 @@ jobs:
     if: github.event_name == 'push'
 
     runs-on: ubuntu-latest
-#    env:
-#      MYSQL: ${{ secrets.MYSQL}}
+    env:
+      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+      MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
 
     steps:
       # 코드 체크아웃
@@ -44,16 +47,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      # Gradle Wrapper 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       # 빌드 및 테스트 실행
       - name: Build and Test
         run: ./gradlew build
-        
-      - name: Run Tests
-        run: ./gradlew test
+
+        # Gradle Test를 실행한다
+      - name: Test with Gradle
+        run: ./gradlew --info test
+
+        # Test 후 Report 생성
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          junit_files: '**/build/test-results/test/TEST-*.xml'
 
       - name: Lint Checks
         run: ./gradlew check
-
   # # 3. develop에서 main으로 자동 배포 작업
   # deploy-to-main:
   #   # develop 브랜치에 push될 때만 실행
