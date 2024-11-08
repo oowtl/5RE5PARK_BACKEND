@@ -1,9 +1,12 @@
 package com.oreo.finalproject_5re5_be.concat.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -19,15 +22,17 @@ public class ConcatRowLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long concatLogSeq;
+    @Column(name = "concat_log_seq")
+    private Long concatRowLogSeq;
 
-    private Long proSeq;
-    private Long concatRowSeq;
+    @ManyToOne
+    @JoinColumn(name = "concat_row_seq")
+    private ConcatRow concatRow;
 
     private Long modifiedNum;
     private LocalDateTime modifiedDate;
     private String RequestContext;
-    private Boolean selected;
+    private Character selected;
     private Float silence;
 
 }

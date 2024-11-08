@@ -1,6 +1,8 @@
 package com.oreo.finalproject_5re5_be.concat.entity;
 
 
+import com.oreo.finalproject_5re5_be.utils.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,17 +19,15 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "audio_file")
-public class AudioFile {
+public class AudioFile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "audio_file_seq")
     private Long audioFileSeq;
 
-
-    @OneToOne(mappedBy = "audio_file")
-    private Project proSeq;
-
-    @OneToOne(mappedBy = "audio_file")
+    @OneToOne
+    @Column(name = "concat_row_Seq")
     private ConcatRow concatRowSeq;
 
     private String audioUrl;

@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.entity;
 
 
+import com.oreo.finalproject_5re5_be.utils.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,7 +18,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "concat_option")
-public class ConcatOption {
+public class ConcatOption extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +26,8 @@ public class ConcatOption {
 
     @ManyToOne
     @JoinColumn(name = "audio_file_seq")
-    private AudioFile audioFileSeq;
+    private AudioFile audioFile;
+
 
     private String optionName;
     private String optionComment;
