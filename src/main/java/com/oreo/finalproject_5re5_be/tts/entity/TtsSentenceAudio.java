@@ -53,7 +53,7 @@ public class TtsSentenceAudio extends BaseEntity {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tts_aud_seq")
-    private TtsAudiofile ttsAudiofile;
+    private TtsAudioFile ttsAudiofile;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "voice_seq")
