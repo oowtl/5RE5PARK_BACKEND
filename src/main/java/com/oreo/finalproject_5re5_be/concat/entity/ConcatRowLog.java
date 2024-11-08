@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.concat.entity;
 
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "concat_row_log")
-public class ConcatRowLog {
+public class ConcatRowLog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
