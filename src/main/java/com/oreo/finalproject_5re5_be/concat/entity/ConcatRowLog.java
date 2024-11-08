@@ -8,17 +8,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
+import lombok.*;
+
 @ToString
-@Entity
-@Table(name = "concat_row_log")
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity(name = "concat_row_log")
 public class ConcatRowLog extends BaseEntity {
 
     @Id
