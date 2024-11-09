@@ -67,7 +67,6 @@ public class MemberServiceImpl {
 
     private void checkDuplicatedEmail(String email) {
         Member foundMember = memberRepository.findByEmail(email);
-        System.out.println("foundMember = " + foundMember);
         if (foundMember != null) {
             throw new MemberDuplicatedEmailException();
         }
