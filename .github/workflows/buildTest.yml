@@ -7,6 +7,10 @@ on:
     branches:
       - main  # main 브랜치로의 PR일 때 실행
       - develop
+    types: # opened, synchronize, reopened를 추가하여 PR이 열리거나 업데이트될 때 작업이 실행
+      - opened
+      - synchronize
+      - reopened
 
   # develop 브랜치에 push가 되면 실행
   push:
@@ -17,6 +21,11 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write  # PR에 댓글, 체크 실행을 할 수 있는 권한
+      checks: write          # 체크 결과를 기록할 권한
+      actions: read          # GitHub Actions의 정보를 읽을 수 있는 권한
 
     steps:
       # 코드 체크아웃
