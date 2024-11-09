@@ -15,7 +15,6 @@ import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
-import com.oreo.finalproject_5re5_be.member.validator.MemberValidator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +44,6 @@ class MemberControllerTest {
     @MockBean
     private MemberServiceImpl memberService;
 
-    @Autowired
-    private MemberValidator memberValidator;
 
     @DisplayName("회원 가입 처리 성공")
     @Test
@@ -92,23 +89,7 @@ class MemberControllerTest {
         // Given
         List<MemberTermRequest> memberTerms = createMemberTerms();
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
-        request.setId("1");
-
-        // Mock memberService 호출
-        Member savedMember = Member.builder()
-                .seq(1L)
-                .id("")
-                .password("")
-                .email("asdf.com")
-                .name("홍길동")
-                .birthDate("1990-01-01")
-                .userRegDate(LocalDateTime.now())
-                .chkValid('Y')
-                .normAddr("서울시 강남구")
-                .passAddr("서초대로 59-32")
-                .locaAddr("서초동")
-                .detailAddr("서초동 123-456")
-                .build();
+        request.setId("잘못된 아이디");
 
 
         given(memberService.create(request)).willReturn(null);
