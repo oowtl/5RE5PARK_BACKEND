@@ -63,7 +63,6 @@ public class MemberServiceImpl {
         saveMemberTermsHistory(request, savedMember);
         // 6. 회원 상태 업데이트
         saveInitMemberState(savedMember);
-
     }
 
     private void checkDuplicatedEmail(String email) {

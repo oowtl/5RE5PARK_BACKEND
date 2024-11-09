@@ -47,12 +47,12 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid MemberRegisterRequest request, BindingResult result) {
+    public ResponseEntity<String> register(@RequestBody @Valid MemberRegisterRequest memberRegisterRequest, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("데이터 입력 형식이 잘못되었습니다");
         }
 
-        memberService.create(request);
+        memberService.create(memberRegisterRequest);
         return ResponseEntity.ok().body("회원가입이 완료되었습니다");
     }
 
