@@ -8,19 +8,29 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
+import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 public class MemberServiceImpl {
+
+    private static final int MAX_RETRY = 10;
+    private static final int RETRY_DELAY = 5_000;
 
     private final MemberConnectionHistoryRepository memberConnectionHistoryRepository;
     private final MemberRepository memberRepository;
@@ -51,6 +61,13 @@ public class MemberServiceImpl {
      */
 
     @Transactional
+    @Retryable(
+            value = {RuntimeException.class},
+            exclude = {MemberDuplicatedIdException.class, MemberDuplicatedIdException.class,
+                       MemberMandatoryTermNotAgreedException.class, MemberWrongCountTermCondition.class},
+            maxAttempts = MAX_RETRY,
+            backoff = @Backoff(delay = RETRY_DELAY)
+    )
     public Member create(MemberRegisterRequest request) {
         // 1. 중복되는 이메일이 있는지 확인
         checkDuplicatedEmail(request.getEmail());
@@ -65,6 +82,11 @@ public class MemberServiceImpl {
         // 6. 회원 상태 업데이트
         saveInitMemberState(savedMember);
         return savedMember;
+    }
+
+    @Recover
+    public void recover(RuntimeException e) {
+        throw new RetryFailedException();
     }
 
     private void checkDuplicatedEmail(String email) {
