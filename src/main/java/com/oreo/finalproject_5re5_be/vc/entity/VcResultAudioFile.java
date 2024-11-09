@@ -3,17 +3,19 @@ package com.oreo.finalproject_5re5_be.vc.entity;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vc_resultaudiofile")
-@Getter @Setter
+@Getter
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class VcResultAudioFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +30,15 @@ public class VcResultAudioFile extends BaseEntity {
     private String fileLength;
     @Column(nullable = false, name = "extension")
     private String extension;
+    @Builder.Default
     @Column(nullable = false, name = "activate")
     private char activate = 'Y';
+    @Builder.Default
     @Column(nullable = false, name = "st_stat")
-    private char StartStatus = 'Y';
+    private char startStatus = 'Y';
+    @Builder.Default
     @Column(nullable = false, name = "dn_stat")
-    private char DownloadStatus = 'Y';
+    private char downloadStatus = 'Y';
     @Column(nullable = false, name = "res_reg_date", updatable = false)
     @CreatedDate
     private LocalDateTime date;
