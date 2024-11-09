@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.vc.repository;
 
-import com.oreo.finalproject_5re5_be.vc.entity.Vc;
 import com.oreo.finalproject_5re5_be.vc.entity.VcSrcFile;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -160,7 +159,7 @@ public class VcSrcFileRepositoryTest {
         log.info("pk값 - 비교 {} : {} ",getSrcFile.getSrcSeq(), createFile.getSrcSeq());
 
         //시퀀스로 생성이 되는지 확인
-        assertEquals(getSrcFile.getSrcSeq(), 1);
+        assertEquals(getSrcFile.getSrcSeq(), createSrcFile.getSrcSeq());
     }
     @Test
     @DisplayName("5. SrcAudioFile 생성 테스트 - 필수값 미입력")
@@ -217,6 +216,8 @@ public class VcSrcFileRepositoryTest {
     @DisplayName("7. SrcAudioFile 조회 테스트 - 다건 전체 데이터 조회")
     void SrcAudioFile다건전체데이터조회(){
 
+        //db데이터 초기화
+        vcSrcFileRepository.deleteAll();
         //반복횟수
         int repeat = 10;
         // 저장용 리스트 생성
