@@ -51,7 +51,7 @@ public class MemberServiceImpl {
      */
 
     @Transactional
-    public MemberRegisterResponse create(MemberRegisterRequest request) {
+    public Member create(MemberRegisterRequest request) {
         // 1. 중복되는 이메일이 있는지 확인
         checkDuplicatedEmail(request.getEmail());
         // 2. 중복되는 아이디가 있는지 확인
@@ -64,8 +64,7 @@ public class MemberServiceImpl {
         saveMemberTermsHistory(request, savedMember);
         // 6. 회원 상태 업데이트
         saveInitMemberState(savedMember);
-
-        return MemberRegisterResponse.of("회원가입이 완료되었습니다");
+        return savedMember;
     }
 
     private void checkDuplicatedEmail(String email) {
