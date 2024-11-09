@@ -27,6 +27,7 @@ jobs:
       checks: write          # 체크 결과를 기록할 권한
       actions: read          # GitHub Actions의 정보를 읽을 수 있는 권한
 
+
     steps:
       # 코드 체크아웃
       - name: Check out code
