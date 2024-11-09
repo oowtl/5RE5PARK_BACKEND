@@ -34,6 +34,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi
     implementation 'com.googlecode.soundlibs:mp3spi:1.9.5-1'
 
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
@@ -46,6 +47,8 @@ dependencies {
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     // DB
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
