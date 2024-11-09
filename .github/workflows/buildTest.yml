@@ -21,7 +21,7 @@ jobs:
     steps:
       # 코드 체크아웃
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # JDK 설치
       - name: Set up JDK 17
@@ -32,7 +32,7 @@ jobs:
 
       # Gradle 의존성 캐시 설정
       - name: Cache Gradle dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
