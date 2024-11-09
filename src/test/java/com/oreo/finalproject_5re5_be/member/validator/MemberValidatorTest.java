@@ -16,7 +16,7 @@ class MemberValidatorTest {
 
 
     @Autowired
-    private UserValidator userValidator;
+    private MemberValidator memberValidator;
 
     private MemberRegisterRequest memberRegisterRequest;
     private Errors errors;
@@ -42,7 +42,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - false
         assertFalse(errors.hasErrors());
@@ -71,7 +71,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());
@@ -100,7 +100,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());
@@ -130,7 +130,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());
@@ -159,7 +159,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());
@@ -188,7 +188,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());
@@ -217,7 +217,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());
@@ -246,7 +246,7 @@ class MemberValidatorTest {
         errors = new BeanPropertyBindingResult(memberRegisterRequest, "userRegisterRequest");
 
         // 유효성 검증 실행
-        userValidator.validate(memberRegisterRequest, errors);
+        memberValidator.validate(memberRegisterRequest, errors);
 
         // 에러 존재 여부 확인 - true
         assertTrue(errors.hasErrors());

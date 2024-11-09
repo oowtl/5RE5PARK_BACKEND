@@ -28,7 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 class MemberServiceImplSuccessTest {
 
     @Autowired
-    private UserServiceImpl userService;
+    private MemberServiceImpl userService;
 
 
     @Autowired

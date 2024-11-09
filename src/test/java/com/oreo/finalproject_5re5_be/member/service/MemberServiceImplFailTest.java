@@ -30,7 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class MemberServiceImplFailTest {
 
     @InjectMocks
-    private UserServiceImpl memberService;
+    private MemberServiceImpl memberService;
 
     @Mock
     private MemberRepository memberRepository;

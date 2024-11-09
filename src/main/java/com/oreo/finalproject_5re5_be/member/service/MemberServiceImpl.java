@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl {
+public class MemberServiceImpl {
 
     private final MemberConnectionHistoryRepository memberConnectionHistoryRepository;
     private final MemberRepository memberRepository;
@@ -29,7 +29,7 @@ public class UserServiceImpl {
     private final PasswordEncoder passwordEncoder;
     private final MemberCategoryRepository memberCategoryRepository;
 
-    public UserServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository,
+    public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository,
             MemberRepository memberRepository, MemberStateRepository memberStateRepository, MemberTermsHistoryRepository memberTermsHistoryRepository,
             MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder, MemberCategoryRepository memberCategoryRepository) {
         this.memberConnectionHistoryRepository = memberConnectionHistoryRepository;

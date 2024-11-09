@@ -9,7 +9,7 @@ import org.springframework.validation.Validator;
 
 
 @Component
-public class UserValidator implements Validator {
+public class MemberValidator implements Validator {
 
     // 아이디 유효성 검증: 6~20자, 영문 및 숫자만 허용
     private static final Pattern ID_PATTERN = Pattern.compile("^[a-zA-Z0-9]{6,20}$");
