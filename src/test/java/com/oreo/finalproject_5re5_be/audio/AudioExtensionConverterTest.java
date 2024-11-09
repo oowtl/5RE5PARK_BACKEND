@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.audio;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -12,12 +13,13 @@ import java.io.IOException;
 
 
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 class AudioExtensionConverterTest {
 
     @Test
     void convertMp3ToWavTest() throws UnsupportedAudioFileException, IOException {
-        AudioInputStream audioInputStream = AudioExtensionConverter.mp3ToWav(new File("/Users/kyuyoung/Downloads/lora.mp3"));
+//        AudioInputStream audioInputStream = AudioExtensionConverter.mp3ToWav(new File("/Users/kyuyoung/Downloads/lora.mp3"));
 
-        AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, new File("test.wav"));
+//        AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, new File("test.wav"));
     }
 }
