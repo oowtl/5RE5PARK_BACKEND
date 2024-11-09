@@ -8,9 +8,11 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgre
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -42,13 +44,27 @@ public class MemberController {
     @PostMapping("/register")
     public ResponseEntity<MemberRegisterResponse> register(@Valid @RequestBody MemberRegisterRequest memberRegisterRequest, BindingResult result) {
         if (result.hasErrors()) {
-            MemberRegisterResponse response = MemberRegisterResponse.of("데이터 입력 형식이 잘못되었습니다");
+            String errorsMessage = createErrorMessage(result.getAllErrors());
+            MemberRegisterResponse response = MemberRegisterResponse.of(errorsMessage);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         memberService.create(memberRegisterRequest);
         MemberRegisterResponse response = MemberRegisterResponse.of("회원가입이 완료되었습니다");
         return ResponseEntity.ok().body(response);
+    }
+
+    private String createErrorMessage(List<ObjectError> errors) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("데이터 입력 형식이 잘못되었습니다. 상세 내용은 다음과 같습니다.")
+                .append("\n");
+
+        for (ObjectError error : errors) {
+            sb.append(error.getDefaultMessage())
+                    .append("\n");
+        }
+
+        return sb.toString();
     }
 
 }

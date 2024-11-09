@@ -17,9 +17,7 @@ public class MemberSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/member/register")
-                        .permitAll() // GET 요청 허용
-                        .requestMatchers(HttpMethod.POST, "/api/member/register")
-                        .permitAll() // POST 요청 허용
+                        .permitAll()
                 );
 
 

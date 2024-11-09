@@ -90,6 +90,7 @@ class MemberControllerTest {
         List<MemberTermRequest> memberTerms = createMemberTerms();
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
         request.setId("잘못된 아이디");
+        String expectedErrorMessage = "데이터 입력 형식이 잘못되었습니다. 상세 내용은 다음과 같습니다.\n아이디는 6~20자의 영문 및 숫자만 허용됩니다.\n";
 
 
         given(memberService.create(request)).willReturn(null);
@@ -99,8 +100,8 @@ class MemberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                 )
-                .andExpect(status().isBadRequest())  // BAD_REQUEST를 예상
-                .andExpect(jsonPath("$.content").value("데이터 입력 형식이 잘못되었습니다"));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.content").value(expectedErrorMessage));
     }
 
 
