@@ -2,7 +2,6 @@ package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
-import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
@@ -33,10 +32,6 @@ public class MemberController {
         this.memberValidator = memberValidator;
     }
 
-    @InitBinder("memberRegisterRequest")
-    public void initBinder(WebDataBinder binder) {
-        binder.addValidators(memberValidator);
-    }
 
     @ExceptionHandler({
             MemberDuplicatedEmailException.class,
@@ -49,7 +44,8 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<MemberRegisterResponse> register(@RequestBody @Valid MemberRegisterRequest memberRegisterRequest, BindingResult result) {
+    public ResponseEntity<MemberRegisterResponse> register(@Valid @RequestBody MemberRegisterRequest memberRegisterRequest, BindingResult result) {
+        memberValidator.validate(memberRegisterRequest, result);
         if (result.hasErrors()) {
             MemberRegisterResponse response = MemberRegisterResponse.of("데이터 입력 형식이 잘못되었습니다");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
