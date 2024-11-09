@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
@@ -47,13 +48,14 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid MemberRegisterRequest memberRegisterRequest, BindingResult result) {
+    public ResponseEntity<MemberRegisterResponse> register(@RequestBody @Valid MemberRegisterRequest memberRegisterRequest, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("데이터 입력 형식이 잘못되었습니다");
+            MemberRegisterResponse response = MemberRegisterResponse.of("데이터 입력 형식이 잘못되었습니다");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        memberService.create(memberRegisterRequest);
-        return ResponseEntity.ok().body("회원가입이 완료되었습니다");
+        MemberRegisterResponse response = memberService.create(memberRegisterRequest);
+        return ResponseEntity.ok().body(response);
     }
 
 }

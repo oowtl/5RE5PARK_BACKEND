@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
@@ -50,7 +51,7 @@ public class MemberServiceImpl {
      */
 
     @Transactional
-    public void create(MemberRegisterRequest request) {
+    public MemberRegisterResponse create(MemberRegisterRequest request) {
         // 1. 중복되는 이메일이 있는지 확인
         checkDuplicatedEmail(request.getEmail());
         // 2. 중복되는 아이디가 있는지 확인
@@ -63,6 +64,8 @@ public class MemberServiceImpl {
         saveMemberTermsHistory(request, savedMember);
         // 6. 회원 상태 업데이트
         saveInitMemberState(savedMember);
+
+        return MemberRegisterResponse.of("회원가입이 완료되었습니다");
     }
 
     private void checkDuplicatedEmail(String email) {
