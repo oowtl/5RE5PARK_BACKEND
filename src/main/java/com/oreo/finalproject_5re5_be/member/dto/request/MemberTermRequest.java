@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class MemberTerm {
+public class MemberTermRequest {
     private Long termCondCode; // 추후에 varchar로 변경
     private Character agreed;
     private Boolean isMandatory;

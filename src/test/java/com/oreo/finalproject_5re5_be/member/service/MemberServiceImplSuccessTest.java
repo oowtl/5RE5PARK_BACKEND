@@ -3,7 +3,7 @@ package com.oreo.finalproject_5re5_be.member.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.MemberTerm;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
@@ -52,8 +52,8 @@ class MemberServiceImplSuccessTest {
     @Test
     public void 회원가입_성공() {
         // 사용자로부터 유효성 검증이 완료된 회원 정보와 약관 동의 내용을 받음
-        List<MemberTerm> memberTerms = createMemberTerms();
-        MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
+        List<MemberTermRequest> memberTermRequests = createMemberTerms();
+        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
 
         // 회원가입 처리
         userService.create(request);
@@ -65,7 +65,7 @@ class MemberServiceImplSuccessTest {
 
         MemberTermsHistory foundMemberTermsHistory = memberTermsHistoryRepository.findByMemberSeq(foundMember.getSeq()).get(0);
         assertNotNull(foundMemberTermsHistory);
-        assertTrue(isSameMemberTermsHistoryFields(foundMemberTermsHistory, memberTerms));
+        assertTrue(isSameMemberTermsHistoryFields(foundMemberTermsHistory, memberTermRequests));
 
         MemberState foundMemberState = memberStateRepository.findByMemberSeq(foundMember.getSeq()).get(0);
         assertNotNull(foundMemberState);
@@ -92,7 +92,7 @@ class MemberServiceImplSuccessTest {
 
 
 
-    private MemberRegisterRequest createMemberRegisterRequest(List<MemberTerm> memberTerms) {
+    private MemberRegisterRequest createMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
         var request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
@@ -101,7 +101,7 @@ class MemberServiceImplSuccessTest {
                 .birthDate("1990-01-01")
                 .userRegDate(LocalDateTime.now())
                 .chkValid('Y')
-                .memberTerms(memberTerms)
+                .memberTermRequests(memberTermRequests)
                 .normAddr("서울시 강남구")
                 .passAddr("서초대로 59-32")
                 .locaAddr("서초동")
@@ -111,46 +111,46 @@ class MemberServiceImplSuccessTest {
         return request;
     }
 
-    private List<MemberTerm> createMemberTerms() {
-        List<MemberTerm> memberTerms = new ArrayList<>();
+    private List<MemberTermRequest> createMemberTerms() {
+        List<MemberTermRequest> memberTermRequests = new ArrayList<>();
         // 약관 동의 내용 설정
-        memberTerms = new ArrayList<>();
-        memberTerms.add(
-                MemberTerm.builder()
+        memberTermRequests = new ArrayList<>();
+        memberTermRequests.add(
+                MemberTermRequest.builder()
                         .termCondCode(1L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTerms.add(
-                MemberTerm.builder()
+        memberTermRequests.add(
+                MemberTermRequest.builder()
                         .termCondCode(2L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTerms.add(
-                MemberTerm.builder()
+        memberTermRequests.add(
+                MemberTermRequest.builder()
                         .termCondCode(3L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTerms.add(
-                MemberTerm.builder()
+        memberTermRequests.add(
+                MemberTermRequest.builder()
                         .termCondCode(4L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        memberTerms.add(
-                MemberTerm.builder()
+        memberTermRequests.add(
+                MemberTermRequest.builder()
                         .termCondCode(5L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        return memberTerms;
+        return memberTermRequests;
     }
 
     private boolean isSameMemberFields(Member member, MemberRegisterRequest request) {
@@ -165,13 +165,13 @@ class MemberServiceImplSuccessTest {
                 member.getPassAddr().equals(request.getPassAddr());
     }
 
-    private boolean isSameMemberTermsHistoryFields(MemberTermsHistory memberTermsHistory, List<MemberTerm> memberTerms) {
+    private boolean isSameMemberTermsHistoryFields(MemberTermsHistory memberTermsHistory, List<MemberTermRequest> memberTermRequests) {
         // 약관 동의 내역 비교
-        return memberTermsHistory.getChkTerm1().equals(memberTerms.get(0).getAgreed()) &&
-                memberTermsHistory.getChkTerm2().equals(memberTerms.get(1).getAgreed()) &&
-                memberTermsHistory.getChkTerm3().equals(memberTerms.get(2).getAgreed()) &&
-                memberTermsHistory.getChkTerm4().equals(memberTerms.get(3).getAgreed()) &&
-                memberTermsHistory.getChkTerm5().equals(memberTerms.get(4).getAgreed());
+        return memberTermsHistory.getChkTerm1().equals(memberTermRequests.get(0).getAgreed()) &&
+                memberTermsHistory.getChkTerm2().equals(memberTermRequests.get(1).getAgreed()) &&
+                memberTermsHistory.getChkTerm3().equals(memberTermRequests.get(2).getAgreed()) &&
+                memberTermsHistory.getChkTerm4().equals(memberTermRequests.get(3).getAgreed()) &&
+                memberTermsHistory.getChkTerm5().equals(memberTermRequests.get(4).getAgreed());
     }
 
     private boolean isSameMemberStateFields(MemberState memberState) {

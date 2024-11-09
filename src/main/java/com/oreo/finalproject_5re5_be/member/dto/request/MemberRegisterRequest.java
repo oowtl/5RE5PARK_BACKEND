@@ -28,7 +28,7 @@ public class MemberRegisterRequest {
     private String passAddr;
     private Character chkValid;
     private LocalDateTime userRegDate;
-    private List<MemberTerm> memberTerms;
+    private List<MemberTermRequest> memberTermRequests;
 
 
     public Member createMemberEntity() {
@@ -50,8 +50,8 @@ public class MemberRegisterRequest {
     public MemberTermsHistory createMemberTermsHistoryEntity(Member member) {
         MemberTermsHistory memberTermsHistory = new MemberTermsHistory();
 
-        for (int i=0; i< memberTerms.size(); i++) {
-            MemberTerm term = memberTerms.get(i);
+        for (int i=0; i< memberTermRequests.size(); i++) {
+            MemberTermRequest term = memberTermRequests.get(i);
             if (!term.isValid()) {
                 throw new MemberMandatoryTermNotAgreedException();
             }
