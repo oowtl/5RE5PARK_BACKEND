@@ -44,7 +44,7 @@ class AudioExtensionCheckerTest {
     void checkAudioExtensionIsMP3ForByteArray() throws IOException {
         byte[] bytes;
         try (FileInputStream fileInputStream = new FileInputStream(mp3)) {
-            bytes = fileInputStream.readAllBytes();
+            bytes = fileInputStream.readAllBytes();//바이트 배열 검사를 하기위해 File을 바이트 배열로 변환
         }
         assertThat(AudioExtensionChecker.isMp3Extension(bytes)).isTrue();
     }
@@ -54,7 +54,7 @@ class AudioExtensionCheckerTest {
     void checkAudioExtensionIsMP3ForByteArrayFalse() throws IOException {
         byte[] bytes;
         try (FileInputStream fileInputStream = new FileInputStream(wav)) {
-            bytes = fileInputStream.readAllBytes();
+            bytes = fileInputStream.readAllBytes();//바이트 배열 검사를 하기위해 File을 바이트 배열로 변환
         }
         assertThat(AudioExtensionChecker.isMp3Extension(bytes)).isFalse();
     }
@@ -64,7 +64,7 @@ class AudioExtensionCheckerTest {
     void checkAudioExtensionIsWavForByteArray() throws IOException {
         byte[] bytes;
         try (FileInputStream fileInputStream = new FileInputStream(wav)) {
-            bytes = fileInputStream.readAllBytes();
+            bytes = fileInputStream.readAllBytes();//바이트 배열 검사를 하기위해 File을 바이트 배열로 변환
         }
         assertThat(AudioExtensionChecker.isWavExtension(bytes)).isTrue();
     }
@@ -74,7 +74,7 @@ class AudioExtensionCheckerTest {
     void checkAudioExtensionIsWavForByteArrayFalse() throws IOException {
         byte[] bytes;
         try (FileInputStream fileInputStream = new FileInputStream(mp3)) {
-            bytes = fileInputStream.readAllBytes();
+            bytes = fileInputStream.readAllBytes();//바이트 배열 검사를 하기위해 File을 바이트 배열로 변환
         }
         assertThat(AudioExtensionChecker.isWavExtension(bytes)).isFalse();
     }
