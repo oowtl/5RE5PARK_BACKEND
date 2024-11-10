@@ -28,7 +28,7 @@ public class Vc extends BaseEntity {
 
     @Builder.Default
     @Column(nullable = false, name = "activate")
-    private char activate = 'Y';
+    private Character activate = 'Y';
 
     @Column(nullable = false, name = "vc_up_date")
     @LastModifiedDate

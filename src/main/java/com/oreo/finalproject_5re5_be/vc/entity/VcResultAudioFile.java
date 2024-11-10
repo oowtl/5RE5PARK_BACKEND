@@ -32,13 +32,13 @@ public class VcResultAudioFile extends BaseEntity {
     private String extension;
     @Builder.Default
     @Column(nullable = false, name = "activate")
-    private char activate = 'Y';
+    private Character activate = 'Y';
     @Builder.Default
     @Column(nullable = false, name = "st_stat")
-    private char startStatus = 'Y';
+    private Character startStatus = 'Y';
     @Builder.Default
     @Column(nullable = false, name = "dn_stat")
-    private char downloadStatus = 'Y';
+    private Character downloadStatus = 'Y';
     @Column(nullable = false, name = "res_reg_date", updatable = false)
     @CreatedDate
     private LocalDateTime date;
