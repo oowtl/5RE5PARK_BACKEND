@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.member.dto.request;
 
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -73,15 +74,25 @@ public class MemberRegisterRequest {
                 .build();
     }
 
+    public void checkValidTerms() {
+        for (MemberTermRequest term : memberTermRequests) {
+            if (!term.isValid()) {
+                throw new MemberMandatoryTermNotAgreedException();
+            }
+        }
+    }
+
+    public void checkValidTermsCount() {
+        if (!(memberTermRequests.size() == 5)) {
+            throw new MemberWrongCountTermCondition();
+        }
+    }
+
     public MemberTermsHistory createMemberTermsHistoryEntity(Member member) {
         MemberTermsHistory memberTermsHistory = new MemberTermsHistory();
 
         for (int i = 0; i < memberTermRequests.size(); i++) {
             MemberTermRequest term = memberTermRequests.get(i);
-            if (!term.isValid()) {
-                throw new MemberMandatoryTermNotAgreedException();
-            }
-
             memberTermsHistory.addMemberTermCondition(i + 1, term.getAgreed());
         }
 

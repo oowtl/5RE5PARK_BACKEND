@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
@@ -21,7 +20,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,32 +58,44 @@ public class MemberServiceImpl {
      *
      */
 
+    public Member create(MemberRegisterRequest request) {
+        try {
+            // 1. 중복되는 이메일 확인 -> MemberDuplicatedEmailException.class
+            checkDuplicatedEmail(request.getEmail());
+            // 2. 중복되는 아이디가 있는지 확인 -> MemberDuplicatedIdException.class
+            checkDuplicatedId(request.getId());
+            // 3. 회원 약관 유효성 확인 -> MemberMandatoryTermNotAgreedException.class, MemberWrongCountTermCondition.class
+            request.checkValidTerms();
+            request.checkValidTermsCount();
+        } catch (MemberDuplicatedEmailException | MemberDuplicatedIdException | MemberMandatoryTermNotAgreedException | MemberWrongCountTermCondition e) {
+            throw e;
+        }
+
+        // 4. 회원가입 처리(재시도를 통한 복구 작업 설정)
+        return RetryableCreateMember(request);
+    }
+
+
     @Transactional
     @Retryable(
             value = {RuntimeException.class},
-            exclude = {MemberDuplicatedIdException.class, MemberDuplicatedIdException.class,
-                       MemberMandatoryTermNotAgreedException.class, MemberWrongCountTermCondition.class},
             maxAttempts = MAX_RETRY,
             backoff = @Backoff(delay = RETRY_DELAY)
     )
-    public Member create(MemberRegisterRequest request) {
-        // 1. 중복되는 이메일이 있는지 확인
-        checkDuplicatedEmail(request.getEmail());
-        // 2. 중복되는 아이디가 있는지 확인
-        checkDuplicatedId(request.getId());
-        // 3. 비밀번호 암호화
+    public Member RetryableCreateMember(MemberRegisterRequest request) {
+        // 1. 비밀번호 암호화
         encodePassword(request);
-        // 4. 회원 엔티티 저장
+        // 2. 회원 엔티티 저장
         Member savedMember = saveMember(request);
-        // 5. 회원 약관 이력 저장
+        // 3. 회원 약관 이력 저장
         saveMemberTermsHistory(request, savedMember);
-        // 6. 회원 상태 업데이트
+        // 4. 회원 상태 업데이트
         saveInitMemberState(savedMember);
         return savedMember;
     }
 
     @Recover
-    public void recover(RuntimeException e) {
+    public Member recover(RuntimeException e) {
         throw new RetryFailedException();
     }
 

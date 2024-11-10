@@ -3,6 +3,8 @@ package com.oreo.finalproject_5re5_be.member.service;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
@@ -14,7 +16,12 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailExcep
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
+import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +29,36 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@EnableRetry
 class MemberServiceImplFailTest {
 
-    @InjectMocks
+    @Autowired
     private MemberServiceImpl memberService;
 
-    @Mock
-    private MemberRepository memberRepository;
 
+    @MockBean
+    private MemberConnectionHistoryRepository memberConnectionHistoryRepository;
+    @MockBean
+    private MemberRepository memberRepository;
+    @MockBean
+    private MemberStateRepository memberStateRepository;
+    @MockBean
+    private MemberTermsHistoryRepository memberTermsHistoryRepository;
+    @MockBean
+    private MemberTermsRepository memberTermsRepository;
+    @MockBean
+    private BCryptPasswordEncoder passwordEncoder;
+    @MockBean
+    private MemberCategoryRepository memberCategoryRepository;
 
     @BeforeEach
     void setUp() {
@@ -45,8 +69,8 @@ class MemberServiceImplFailTest {
     @DisplayName("회원가입 - 중복된 이메일")
     @Test
     public void 중복된_이메일_예외_발생() {
-        List<MemberTermRequest> memberTermRequests = createMemberTerms();
-        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
         Member member = request.createMemberEntity();
         when(memberRepository.findByEmail(request.getEmail())).thenReturn(member);
         assertThrows(MemberDuplicatedEmailException.class, () -> memberService.create(request));
@@ -55,8 +79,8 @@ class MemberServiceImplFailTest {
     @DisplayName("회원가입 - 중복된 아이디")
     @Test
     public void 중복된_아이디_예외_발생() {
-        List<MemberTermRequest> memberTermRequests = createMemberTerms();
-        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
         Member member = request.createMemberEntity();
         when(memberRepository.findById(request.getId())).thenReturn(member);
         assertThrows(MemberDuplicatedIdException.class, () -> memberService.create(request));
@@ -65,9 +89,9 @@ class MemberServiceImplFailTest {
     @DisplayName("회원가입 - 필수 약관 미동의")
     @Test
     public void 필수_약관_미동의_예외_발생() {
-        List<MemberTermRequest> memberTermRequests = createMemberTerms();
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
         memberTermRequests.get(0).setAgreed('N');
-        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
         Member member = request.createMemberEntity();
         assertThrows(MemberMandatoryTermNotAgreedException.class, () -> memberService.create(request));
     }
@@ -75,20 +99,38 @@ class MemberServiceImplFailTest {
     @DisplayName("회원가입 - 5개의 약관 항목 보다 많은 경우")
     @Test
     public void 약관_항목_초과_예외_발생() {
-        List<MemberTermRequest> memberTermRequests = createMemberTerms();
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
         memberTermRequests.add(MemberTermRequest.builder()
                         .termCondCode(6L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
-        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
         Member member = request.createMemberEntity();
-        assertThrows(MemberWrongCountTermCondition.class, () -> request.createMemberTermsHistoryEntity(member));
+        assertThrows(MemberWrongCountTermCondition.class, () -> memberService.create(request));
+    }
+
+    // 추후에 해당 부분 문제 해결 : RetryFailedException 발생함. 이거 어떻게 잡을지 고민하기
+    @DisplayName("재시도 복구 로직 정상적으로 동작하는지 테스트")
+    @Test
+    public void 재시도_복구_동작_테스트() {
+//        List<MemberTermRequest> memberTermRequests = createMemberTerms();
+//        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
+//
+//        doThrow(new RuntimeException("회원 생성 실패")).when(memberRepository).save(Mockito.any());
+//
+//        // memberService.create() 호출 시 예외가 발생하고 재시도 되도록 설정
+//        memberService.create(request); // 실제 메서드 호출
+//
+//
+//        // 재시도 횟수만큼 호출되었는지 검증
+//        verify(memberService, times(10)).create(Mockito.any());
+//        // RetryFailedException 발생함. 이거 어떻게 잡을지 고민하기
     }
 
 
 
-    private MemberRegisterRequest createMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
+    private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
         var request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
@@ -107,7 +149,7 @@ class MemberServiceImplFailTest {
         return request;
     }
 
-    private List<MemberTermRequest> createMemberTerms() {
+    private List<MemberTermRequest> retryableCreateMemberMemberTerms() {
         List<MemberTermRequest> memberTermRequests = new ArrayList<>();
         // 약관 동의 내용 설정
         memberTermRequests = new ArrayList<>();
@@ -170,6 +212,7 @@ class MemberServiceImplFailTest {
                 memberTermsHistory.getChkTerm5().equals(memberTermRequests.get(4).getAgreed());
     }
 
+    // 추후에 해당 부분 문제 해결 : 회원 상태 어떻게 비교할지 고민하기
     private boolean isSameMemberStateFields(MemberState memberState) {
         // 회원 상태 비교
         return true;

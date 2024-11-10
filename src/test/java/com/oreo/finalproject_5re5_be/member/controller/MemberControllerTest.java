@@ -1,14 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
@@ -23,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -69,7 +65,7 @@ class MemberControllerTest {
                 .detailAddr("서초동 123-456")
                 .build();
 
-        given(memberService.create(request)).willReturn(savedMember);
+        given(memberService.RetryableCreateMember(request)).willReturn(savedMember);
 
         // When & Then
         mockMvc.perform(post("/api/member/register")
@@ -93,7 +89,7 @@ class MemberControllerTest {
         String expectedErrorMessage = "데이터 입력 형식이 잘못되었습니다. 상세 내용은 다음과 같습니다.\n아이디는 6~20자의 영문 및 숫자만 허용됩니다.\n";
 
 
-        given(memberService.create(request)).willReturn(null);
+        given(memberService.RetryableCreateMember(request)).willReturn(null);
 
         // When & Then
         mockMvc.perform(post("/api/member/register")

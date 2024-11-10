@@ -52,10 +52,6 @@ public class MemberTermsHistory extends BaseEntity {
     private Character chkTerm5;
 
     public void addMemberTermCondition(int i, Character chk) {
-        if (!(1 <= i && i <=5)) {
-            throw new MemberWrongCountTermCondition();
-        }
-
         switch (i) {
             case 1:
                 this.chkTerm1 = chk;

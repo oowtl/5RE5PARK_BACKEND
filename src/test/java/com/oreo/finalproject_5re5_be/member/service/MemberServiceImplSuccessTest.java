@@ -52,11 +52,11 @@ class MemberServiceImplSuccessTest {
     @Test
     public void 회원가입_성공() {
         // 사용자로부터 유효성 검증이 완료된 회원 정보와 약관 동의 내용을 받음
-        List<MemberTermRequest> memberTermRequests = createMemberTerms();
-        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
 
         // 회원가입 처리
-        userService.create(request);
+        userService.RetryableCreateMember(request);
 
         // 정상처리 - 회원 정보, 회원 약관 내역, 회원 상태 등록 확인
         Member foundMember = memberRepository.findByEmail(request.getEmail());
@@ -72,27 +72,10 @@ class MemberServiceImplSuccessTest {
         assertTrue(isSameMemberStateFields(foundMemberState));
     }
 
-    @DisplayName("회원가입 - 중복된 이메일")
-    @Test
-    public void failRegisterDuplicatedEmail() {
-
-    }
-
-    @DisplayName("회원가입 - 중복된 아이디")
-    @Test
-    public void failRegisterDuplicatedId() {
-
-    }
-
-    @DisplayName("회원가입 - 필수 약관 미동의")
-    @Test
-    public void failRegisterNotAgreedMandatoryTerm() {
-
-    }
 
 
 
-    private MemberRegisterRequest createMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
+    private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
         var request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
@@ -111,7 +94,7 @@ class MemberServiceImplSuccessTest {
         return request;
     }
 
-    private List<MemberTermRequest> createMemberTerms() {
+    private List<MemberTermRequest> retryableCreateMemberMemberTerms() {
         List<MemberTermRequest> memberTermRequests = new ArrayList<>();
         // 약관 동의 내용 설정
         memberTermRequests = new ArrayList<>();
@@ -174,6 +157,7 @@ class MemberServiceImplSuccessTest {
                 memberTermsHistory.getChkTerm5().equals(memberTermRequests.get(4).getAgreed());
     }
 
+    // 추후에 해당 부분 문제 해결 : 회원 상태 어떻게 비교할지 고민하기
     private boolean isSameMemberStateFields(MemberState memberState) {
         // 회원 상태 비교
         return true;

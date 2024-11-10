@@ -6,6 +6,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailExcep
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
+import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -13,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +28,13 @@ public class MemberController {
 
     public MemberController(MemberServiceImpl memberService) {
         this.memberService = memberService;
+    }
+
+    @ExceptionHandler({
+            RetryFailedException.class
+    })
+    public ResponseEntity<String> handleRetryFailedException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 
     @ExceptionHandler({
@@ -46,12 +52,14 @@ public class MemberController {
         if (result.hasErrors()) {
             String errorsMessage = createErrorMessage(result.getAllErrors());
             MemberRegisterResponse response = MemberRegisterResponse.of(errorsMessage);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .body(response);
         }
 
-        memberService.create(memberRegisterRequest);
+        memberService.RetryableCreateMember(memberRegisterRequest);
         MemberRegisterResponse response = MemberRegisterResponse.of("회원가입이 완료되었습니다");
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok()
+                             .body(response);
     }
 
     private String createErrorMessage(List<ObjectError> errors) {
