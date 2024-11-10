@@ -45,7 +45,7 @@ public class AudioExtensionChecker {
 
         byte[] buffer = new byte[WAV_SIGNATURE_BYTE];
         if(byteArrayInputStream.read(buffer) != -1) {//스트림에서 WAV_SIGNATURE_BYTE 만큼 읽기
-            String hexSignature = bytesToHex(buffer);//읽은 buffer을 Stringdmfh 변환
+            String hexSignature = bytesToHex(buffer);//읽은 buffer을 String으로 변환
             byteArrayInputStream.close();//리소스 반환
             System.out.println("hexSignature = " + hexSignature);
             return AudioExtensions.isWavExtension(hexSignature);//바이트 배열 검사
