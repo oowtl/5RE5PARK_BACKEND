@@ -58,7 +58,7 @@ public class MemberController {
                                  .body(response);
         }
 
-        memberService.RetryableCreateMember(memberRegisterRequest);
+        memberService.create(memberRegisterRequest);
         MemberRegisterResponse response = MemberRegisterResponse.of("회원가입이 완료되었습니다");
         return ResponseEntity.ok()
                              .body(response);
