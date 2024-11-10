@@ -34,7 +34,8 @@ public class MemberController {
             RetryFailedException.class
     })
     public ResponseEntity<String> handleRetryFailedException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body(e.getMessage());
     }
 
     @ExceptionHandler({
@@ -44,7 +45,8 @@ public class MemberController {
             MemberWrongCountTermCondition.class
     })
     public ResponseEntity<String> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(e.getMessage());
     }
 
     @PostMapping("/register")

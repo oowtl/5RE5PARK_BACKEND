@@ -35,9 +35,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 @EnableRetry
 class MemberServiceImplFailTest {
 
