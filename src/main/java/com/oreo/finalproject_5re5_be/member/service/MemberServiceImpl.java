@@ -51,31 +51,26 @@ public class MemberServiceImpl {
     }
 
     // 1. 회원가입 : 유효성 검증이 완료된 회원 정보를 통해 회원가입을 처리한다.
-    /**
-     * - 중복 이메일/아이디 확인
-     * - 비밀번호 암호화
-     * - 회원, 약관 이력, 상태 저장
-     *
-     */
 
+    // 회원가입 처리 가능 유무 파악
     public Member create(MemberRegisterRequest request) {
         try {
-            // 1. 중복되는 이메일 확인 -> MemberDuplicatedEmailException.class
+            // 중복되는 이메일 확인 -> MemberDuplicatedEmailException.class
             checkDuplicatedEmail(request.getEmail());
-            // 2. 중복되는 아이디가 있는지 확인 -> MemberDuplicatedIdException.class
+            // 중복되는 아이디가 있는지 확인 -> MemberDuplicatedIdException.class
             checkDuplicatedId(request.getId());
-            // 3. 회원 약관 유효성 확인 -> MemberMandatoryTermNotAgreedException.class, MemberWrongCountTermCondition.class
+            // 회원 약관 유효성 확인 -> MemberMandatoryTermNotAgreedException.class, MemberWrongCountTermCondition.class
             request.checkValidTerms();
             request.checkValidTermsCount();
         } catch (MemberDuplicatedEmailException | MemberDuplicatedIdException | MemberMandatoryTermNotAgreedException | MemberWrongCountTermCondition e) {
             throw e;
         }
 
-        // 4. 회원가입 처리(재시도를 통한 복구 작업 설정)
+        // 회원가입 처리, 재시도를 통한 복구 작업 설정
         return RetryableCreateMember(request);
     }
 
-
+    // 재시도를 통한 복구 작업 설정
     @Transactional
     @Retryable(
             value = {RuntimeException.class},
@@ -83,22 +78,24 @@ public class MemberServiceImpl {
             backoff = @Backoff(delay = RETRY_DELAY)
     )
     public Member RetryableCreateMember(MemberRegisterRequest request) {
-        // 1. 비밀번호 암호화
+        // 비밀번호 암호화
         encodePassword(request);
-        // 2. 회원 엔티티 저장
+        // 회원 엔티티 저장
         Member savedMember = saveMember(request);
-        // 3. 회원 약관 이력 저장
+        // 회원 약관 이력 엔티티 저장
         saveMemberTermsHistory(request, savedMember);
-        // 4. 회원 상태 업데이트
+        // 회원 초기 상태 엔티티 저장
         saveInitMemberState(savedMember);
         return savedMember;
     }
 
+    // 재시도 복구시 RetryFailedException 예외 발생
     @Recover
     public Member recover(RuntimeException e) {
         throw new RetryFailedException();
     }
 
+    // 중복된 에메일 확인
     private void checkDuplicatedEmail(String email) {
         Member foundMember = memberRepository.findByEmail(email);
         if (foundMember != null) {
@@ -107,6 +104,7 @@ public class MemberServiceImpl {
 
     }
 
+    // 중복된 아이디 확인
     private void checkDuplicatedId(String id) {
         Member foundMember = memberRepository.findById(id);
         if (foundMember != null) {
@@ -114,23 +112,27 @@ public class MemberServiceImpl {
         }
     }
 
+    // 비밀번호 암호화
     private void encodePassword(MemberRegisterRequest request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         request.setPassword(encodedPassword);
     }
 
+    // 회원 엔티티 저장
     private Member saveMember(MemberRegisterRequest request) {
         Member member = request.createMemberEntity();
         Member savedMember = memberRepository.save(member);
         return savedMember;
     }
 
+    // 회원 약관 이력 저장
     private MemberTermsHistory saveMemberTermsHistory(MemberRegisterRequest request, Member member) {
         MemberTermsHistory memberTermsHistory = request.createMemberTermsHistoryEntity(member);
         MemberTermsHistory savedMemberTermsHistory = memberTermsHistoryRepository.save(memberTermsHistory);
         return savedMemberTermsHistory;
     }
 
+    // 회원 상태 업데이트
     private MemberState saveInitMemberState(Member member) {
         MemberState userState = new MemberState();
         MemberCategory memberInitState = findMemberStateCategory("신규등록");
@@ -140,6 +142,7 @@ public class MemberServiceImpl {
         return savedMemberState;
     }
 
+    // 회원 상태 카테고리 조회
     private MemberCategory findMemberStateCategory(String cateName) {
         MemberCategory foundMemberCategory = memberCategoryRepository.findByName(cateName);
         return foundMemberCategory;
