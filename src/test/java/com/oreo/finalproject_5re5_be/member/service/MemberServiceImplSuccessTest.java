@@ -12,6 +12,7 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
@@ -37,6 +39,7 @@ class MemberServiceImplSuccessTest {
     private MemberStateRepository memberStateRepository;
     @Autowired
     private MemberTermsHistoryRepository memberTermsHistoryRepository;
+
 
 
     @BeforeEach
@@ -71,7 +74,6 @@ class MemberServiceImplSuccessTest {
         assertNotNull(foundMemberState);
         assertTrue(isSameMemberStateFields(foundMemberState));
     }
-
 
 
 
