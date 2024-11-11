@@ -60,8 +60,9 @@ jobs:
       - name: Create JSON Config File
         env:
           TTS_JSON_CONTENT: ${{ secrets.TTS_JSON }}
-        run: echo "${TTS_JSON_CONTENT}" > src/resource/tts.json
-
+        run: |
+          echo "${TTS_JSON_CONTENT}" > src/main/resources/tts.json
+          echo $TTS_JSON_CONTENT
       - name: 확인
         run : cat src/resource/tts.json
 
