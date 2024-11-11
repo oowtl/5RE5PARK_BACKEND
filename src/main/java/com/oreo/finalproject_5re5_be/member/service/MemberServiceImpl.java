@@ -27,6 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberServiceImpl {
 
+    // 재시도 복구 설정값
+    // - 최대 재시도 횟수 : 10회
+    // - 재시도 딜레이 : 5초
+    // - 재시도 실패시 예외 발생 : RetryFailedException.class
+    // - 총 소요 시간 : 50초
     private static final int MAX_RETRY = 10;
     private static final int RETRY_DELAY = 5_000;
 
@@ -52,25 +57,26 @@ public class MemberServiceImpl {
 
     // 1. 회원가입 : 유효성 검증이 완료된 회원 정보를 통해 회원가입을 처리한다.
 
-    // 회원가입 처리 가능 유무 파악
+    // 1-1. 회원가입 처리 가능 유무 파악
     public Member create(MemberRegisterRequest request) {
         try {
-            // 중복되는 이메일 확인 -> MemberDuplicatedEmailException.class
+            // 중복되는 이메일 확인
             checkDuplicatedEmail(request.getEmail());
-            // 중복되는 아이디가 있는지 확인 -> MemberDuplicatedIdException.class
+            // 중복되는 아이디가 있는지 확인
             checkDuplicatedId(request.getId());
-            // 회원 약관 유효성 확인 -> MemberMandatoryTermNotAgreedException.class, MemberWrongCountTermCondition.class
+            // 회원 약관 유효성 확인
             request.checkValidTerms();
             request.checkValidTermsCount();
         } catch (MemberDuplicatedEmailException | MemberDuplicatedIdException | MemberMandatoryTermNotAgreedException | MemberWrongCountTermCondition e) {
+            // 회원가입 처리가 불가능할 경우 컨트롤러에 비즈니스 예외 전달
             throw e;
         }
 
-        // 회원가입 처리, 재시도를 통한 복구 작업 설정
+        // 회원가입 처리, 서버 내부 예외 발생시 재시도를 통한 복구 작업 진행
         return RetryableCreateMember(request);
     }
 
-    // 재시도를 통한 복구 작업 설정
+    // 1-2. 회원가입 처리, 서버 내부 예외 발생시 재시도를 통한 복구 작업 진행
     @Transactional
     @Retryable(
             value = {RuntimeException.class},
@@ -89,7 +95,7 @@ public class MemberServiceImpl {
         return savedMember;
     }
 
-    // 재시도 복구시 RetryFailedException 예외 발생
+    // 1-3. 재시도 복구 실패시 RetryFailedException 예외 발생
     @Recover
     public Member recover(RuntimeException e) {
         throw new RetryFailedException();

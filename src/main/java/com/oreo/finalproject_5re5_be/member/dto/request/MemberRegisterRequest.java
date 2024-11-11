@@ -58,6 +58,7 @@ public class MemberRegisterRequest {
     @NotEmpty(message = "필수 약관 동의 항목이 비어 있습니다.")  // 약관 요청 리스트가 비어 있으면 오류
     private List<@Valid MemberTermRequest> memberTermRequests;  // 리스트의 각 항목에 대해 검증
 
+    // Member 엔티티로 변환
     public Member createMemberEntity() {
         return Member.builder()
                 .id(id)
@@ -74,6 +75,7 @@ public class MemberRegisterRequest {
                 .build();
     }
 
+    // 약관 동의 항목 검증
     public void checkValidTerms() {
         for (MemberTermRequest term : memberTermRequests) {
             if (!term.isValid()) {
@@ -82,12 +84,14 @@ public class MemberRegisterRequest {
         }
     }
 
+    // 약관 동의 항목 개수 검증
     public void checkValidTermsCount() {
         if (!(memberTermRequests.size() == 5)) {
             throw new MemberWrongCountTermCondition();
         }
     }
 
+    // 회원 등록 dto로부터 약관 이력 엔티티 생성
     public MemberTermsHistory createMemberTermsHistoryEntity(Member member) {
         MemberTermsHistory memberTermsHistory = new MemberTermsHistory();
 

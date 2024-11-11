@@ -51,6 +51,7 @@ public class MemberTermsHistory extends BaseEntity {
     private Character chkTerm4;
     private Character chkTerm5;
 
+    // 회원 약관 동의 항목 체크
     public void addMemberTermCondition(int i, Character chk) {
         switch (i) {
             case 1:

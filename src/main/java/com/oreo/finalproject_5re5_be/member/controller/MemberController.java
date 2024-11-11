@@ -30,6 +30,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    // 재시도 복구 실패할 경우 예외 처리 핸들러
     @ExceptionHandler({
             RetryFailedException.class
     })
@@ -38,6 +39,7 @@ public class MemberController {
                              .body(e.getMessage());
     }
 
+    // 회원 파트에서 발생한 비즈니스 예외 처리 핸들러
     @ExceptionHandler({
             MemberDuplicatedEmailException.class,
             MemberDuplicatedIdException.class,
@@ -49,8 +51,10 @@ public class MemberController {
                              .body(e.getMessage());
     }
 
+    // 회원가입 처리
     @PostMapping("/register")
     public ResponseEntity<MemberRegisterResponse> register(@Valid @RequestBody MemberRegisterRequest memberRegisterRequest, BindingResult result) {
+        // 유효성 검증 실패시 에러 메시지 반환
         if (result.hasErrors()) {
             String errorsMessage = createErrorMessage(result.getAllErrors());
             MemberRegisterResponse response = MemberRegisterResponse.of(errorsMessage);
@@ -58,12 +62,16 @@ public class MemberController {
                                  .body(response);
         }
 
+        // 회원가입 처리
         memberService.create(memberRegisterRequest);
+        // 회원가입 완료 응답 생성
         MemberRegisterResponse response = MemberRegisterResponse.of("회원가입이 완료되었습니다");
+        // 응답 반환
         return ResponseEntity.ok()
                              .body(response);
     }
 
+    // 유효성 검증 실패시 에러 메시지 생성
     private String createErrorMessage(List<ObjectError> errors) {
         StringBuilder sb = new StringBuilder();
         sb.append("데이터 입력 형식이 잘못되었습니다. 상세 내용은 다음과 같습니다.")

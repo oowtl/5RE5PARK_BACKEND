@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class MemberConfig {
 
 
+    // 비밀번호 암호화 빈 등록
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

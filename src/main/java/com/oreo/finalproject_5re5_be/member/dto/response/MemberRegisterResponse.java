@@ -13,6 +13,7 @@ public class MemberRegisterResponse {
 
     private String content;
 
+    // 정적 팩토리 메서드
     public static MemberRegisterResponse of(String content) {
         return MemberRegisterResponse.builder()
                 .content(content)

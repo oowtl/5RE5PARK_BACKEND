@@ -10,10 +10,11 @@ import lombok.ToString;
 @Builder
 @ToString
 public class MemberTermRequest {
-    private Long termCondCode; // 추후에 varchar로 변경
+    private Long termCondCode;
     private Character agreed;
     private Boolean isMandatory;
 
+    // 서비스 정책 사항에 부합한 약관 동의 여부 확인
     public boolean isValid() {
         if (isMandatory) {
             return agreed != null && agreed.equals('Y');
