@@ -3,9 +3,6 @@ package com.oreo.finalproject_5re5_be.member.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
@@ -17,12 +14,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailExcep
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
-import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +31,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,21 +42,8 @@ class MemberServiceImplFailTest {
     @Autowired
     private MemberServiceImpl memberService;
 
-
-    @MockBean
-    private MemberConnectionHistoryRepository memberConnectionHistoryRepository;
     @MockBean
     private MemberRepository memberRepository;
-    @MockBean
-    private MemberStateRepository memberStateRepository;
-    @MockBean
-    private MemberTermsHistoryRepository memberTermsHistoryRepository;
-    @MockBean
-    private MemberTermsRepository memberTermsRepository;
-    @MockBean
-    private BCryptPasswordEncoder passwordEncoder;
-    @MockBean
-    private MemberCategoryRepository memberCategoryRepository;
 
     private User user;
 
@@ -124,18 +102,7 @@ class MemberServiceImplFailTest {
     @DisplayName("재시도 복구 로직 정상적으로 동작하는지 테스트")
     @Test
     public void 재시도_복구_동작_테스트() {
-//        List<MemberTermRequest> memberTermRequests = createMemberTerms();
-//        MemberRegisterRequest request = createMemberRegisterRequest(memberTermRequests);
-//
-//        doThrow(new RuntimeException("회원 생성 실패")).when(memberRepository).save(Mockito.any());
-//
-//        // memberService.create() 호출 시 예외가 발생하고 재시도 되도록 설정
-//        memberService.create(request); // 실제 메서드 호출
-//
-//
-//        // 재시도 횟수만큼 호출되었는지 검증
-//        verify(memberService, times(10)).create(Mockito.any());
-//        // RetryFailedException 발생함. 이거 어떻게 잡을지 고민하기
+
     }
 
     @DisplayName("스프링시큐리티에서 호출하는 loadUserByUsername() 성공 테스트 ")
