@@ -25,7 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties") // - 현재 에러가 발생함. h2와 MySQL의 pk 설정 차이
-class MemberServiceImplSuccessTest {
+class MemberServiceImplTest {
 
     @Autowired
     private MemberServiceImpl userService;
