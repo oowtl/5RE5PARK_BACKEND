@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class VcRequestLog extends BaseEntity {
     @Id
@@ -35,10 +35,9 @@ public class VcRequestLog extends BaseEntity {
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vc_seq")
-    private Vc vcSeq;
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project proSeq;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "trg_seq")
+    private VcTarget trgSeq;
 }
