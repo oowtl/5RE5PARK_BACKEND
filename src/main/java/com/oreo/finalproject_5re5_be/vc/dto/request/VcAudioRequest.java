@@ -10,11 +10,10 @@ import lombok.ToString;
 @Builder
 @ToString
 public class VcAudioRequest {
-    private Long Seq1;
-    private Long Seq2;
+    private Long seq1;
     private String name;
     private String fileUrl;
     private Integer length;
-    private String  size;
+    private String size;
     private String extension;
 }
