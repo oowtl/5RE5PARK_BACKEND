@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,7 +47,8 @@ public class MemberController {
             MemberDuplicatedEmailException.class,
             MemberDuplicatedIdException.class,
             MemberMandatoryTermNotAgreedException.class,
-            MemberWrongCountTermCondition.class
+            MemberWrongCountTermCondition.class,
+            UsernameNotFoundException.class
     })
     public ResponseEntity<String> handleException(Exception e) {
         // 비즈니스 예외 발생시 에러 메시지 반환
