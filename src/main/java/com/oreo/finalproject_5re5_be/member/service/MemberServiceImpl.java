@@ -20,13 +20,17 @@ import java.time.LocalDateTime;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class MemberServiceImpl {
+public class MemberServiceImpl implements UserDetailsService {
 
     // 재시도 복구 설정값 -> DB로부터 알수없는 에러가 발생할시 재시도 설정 규칙에 따라 재시도를 통해 복구 작업을 처리한다.
     // - 최대 재시도 횟수 : 10회
@@ -168,7 +172,22 @@ public class MemberServiceImpl {
     }
 
 
-    // 2. 로그인
+    // 2. 로그인 처리시 스프링 시큐리티 내부적으로 활용함
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // 아이디로 회원 조회
+        Member foundMember = memberRepository.findById(username);
+
+        // 만약 해당 아이디로 조회된 회원이 없는 경우 예외 발생
+        if (foundMember == null) {
+            throw new UsernameNotFoundException("해당 아이디로 조회된 회원이 없습니다.");
+        }
+
+        // 조회된 회원 정보를 바탕으로 UserDetails 반환
+        return User.withUsername(foundMember.getId())
+                .password(foundMember.getPassword())
+                .build();
+    }
 
     // 3. 회원정보 조회
 
