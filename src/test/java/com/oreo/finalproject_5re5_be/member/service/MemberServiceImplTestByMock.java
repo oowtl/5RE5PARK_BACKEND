@@ -37,7 +37,7 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 @EnableRetry
-class MemberServiceImplFailTest {
+class MemberServiceImplTestByMock {
 
     @Autowired
     private MemberServiceImpl memberService;
