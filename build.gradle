@@ -82,6 +82,9 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
 
+
+    // tts
+    implementation 'com.google.cloud:google-cloud-texttospeech:2.49.0'
 }
 
 test {
