@@ -10,8 +10,8 @@ import lombok.*;
 @Getter
 @ToString
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class VcTarget extends BaseEntity {
     @Id
@@ -20,18 +20,15 @@ public class VcTarget extends BaseEntity {
     private Long trgSeq;
     @Column(nullable = false, name = "name")
     private String fileName;
-    @Column(nullable = false, name = "fileurl")
+    @Column(nullable = false, name = "file_url")
     private String fileUrl;
-    @Column(name = "localurl")
+    @Column(name = "local_url")
     private String localUrl;
     @Column(nullable = false, name = "length")
     private String fileLength;
     @Column(nullable = false, name = "extension")
     private String extension;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vc_seq")
-    private Vc vcSeq;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project proSeq;

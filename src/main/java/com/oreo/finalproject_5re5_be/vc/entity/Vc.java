@@ -12,19 +12,18 @@ import java.time.LocalDateTime;
 @Table(name = "vc_table")
 @Getter
 @ToString
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class Vc extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "vc_seq")
-    private Long vcSeq;
+    private Long projectId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @MapsId // Project 엔티티의 ID를 ConcatTab의 ID로 사용
+    @OneToOne
     @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+    private Project project;
 
     @Builder.Default
     @Column(nullable = false, name = "activate")

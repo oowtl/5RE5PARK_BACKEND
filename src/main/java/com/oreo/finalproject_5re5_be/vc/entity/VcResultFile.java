@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
-public class VcResultAudioFile extends BaseEntity {
+public class VcResultFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, name = "res_seq")
@@ -24,7 +24,7 @@ public class VcResultAudioFile extends BaseEntity {
 
     @Column(nullable = false, name = "name")
     private String fileName;
-    @Column(nullable = false, name = "fileUrl")
+    @Column(nullable = false, name = "file_url")
     private String fileUrl;
     @Column(nullable = false, name = "length")
     private String fileLength;
@@ -43,10 +43,10 @@ public class VcResultAudioFile extends BaseEntity {
     @CreatedDate
     private LocalDateTime date;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vc_seq")
-    private Vc vcSeq;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "src_seq")
+    private VcSrcFile src_seq;
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project proSeq;
 
