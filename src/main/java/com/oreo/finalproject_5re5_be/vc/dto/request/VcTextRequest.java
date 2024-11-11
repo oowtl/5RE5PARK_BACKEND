@@ -10,6 +10,6 @@ import lombok.ToString;
 @Builder
 @ToString
 public class VcTextRequest {
-    private Long SrcSeq;
+    private Long srcSeq;
     private String text;
 }

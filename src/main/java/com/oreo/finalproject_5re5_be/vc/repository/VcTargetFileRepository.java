@@ -1,10 +1,10 @@
 package com.oreo.finalproject_5re5_be.vc.repository;
 
 
-import com.oreo.finalproject_5re5_be.vc.entity.VcTargetFile;
+import com.oreo.finalproject_5re5_be.vc.entity.VcTrgFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VcTargetFileRepository extends JpaRepository<VcTargetFile, Long> {
+public interface VcTargetFileRepository extends JpaRepository<VcTrgFile, Long> {
 }
