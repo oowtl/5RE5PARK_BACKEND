@@ -46,12 +46,11 @@ class MemberControllerTest {
     @DisplayName("회원 가입 처리 성공")
     @Test
     public void 회원가입_성공() throws Exception {
-        // Given
+        // 회원 가입에 필요한 데이터 생성
         List<MemberTermRequest> memberTerms = createMemberTerms();
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
-        MemberRegisterResponse response = MemberRegisterResponse.of("회원가입이 완료되었습니다");
 
-        // Mock memberService 호출
+        // 회원 엔티티 생성
         Member savedMember = Member.builder()
                 .seq(1L)
                 .id("qwerfde2312")
@@ -67,9 +66,10 @@ class MemberControllerTest {
                 .detailAddr("서초동 123-456")
                 .build();
 
-        given(memberService.RetryableCreateMember(request)).willReturn(savedMember);
+        // 서비스로 create 호출 시 savedMember 반환하게 세팅
+        given(memberService.create(request)).willReturn(savedMember);
 
-        // When & Then
+        // 컨트롤러로 요청 보내기
         mockMvc.perform(post("/api/member/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -84,16 +84,15 @@ class MemberControllerTest {
     @DisplayName("유효성 검증 실패로 인한 회원가입 실패")
     @Test
     public void 유효성_검증_실패_회원가입_실패() throws Exception {
-        // Given
+        // 회원 가입에 필요한 데이터 생성
         List<MemberTermRequest> memberTerms = createMemberTerms();
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
+        // 잘못된 아이디로 설정
         request.setId("잘못된 아이디");
+        // 기대하는 에러 메시지 설정
         String expectedErrorMessage = "데이터 입력 형식이 잘못되었습니다. 상세 내용은 다음과 같습니다.\n아이디는 6~20자의 영문 및 숫자만 허용됩니다.\n";
 
-
-        given(memberService.RetryableCreateMember(request)).willReturn(null);
-
-        // When & Then
+        // 컨트롤러로 요청 보내기
         mockMvc.perform(post("/api/member/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -147,7 +146,7 @@ class MemberControllerTest {
 
     private MemberRegisterRequest createMemberRegisterRequest(
             List<MemberTermRequest> memberTermRequests) {
-        var request = MemberRegisterRequest.builder()
+        MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
                 .email("asdf3214@gmail.com")
