@@ -3,15 +3,16 @@ package com.oreo.finalproject_5re5_be.vc.entity;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "vc_target")
 @Getter
-@Setter
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class VcTarget extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

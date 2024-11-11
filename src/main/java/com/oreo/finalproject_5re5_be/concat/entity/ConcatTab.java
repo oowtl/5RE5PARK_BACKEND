@@ -15,8 +15,11 @@ import lombok.ToString;
 @Entity(name = "concat_tab")
 public class ConcatTab extends BaseEntity {
     @Id
+    private Long projectId;
+
+    @MapsId // Project 엔티티의 ID를 ConcatTab의 ID로 사용
     @OneToOne
-    @JoinColumn(name = "pro_seq") // 기본 키이면서 외래 키로 사용
+    @JoinColumn(name = "pro_seq")
     private Project project;
 
     @OneToOne(fetch = FetchType.EAGER)
@@ -31,7 +34,6 @@ public class ConcatTab extends BaseEntity {
 
     @Column(name = "back_silence")
     private Float backSilence;
-
 }
 
 

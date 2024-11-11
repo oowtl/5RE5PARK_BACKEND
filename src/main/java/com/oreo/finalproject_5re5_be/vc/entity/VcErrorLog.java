@@ -3,9 +3,7 @@ package com.oreo.finalproject_5re5_be.vc.entity;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -13,8 +11,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "vc_errorlog")
 @Getter
-@Setter
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class VcErrorLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,7 +1,7 @@
 package com.oreo.finalproject_5re5_be.project.entity;
 
 
-import com.oreo.finalproject_5re5_be.user.entity.User;
+import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +30,7 @@ public class Project extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq")
-    private User user;
+    private Member member;
 
     private String proName;
     private String proCmt;
