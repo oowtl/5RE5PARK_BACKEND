@@ -56,7 +56,7 @@ class MemberServiceImplSuccessTest {
         MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
 
         // 회원가입 처리
-        userService.RetryableCreateMember(request);
+        userService.create(request);
 
         // 정상처리 - 회원 정보, 회원 약관 내역, 회원 상태 등록 확인
         Member foundMember = memberRepository.findByEmail(request.getEmail());

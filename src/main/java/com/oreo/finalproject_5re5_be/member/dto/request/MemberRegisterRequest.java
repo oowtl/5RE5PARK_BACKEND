@@ -60,18 +60,21 @@ public class MemberRegisterRequest {
 
     // Member 엔티티로 변환
     public Member createMemberEntity() {
+        // 현재 시간 조회
+        LocalDateTime now = LocalDateTime.now();
         return Member.builder()
                 .id(id)
                 .email(email)
                 .password(password)
                 .name(name)
                 .normAddr(normAddr)
+                .memberRegDate(now)
                 .birthDate(birthDate)
                 .locaAddr(locaAddr)
                 .detailAddr(detailAddr)
                 .passAddr(passAddr)
                 .chkValid(chkValid)
-                .userRegDate(userRegDate)
+                .memberRegDate(userRegDate)
                 .build();
     }
 
@@ -93,13 +96,24 @@ public class MemberRegisterRequest {
 
     // 회원 등록 dto로부터 약관 이력 엔티티 생성
     public MemberTermsHistory createMemberTermsHistoryEntity(Member member) {
+        // 회원 약관 이력 엔티티 생성
         MemberTermsHistory memberTermsHistory = new MemberTermsHistory();
 
+        // 입력 데이터로 부터 약관 정보를 조회해서 약관 이력 엔티티에 저장
         for (int i = 0; i < memberTermRequests.size(); i++) {
             MemberTermRequest term = memberTermRequests.get(i);
             memberTermsHistory.addMemberTermCondition(i + 1, term.getAgreed());
         }
 
+        // 현재 시간과 최대 시간 조회
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.MAX;
+
+        // 시간 세팅
+        memberTermsHistory.setHistRegDate(now);
+        memberTermsHistory.setHistEndDate(end);
+
+        // 회원 세팅
         memberTermsHistory.setMember(member);
         return memberTermsHistory;
     }

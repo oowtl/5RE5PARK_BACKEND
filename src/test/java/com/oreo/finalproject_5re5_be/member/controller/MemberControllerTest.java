@@ -59,7 +59,7 @@ class MemberControllerTest {
                 .email("asdf3214@gmail.com")
                 .name("홍길동")
                 .birthDate("1990-01-01")
-                .userRegDate(LocalDateTime.now())
+                .memberRegDate(LocalDateTime.now())
                 .chkValid('Y')
                 .normAddr("서울시 강남구")
                 .passAddr("서초대로 59-32")

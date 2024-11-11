@@ -25,7 +25,7 @@ import lombok.ToString;
 @Table(name = "member_terms_history")
 @Getter @Setter
 @ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class MemberTermsHistory extends BaseEntity {

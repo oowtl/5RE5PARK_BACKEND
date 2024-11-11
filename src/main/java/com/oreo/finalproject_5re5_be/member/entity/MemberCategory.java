@@ -22,7 +22,7 @@ public class MemberCategory extends BaseEntity {
     @Column(name = "cate_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cateCode;
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
     @Column(name = "comt")
     private String comt;

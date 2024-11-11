@@ -39,4 +39,20 @@ public class MemberState extends BaseEntity {
     private LocalDateTime applDate;
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
+
+    public static MemberState of(Member member, MemberCategory cateCode) {
+        MemberState memberState = new MemberState();
+
+        // 현재 시간과 최대 시간 세팅
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.MAX;
+
+        // 회원 상태에 생성된 회원과 신규 등록 회원 카테고리 그리고 시간 세팅
+        memberState.setMember(member);
+        memberState.setCateCode(cateCode);
+        memberState.setApplDate(now);
+        memberState.setEndDate(end);
+        return memberState;
+
+    }
 }

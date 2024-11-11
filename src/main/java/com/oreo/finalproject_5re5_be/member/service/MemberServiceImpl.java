@@ -16,6 +16,7 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
+import java.time.LocalDateTime;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -27,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberServiceImpl {
 
-    // 재시도 복구 설정값
+    // 재시도 복구 설정값 -> DB로부터 알수없는 에러가 발생할시 재시도 설정 규칙에 따라 재시도를 통해 복구 작업을 처리한다.
     // - 최대 재시도 횟수 : 10회
     // - 재시도 딜레이 : 5초
     // - 재시도 실패시 예외 발생 : RetryFailedException.class
@@ -103,7 +104,9 @@ public class MemberServiceImpl {
 
     // 중복된 에메일 확인
     private void checkDuplicatedEmail(String email) {
+        // 이메일로 회원 조회
         Member foundMember = memberRepository.findByEmail(email);
+        // 조회된 회원이 있으면 중복된 이메일로 판단하고 비즈니스 예외 반환
         if (foundMember != null) {
             throw new MemberDuplicatedEmailException();
         }
@@ -112,7 +115,9 @@ public class MemberServiceImpl {
 
     // 중복된 아이디 확인
     private void checkDuplicatedId(String id) {
+        // 아이디로 회원 조회
         Member foundMember = memberRepository.findById(id);
+        // 조회된 회원이 있으면 중복된 아이디로 판단하고 비즈니스 예외 반환
         if (foundMember != null) {
             throw new MemberDuplicatedIdException();
         }
@@ -120,36 +125,44 @@ public class MemberServiceImpl {
 
     // 비밀번호 암호화
     private void encodePassword(MemberRegisterRequest request) {
+        // 비밀번호 암호화 처리
         String encodedPassword = passwordEncoder.encode(request.getPassword());
+        // 암호화된 비밀번호로 변경
         request.setPassword(encodedPassword);
     }
 
     // 회원 엔티티 저장
     private Member saveMember(MemberRegisterRequest request) {
+        // 입력 데이터로부터 회원 엔티티 생성
         Member member = request.createMemberEntity();
+        // 회원 엔티티 저장
         Member savedMember = memberRepository.save(member);
         return savedMember;
     }
 
     // 회원 약관 이력 저장
     private MemberTermsHistory saveMemberTermsHistory(MemberRegisterRequest request, Member member) {
+        // 입력 데이터로부터 회원 약관 이력 엔티티 생성
         MemberTermsHistory memberTermsHistory = request.createMemberTermsHistoryEntity(member);
+        // 회원 약관 이력 엔티티 저장
         MemberTermsHistory savedMemberTermsHistory = memberTermsHistoryRepository.save(memberTermsHistory);
         return savedMemberTermsHistory;
     }
 
     // 회원 상태 업데이트
     private MemberState saveInitMemberState(Member member) {
-        MemberState userState = new MemberState();
-        MemberCategory memberInitState = findMemberStateCategory("신규등록");
-        userState.setMember(member);
-        userState.setCateCode(memberInitState);
-        MemberState savedMemberState = memberStateRepository.save(userState);
+        // 신규 등록 회원 상태 조회
+        MemberCategory memberInitStateCategory = findMemberStateCategory("신규등록");
+        // 신규 등록 회원 상태 생성
+        MemberState memberInitState = MemberState.of(member, memberInitStateCategory);
+        // 회원 상태 엔티티 저장
+        MemberState savedMemberState = memberStateRepository.save(memberInitState);
         return savedMemberState;
     }
 
     // 회원 상태 카테고리 조회
     private MemberCategory findMemberStateCategory(String cateName) {
+        // 회원 상태를 이름으로 조회
         MemberCategory foundMemberCategory = memberCategoryRepository.findByName(cateName);
         return foundMemberCategory;
     }

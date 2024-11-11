@@ -39,9 +39,9 @@ public class Member extends BaseEntity {
     private String birthDate;
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "phon", nullable = false)
+    @Column(name = "phon")
     private String phon;
-    @Column(name = "member_reg_date", nullable = false)
+    @Column(name = "member_reg_date")
     private LocalDateTime memberRegDate;
     @Column(name = "chk_valid", nullable = false)
     private Character chkValid;
