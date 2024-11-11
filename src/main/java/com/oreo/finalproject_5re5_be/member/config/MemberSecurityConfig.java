@@ -54,9 +54,9 @@ public class MemberSecurityConfig {
                         .permitAll()
                 )
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
+                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정 - 이 부분 프론트엔드 페이지 요청 경로로 변경하기
                         .successHandler(successHandler) // 로그인 성공시 처리되는 핸들러 설정
-                        .failureUrl("/api/member/login") // 로그인 실패시 로그인 페이지로 이동
+                        .failureUrl("/api/member/login") // 로그인 실패시 로그인 페이지로 이동 - 이 부분 프론트엔드 페이지 요청 경로로 변경하기
                 ).logout(logout -> logout
                         .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
                         .invalidateHttpSession(true) // 로그아웃시 세션 무효화 설정
