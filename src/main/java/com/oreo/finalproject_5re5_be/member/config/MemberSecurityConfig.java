@@ -31,7 +31,7 @@ public class MemberSecurityConfig {
 //                )
 //                .formLogin(formLogin -> formLogin
 //                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
-//                        .successHandler(null) // 로그인 성공시 처리되는 핸들러 설정
+//                        .successHandler(successHandler) // 로그인 성공시 처리되는 핸들러 설정
 //                        .failureUrl("/api/member/login") // 로그인 실패시 로그인 페이지로 이동
 //                ).logout(logout -> logout
 //                        .logoutUrl("/api/member/logout") // 로그아웃 경로 설정

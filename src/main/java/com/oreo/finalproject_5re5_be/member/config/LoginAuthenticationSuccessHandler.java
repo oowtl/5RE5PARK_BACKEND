@@ -37,6 +37,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         String memberId = authentication.getName();
         String rememberMe = request.getParameter("rememberMe");
 
+
         if (rememberMe != null) {
             Cookie cookie = new Cookie("memberId", memberId);
             cookie.setMaxAge(60 * 60 * 24 * 1); // 1일간 유지
