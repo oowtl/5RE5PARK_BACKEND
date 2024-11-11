@@ -67,6 +67,7 @@ class MemberSecurityConfigTest {
         // 가입 정보로 부터 회원 엔티티 생성
         Member foundMember = memberRegisterRequest.createMemberEntity();
         // 비밀번호 암호화 처리 후 저장
+        String notEncodedPassword = foundMember.getPassword();
         String encodedPassword = passwordEncoder.encode(foundMember.getPassword());
         foundMember.setPassword(encodedPassword);
 
@@ -83,7 +84,8 @@ class MemberSecurityConfigTest {
         mockMvc.perform(formLogin("/api/member/login")
                         .user(memberRegisterRequest.getId())
                         .password(memberRegisterRequest.getPassword()))  // 실제 인코딩 전 비밀번호 전달
-                .andExpect(status().isOk());
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
 
     }
 
