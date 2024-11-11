@@ -87,6 +87,6 @@ dependencies {
     implementation 'com.google.cloud:google-cloud-texttospeech:2.49.0'
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
 }
