@@ -55,6 +55,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile전체데이터생성Default값미포함(){
         //생성할 오디오 정보 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -82,6 +83,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile전체데이터생성Default값포함(){
         //생성할 오디오 정보 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -112,6 +114,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile필수데이터만생성(){
         // 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .fileLength("100KB")
@@ -140,6 +143,7 @@ public class VcSrcFileRepositoryTest {
         // 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
                 .srcSeq(999L)
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .fileLength("100KB")
@@ -166,6 +170,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile필수값미포함() throws Exception{
         // 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileUrl("https://s3/test")
                 .fileLength("100KB")
                 .extension("Wav").build();
@@ -197,6 +202,7 @@ public class VcSrcFileRepositoryTest {
         //vcSrcFile 객체 10개 생성
         for (int i = 0; i < repeat; i++) {
             VcSrcFile createFile = VcSrcFile.builder()
+                    .rowOrder(i+1)
                     .fileName("testAudio"+i)
                     .fileUrl("https://s3/test"+i)
                     .localUrl("USER/Test"+i)
@@ -225,6 +231,7 @@ public class VcSrcFileRepositoryTest {
         //vcSrcFile 객체 10개 생성
         for (int i = 0; i < repeat; i++) {
             VcSrcFile createFile = VcSrcFile.builder()
+                    .rowOrder(i+1)
                     .fileName("testAudio"+i)
                     .fileUrl("https://s3/test"+i)
                     .localUrl("USER/Test"+i)
@@ -253,6 +260,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile전체데이터수정(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -263,6 +271,7 @@ public class VcSrcFileRepositoryTest {
         Long saveSrcSeq = save.getSrcSeq();// 저장한 pk 추출
 
         VcSrcFile updateFile = VcSrcFile.builder() //pk로 변경할 데이터들 생성
+                .rowOrder(2)
                 .srcSeq(saveSrcSeq)
                 .fileName(save.getFileName()+"1")
                 .fileUrl(save.getFileUrl()+"1")
@@ -290,6 +299,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile일부데이터수정(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -300,6 +310,7 @@ public class VcSrcFileRepositoryTest {
         Long saveSrcSeq = save.getSrcSeq();// 저장한 pk 추출
 
         VcSrcFile updateFile = VcSrcFile.builder() //pk로 변경할 데이터들 생성
+                .rowOrder(2)
                 .srcSeq(saveSrcSeq)
                 .fileName(createFile.getFileName()+"1")
                 .fileUrl(createFile.getFileUrl()+"1")
@@ -326,6 +337,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile일부데이터수정시필수값미포함(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -357,6 +369,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile단건ID삭제(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -384,6 +397,7 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile단건객체삭제(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .localUrl("USER/Test")
@@ -414,6 +428,7 @@ public class VcSrcFileRepositoryTest {
         //vcSrcFile 객체 10개 생성
         for (int i = 0; i < repeat; i++) {
             VcSrcFile createFile = VcSrcFile.builder()
+                    .rowOrder(i+1)
                     .fileName("testAudio" + i)
                     .fileUrl("https://s3/test" + i)
                     .localUrl("USER/Test" + i)
