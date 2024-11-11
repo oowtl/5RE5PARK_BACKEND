@@ -59,7 +59,7 @@ public class VcSrcFileRepositoryTest {
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
                 .fileSize("1000")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .extension("Wav").build();
         //오디오 정보 저장
         VcSrcFile createSrcFile = vcSrcFileRepository.save(createFile);
@@ -86,7 +86,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav")
                 .activate('N')
@@ -117,7 +117,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
 
@@ -146,7 +146,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
 
@@ -173,7 +173,7 @@ public class VcSrcFileRepositoryTest {
         VcSrcFile createFile = VcSrcFile.builder()
                 .rowOrder(1)
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
 
@@ -207,7 +207,7 @@ public class VcSrcFileRepositoryTest {
                     .rowOrder(i+1)
                     .fileName("testAudio"+i)
                     .fileUrl("https://s3/test"+i)
-                    .fileLength("100KB")
+                    .fileLength(1000)
                     .fileSize("1000")
                     .extension("Wav").build();
             //객체 10개 저장
@@ -236,7 +236,7 @@ public class VcSrcFileRepositoryTest {
                     .rowOrder(i+1)
                     .fileName("testAudio"+i)
                     .fileUrl("https://s3/test"+i)
-                    .fileLength("100KB")
+                    .fileLength(1000)
                     .fileSize("1000")
                     .extension("Wav").build();
             //객체 10개 저장
@@ -265,7 +265,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
@@ -277,7 +277,7 @@ public class VcSrcFileRepositoryTest {
                 .srcSeq(saveSrcSeq)
                 .fileName(save.getFileName()+"1")
                 .fileUrl(save.getFileUrl()+"1")
-                .fileLength("200KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav")
                 .activate('N')
@@ -304,7 +304,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
@@ -316,7 +316,7 @@ public class VcSrcFileRepositoryTest {
                 .srcSeq(saveSrcSeq)
                 .fileName(createFile.getFileName()+"1")
                 .fileUrl(createFile.getFileUrl()+"1")
-                .fileLength("200KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav")
                 .startStatus('N')
@@ -343,7 +343,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
@@ -375,7 +375,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
@@ -403,7 +403,7 @@ public class VcSrcFileRepositoryTest {
                 .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
                 .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
@@ -434,7 +434,7 @@ public class VcSrcFileRepositoryTest {
                     .rowOrder(i+1)
                     .fileName("testAudio" + i)
                     .fileUrl("https://s3/test" + i)
-                    .fileLength("100KB")
+                    .fileLength(1000)
                     .fileSize("1000")
                     .extension("Wav").build();
             //객체 10개 저장

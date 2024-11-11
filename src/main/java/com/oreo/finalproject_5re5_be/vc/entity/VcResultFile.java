@@ -47,7 +47,7 @@ public class VcResultFile extends BaseEntity {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "src_seq")
-    private VcSrcFile src_seq;
+    private VcSrcFile srcSeq;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project proSeq;
