@@ -12,14 +12,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name = "project")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 public class Project extends BaseEntity {
 
@@ -36,6 +40,15 @@ public class Project extends BaseEntity {
     private String proCmt;
     private LocalDateTime proUpDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Project project)) return false;
+        return Objects.equals(proSeq, project.proSeq) && Objects.equals(member, project.member) && Objects.equals(proName, project.proName) && Objects.equals(proCmt, project.proCmt) && Objects.equals(proUpDate, project.proUpDate);
+    }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(proSeq, member, proName, proCmt, proUpDate);
+    }
 }
