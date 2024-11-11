@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +25,7 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryReposit
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
@@ -62,9 +67,12 @@ class MemberServiceImplFailTest {
     @MockBean
     private MemberCategoryRepository memberCategoryRepository;
 
+    private User user;
+
     @BeforeEach
     void setUp() {
         assertNotNull(memberService);
+        user = new User("qwefghnm1212", "dqwesf1212@!", Collections.emptyList());
     }
 
 
@@ -130,6 +138,29 @@ class MemberServiceImplFailTest {
 //        // RetryFailedException 발생함. 이거 어떻게 잡을지 고민하기
     }
 
+    @DisplayName("스프링시큐리티에서 호출하는 loadUserByUsername() 성공 테스트 ")
+    @Test
+    public void 스프링시큐리티_회원_조회_성공() {
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
+                memberTermRequests);
+        Member foundMember = memberRegisterRequest.createMemberEntity();
+        when(memberRepository.findById("qwerfde2312")).thenReturn(foundMember);
+        UserDetails foundMemberDetails = memberService.loadUserByUsername("qwerfde2312");
+        assertEquals(foundMemberDetails.getUsername(), foundMember.getId());
+    }
+
+    @DisplayName("스프링시큐리티에서 호출하는 loadUserByUsername() 실패 테스트 ")
+    @Test
+    public void 스프링시큐리티_회원_조회_실패() {
+        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
+                memberTermRequests);
+        Member foundMember = memberRegisterRequest.createMemberEntity();
+        when(memberRepository.findById("qwerfde2312")).thenReturn(null);
+        assertThrows(UsernameNotFoundException.class,
+                () -> memberService.loadUserByUsername("qwerfde2312"));
+    }
 
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
