@@ -39,5 +39,5 @@ public class VcRequestLog extends BaseEntity {
     private Project proSeq;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trg_seq")
-    private VcTarget trgSeq;
+    private VcTargetFile trgSeq;
 }
