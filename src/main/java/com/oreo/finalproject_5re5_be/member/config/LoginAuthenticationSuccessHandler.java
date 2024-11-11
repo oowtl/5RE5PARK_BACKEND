@@ -34,7 +34,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
     // 쿠키 등록
     // 만약 쿠키 체크가 rememberMe로 되어 있다고 가정. 이 부분 추후에 프론트랑 얘기해야함
     private void handleCookie(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) {
+            Authentication authentication) throws IOException {
         String memberId = authentication.getName();
         String rememberMe = request.getParameter("rememberMe");
 
@@ -48,6 +48,8 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             cookie.setMaxAge(0); // 쿠키 삭제
             response.addCookie(cookie);
         }
+
+        response.sendRedirect("/");
     }
 
 }
