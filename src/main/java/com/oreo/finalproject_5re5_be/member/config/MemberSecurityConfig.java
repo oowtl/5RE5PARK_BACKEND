@@ -11,14 +11,50 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class MemberSecurityConfig {
 
-    // SecurityFilterChain 설정 빈 등록
+    // SecurityFilterChain 설정 빈 등록, 추후에 적용 예정(다른 파트 작업 완료후 인증/인가 처리 적용예정)
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf.disable()) // csrf 비활성화
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/", "/api/member/register") // 회원가입 페이지와 홈 페이지는 인증/인가 없이 접근 가능
+//                        .permitAll()
+//                        .requestMatchers("/audio/**", "/project/**", "/languagecode/**",
+//                                "/voice/**", "/style", "/vc/**", "/concat") // 그외의 페이지는 인증/인가가 필요함
+//                        .authenticated()
+//                )
+//                .formLogin(formLogin -> formLogin
+//                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
+//                        .successHandler(null) // 로그인 성공시 처리되는 핸들러 설정
+//                        .failureUrl("/api/member/login") // 로그인 실패시 로그인 페이지로 이동
+//                ).logout(logout -> logout
+//                        .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
+//                        .invalidateHttpSession(true) // 로그아웃시 세션 무효화 설정
+//                        .logoutSuccessUrl("/") // 로그아웃 성공시 이동할 페이지 설정
+//                );
+//
+//
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // csrf 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/api/member/register")
+                        .requestMatchers("/", "/member/**", "/api/member/**",
+                                         "/audio/**", "/project/**", "/languagecode/**",
+                                         "/voice/**", "/style", "/vc/**", "/concat") // 다른 파트 개발 작업 진행으로 모든 페이지는 인증/인가 처리 x
                         .permitAll()
+                )
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
+                        .successHandler(null) // 로그인 성공시 처리되는 핸들러 설정
+                        .failureUrl("/api/member/login") // 로그인 실패시 로그인 페이지로 이동
+                ).logout(logout -> logout
+                        .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
+                        .invalidateHttpSession(true) // 로그아웃시 세션 무효화 설정
+                        .logoutSuccessUrl("/") // 로그아웃 성공시 이동할 페이지 설정
                 );
 
 
