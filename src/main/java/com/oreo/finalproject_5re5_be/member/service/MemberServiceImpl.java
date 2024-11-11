@@ -174,7 +174,7 @@ public class MemberServiceImpl implements UserDetailsService {
 
     // 2. 로그인 처리시 스프링 시큐리티 내부적으로 활용함
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {;
         // 아이디로 회원 조회
         Member foundMember = memberRepository.findById(username);
 
