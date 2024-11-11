@@ -28,6 +28,8 @@ public class VcResultFile extends BaseEntity {
     private String fileUrl;
     @Column(nullable = false, name = "length")
     private String fileLength;
+    @Column(nullable = false, name = "size")
+    private String fileSize;
     @Column(nullable = false, name = "extension")
     private String extension;
     @Builder.Default

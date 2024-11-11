@@ -22,10 +22,10 @@ public class VcTargetFile extends BaseEntity {
     private String fileName;
     @Column(nullable = false, name = "file_url")
     private String fileUrl;
-    @Column(name = "local_url")
-    private String localUrl;
     @Column(nullable = false, name = "length")
     private String fileLength;
+    @Column(nullable = false, name = "size")
+    private String fileSize;
     @Column(nullable = false, name = "extension")
     private String extension;
 
