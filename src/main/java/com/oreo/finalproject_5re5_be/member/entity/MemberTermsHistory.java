@@ -61,24 +61,16 @@ public class MemberTermsHistory extends BaseEntity {
 
     // 회원 약관 동의 항목 체크
     public void addMemberTermCondition(int i, Character chk) {
-        switch (i) {
-            case 1:
-                this.chkTerm1 = chk;
-                break;
-            case 2:
-                this.chkTerm2 = chk;
-                break;
-            case 3:
-                this.chkTerm3 = chk;
-                break;
-            case 4:
-                this.chkTerm4 = chk;
-                break;
-            case 5:
-                this.chkTerm5 = chk;
-                break;
-            default:
-                break;
+        if (i == 1) {
+            this.chkTerm1 = chk;
+        } else if (i == 2) {
+            this.chkTerm2 = chk;
+        } else if (i == 3) {
+            this.chkTerm3 = chk;
+        } else if (i == 4) {
+            this.chkTerm4 = chk;
+        } else if (i == 5) {
+            this.chkTerm5 = chk;
         }
     }
 }
