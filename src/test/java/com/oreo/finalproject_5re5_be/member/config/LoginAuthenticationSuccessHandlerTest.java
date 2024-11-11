@@ -28,9 +28,11 @@ class LoginAuthenticationSuccessHandlerTest {
     @InjectMocks
     private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
 
+    // 테스트를 위한 request, response 목 객체 생성
     @Mock
     private Authentication authentication;
 
+    // 테스트를 위한 request, response 목 객체 생성
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
 
@@ -99,4 +101,6 @@ class LoginAuthenticationSuccessHandlerTest {
 
         assertTrue(check);
     }
+
+
 }
