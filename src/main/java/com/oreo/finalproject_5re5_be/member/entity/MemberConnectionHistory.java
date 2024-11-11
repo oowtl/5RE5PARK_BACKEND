@@ -31,6 +31,7 @@ public class MemberConnectionHistory extends BaseEntity {
     @JoinColumn(name = "member_seq")
     private Member member;
 
+    @Column(name = "conn_date", nullable = false)
     private LocalDateTime connDate;
 
 }

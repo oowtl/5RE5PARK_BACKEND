@@ -35,6 +35,8 @@ public class MemberState extends BaseEntity {
     @JoinColumn(name = "cate_code")
     private MemberCategory cateCode;
 
+    @Column(name = "appl_date", nullable = false)
     private LocalDateTime applDate;
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 }

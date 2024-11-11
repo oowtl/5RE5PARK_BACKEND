@@ -44,12 +44,19 @@ public class MemberTermsHistory extends BaseEntity {
     @JoinColumn(name = "terms_seq")
     private MemberTerms terms;
 
+    @Column(name = "hist_reg_date", nullable = false)
     private LocalDateTime histRegDate;
+    @Column(name = "hist_end_date", nullable = false)
     private LocalDateTime histEndDate;
+    @Column(name = "chk_term_1", nullable = false)
     private Character chkTerm1; // 'Y' or 'N'
+    @Column(name = "chk_term_2", nullable = false)
     private Character chkTerm2;
+    @Column(name = "chk_term_3", nullable = false)
     private Character chkTerm3;
+    @Column(name = "chk_term_4", nullable = false)
     private Character chkTerm4;
+    @Column(name = "chk_term_5", nullable = false)
     private Character chkTerm5;
 
     // 회원 약관 동의 항목 체크

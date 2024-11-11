@@ -23,6 +23,8 @@ public class MemberRolesCategory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cateCode;
 
+    @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "comt")
     private String comt;
 }

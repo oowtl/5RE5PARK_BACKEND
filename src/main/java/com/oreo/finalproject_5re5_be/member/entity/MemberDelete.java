@@ -31,7 +31,10 @@ public class MemberDelete extends BaseEntity {
     @JoinColumn(name = "cate_code")
     private MemberCategory cateCode;
 
+    @Column(name = "detail_cont", nullable = false)
     private String detailCont;
+    @Column(name = "chk_use", nullable = false)
     private Character chkUse;
+    @Column(name = "appl_date", nullable = false)
     private LocalDateTime applDate;
 }

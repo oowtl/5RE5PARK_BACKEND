@@ -35,8 +35,12 @@ public class MemberChangeHistory extends BaseEntity {
     @JoinColumn(name = "cate_code")
     private MemberCategory chngFieldCode;
 
+    @Column(name = "bef_val", nullable = false)
     private String befVal;
+    @Column(name = "aft_val", nullable = false)
     private String aftVal;
+    @Column(name = "appl_date", nullable = false)
     private LocalDateTime applDate;
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 }
