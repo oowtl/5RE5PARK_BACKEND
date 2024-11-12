@@ -40,15 +40,15 @@ class AudioInfoTest {
                     mp3InputStream              // 파일 데이터
             );
 
-            AudioFileInfo fileInfo = audioInfo.extractAudioFileInfo(multipartMp3);
-            log.info(fileInfo.toString());
-            assertNotNull(fileInfo);
-            assertEquals(mp3.getName(), fileInfo.getName());
+            AudioFileInfo fileInfo = audioInfo.extractAudioFileInfo(multipartMp3);//오디오파일 info 추출
+            log.info(fileInfo.toString());//값 확인
+            assertNotNull(fileInfo);//값 생성 확인
+            assertEquals(mp3.getName(), fileInfo.getName());//이름 값 확인
             assertEquals(mp3.getName()
                     .substring(mp3.getName()
                             .lastIndexOf(".") + 1)
-                    .toLowerCase(), fileInfo.getExtension());
-            assertEquals(String.valueOf(mp3.length()), fileInfo.getSize());
+                    .toLowerCase(), fileInfo.getExtension()); //확장자 확인
+            assertEquals(String.valueOf(mp3.length()), fileInfo.getSize());//파일 용량 확인
         }
     }
 
@@ -66,16 +66,16 @@ class AudioInfoTest {
                     "audio/wav",               // MIME 타입
                     wavInputStream              // 파일 데이터
             );
-
+            //multipart 파일 입력해서 audio파일 정보 추출
             AudioFileInfo fileInfo = audioInfo.extractAudioFileInfo(multipartWav);
-            log.info(fileInfo.toString());
-            assertNotNull(fileInfo);
-            assertEquals(wav.getName(), fileInfo.getName());
+            log.info(fileInfo.toString());//값 확인
+            assertNotNull(fileInfo);//값 생성 확인
+            assertEquals(wav.getName(), fileInfo.getName());//파일 이름 값 확인
             assertEquals(wav.getName()
                     .substring(wav.getName()
                             .lastIndexOf(".") + 1)
-                    .toLowerCase(), fileInfo.getExtension());
-            assertEquals(String.valueOf(wav.length()), fileInfo.getSize());
+                    .toLowerCase(), fileInfo.getExtension()); //파일 확장자 값 확인
+            assertEquals(String.valueOf(wav.length()), fileInfo.getSize()); //파일 용량 확인
         }
     }
 }
