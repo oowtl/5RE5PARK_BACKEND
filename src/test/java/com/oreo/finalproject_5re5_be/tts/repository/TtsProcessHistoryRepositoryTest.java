@@ -243,7 +243,7 @@ class TtsProcessHistoryRepositoryTest {
         List<TtsProcessHistory> findTtsProcessHistoryList = ttsProcessHistoryRepository.findAll();
 
         // 조회한 리스트가 저장한 엔티티 10개 리스트와 일치해야함
-        assertTrue(ttsProcessHistoryList.containsAll(findTtsProcessHistoryList));
+        assertTrue(findTtsProcessHistoryList.containsAll(ttsProcessHistoryList));
     }
 
     /* 삭제 테스트 */
