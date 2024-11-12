@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
@@ -43,8 +44,8 @@ public class MemberServiceImpl implements UserDetailsService {
     private String SERVICE_NAME;
 
     // 이메일 전송자 이메일 주소
-    @Value("${EMAIL_SENDER_NAME}")
-    private String EMAIL_SENDER_NAME;
+    @Value("${EMAIL_USERNAME}")
+    private String EMAIL_USERNAME;
 
     // 이메일 제목
     @Value("${EMAIL_TITLE}")
@@ -214,18 +215,21 @@ public class MemberServiceImpl implements UserDetailsService {
     }
 
     // 3. 비회원 이메일 인증번호 전송 : 회원 가입시에 이메일 인증번호 전송
-    public void sendVerificationCode(String email) {
+    public String sendVerificationCode(String email) {
         // 인증번호 생성
         String verificationCode = createVerificationCode();
         // 이메일 내용 작성
         String emailContent = createEmailContent(verificationCode);
         // 이메일 전송
         sendEmail(email, emailContent);
+        // 인증번호 반환
+        return verificationCode;
     }
 
     // 인증번호 생성
     private String createVerificationCode() {
         StringBuilder sb = new StringBuilder();
+
         // 6자리 랜덤 숫자 코드 생성
         for (int i=0; i<6; i++) {
             int random = (int) (Math.random() * 10);
@@ -249,7 +253,7 @@ public class MemberServiceImpl implements UserDetailsService {
             MimeMessageHelper mailHelper = new MimeMessageHelper(mail, "UTF-8");
 
             // 메일 내용 및 설정값 세팅
-            mailHelper.setFrom(EMAIL_SENDER_NAME); // 보내는 사람
+            mailHelper.setFrom(EMAIL_USERNAME); // 보내는 사람
             mailHelper.setTo(email); // 받는 사람
             mailHelper.setSubject(EMAIL_TITLE); // 제목
             mailHelper.setText(emailContent); // 내용
@@ -257,6 +261,7 @@ public class MemberServiceImpl implements UserDetailsService {
             // 이메일 전송
             mailSender.send(mail);
         } catch (Exception e) {
+            e.printStackTrace();
             // 이메일 전송 실패시 예외 발생
             throw new MailSendException("이메일 전송에 실패했습니다");
         }

@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,6 +79,12 @@ public class MemberController {
         // 응답 반환
         return ResponseEntity.ok()
                              .body(response);
+    }
+
+    @GetMapping("/verify/email")
+    public ResponseEntity<String> verifyEmail(String email) {
+        memberService.sendVerificationCode(email);
+        return null;
     }
 
     // 유효성 검증 실패시 에러 메시지 생성
