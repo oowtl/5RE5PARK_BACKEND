@@ -8,6 +8,7 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
@@ -16,8 +17,12 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -30,8 +35,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class MemberServiceImpl implements UserDetailsService {
+
+    // 서비스 이름
+    @Value("${SERVICE_NAME}")
+    private String SERVICE_NAME;
+
+    // 이메일 전송자 이메일 주소
+    @Value("${EMAIL_SENDER_NAME}")
+    private String EMAIL_SENDER_NAME;
+
+    @Value("${EMAIL_TITLE}")
+    private String EMAIL_TITLE;
+
+    @Value("${EMAIL_CONTENT}")
+    private String EMAIL_CONTENT;
 
     // 재시도 복구 설정값 -> DB로부터 알수없는 에러가 발생할시 재시도 설정 규칙에 따라 재시도를 통해 복구 작업을 처리한다.
     // - 최대 재시도 횟수 : 10회
@@ -175,7 +194,7 @@ public class MemberServiceImpl implements UserDetailsService {
     }
 
 
-    // 2. 로그인 처리시 스프링 시큐리티 내부적으로 활용함
+    // 2. 로그인 : 아이디로 회원 조회하여 UserDetails 반환, 스프링 시큐리티 내부적으로 호출하여 로그인 처리
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {;
         // 아이디로 회원 조회
@@ -192,7 +211,57 @@ public class MemberServiceImpl implements UserDetailsService {
                 .build();
     }
 
-    // 3. 회원정보 조회
+    // 3. 비회원 이메일 인증번호 전송 : 회원 가입시에 이메일 인증번호 전송
+    public void sendVerificationCode(String email) {
+        // 인증번호 생성
+        String verificationCode = createVerificationCode();
+        // 이메일 내용 작성
+        String emailContent = createEmailContent(verificationCode);
+        // 이메일 전송
+        sendEmail(email, emailContent);
+    }
 
-    // 4. 회원정보 수정
+    // 인증번호 생성
+    private String createVerificationCode() {
+        StringBuilder sb = new StringBuilder();
+        // 6자리 랜덤 숫자 코드 생성
+        for (int i=0; i<6; i++) {
+            int random = (int) (Math.random() * 10);
+            sb.append(random);
+        }
+        // 문자열로 변환하여 반환
+        return sb.toString();
+    }
+
+    // 이메일 내용 작성
+    private String createEmailContent(String verificationCode) {
+        String emailContent = String.format(EMAIL_CONTENT, SERVICE_NAME, verificationCode);
+        return emailContent;
+    }
+
+    // 이메일 전송
+    private void sendEmail(String email, String emailContent) {
+        try {
+            // 메일 내용 넣을 객체와, 이를 도와주는 Helper 객체
+            MimeMessage mail = mailSender.createMimeMessage();
+            MimeMessageHelper mailHelper = new MimeMessageHelper(mail, "UTF-8");
+
+            // 메일 내용 및 설정값 세팅
+            mailHelper.setFrom(EMAIL_SENDER_NAME); // 보내는 사람
+            mailHelper.setTo(email); // 받는 사람
+            mailHelper.setSubject(EMAIL_TITLE); // 제목
+            mailHelper.setText(emailContent); // 내용
+
+            // 이메일 전송
+            mailSender.send(mail);
+        } catch (Exception e) {
+            // 이메일 전송 실패시 예외 발생
+            throw new MailSendException("이메일 전송에 실패했습니다");
+        }
+
+    }
+
+    // 4. 회원정보 조회
+
+    // 5. 회원정보 수정
 }
