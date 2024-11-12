@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @Table(name = "vc_text")
 @Getter
 @ToString
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class VcText extends BaseEntity {
     @Id
@@ -25,19 +25,22 @@ public class VcText extends BaseEntity {
 
     @Column(nullable = false, name = "comment")
     private String comment;
+
     @Column(nullable = false, name = "length")
     private String length;
+
     @Column(nullable = false, name = "vt_up_date")
     @LastModifiedDate
     private LocalDateTime vtUpDate;
+
     @Column(nullable = false, name = "vt_date", updatable = false)
     @CreatedDate
     private LocalDateTime vtDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vc_seq")
-    private Vc vcSeq;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "src_seq")
+    private VcSrcFile srcSeq;
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project proSeq;
 }

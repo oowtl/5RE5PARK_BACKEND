@@ -82,6 +82,9 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
 
+    //Mp3, Wav 파일 정보 추출 라이브러리
+    implementation 'com.mpatric:mp3agic:0.9.1'
+
 
     // tts
     implementation 'com.google.cloud:google-cloud-texttospeech:2.49.0'

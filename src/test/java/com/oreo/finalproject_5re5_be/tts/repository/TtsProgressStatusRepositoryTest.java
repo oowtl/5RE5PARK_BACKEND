@@ -185,7 +185,7 @@ class TtsProgressStatusRepositoryTest {
 
     // Project 엔티티 생성 메서드
     private Project createProject() {
-        return new Project();
+        return Project.builder().build();
     }
 
 

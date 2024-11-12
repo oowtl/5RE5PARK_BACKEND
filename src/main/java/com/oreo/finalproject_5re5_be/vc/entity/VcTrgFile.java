@@ -10,28 +10,25 @@ import lombok.*;
 @Getter
 @ToString
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
-public class VcTarget extends BaseEntity {
+public class VcTrgFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trg_seq")
     private Long trgSeq;
     @Column(nullable = false, name = "name")
     private String fileName;
-    @Column(nullable = false, name = "fileurl")
+    @Column(nullable = false, name = "file_url")
     private String fileUrl;
-    @Column(name = "localurl")
-    private String localUrl;
     @Column(nullable = false, name = "length")
-    private String fileLength;
+    private Integer fileLength;
+    @Column(nullable = false, name = "size")
+    private String fileSize;
     @Column(nullable = false, name = "extension")
     private String extension;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "vc_seq")
-    private Vc vcSeq;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project proSeq;
