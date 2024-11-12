@@ -46,11 +46,13 @@ public class MemberServiceImpl implements UserDetailsService {
     @Value("${EMAIL_SENDER_NAME}")
     private String EMAIL_SENDER_NAME;
 
+    // 이메일 제목
     @Value("${EMAIL_TITLE}")
     private String EMAIL_TITLE;
 
-    @Value("${EMAIL_CONTENT}")
-    private String EMAIL_CONTENT;
+    // 이메일 내용 템플릿
+    @Value("${EMAIL_CONTENT_TEMPLATE}")
+    private String EMAIL_CONTENT_TEMPLATE;
 
     // 재시도 복구 설정값 -> DB로부터 알수없는 에러가 발생할시 재시도 설정 규칙에 따라 재시도를 통해 복구 작업을 처리한다.
     // - 최대 재시도 횟수 : 10회
@@ -235,7 +237,7 @@ public class MemberServiceImpl implements UserDetailsService {
 
     // 이메일 내용 작성
     private String createEmailContent(String verificationCode) {
-        String emailContent = String.format(EMAIL_CONTENT, SERVICE_NAME, verificationCode);
+        String emailContent = String.format(EMAIL_CONTENT_TEMPLATE, SERVICE_NAME, verificationCode);
         return emailContent;
     }
 
