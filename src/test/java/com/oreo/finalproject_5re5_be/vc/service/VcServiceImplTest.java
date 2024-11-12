@@ -69,7 +69,7 @@ class VcServiceImplTest {
         log.info("[VcServiceTest] srcSave request: {}", request);
         when(projectRepository.findById(request.getSeq1())).thenReturn(Optional.of(project));//프로젝트 조회 값 설정
 
-        vcServiceImpl.SrcSave(request);//SRC 저장
+        vcServiceImpl.srcSave(request);//SRC 저장
 
         verify(vcSrcFileRepository, times(1)).save(any(VcSrcFile.class));//저장 확인
     }
@@ -92,7 +92,7 @@ class VcServiceImplTest {
         log.info("[VcServiceTest] trgSave request: {}", request);
         when(projectRepository.findById(request.getSeq1())).thenReturn(Optional.of(project));//프로젝트 조회 값 설정
 
-        vcServiceImpl.TrgSave(request);//Trg 저장
+        vcServiceImpl.trgSave(request);//Trg 저장
 
         verify(vcTargetFileRepository, times(1)).save(any(VcTrgFile.class)); //저장 확인
     }
@@ -117,7 +117,7 @@ class VcServiceImplTest {
         when(vcSrcFileRepository.findById(request.getSeq1())).thenReturn(Optional.of(srcFile));//SRC 조회 값 설정
         when(projectRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(project));//Project 조회값 설정
 
-        vcServiceImpl.ResultSave(request);//result 저장
+        vcServiceImpl.resultSave(request);//result 저장
 
         verify(vcResultFileRepository, times(1)).save(any(VcResultFile.class));//저장 확인
     }
@@ -138,7 +138,7 @@ class VcServiceImplTest {
         when(vcSrcFileRepository.findById(request.getSrcSeq())).thenReturn(Optional.of(srcFile));//src 조회 값 설정
         when(projectRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(project));//project 조회 값 설정
 
-        vcServiceImpl.TextSave(request);//text 저장
+        vcServiceImpl.textSave(request);//text 저장
 
         verify(vcTextRepository, times(1)).save(any(VcText.class));//저장 확인
     }

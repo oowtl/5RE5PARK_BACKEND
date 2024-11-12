@@ -44,7 +44,7 @@ public class VcServiceImpl implements VcService{
 
 
     @Override
-    public void SrcSave(VcSrcRequest vcSrcRequest) {
+    public void srcSave(VcSrcRequest vcSrcRequest) {
         //프로젝트 조회
         Project project = projectRepository.findById(vcSrcRequest.getSeq1())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
@@ -63,7 +63,7 @@ public class VcServiceImpl implements VcService{
     }
 
     @Override
-    public void TrgSave(VcAudioRequest vcAudioRequest) {
+    public void trgSave(VcAudioRequest vcAudioRequest) {
         //프로젝트 조회
         Project project = projectRepository.findById(vcAudioRequest.getSeq1())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
@@ -81,7 +81,7 @@ public class VcServiceImpl implements VcService{
     }
 
     @Override
-    public void ResultSave(VcAudioRequest vcAudioRequest) {
+    public void resultSave(VcAudioRequest vcAudioRequest) {
         //SRCFile 조회
         VcSrcFile srcFile = vcSrcFileRepository.findById(vcAudioRequest.getSeq1())
                 .orElseThrow(() -> new IllegalArgumentException("SrcFile not found"));
@@ -105,7 +105,7 @@ public class VcServiceImpl implements VcService{
 
 
     @Override
-    public void TextSave(VcTextRequest vcTextRequest) {
+    public void textSave(VcTextRequest vcTextRequest) {
         //SRC 조회
         VcSrcFile srcFile = vcSrcFileRepository.findById(vcTextRequest.getSrcSeq())
                 .orElseThrow(() -> new IllegalArgumentException("SrcFile not found"));

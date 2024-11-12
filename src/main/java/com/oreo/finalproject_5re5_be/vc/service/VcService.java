@@ -30,10 +30,10 @@ public interface VcService {
         10. 행 텍스트 수정 (TextSeq, text)
         11. 행 순서 변경 (SrcSeq, rowOrder)
      */
-    void SrcSave(VcSrcRequest vcSrcRequest);
-    void TrgSave(VcAudioRequest vcAudioRequest);
-    void ResultSave(VcAudioRequest vcAudioRequest);
-    void TextSave(VcTextRequest vcTextRequest);
+    void srcSave(VcSrcRequest vcSrcRequest);
+    void trgSave(VcAudioRequest vcAudioRequest);
+    void resultSave(VcAudioRequest vcAudioRequest);
+    void textSave(VcTextRequest vcTextRequest);
 
     List<VcResponse> getVcResponse(Long ProjectSeq);
     String getSrcFile(Long seq);
