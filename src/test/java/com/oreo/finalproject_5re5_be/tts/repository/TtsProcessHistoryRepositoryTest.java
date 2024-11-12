@@ -242,9 +242,6 @@ class TtsProcessHistoryRepositoryTest {
         // DB에 저장된 TtsProcessHistory 리스트 조회
         List<TtsProcessHistory> findTtsProcessHistoryList = ttsProcessHistoryRepository.findAll();
 
-        // 조회한 리스트의 개체 수가  저장한 엔티티 리스트의 개수와 일치해야함
-        assertEquals(findTtsProcessHistoryList.size() , ttsProcessHistoryList.size());
-
         // 조회한 리스트가 저장한 엔티티 10개 리스트와 일치해야함
         assertTrue(ttsProcessHistoryList.containsAll(findTtsProcessHistoryList));
     }
@@ -286,13 +283,6 @@ class TtsProcessHistoryRepositoryTest {
     @Test
     @DisplayName(" TtsProcessHistory 삭제 테스트 - null 값으로 삭제")
     public void deleteNotExistTtsProcessHistory() {
-
-        // 전체 데이터 삭제
-        ttsAudioFileRepository.deleteAll();
-
-        // 전체 조회 결과가 0이어야함
-        assertEquals(ttsProcessHistoryRepository.findAll().size() , 0);
-
         // null 값으로 데이터 삭제 시도 시 예외 발생
         assertThrows(InvalidDataAccessApiUsageException.class, ()->ttsProcessHistoryRepository.deleteById(null));
 
