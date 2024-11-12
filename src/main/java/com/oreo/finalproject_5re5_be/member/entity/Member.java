@@ -20,7 +20,7 @@ import lombok.ToString;
 @Table(name = "member")
 @Getter @Setter
 @ToString
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class Member extends BaseEntity {

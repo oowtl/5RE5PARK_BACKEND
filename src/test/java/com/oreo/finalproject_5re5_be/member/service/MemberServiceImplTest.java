@@ -25,7 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties") // - 현재 에러가 발생함. h2와 MySQL의 pk 설정 차이
-class MemberServiceImplSuccessTest {
+class MemberServiceImplTest {
 
     @Autowired
     private MemberServiceImpl userService;
@@ -39,15 +39,13 @@ class MemberServiceImplSuccessTest {
     private MemberTermsHistoryRepository memberTermsHistoryRepository;
 
 
+
     @BeforeEach
     void setUp() {
         assertNotNull(userService);
     }
 
-    // 1. 회원가입
-    // - 성공
-        // - 사용자로부터 정상적인 데이터를 입력받아서 회원가입이 완료되는 경우
-
+    // 1. 회원가입 성공 테스트
     @DisplayName("회원가입 - 성공")
     @Test
     public void 회원가입_성공() {
@@ -71,7 +69,6 @@ class MemberServiceImplSuccessTest {
         assertNotNull(foundMemberState);
         assertTrue(isSameMemberStateFields(foundMemberState));
     }
-
 
 
 
