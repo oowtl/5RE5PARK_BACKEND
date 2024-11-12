@@ -17,6 +17,7 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import java.time.LocalDateTime;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -47,10 +48,11 @@ public class MemberServiceImpl implements UserDetailsService {
     private final MemberTermsRepository memberTermsRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberCategoryRepository memberCategoryRepository;
+    private final JavaMailSender mailSender;
 
-    public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository,
-            MemberRepository memberRepository, MemberStateRepository memberStateRepository, MemberTermsHistoryRepository memberTermsHistoryRepository,
-            MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder, MemberCategoryRepository memberCategoryRepository) {
+    public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository, MemberRepository memberRepository, MemberStateRepository memberStateRepository,
+                             MemberTermsHistoryRepository memberTermsHistoryRepository, MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder,
+            MemberCategoryRepository memberCategoryRepository, JavaMailSender mailSender) {
         this.memberConnectionHistoryRepository = memberConnectionHistoryRepository;
         this.memberRepository = memberRepository;
         this.memberStateRepository = memberStateRepository;
@@ -58,6 +60,7 @@ public class MemberServiceImpl implements UserDetailsService {
         this.memberTermsRepository = memberTermsRepository;
         this.passwordEncoder = passwordEncoder;
         this.memberCategoryRepository = memberCategoryRepository;
+        this.mailSender = mailSender;
     }
 
     // 1. 회원가입 : 유효성 검증이 완료된 회원 정보를 통해 회원가입을 처리한다.
