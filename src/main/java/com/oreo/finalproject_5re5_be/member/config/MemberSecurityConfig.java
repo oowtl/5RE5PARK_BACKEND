@@ -50,7 +50,7 @@ public class MemberSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/member/**", "/api/member/**",
                                          "/audio/**", "/project/**", "/languagecode/**",
-                                         "/voice/**", "/style", "/vc/**", "/concat") // 다른 파트 개발 작업 진행으로 모든 페이지는 인증/인가 처리 x
+                                         "/voice/**", "/style", "/vc/**", "/concat/**") // 다른 파트 개발 작업 진행으로 모든 페이지는 인증/인가 처리 x
                         .permitAll()
                 )
                 .formLogin(formLogin -> formLogin
