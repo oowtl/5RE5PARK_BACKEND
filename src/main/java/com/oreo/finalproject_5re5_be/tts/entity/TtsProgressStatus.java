@@ -3,7 +3,7 @@ package com.oreo.finalproject_5re5_be.tts.entity;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +29,7 @@ public class TtsProgressStatus extends BaseEntity {
     @Column(name="prog_stat", nullable = false)
     private TtsProgressStatusCode progressStatus;
 
-    @UpdateTimestamp
+    @CreationTimestamp
     @Column(name = "chg_date", nullable = false)
     private LocalDateTime changed_at;
 
