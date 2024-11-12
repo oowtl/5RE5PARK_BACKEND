@@ -261,7 +261,6 @@ public class MemberServiceImpl implements UserDetailsService {
             // 이메일 전송
             mailSender.send(mail);
         } catch (Exception e) {
-            e.printStackTrace();
             // 이메일 전송 실패시 예외 발생
             throw new MailSendException("이메일 전송에 실패했습니다");
         }
