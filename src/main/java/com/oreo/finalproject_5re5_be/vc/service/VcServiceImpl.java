@@ -129,20 +129,23 @@ public class VcServiceImpl implements VcService{
     public List<VcResponse> getVcResponse(Long ProjectSeq) {
         //프로젝트 seq 조회한 값
         List<VcSrcFile> vcSrcFileList = vcSrcFileRepository.findByProjectId(ProjectSeq);
+        log.info("[vcService] GetVcResponse vcSrcFileList find : {} ", vcSrcFileList);
         //src, result, text 값 저장하기 위한 배열 생성
         List<VcResponse> vcResponseList = new ArrayList<>();
 
         for (VcSrcFile vcSrcFile : vcSrcFileList) {
             // SRC 로 Result, Text 조회 값이 없을경우 null 출력
-            VcResultFile vcResultFile = vcResultFileRepository.findBySrcSeq(vcSrcFile.getSrcSeq())
-                    != null ? vcResultFileRepository.findBySrcSeq(vcSrcFile.getSrcSeq()) : null;
-            VcText vcText = vcTextRepository.findBySrcSeq(vcSrcFile.getSrcSeq())
-                    != null ? vcTextRepository.findBySrcSeq(vcSrcFile.getSrcSeq()) : null;
-
+            VcResultFile vcResultFile = vcResultFileRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq())
+                    != null ? vcResultFileRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq()) : null;
+            log.info("[vcService] GetVcResponse vcResultFile find : {} ", vcResultFile);
+            VcText vcText = vcTextRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq())
+                    != null ? vcTextRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq()) : null;
+            log.info("[vcService] GetVcText find : {} ", vcText);
             // VcResponse 객체 생성 후 리스트에 추가
             VcResponse vcResponse = new VcResponse(vcSrcFile, vcResultFile, vcText);
             vcResponseList.add(vcResponse);
         }
+        log.info("[vcService] GetVcResponseList find : {} ", vcResponseList);
         return vcResponseList;
     }
 

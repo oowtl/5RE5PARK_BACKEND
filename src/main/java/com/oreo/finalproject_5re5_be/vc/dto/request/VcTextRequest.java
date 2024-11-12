@@ -1,14 +1,13 @@
 package com.oreo.finalproject_5re5_be.vc.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class VcTextRequest {
     private Long srcSeq;
     private String text;
