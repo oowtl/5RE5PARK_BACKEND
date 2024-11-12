@@ -55,10 +55,11 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile전체데이터생성Default값미포함(){
         //생성할 오디오 정보 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileSize("1000")
+                .fileLength(1000)
                 .extension("Wav").build();
         //오디오 정보 저장
         VcSrcFile createSrcFile = vcSrcFileRepository.save(createFile);
@@ -82,10 +83,11 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile전체데이터생성Default값포함(){
         //생성할 오디오 정보 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav")
                 .activate('N')
                 .downloadStatus('N')
@@ -112,9 +114,11 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile필수데이터만생성(){
         // 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
 
         //오디오 정보 저장
@@ -130,7 +134,6 @@ public class VcSrcFileRepositoryTest {
         VcSrcFile getSrcFile = findSrcFile.get();
         log.info("pk값 - 비교 {} : {} ",getSrcFile.getSrcSeq(), createFile.getSrcSeq());
         log.info("기본값 - 비교 {} : {} ",getSrcFile.getActivate(), createFile.getActivate());
-        log.info("미필수값 - 비교 {} : {} ",getSrcFile.getLocalUrl(), createFile.getLocalUrl());
         assertEquals(getSrcFile, createFile);
     }
 
@@ -140,9 +143,11 @@ public class VcSrcFileRepositoryTest {
         // 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
                 .srcSeq(999L)
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
 
         //오디오 정보 저장
@@ -166,8 +171,10 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile필수값미포함() throws Exception{
         // 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileUrl("https://s3/test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
 
         //DATA 미포함 에러
@@ -197,10 +204,11 @@ public class VcSrcFileRepositoryTest {
         //vcSrcFile 객체 10개 생성
         for (int i = 0; i < repeat; i++) {
             VcSrcFile createFile = VcSrcFile.builder()
+                    .rowOrder(i+1)
                     .fileName("testAudio"+i)
                     .fileUrl("https://s3/test"+i)
-                    .localUrl("USER/Test"+i)
-                    .fileLength("100KB")
+                    .fileLength(1000)
+                    .fileSize("1000")
                     .extension("Wav").build();
             //객체 10개 저장
             VcSrcFile save = vcSrcFileRepository.save(createFile);
@@ -225,10 +233,11 @@ public class VcSrcFileRepositoryTest {
         //vcSrcFile 객체 10개 생성
         for (int i = 0; i < repeat; i++) {
             VcSrcFile createFile = VcSrcFile.builder()
+                    .rowOrder(i+1)
                     .fileName("testAudio"+i)
                     .fileUrl("https://s3/test"+i)
-                    .localUrl("USER/Test"+i)
-                    .fileLength("100KB")
+                    .fileLength(1000)
+                    .fileSize("1000")
                     .extension("Wav").build();
             //객체 10개 저장
             VcSrcFile save = vcSrcFileRepository.save(createFile);
@@ -253,21 +262,23 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile전체데이터수정(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
         VcSrcFile save = vcSrcFileRepository.save(createFile);
         Long saveSrcSeq = save.getSrcSeq();// 저장한 pk 추출
 
         VcSrcFile updateFile = VcSrcFile.builder() //pk로 변경할 데이터들 생성
+                .rowOrder(2)
                 .srcSeq(saveSrcSeq)
                 .fileName(save.getFileName()+"1")
                 .fileUrl(save.getFileUrl()+"1")
-                .localUrl(save.getLocalUrl()+"1")
-                .fileLength("200KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav")
                 .activate('N')
                 .startStatus('N')
@@ -290,20 +301,23 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile일부데이터수정(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
         VcSrcFile save = vcSrcFileRepository.save(createFile);
         Long saveSrcSeq = save.getSrcSeq();// 저장한 pk 추출
 
         VcSrcFile updateFile = VcSrcFile.builder() //pk로 변경할 데이터들 생성
+                .rowOrder(2)
                 .srcSeq(saveSrcSeq)
                 .fileName(createFile.getFileName()+"1")
                 .fileUrl(createFile.getFileUrl()+"1")
-                .fileLength("200KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav")
                 .startStatus('N')
                 .downloadStatus('N').build();
@@ -326,10 +340,11 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile일부데이터수정시필수값미포함(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
         VcSrcFile save = vcSrcFileRepository.save(createFile);
@@ -337,7 +352,7 @@ public class VcSrcFileRepositoryTest {
 
         VcSrcFile updateFile = createFile.toBuilder() //pk로 변경할 데이터들 생성
                 .srcSeq(saveSrcSeq)
-                .localUrl(createFile.getLocalUrl()+"1").build();
+                .rowOrder(2).build();
         //데이터 변경후 확인
         VcSrcFile updateSave = vcSrcFileRepository.save(updateFile);
         assertEquals(updateFile, updateSave);
@@ -357,10 +372,11 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile단건ID삭제(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
         VcSrcFile save = vcSrcFileRepository.save(createFile);
@@ -384,10 +400,11 @@ public class VcSrcFileRepositoryTest {
     void SrcAudioFile단건객체삭제(){
         // 저장할 객체 생성
         VcSrcFile createFile = VcSrcFile.builder()
+                .rowOrder(1)
                 .fileName("testAudio")
                 .fileUrl("https://s3/test")
-                .localUrl("USER/Test")
-                .fileLength("100KB")
+                .fileLength(1000)
+                .fileSize("1000")
                 .extension("Wav").build();
         //DB 저장
         VcSrcFile save = vcSrcFileRepository.save(createFile);
@@ -414,10 +431,11 @@ public class VcSrcFileRepositoryTest {
         //vcSrcFile 객체 10개 생성
         for (int i = 0; i < repeat; i++) {
             VcSrcFile createFile = VcSrcFile.builder()
+                    .rowOrder(i+1)
                     .fileName("testAudio" + i)
                     .fileUrl("https://s3/test" + i)
-                    .localUrl("USER/Test" + i)
-                    .fileLength("100KB")
+                    .fileLength(1000)
+                    .fileSize("1000")
                     .extension("Wav").build();
             //객체 10개 저장
             VcSrcFile save = vcSrcFileRepository.save(createFile);

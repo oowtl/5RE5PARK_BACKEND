@@ -403,8 +403,10 @@ public class TtsSentenceRepositoryTest {
 
     // 헬퍼 메서드 - Project 생성
     private Project createProject() {
-        return new Project();
+//        return new Project();
+        return Project.builder().build();
     }
+
 
     // 헬퍼 메서드 - TtsAudioFile 생성
     private TtsAudioFile createTtsAudioFile() {
