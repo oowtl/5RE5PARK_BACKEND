@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
@@ -30,6 +31,8 @@ class MemberServiceImplTest {
     @Autowired
     private MemberServiceImpl userService;
 
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -43,6 +46,7 @@ class MemberServiceImplTest {
     @BeforeEach
     void setUp() {
         assertNotNull(userService);
+        assertNotNull(mailSender);
     }
 
     // 1. 회원가입 성공 테스트

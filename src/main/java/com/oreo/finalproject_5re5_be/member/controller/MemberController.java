@@ -12,10 +12,12 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +35,8 @@ public class MemberController {
 
     // 재시도 복구 실패할 경우 예외 처리 핸들러
     @ExceptionHandler({
-            RetryFailedException.class
+            RetryFailedException.class,
+            MailSendException.class
     })
     public ResponseEntity<String> handleRetryFailedException(Exception e) {
         // 재시도 복구 실패시 에러 메시지 반환
@@ -78,6 +81,12 @@ public class MemberController {
         // 응답 반환
         return ResponseEntity.ok()
                              .body(response);
+    }
+
+    @GetMapping("/verify/email")
+    public ResponseEntity<String> verifyEmail(String email) {
+        String verificationCode = memberService.sendVerificationCode(email);
+        return ResponseEntity.ok().body(verificationCode);
     }
 
     // 유효성 검증 실패시 에러 메시지 생성

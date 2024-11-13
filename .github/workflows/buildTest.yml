@@ -21,7 +21,12 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
+    env:
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      EMAIL_TITLE: ${{ secrets.EMAIL_TITLE }}
+      EMAIL_CONTENT_TEMPLATE: ${{ secrets.EMAIL_CONTENT_TEMPLATE }}
+      SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
     permissions:
       pull-requests: write  # PR에 댓글, 체크 실행을 할 수 있는 권한
       checks: write          # 체크 결과를 기록할 권한
@@ -39,6 +44,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
 
       # Gradle 의존성 캐시 설정
       - name: Cache Gradle dependencies
@@ -63,6 +69,7 @@ jobs:
         run: |
           echo "${TTS_JSON_CONTENT}" > src/main/resources/tts.json
           echo $TTS_JSON_CONTENT
+          
 
       # 빌드 및 테스트 실행
       - name: Build and Test

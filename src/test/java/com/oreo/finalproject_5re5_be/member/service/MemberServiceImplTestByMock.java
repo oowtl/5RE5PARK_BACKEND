@@ -1,8 +1,14 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doNothing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
@@ -15,6 +21,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdExceptio
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,10 +30,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,6 +55,9 @@ class MemberServiceImplTestByMock {
 
     @MockBean
     private MemberRepository memberRepository;
+
+    @MockBean
+    private JavaMailSender mailSender;
 
     private User user;
 
@@ -159,6 +173,13 @@ class MemberServiceImplTestByMock {
         // 실행 및 예외 발생 여부 파악
         assertThrows(UsernameNotFoundException.class,
                 () -> memberService.loadUserByUsername("qwerfde2312"));
+    }
+
+    // 추후에 해당 부분 문제 해결 : 내부적으로 이메일을 전송하는 기능이 있는 메서드는 테스트 코드를 어떻게 작성할지 고민하기
+    @DisplayName("이메일 전송 성공 테스트")
+    @Test
+    public void 이메일_전송_성공() {
+
     }
 
 
