@@ -13,12 +13,14 @@ import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import jakarta.mail.internet.MimeMessage;
@@ -180,6 +182,44 @@ class MemberServiceImplTestByMock {
     @Test
     public void 이메일_전송_성공() {
 
+    }
+
+    // 회원 단순 조회 테스트
+    @DisplayName("회원 단순 조회 테스트")
+    @Test
+    public void 회원_단순_조회_성공() {
+        // 회원 아이디로 호출시 목객체 반환
+        Member foundMember = Member.builder()
+                                   .id("qwerfde2312")
+                                   .email("qwedr123@gmail.com")
+                                   .name("홍길동")
+                                   .normAddr("서울시 강남구")
+                                   .detailAddr("서초대로 59-32")
+                                   .build();
+        when(memberRepository.findById("qwerfde2312")).thenReturn(foundMember);
+
+        // 회원 응답 객체 생성
+        MemberReadResponse response = MemberReadResponse.of(foundMember.getId(), foundMember.getEmail(),
+                                                            foundMember.getName(), foundMember.getNormAddr(),
+                                                            foundMember.getDetailAddr());
+
+        // 서비스 호출
+        MemberReadResponse actualResponse = memberService.read("qwerfde2312");
+
+        // 결과 비교
+        assertEquals(response, actualResponse);
+    }
+
+    @DisplayName("회원 단순 조회 실패 테스트")
+    @Test
+    public void 회원_단순_조회_실패() {
+        // 회원 아이디로 호출시 null 반환하게 세팅
+        when(memberRepository.findById("qwerfde2312")).thenReturn(null);
+
+        // 서비스 호출 및 예외 발생 여부 확인
+        assertThrows(MemberNotFoundException.class, () -> {
+            memberService.read("qwerfde2312");
+        });
     }
 
 

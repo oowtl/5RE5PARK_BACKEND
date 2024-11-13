@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.ErrorResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
@@ -41,21 +42,23 @@ public class MemberController {
             RetryFailedException.class,
             MailSendException.class
     })
-    public ResponseEntity<String> handleInternalServerException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleInternalServerException(RuntimeException e) {
         // 재시도 복구 실패시 에러 메시지 반환
         // - 500 Internal Server Error 와 에러 메시지 반환
+        ErrorResponse errorResponse = ErrorResponse.of(e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body(e.getMessage());
+                             .body(errorResponse);
     }
 
     @ExceptionHandler({
             MemberNotFoundException.class
     })
-    public ResponseEntity<String> handleNotFoundException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException(RuntimeException e) {
         // 비즈니스 예외 발생시 에러 메시지 반환
         // - 404 Not Found 와 에러 메시지 반환
+        ErrorResponse errorResponse = ErrorResponse.of(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                             .body(e.getMessage());
+                             .body(errorResponse);
     }
 
     // 회원 파트에서 발생한 비즈니스 예외 처리 핸들러
@@ -66,11 +69,12 @@ public class MemberController {
             MemberWrongCountTermCondition.class,
             UsernameNotFoundException.class
     })
-    public ResponseEntity<String> handleWrongRequestException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleWrongRequestException(Exception e) {
         // 비즈니스 예외 발생시 에러 메시지 반환
         // - 400 Bad Request 와 에러 메시지 반환
+        ErrorResponse errorResponse = ErrorResponse.of(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                             .body(e.getMessage());
+                             .body(errorResponse);
     }
 
     // 회원가입 처리
