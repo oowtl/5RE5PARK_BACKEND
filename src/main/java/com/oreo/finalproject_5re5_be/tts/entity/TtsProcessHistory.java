@@ -1,27 +1,28 @@
 package com.oreo.finalproject_5re5_be.tts.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(name = "tts_sentence_audio")
+@Table(name = "tts_process_history")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Setter
-public class TtsSentenceAudio extends BaseEntity {
+@Builder
+@ToString
+@EqualsAndHashCode(callSuper = false)
+public class TtsProcessHistory extends BaseEntity {
     @Id
-    @Column(name = "tsa_seq")
+    @Column(name = "tph_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tsaSeq;
-
-    @Column(name = "active")
-    private char active;
+    private Long tphSeq;
 
     @Column(name = "text", nullable = false)
     private String text;
 
-    @Column(name = "sort_ord", nullable = false)
+    @Column(name = "sort_ord")
     private Integer sortOrder;
 
     @Column(name = "volume")
@@ -52,10 +53,14 @@ public class TtsSentenceAudio extends BaseEntity {
     private String audioFormat;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "tts_aud_seq")
+    @JoinColumn(name = "tts_aud_seq", nullable = false)
     private TtsAudioFile ttsAudiofile;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "voice_seq")
+    @JoinColumn(name = "voice_seq", nullable = false)
     private Voice voice;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pro_seq", nullable = false)
+    private Project project;
 }
