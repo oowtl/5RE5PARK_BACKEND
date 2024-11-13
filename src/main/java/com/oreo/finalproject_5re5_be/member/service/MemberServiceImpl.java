@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
@@ -10,6 +11,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailExcep
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundEmailException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
@@ -269,7 +271,22 @@ public class MemberServiceImpl implements UserDetailsService {
 
     // 4. 회원정보 상세 조회
     // - 기본적인 회원 정보만 조회
+    public MemberReadResponse read(String memberId) {
+        // 회원 아이디로 조회
+        Member foundMember = memberRepository.findById(memberId);
+        // 해당 아이디로 회원을 찾지 못한 경우 예외 발생
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+        // 조회된 회원 정보를 바탕으로 응답 객체 생성
+        return MemberReadResponse.of(foundMember.getId(), foundMember.getEmail(),
+                                     foundMember.getName(), foundMember.getNormAddr(),
+                                     foundMember.getDetailAddr());
+    }
+
     // - 회원에 대한 상세 정보 모두 조회
+
+
     // - 기본적인 회원 정보와 프로젝트 이력 조회
 
 
