@@ -29,6 +29,9 @@ public interface VcService {
         수정
         10. 행 텍스트 수정 (TextSeq, text)
         11. 행 순서 변경 (SrcSeq, rowOrder)
+
+        삭제 (수정)
+        12. SRC 파일 활성화상태 N로 변경
      */
     void srcSave(VcSrcRequest vcSrcRequest);
     void trgSave(VcAudioRequest vcAudioRequest);
@@ -37,8 +40,10 @@ public interface VcService {
 
     List<VcResponse> getVcResponse(Long ProjectSeq);
     String getSrcFile(Long seq);
-    String getTrgFile(Long seq);
+    String getResultFile(Long seq);
 
     void updateText(Long seq, String text);
     void updateRowOrder(Long seq, int rowOrder);
+
+    void deleteSrcFile(Long seq);
 }

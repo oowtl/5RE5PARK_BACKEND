@@ -160,13 +160,13 @@ public class VcServiceImpl implements VcService{
     }
 
     @Override
-    public String getTrgFile(Long seq) {
+    public String getResultFile(Long seq) {
         //TRG seq 로 TRG 값 조회
-        VcTrgFile trgFile = vcTargetFileRepository.findById(seq)
+        VcResultFile resultFile = vcResultFileRepository.findById(seq)
                 .orElseThrow(() -> new IllegalArgumentException("TrgFile not found"));
-        log.info("[vcService] getTrgFile VcTrgFile find : {} ", trgFile);//TRG 값 확인
+        log.info("[vcService] getResultFile ResultFile find : {} ", resultFile);//TRG 값 확인
         //S3 TRG URL 값 출력
-        return trgFile.getFileUrl();
+        return resultFile.getFileUrl();
     }
 
     @Override
@@ -197,5 +197,19 @@ public class VcServiceImpl implements VcService{
                 .build();
         log.info("[vcService] updateRowOrder updateSrcFile find : {} ", updateSrcFile);// 변경 객체 확인
         vcSrcFileRepository.save(updateSrcFile);//행순서 변경
+    }
+
+    @Override
+    public void deleteSrcFile(Long seq) {
+        //SRC seq 로 SRC 값 조회 검증
+        VcSrcFile vcSrcFile = vcSrcFileRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("src file not found"));
+        //활성화 상태 N로 변경
+        VcSrcFile deleteSrcFile = vcSrcFile.toBuilder()
+                .srcSeq(vcSrcFile.getSrcSeq())
+                .activate('N')
+                .build();
+        log.info("[vcService] deleteSrcFile vcSrcFile find : {} ", deleteSrcFile);//변경 확인
+        vcSrcFileRepository.save(deleteSrcFile);//활성화상태 변경
     }
 }
