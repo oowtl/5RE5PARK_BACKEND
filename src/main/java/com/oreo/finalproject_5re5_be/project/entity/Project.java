@@ -41,16 +41,4 @@ public class Project extends BaseEntity {
     private String proName;
     private String proCmt;
     private LocalDateTime proUpDate;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Project project)) return false;
-        return Objects.equals(proSeq, project.proSeq) && Objects.equals(member, project.member) && Objects.equals(proName, project.proName) && Objects.equals(proCmt, project.proCmt) && Objects.equals(proUpDate, project.proUpDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(proSeq, member, proName, proCmt, proUpDate);
-    }
 }
