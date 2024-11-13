@@ -3,6 +3,8 @@ package com.oreo.finalproject_5re5_be.vc.service;
 
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -33,17 +35,17 @@ public interface VcService {
         삭제 (수정)
         12. SRC 파일 활성화상태 N로 변경
      */
-    void srcSave(VcSrcRequest vcSrcRequest);
-    void trgSave(VcAudioRequest vcAudioRequest);
-    void resultSave(VcAudioRequest vcAudioRequest);
-    void textSave(VcTextRequest vcTextRequest);
+    void srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest);
+    void trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+    void resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+    void textSave(@Valid @NotNull VcTextRequest vcTextRequest);
 
-    List<VcResponse> getVcResponse(Long ProjectSeq);
-    String getSrcFile(Long seq);
-    String getResultFile(Long seq);
+    List<VcResponse> getVcResponse(@Valid @NotNull Long ProjectSeq);
+    String getSrcFile(@Valid @NotNull Long seq);
+    String getResultFile(@Valid @NotNull Long seq);
 
-    void updateText(Long seq, String text);
-    void updateRowOrder(Long seq, int rowOrder);
+    void updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
+    void updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
 
-    void deleteSrcFile(Long seq);
+    void deleteSrcFile(@Valid @NotNull Long seq);
 }
