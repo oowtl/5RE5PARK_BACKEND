@@ -268,6 +268,10 @@ public class MemberServiceImpl implements UserDetailsService {
     }
 
     // 4. 회원정보 상세 조회
+    // - 기본적인 회원 정보만 조회
+    // - 회원에 대한 상세 정보 모두 조회
+    // - 기본적인 회원 정보와 프로젝트 이력 조회
+
 
     // 5. 회원정보 수정
 
