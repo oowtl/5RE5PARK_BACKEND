@@ -33,7 +33,6 @@ class MemberServiceImplTest {
 
     @Autowired
     private JavaMailSender mailSender;
-
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
