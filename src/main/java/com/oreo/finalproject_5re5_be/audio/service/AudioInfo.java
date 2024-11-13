@@ -25,7 +25,7 @@ public class AudioInfo {
             fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         }
 
-        long fileLength = 0L;
+        Integer fileLength = 0;
 
         // 임시 파일로 변환하여 파일 길이 추출
         try {
@@ -35,10 +35,10 @@ public class AudioInfo {
             if ("mp3".equalsIgnoreCase(fileExtension)) {
                 // mp3 파일 길이 추출
                 Mp3File mp3File = new Mp3File(tempFile);
-                fileLength = mp3File.getLengthInSeconds();
+                fileLength = Math.toIntExact(mp3File.getLengthInSeconds());
             } else if ("wav".equalsIgnoreCase(fileExtension)) {
                 // wav 파일 길이 추출
-                fileLength = getWavFileDuration(tempFile);
+                fileLength = Math.toIntExact(getWavFileDuration(tempFile));
             }
 
             tempFile.delete(); // 임시 파일 삭제

@@ -146,8 +146,7 @@ public class VcServiceImpl implements VcService{
                     .fileUrl(vcSrcFile.getFileUrl())
                     .build();
             // SRC 로 Result, Text 조회 값이 없을경우 null 출력
-            VcResultFile vcResultFile = vcResultFileRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq())
-                    != null ? vcResultFileRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq()) : null;
+            VcResultFile vcResultFile = vcResultFileRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq());
             if (vcResultFile == null) {
                 new IllegalArgumentException("VcResultFile not found");
             }
@@ -159,8 +158,7 @@ public class VcServiceImpl implements VcService{
                     .build();
 
             log.info("[vcService] GetVcResponse vcResultFile find : {} ", vcResultFile);
-            VcText vcText = vcTextRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq())
-                    != null ? vcTextRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq()) : null;
+            VcText vcText = vcTextRepository.findBySrcSeq_SrcSeq(vcSrcFile.getSrcSeq());
             if (vcText == null) {
                 new IllegalArgumentException("vcText not found");
             }
