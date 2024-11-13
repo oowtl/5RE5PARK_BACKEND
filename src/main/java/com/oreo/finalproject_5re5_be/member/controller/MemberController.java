@@ -1,10 +1,12 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
@@ -18,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,10 +41,20 @@ public class MemberController {
             RetryFailedException.class,
             MailSendException.class
     })
-    public ResponseEntity<String> handleRetryFailedException(Exception e) {
+    public ResponseEntity<String> handleInternalServerException(Exception e) {
         // 재시도 복구 실패시 에러 메시지 반환
         // - 500 Internal Server Error 와 에러 메시지 반환
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body(e.getMessage());
+    }
+
+    @ExceptionHandler({
+            MemberNotFoundException.class
+    })
+    public ResponseEntity<String> handleNotFoundException(Exception e) {
+        // 비즈니스 예외 발생시 에러 메시지 반환
+        // - 404 Not Found 와 에러 메시지 반환
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(e.getMessage());
     }
 
@@ -53,7 +66,7 @@ public class MemberController {
             MemberWrongCountTermCondition.class,
             UsernameNotFoundException.class
     })
-    public ResponseEntity<String> handleException(Exception e) {
+    public ResponseEntity<String> handleWrongRequestException(Exception e) {
         // 비즈니스 예외 발생시 에러 메시지 반환
         // - 400 Bad Request 와 에러 메시지 반환
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -92,6 +105,20 @@ public class MemberController {
         return ResponseEntity.ok()
                              .body(verificationCode);
     }
+
+    // 회원 단순 조회 처리
+    @GetMapping("/read/{memberId}")
+    public ResponseEntity<MemberReadResponse> read(@PathVariable("memberId") String memberId) {
+        // 회원 조회
+        MemberReadResponse response = memberService.read(memberId);
+        // 응답 반환
+        return ResponseEntity.ok()
+                             .body(response);
+    }
+
+    // 회원 상세 조회 처리
+    // 회원 프로필 정보 조회 처리(회원 단순 조회, 회원 프로젝트 내역 조회)
+
 
     // 유효성 검증 실패시 에러 메시지 생성
     private String createErrorMessage(List<ObjectError> errors) {
