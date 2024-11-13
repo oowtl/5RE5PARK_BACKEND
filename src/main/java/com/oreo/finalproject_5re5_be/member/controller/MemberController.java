@@ -83,10 +83,14 @@ public class MemberController {
                              .body(response);
     }
 
-    @GetMapping("/verify/email")
-    public ResponseEntity<String> verifyEmail(String email) {
+    // 이메일 인증 번호 발송 처리
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmail(@RequestBody String email) {
+        // 인증번호 생성 및 유저에게 이메일 발송
         String verificationCode = memberService.sendVerificationCode(email);
-        return ResponseEntity.ok().body(verificationCode);
+        // 인증번호 반환
+        return ResponseEntity.ok()
+                             .body(verificationCode);
     }
 
     // 유효성 검증 실패시 에러 메시지 생성

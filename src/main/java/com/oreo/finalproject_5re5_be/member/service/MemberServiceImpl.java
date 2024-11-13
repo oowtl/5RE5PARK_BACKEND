@@ -267,7 +267,10 @@ public class MemberServiceImpl implements UserDetailsService {
 
     }
 
-    // 4. 회원정보 조회
+    // 4. 회원정보 상세 조회
 
     // 5. 회원정보 수정
+
+    // 6. 회원 탈퇴(유해기간 30일 설정, 그 이후에 삭제)
+
 }
