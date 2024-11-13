@@ -27,7 +27,6 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
 class VcServiceImplTest {
     @Autowired
     private VcServiceImpl vcServiceImpl;
@@ -157,6 +156,7 @@ class VcServiceImplTest {
         List<VcResponse> vcResponse = vcServiceImpl.getVcResponse(project.getProSeq()); //프로젝트로 조회 호출
         log.info("[VcServiceTest] getVcResponse request: {}", vcResponse);
 
+
         assertEquals(1, vcResponse.size()); //값 확인
     }
 
@@ -195,7 +195,7 @@ class VcServiceImplTest {
     }
 
     @Test
-    @DisplayName("[VcServiceTest] VC 탭 조회 테스트 - 성공")
+    @DisplayName("[VcServiceTest] SRC 오디오 조회(다운로드, 재생) 테스트 - 성공")
     void getSrcFile() {
         // 주어진 seq를 사용하여 getSrcFile 메서드를 테스트합니다.
         // src 파일을 조회하고 해당 URL을 반환하는지 확인합니다.
@@ -211,21 +211,23 @@ class VcServiceImplTest {
     }
 
     @Test
-    void getTrgFile() {
+    @DisplayName("[VcServiceTest] Result 오디오 조회(다운로드, 재생) 테스트 - 성공")
+    void getResultFile() {
         // 주어진 seq를 사용하여 getTrgFile 메서드를 테스트합니다.
         // trg 파일을 조회하고 해당 URL을 반환하는지 확인합니다.
-        VcTrgFile trgFile = VcTrgFile.builder()//trg 객체 생성
+        VcResultFile resultFile = VcResultFile.builder()//trg 객체 생성
                 .fileUrl("file_url")
                 .build();
 
-        when(vcTargetFileRepository.findById(trgFile.getTrgSeq())).thenReturn(Optional.of(trgFile));//trg조회 값 설정
+        when(vcResultFileRepository.findById(resultFile.getResSeq())).thenReturn(Optional.of(resultFile));//trg조회 값 설정
 
-        String result = vcServiceImpl.getTrgFile(trgFile.getTrgSeq());//조회
+        String result = vcServiceImpl.getResultFile(resultFile.getResSeq());//조회
 
-        assertEquals(trgFile.getFileUrl(), result);//값 확인
+        assertEquals(resultFile.getFileUrl(), result);//값 확인
     }
 
     @Test
+    @DisplayName("[VcServiceTest] Text 수정 테스트 - 성공")
     void updateText() {
         // 주어진 seq와 텍스트를 사용하여 updateText 메서드를 테스트합니다.
         // 텍스트를 조회하고 업데이트된 텍스트로 저장하는지 확인합니다.
@@ -243,6 +245,7 @@ class VcServiceImplTest {
     }
 
     @Test
+    @DisplayName("[VcServiceTest] 행순서 변경 테스트 - 성공")
     void updateRowOrder() {
         // 주어진 seq와 새로운 rowOrder를 사용하여 updateRowOrder 메서드를 테스트합니다.
         // src 파일을 조회하고 새로운 행 순서로 업데이트하여 저장하는지 확인합니다.
@@ -253,5 +256,15 @@ class VcServiceImplTest {
         when(vcSrcFileRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(srcFile));//src 조회 값 설정
         vcServiceImpl.updateRowOrder(srcFile.getSrcSeq(), newRowOrder);//수정
         verify(vcSrcFileRepository, times(1)).save(any(VcSrcFile.class));//수정확인
+    }
+
+    @Test
+    @DisplayName("[VcServiceTest] SRC 행 삭제 (변경) 테스트 - 성공")
+    void deleteSrcFile(){
+        VcSrcFile srcFile = VcSrcFile.builder().activate('N').build();
+
+        when(vcSrcFileRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(srcFile));
+        vcServiceImpl.deleteSrcFile(srcFile.getSrcSeq());
+        verify(vcSrcFileRepository, times(1)).save(any(VcSrcFile.class));
     }
 }
