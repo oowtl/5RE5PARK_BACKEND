@@ -64,8 +64,14 @@ public class MemberConfig {
 
         //리소스를 허용할 URL 지정
         ArrayList<String> allowedOriginPatterns = new ArrayList<>();
+        // 스프링 로컬 포트 번호 8080
         allowedOriginPatterns.add("http://localhost:8080");
         allowedOriginPatterns.add("http://127.0.0.1:8080");
+
+        // 리액트 로컬 포트 번호 5173
+        allowedOriginPatterns.add("http://localhost:5173");
+        allowedOriginPatterns.add("http://127.0.0.1:5173");
+
         configuration.setAllowedOrigins(allowedOriginPatterns);
 
         //허용하는 HTTP METHOD 지정
