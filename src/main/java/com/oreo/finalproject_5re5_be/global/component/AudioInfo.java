@@ -1,7 +1,7 @@
-package com.oreo.finalproject_5re5_be.audio.service;
+package com.oreo.finalproject_5re5_be.global.component;
 
 import com.mpatric.mp3agic.Mp3File;
-import com.oreo.finalproject_5re5_be.audio.dto.response.AudioFileInfo;
+import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

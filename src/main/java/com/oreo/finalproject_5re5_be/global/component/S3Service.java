@@ -1,17 +1,22 @@
-package com.oreo.finalproject_5re5_be.s3;
+package com.oreo.finalproject_5re5_be.global.component;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.UUID;
 
-@Service
+@Component
 public class S3Service {
     @Autowired
     private AmazonS3 s3Client;
@@ -53,6 +58,22 @@ public class S3Service {
         return s3Client.getUrl(buketName, key).toString();
     }
 
+    public File downloadFile(String key) throws IOException {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(buketName, key);
 
+        S3ObjectInputStream inputStream = s3Client.getObject(getObjectRequest).getObjectContent();
+        File file = new File(Paths.get("downloads", key).toString()); // 로컬에 저장할 경로
 
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("파일 다운로드 실패");
+        }
+        return file;
+    }
 }

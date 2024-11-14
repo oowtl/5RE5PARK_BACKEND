@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.audio.service;
 
-import com.oreo.finalproject_5re5_be.audio.dto.response.AudioFileInfo;
+import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
+import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,12 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
