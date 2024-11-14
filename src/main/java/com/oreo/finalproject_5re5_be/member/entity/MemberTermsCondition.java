@@ -42,6 +42,10 @@ public class MemberTermsCondition extends BaseEntity  {
     private String longCont;
     @Column(name = "chk_use", nullable = false)
     private Character chkUse;
+
+    @Column(name = "ord", nullable = false)
+    private Integer ord;
+
     @Column(name = "term_cond_date", nullable = false)
     private LocalDateTime termCondDate;
     @Column(name = "term_cond_up_date")
