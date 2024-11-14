@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.s3;
+package com.oreo.finalproject_5re5_be.global.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
