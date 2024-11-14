@@ -77,7 +77,7 @@ public class TtsSentenceRepositoryTest {
                 .volume(80)                            // 볼륨 설정
                 .speed(1.0f)                           // 속도 설정
                 .startPitch(1)                         // 시작 피치 설정
-                .emotion(5)                            // 감정 설정
+                .emotion("5")                            // 감정 설정
                 .emotionStrength(3)                    // 감정 강도 설정
                 .sampleRate(44100)                     // 샘플레이트 설정
                 .alpha(2)                              // 알파 값 설정
@@ -233,7 +233,7 @@ public class TtsSentenceRepositoryTest {
         Integer updatedVolume = 70;             // 수정할 볼륨
         Float updatedSpeed = 1.5f;              // 수정할 속도
         Integer updatedStartPitch = 2;          // 수정할 시작 피치
-        Integer updatedEmotion = 4;             // 수정할 감정
+        String updatedEmotion = "4";             // 수정할 감정
         Float updatedEndPitch = 1.0f;           // 수정할 끝 피치
         String updatedAudioFormat = "mp3";      // 수정할 오디오 형식
 
@@ -272,7 +272,7 @@ public class TtsSentenceRepositoryTest {
     public void updateSomeFieldsTest() {
         // given
         Integer updatedVolume = 85;
-        Integer updatedEmotion = 3;
+        String updatedEmotion = "3";
 
         // 1. Voice 엔티티 생성 및 저장
         Voice voice = voiceRepository.save(createVoice());
