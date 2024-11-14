@@ -79,7 +79,7 @@ class AudioResampleTest {
 
         audioMonoResample
                 .resample(audioInputStream)
-                .forEach(ais -> assertThat(ais.getFormat().matches(monoFormat)).isFalse());
+                .forEach(ais -> assertThat(ais.getFormat().matches(stereoFormat)).isFalse());
     }
 
     @Test
@@ -117,6 +117,6 @@ class AudioResampleTest {
         List<AudioInputStream> audioInputStream
                 = List.of(AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2));
 
-        audioStereoResample.resample(audioInputStream).forEach(ais -> assertThat(ais.getFormat().matches(stereoFormat)).isFalse());
+        audioStereoResample.resample(audioInputStream).forEach(ais -> assertThat(ais.getFormat().matches(monoFormat)).isFalse());
     }
 }
