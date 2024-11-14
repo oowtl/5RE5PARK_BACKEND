@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.audio.dto.response;
+package com.oreo.finalproject_5re5_be.global.dto.response;
 
 import lombok.*;
 
