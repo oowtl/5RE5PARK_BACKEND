@@ -57,10 +57,10 @@ public class MemberSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/member/**", "/api/member/**", // 허용되는 URL
-                                "/audio/**", "/project/**", "/languagecode/**",
-                                "/voice/**", "/style/**", "/vc/**", "/concat/**",
-                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") // Swagger 관련 URL 허용
+                        .requestMatchers("/", "/member/**", "/api/member/**", "/api/member-term-condition/**", // 허용되는 URL
+                                         "/audio/**", "/project/**", "/languagecode/**",
+                                         "/voice/**", "/style/**", "/vc/**", "/concat/**",
+                                         "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") // Swagger 관련 URL 허용
                         .permitAll() // 위 URL들은 인증 없이 접근 가능
                 )
                 .formLogin(formLogin -> formLogin
