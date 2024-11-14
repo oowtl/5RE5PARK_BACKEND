@@ -88,6 +88,10 @@ dependencies {
 
     // tts
     implementation 'com.google.cloud:google-cloud-texttospeech:2.49.0'
+
+    // AWS
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
+    implementation 'com.amazonaws:aws-java-sdk-s3'
 }
 
 test {
