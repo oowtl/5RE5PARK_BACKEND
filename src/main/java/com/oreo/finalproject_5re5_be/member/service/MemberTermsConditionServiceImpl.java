@@ -55,6 +55,11 @@ public class MemberTermsConditionServiceImpl {
     public MemberTermConditionResponse read(String condCode) {
         // 특정 약관 항목 코드로 조회
         MemberTermsCondition foundMemberTermsCondition = memberTermConditionRepository.findMemberTermsConditionByCondCode(condCode);
+        if (foundMemberTermsCondition == null) {
+            // 없을 경우 예외 발생
+             throw new MemberTermsConditionNotFoundException();
+        }
+
         // 조회된 엔티티를 response로 변환하여 반환한다
         return new MemberTermConditionResponse(foundMemberTermsCondition);
     }
