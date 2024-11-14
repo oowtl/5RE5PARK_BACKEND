@@ -16,4 +16,10 @@ public interface MemberTermConditionRepository extends JpaRepository<MemberTerms
             "WHERE mtc.chkUse = 'Y' " +
             "ORDER BY mtc.ord")
     public List<MemberTermsCondition> findAvailableMemberTermsConditions();
+
+    @Query( "SELECT mtc " +
+            "FROM MemberTermsCondition mtc " +
+            "WHERE mtc.chkUse = 'N' " +
+            "ORDER BY mtc.ord")
+    public List<MemberTermsCondition> findNotAvailableMemberTermsConditions();
 }
