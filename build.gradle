@@ -37,8 +37,7 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
-    implementation 'org.modelmapper:modelmapper:3.1.1'
+
     //DOTENV
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     // Spring Security
@@ -84,7 +83,6 @@ dependencies {
 
     //Mp3, Wav 파일 정보 추출 라이브러리
     implementation 'com.mpatric:mp3agic:0.9.1'
-
 
     // tts
     implementation 'com.google.cloud:google-cloud-texttospeech:2.49.0'
