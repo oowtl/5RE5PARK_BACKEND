@@ -11,6 +11,6 @@ import lombok.*;
 public class AudioFileInfo {
     private String name;
     private String size;      //크기 (용량)
-    private Long length;    // 초 단위 길이
+    private Integer length;    // 초 단위 길이
     private String extension; //확장자
 }

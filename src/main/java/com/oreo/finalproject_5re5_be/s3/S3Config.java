@@ -21,7 +21,7 @@ public class S3Config {
     private String region;
 
     @Bean
-    AmazonS3 amazonS3Client() {
+    public AmazonS3 amazonS3Client() {
         // AWS 자격 증명 객체 생성
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
 

@@ -27,6 +27,10 @@ jobs:
       EMAIL_TITLE: ${{ secrets.EMAIL_TITLE }}
       EMAIL_CONTENT_TEMPLATE: ${{ secrets.EMAIL_CONTENT_TEMPLATE }}
       SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+      AWS_S3_ACCESSKEY: ${{ secrets.AWS_S3_ACCESSKEY }}
+      AWS_S3_SECRETKEY: ${{ secrets.AWS_S3_SECRETKEY }}
+      AWS_S3_BUKET_NAME: ${{ secrets.AWS_S3_BUKET_NAME }}
+      AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
     permissions:
       pull-requests: write  # PR에 댓글, 체크 실행을 할 수 있는 권한
       checks: write          # 체크 결과를 기록할 권한
