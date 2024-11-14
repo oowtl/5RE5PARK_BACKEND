@@ -1,9 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionsResponse;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
+import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class MemberTermsConditionServiceImpl {
 
     private final MemberTermConditionRepository memberTermConditionRepository;
@@ -31,7 +34,6 @@ public class MemberTermsConditionServiceImpl {
     }
 
     // 1-2. 여러개 회원 약관 항목을 등록한다
-    @Transactional
     public MemberTermConditionsResponse create(List<MemberTermConditionRequest> requests) {
         // 유효성 검증이 완료된 requests 더미로부터 이터러블 할 수 있는 엔티티 더미를 생성한다
         Stream<MemberTermsCondition> memberTermConditions = requests.stream()
@@ -97,11 +99,30 @@ public class MemberTermsConditionServiceImpl {
     }
 
     // 3-1. 단건 회원 약관 항목을 수정한다
+    public void update(String condCode, MemberTermConditionUpdateRequest request) {
+        // 특정 약관 항목 코드로 약과 조회
+        MemberTermsCondition foundMemberTermCondition = memberTermConditionRepository.findMemberTermsConditionByCondCode(condCode);
+        if (foundMemberTermCondition == null) {
+            // 없을 경우 예외 발생
+             throw new MemberTermsConditionNotFoundException();
+        }
+        // 있을 경우 엔티티를 수정
+        foundMemberTermCondition.update(request);
+    }
 
-    // 3-2. 여러개 회원 약관 항목을 수정한다
 
     // 4-1. 단건 회원 약관 항목을 삭제한다
-    // 4-2. 여러개 회원 약관 항목을 삭제한다
+    public void remove(String condCode) {
+        // 특정 약관 항목 코드로 약관을 조회한다
+        MemberTermsCondition foundMemberTermCondition = memberTermConditionRepository.findMemberTermsConditionByCondCode(condCode);
+        if (foundMemberTermCondition == null) {
+            // 없을 경우 예외 발생
+             throw new MemberTermsConditionNotFoundException();
+        }
+
+        // 조회된 약관을 삭제한다
+        memberTermConditionRepository.delete(foundMemberTermCondition);
+    }
 
 
 }

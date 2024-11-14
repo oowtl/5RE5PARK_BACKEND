@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,4 +57,12 @@ public class MemberTermsCondition extends BaseEntity  {
     private String law2;
     @Column(name = "law3")
     private String law3;
+
+    public void update(MemberTermConditionUpdateRequest updateRequest) {
+        this.shortCont = updateRequest.getShortCont();
+        this.longCont = updateRequest.getLongCont();
+        this.chkUse = updateRequest.getChkUse();
+        this.ord = updateRequest.getOrd();
+        this.termCondUpDate = LocalDateTime.now();
+    }
 }
