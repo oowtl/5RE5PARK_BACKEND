@@ -32,7 +32,7 @@ public class MemberTermsCondition extends BaseEntity  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long termCondSeq;
 
-    @Column(name = "terms_cond_code", nullable = false, unique = true)
+    @Column(name = "terms_cond_code", nullable = false)
     private String condCode;
 
     @Column(name = "name", nullable = false)
