@@ -120,10 +120,10 @@ public class MemberServiceImpl implements UserDetailsService {
         encodePassword(request);
         // 회원 엔티티 저장
         Member savedMember = saveMember(request);
-        // 회원 약관 이력 엔티티 저장
-        saveMemberTermsHistory(request, savedMember);
-        // 회원 초기 상태 엔티티 저장
-        saveInitMemberState(savedMember);
+//        // 회원 약관 이력 엔티티 저장
+//        saveMemberTermsHistory(request, savedMember);
+//        // 회원 초기 상태 엔티티 저장
+//        saveInitMemberState(savedMember);
         return savedMember;
     }
 
