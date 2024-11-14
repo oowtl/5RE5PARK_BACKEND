@@ -14,4 +14,5 @@ import java.util.function.Function;
 public interface VoiceRepository extends JpaRepository<Voice, Long> {
     List<Voice> findAllByName(String name);
     List<Voice> findAllByNameContaining(String name);
+    Optional<Voice> findByVoiceSeq(Long voiceSeq);
 }

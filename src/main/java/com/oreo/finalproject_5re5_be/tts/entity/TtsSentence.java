@@ -5,8 +5,6 @@ import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Objects;
-
 @Entity
 @Table(name = "tts_sentence")
 @Getter
@@ -39,7 +37,7 @@ public class TtsSentence extends BaseEntity {
     private Integer startPitch;
 
     @Column(name = "emotion")
-    private Integer emotion;
+    private String emotion;
 
     @Column(name = "emt_strength")
     private Integer emotionStrength;
@@ -67,4 +65,8 @@ public class TtsSentence extends BaseEntity {
     @OneToOne(optional = false)
     @JoinColumn(name = "voice_seq", nullable = false)
     private Voice voice;
+
+    @OneToOne
+    @JoinColumn(name = "style_seq")
+    private Style style;
 }
