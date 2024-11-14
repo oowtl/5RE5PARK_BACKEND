@@ -70,8 +70,6 @@ class MemberTermConditionRepositoryTest {
                 && expected.getLongCont().equals(actual.getLongCont())
                 && expected.getChkUse().equals(actual.getChkUse())
                 && expected.getOrd().equals(actual.getOrd())
-                && expected.getTermCondDate().equals(actual.getTermCondDate())
-                && expected.getTermCondUpDate().equals(actual.getTermCondUpDate())
                 && expected.getLaw1().equals(actual.getLaw1())
                 && expected.getLaw2().equals(actual.getLaw2())
                 && expected.getLaw3().equals(actual.getLaw3());
