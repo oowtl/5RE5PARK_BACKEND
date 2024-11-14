@@ -24,7 +24,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties") // - 현재 에러가 발생함. h2와 MySQL의 pk 설정 차이
 class MemberServiceImplTest {
 
@@ -35,11 +34,6 @@ class MemberServiceImplTest {
     private JavaMailSender mailSender;
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private MemberStateRepository memberStateRepository;
-    @Autowired
-    private MemberTermsHistoryRepository memberTermsHistoryRepository;
-
 
 
     @BeforeEach

@@ -15,9 +15,13 @@ import lombok.ToString;
 @Builder
 @ToString
 public class MemberTermConditionRequest {
+
+
     @NotBlank(message = "약관 코드를 입력해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9]{1,20}$", message = "약관 코드는 1~20자의 영문 및 숫자만 허용됩니다.")
     private String condCode;
+
+    private String name;
 
     @NotBlank(message = "약관 짧은 내용을 입력해주세요.")
     private String shortCont;
@@ -43,6 +47,7 @@ public class MemberTermConditionRequest {
         LocalDateTime now = LocalDateTime.now();
         return MemberTermsCondition.builder()
                 .condCode(condCode)
+                .name(name)
                 .shortCont(shortCont)
                 .longCont(longCont)
                 .chkUse(chkUse)
@@ -54,4 +59,5 @@ public class MemberTermConditionRequest {
                 .law3(law3)
                 .build();
     }
+
 }
