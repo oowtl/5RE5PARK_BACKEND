@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "project")
@@ -38,7 +39,18 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "user_seq")
     private Member member;
 
-    private String proName;
+    @Builder.Default
+    @Column(nullable = false, name = "pro_name")
+    private String proName="ProjectName";
+
+    @Column(name = "pro_cmt")
     private String proCmt;
+
+    @Column(nullable = false, name = "pro_up_date")
+    @LastModifiedDate
     private LocalDateTime proUpDate;
+
+    @Builder.Default
+    @Column(nullable = false, name = "activate")
+    private Character proActivate = 'Y';
 }
