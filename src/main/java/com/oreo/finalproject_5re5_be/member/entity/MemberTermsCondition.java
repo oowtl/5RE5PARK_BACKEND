@@ -20,9 +20,13 @@ import lombok.ToString;
 public class MemberTermsCondition extends BaseEntity  {
 
     @Id
-    @Column(name = "terms_cond_code")
+    @Column(name = "terms_cond_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long termCondCode;
+    private Long termCondSeq;
+
+    @Column(name = "terms_cond_code", nullable = false, unique = true)
+    private String condCode;
+
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "short_cont", nullable = false)

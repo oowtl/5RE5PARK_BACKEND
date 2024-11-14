@@ -44,6 +44,7 @@ public class MemberTerms extends BaseEntity  {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_code_3")
     private MemberTermsCondition termCode3;
+
     @Column(name = "chk_term_3")
     private Character chkTerm3;
 
