@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -54,24 +55,24 @@ public class MemberTerms extends BaseEntity{
     @Column(name = "chk_use", nullable = false)
     private Character chkUse;
 
-    // term_cond_seq_1~5 외래 키를 OneToOne 관계로 처리
-    @OneToOne(fetch = FetchType.EAGER)
+    // term_cond_seq_1~5 외래 키를 ManyToOne 관계로 처리
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_cond_seq_1", referencedColumnName = "terms_cond_seq")
     private MemberTermsCondition termCond1;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_cond_seq_2", referencedColumnName = "terms_cond_seq")
     private MemberTermsCondition termCond2;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_cond_seq_3", referencedColumnName = "terms_cond_seq")
     private MemberTermsCondition termCond3;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_cond_seq_4", referencedColumnName = "terms_cond_seq")
     private MemberTermsCondition termCond4;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_cond_seq_5", referencedColumnName = "terms_cond_seq")
     private MemberTermsCondition termCond5;
 
