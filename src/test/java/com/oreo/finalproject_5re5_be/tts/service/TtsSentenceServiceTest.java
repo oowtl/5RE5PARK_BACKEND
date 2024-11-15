@@ -4,7 +4,7 @@ import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceResponse;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
 import com.oreo.finalproject_5re5_be.tts.repository.*;
 import jakarta.validation.ConstraintViolationException;
@@ -333,7 +333,7 @@ class TtsSentenceServiceTest {
 
         // when
         // 8. ttsSentenceService addSentence 메소드 호출
-        TtsSentenceResponse ttsSentenceResponse = ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest);
+        TtsSentenceDto ttsSentenceResponse = ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest);
 
         // then
         // 9. ttsSentenceResponse 가 null 이 아님
