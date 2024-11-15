@@ -9,17 +9,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberTermConditionRepository extends JpaRepository<MemberTermsCondition, Long> {
 
-    public MemberTermsCondition findMemberTermsConditionByCondCode(String condCode);
+    MemberTermsCondition findMemberTermsConditionByCondCode(String condCode);
 
     @Query( "SELECT mtc " +
             "FROM MemberTermsCondition mtc " +
             "WHERE mtc.chkUse = 'Y' " +
             "ORDER BY mtc.ord")
-    public List<MemberTermsCondition> findAvailableMemberTermsConditions();
+    List<MemberTermsCondition> findAvailableMemberTermsConditions();
 
     @Query( "SELECT mtc " +
             "FROM MemberTermsCondition mtc " +
             "WHERE mtc.chkUse = 'N' " +
             "ORDER BY mtc.ord")
-    public List<MemberTermsCondition> findNotAvailableMemberTermsConditions();
+    List<MemberTermsCondition> findNotAvailableMemberTermsConditions();
 }
