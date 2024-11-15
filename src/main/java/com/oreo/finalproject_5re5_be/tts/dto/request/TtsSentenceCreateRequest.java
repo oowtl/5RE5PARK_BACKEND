@@ -4,10 +4,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Schema(description = "TTS 문장 생성 요청")
 @Getter
+@ToString
+@AllArgsConstructor
+@Builder
 public class TtsSentenceCreateRequest {
     @Schema(description = "스타일 ID", example = "1")
     private Long styleSeq; // 스타일 id
@@ -28,15 +34,13 @@ public class TtsSentenceCreateRequest {
     private TtsAttributeInfo attribute; // 옵션 정보
 
     public static TtsSentenceCreateRequest of(Long styleSeq, Long voiceSeq, String text, Integer order, TtsAttributeInfo attribute) {
-        TtsSentenceCreateRequest ttsSentenceCreateRequest = new TtsSentenceCreateRequest();
-
-        ttsSentenceCreateRequest.styleSeq = styleSeq;
-        ttsSentenceCreateRequest.voiceSeq = voiceSeq;
-        ttsSentenceCreateRequest.text = text;
-        ttsSentenceCreateRequest.order = order;
-        ttsSentenceCreateRequest.attribute = attribute;
-
-        return ttsSentenceCreateRequest;
+        return TtsSentenceCreateRequest.builder()
+                .styleSeq(styleSeq)
+                .voiceSeq(voiceSeq)
+                .text(text)
+                .order(order)
+                .attribute(attribute)
+                .build();
     }
 
 

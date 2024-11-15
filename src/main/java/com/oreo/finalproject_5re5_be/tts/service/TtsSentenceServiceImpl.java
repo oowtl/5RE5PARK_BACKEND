@@ -4,7 +4,7 @@ import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceResponse;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
 import com.oreo.finalproject_5re5_be.tts.repository.*;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     }
 
     @Override
-    public TtsSentenceResponse addSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceCreateRequest createRequest) {
+    public TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceCreateRequest createRequest) {
         // 1. TtsSentenceCreateRequest 유효성 검증 : Text (not blank) => @NotBlank
 
         // 2.1 projectSeq 유효성 검증 : not null => @NotNull
@@ -89,6 +89,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         log.info("[ttsProgressStatus] save : {}", createdTtsProgress);
 
         // 6. TtsSentenceResponse 변환
-        return TtsSentenceResponse.of(createdTtsSentence);
+        return TtsSentenceDto.of(createdTtsSentence);
     }
 }
