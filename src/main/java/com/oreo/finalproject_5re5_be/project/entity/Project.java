@@ -40,10 +40,11 @@ public class Project extends BaseEntity {
 
     @Column(nullable = false, name = "pro_up_date")
     @LastModifiedDate
+    @EqualsAndHashCode.Exclude
     private LocalDateTime proUpDate;
 
     @Builder.Default
-    @Column(nullable = false, name = "activate")
+    @Column(nullable = false, name = "asctivate")
     private Character proActivate = 'Y';
 
     public void prePersist() {
