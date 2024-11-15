@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.member.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,12 +43,37 @@ class MemberTermsRepositoryTest {
         memberTermConditionRepository.saveAll(dummy);
         assertTrue(10 == memberTermConditionRepository.count());
 
+        // 약관 1개 만들기
+        MemberTerms term = new MemberTerms();
+
+        // TERMS001 ~ TERMS005까지로 약관 항목들 조회
+        MemberTermsCondition termCond1 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS001");
+        MemberTermsCondition termCond2 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS002");
+        MemberTermsCondition termCond3 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS003");
+        MemberTermsCondition termCond4 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS004");
+        MemberTermsCondition termCond5 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS005");
+
+        // 약관에 약관 항목들 세팅
+
+
+        // 약관에 필요한 기본값 세팅
+
+
+        // 약관 이름 세팅
+        term.setName("2024상반기회원약관");
+
+        // 약관 등록일 세팅
+        term.setRegDate(LocalDateTime.now());
+
+        // 약관 저장
+        memberTermsRepository.save(term);
+        assertTrue(1 == memberTermsRepository.count());
+
     }
 
     @DisplayName("사용가능한 가장 최근 약관 조회")
     @Test
     void 사용_가능한_가장_최근_약관_조회() {
-
     }
 
     @DisplayName("사용가능한 약관 모두 조회")
