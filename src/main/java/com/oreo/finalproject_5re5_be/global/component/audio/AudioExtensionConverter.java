@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.audio;
+package com.oreo.finalproject_5re5_be.global.component.audio;
 
 import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;

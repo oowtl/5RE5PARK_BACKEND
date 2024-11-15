@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.audio;
+package com.oreo.finalproject_5re5_be.global.component.audio;
 
 import lombok.Getter;
 
@@ -27,17 +27,17 @@ public enum AudioExtensions {
     private final String signatures;
 
     //파라미터가 Enum중 있는지 여부 반환
-    static boolean isSupported(String signature) {
+    public static boolean isSupported(String signature) {
         return collect.contains("E_" + signature);
     }
 
     //Enum의 wav 확장자 시그니처와 파라미터가 같은지 여부 반환
-    static boolean isWavExtension(String signature) {
+    public static boolean isWavExtension(String signature) {
         return AudioExtensions.E_52494646.toString().equals("E_" + signature);
     }
 
     //wav 확장자가 아니고 지원되는 확장자라면 mp3확장자
-    static boolean isMp3Extension(String signature) {
+    public static boolean isMp3Extension(String signature) {
         if (isWavExtension(signature)) {
             return false;
         }

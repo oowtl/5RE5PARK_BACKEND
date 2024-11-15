@@ -1,4 +1,8 @@
-package com.oreo.finalproject_5re5_be.audio;
+package com.oreo.finalproject_5re5_be.concat.service.concatenator;
+
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
+import com.oreo.finalproject_5re5_be.global.component.audio.BeepMaker;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -6,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import static com.oreo.finalproject_5re5_be.audio.IntervalConcatenator.prepareAudioStreams;
+import static com.oreo.finalproject_5re5_be.concat.service.concatenator.IntervalConcatenator.prepareAudioStreams;
 
 /**
  * @apiNote 스테레오 포맷의 무음구간을 포함한 병합에 사용되는 클래스 입니다. <br>

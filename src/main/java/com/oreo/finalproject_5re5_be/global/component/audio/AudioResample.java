@@ -1,4 +1,6 @@
-package com.oreo.finalproject_5re5_be.audio;
+package com.oreo.finalproject_5re5_be.global.component.audio;
+
+import com.oreo.finalproject_5re5_be.concat.service.concatenator.Concatenator;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;

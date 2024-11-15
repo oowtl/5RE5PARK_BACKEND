@@ -1,5 +1,9 @@
 package com.oreo.finalproject_5re5_be.audio;
 
+import com.oreo.finalproject_5re5_be.global.component.audio.*;
+import com.oreo.finalproject_5re5_be.concat.service.concatenator.AudioProperties;
+import com.oreo.finalproject_5re5_be.concat.service.concatenator.IntervalConcatenator;
+import com.oreo.finalproject_5re5_be.concat.service.concatenator.StereoIntervalConcatenator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

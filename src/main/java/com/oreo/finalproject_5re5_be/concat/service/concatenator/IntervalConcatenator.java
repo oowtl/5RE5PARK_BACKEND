@@ -1,4 +1,6 @@
-package com.oreo.finalproject_5re5_be.audio;
+package com.oreo.finalproject_5re5_be.concat.service.concatenator;
+
+import com.oreo.finalproject_5re5_be.global.component.audio.BeepMaker;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
