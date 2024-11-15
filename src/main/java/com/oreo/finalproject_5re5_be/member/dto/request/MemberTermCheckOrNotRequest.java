@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class MemberTermRequest {
+public class MemberTermCheckOrNotRequest {
     private Long termCondCode;
     private Character agreed;
     private Boolean isMandatory;

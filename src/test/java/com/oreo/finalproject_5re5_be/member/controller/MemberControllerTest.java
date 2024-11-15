@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
@@ -50,7 +50,7 @@ class MemberControllerTest {
     @Test
     public void 회원가입_성공() throws Exception {
         // 회원 가입에 필요한 데이터 생성
-        List<MemberTermRequest> memberTerms = createMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTerms = createMemberTerms();
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
 
         // 회원 엔티티 생성
@@ -88,7 +88,7 @@ class MemberControllerTest {
     @Test
     public void 유효성_검증_실패_회원가입_실패() throws Exception {
         // 회원 가입에 필요한 데이터 생성
-        List<MemberTermRequest> memberTerms = createMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTerms = createMemberTerms();
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
         // 잘못된 아이디로 설정
         request.setId("잘못된 아이디");
@@ -139,50 +139,50 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.message").value(expectedErrorMessage));;
     }
 
-    private List<MemberTermRequest> createMemberTerms() {
-        List<MemberTermRequest> memberTermRequests = new ArrayList<>();
+    private List<MemberTermCheckOrNotRequest> createMemberTerms() {
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = new ArrayList<>();
         // 약관 동의 내용 설정
-        memberTermRequests = new ArrayList<>();
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests = new ArrayList<>();
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(1L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(2L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(3L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(4L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(5L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        return memberTermRequests;
+        return memberTermCheckOrNotRequests;
     }
 
     private MemberRegisterRequest createMemberRegisterRequest(
-            List<MemberTermRequest> memberTermRequests) {
+            List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
@@ -191,7 +191,7 @@ class MemberControllerTest {
                 .birthDate("1990-01-01")
                 .userRegDate(LocalDateTime.now())
                 .chkValid('Y')
-                .memberTermRequests(memberTermRequests)
+                .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
                 .normAddr("서울시 강남구")
                 .passAddr("서초대로 59-32")
                 .locaAddr("서초동")
