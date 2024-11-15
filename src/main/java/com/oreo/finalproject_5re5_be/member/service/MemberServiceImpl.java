@@ -102,7 +102,7 @@ public class MemberServiceImpl implements UserDetailsService {
         }
 
         // 회원가입 처리, 서버 내부 예외 발생시 재시도를 통한 복구 작업 진행
-        return RetryableCreateMember(request);
+        return retryableCreateMember(request);
     }
 
     // 1-2. 회원가입 처리, 서버 내부 예외 발생시 재시도를 통한 복구 작업 진행
@@ -112,7 +112,7 @@ public class MemberServiceImpl implements UserDetailsService {
             maxAttempts = MAX_RETRY,
             backoff = @Backoff(delay = RETRY_DELAY)
     )
-    public Member RetryableCreateMember(MemberRegisterRequest request) {
+    public Member retryableCreateMember(MemberRegisterRequest request) {
         // 비밀번호 암호화
         encodePassword(request);
         // 회원 엔티티 저장

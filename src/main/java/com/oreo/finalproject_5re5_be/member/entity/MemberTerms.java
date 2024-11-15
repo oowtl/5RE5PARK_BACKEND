@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,7 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -44,7 +47,7 @@ public class MemberTerms extends BaseEntity{
     private Character chkTerm5;
 
     @Column(name = "term_end_date")
-    private Character termEndDate;
+    private LocalDateTime termEndDate;
 
     @Column(name = "term_reg_date", nullable = false)
     private LocalDateTime termRegDate;
@@ -75,5 +78,26 @@ public class MemberTerms extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "term_cond_seq_5", referencedColumnName = "terms_cond_seq")
     private MemberTermsCondition termCond5;
+
+    public void update(MemberTermUpdateRequest request) {
+        // 사용 가능 여부를 세팅함
+        Character chk = request.getChkUse();
+        this.setChkUse(chk);
+
+        // 약관 필수 여부 변경
+        List<Character> memberTermConditionMandatoryOrNot = request.getMemberTermConditionMandatoryOrNot();
+        this.setChkTerm1(memberTermConditionMandatoryOrNot.get(0));
+        this.setChkTerm2(memberTermConditionMandatoryOrNot.get(1));
+        this.setChkTerm3(memberTermConditionMandatoryOrNot.get(2));
+        this.setChkTerm4(memberTermConditionMandatoryOrNot.get(3));
+        this.setChkTerm5(memberTermConditionMandatoryOrNot.get(4));
+
+        // 시간 세팅함
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime max = LocalDateTime.MAX;
+
+        this.setTermRegDate(now);
+        this.setTermEndDate(max);
+    }
 
 }
