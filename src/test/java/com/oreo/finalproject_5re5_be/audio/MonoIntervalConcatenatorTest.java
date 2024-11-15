@@ -40,8 +40,6 @@ class MonoIntervalConcatenatorTest {
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 10000f);
 
-        new SoundPlayer().play(audioResample.resample(byteArrayOutputStream));
-
         //테스트
         assertThatCode(() -> audioResample.resample(byteArrayOutputStream)).doesNotThrowAnyException();
     }
