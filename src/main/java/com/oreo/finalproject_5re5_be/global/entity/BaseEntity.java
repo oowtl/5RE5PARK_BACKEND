@@ -1,8 +1,6 @@
 package com.oreo.finalproject_5re5_be.global.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,4 +34,15 @@ public class BaseEntity {
     @LastModifiedBy
     @Column(insertable = false, name = "up_seq")
     private Long upSeq;
+
+    @PrePersist
+    public void prePersist() {
+        regDate = LocalDateTime.now();
+        upDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        upDate = LocalDateTime.now();
+    }
 }
