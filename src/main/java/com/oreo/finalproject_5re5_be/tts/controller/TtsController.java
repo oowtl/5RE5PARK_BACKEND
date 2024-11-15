@@ -2,7 +2,6 @@ package com.oreo.finalproject_5re5_be.tts.controller;
 
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.response.ApiResponse;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsErrorResponse;
