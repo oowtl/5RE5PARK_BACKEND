@@ -18,6 +18,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 추후에 응답 데이터 Response 만들어서 반환하도록 리팩토링
+ * - 기본처리 틀 잡아 놓기
+ */
+
+
 @Service
 @Transactional
 public class MemberTermsServiceImpl {
@@ -70,8 +76,6 @@ public class MemberTermsServiceImpl {
         terms.setTermRegDate(now);
         terms.setTermEndDate(max);
 
-        System.out.println("terms = " + terms);
-
         // 생성한 값을 반환함
         MemberTerms savedMemberTerm = memberTermsRepository.save(terms);
         return savedMemberTerm;
@@ -86,7 +90,7 @@ public class MemberTermsServiceImpl {
 
     // 회원 약관 코드로 조회
     public MemberTerms read(String name) {
-        return memberTermsRepository.findMemberTermsByName(name);
+        return findMemberTerm(name);
     }
 
 
@@ -128,6 +132,14 @@ public class MemberTermsServiceImpl {
     // 약관 시퀀스로 약관을 찾아서 반환함
     private MemberTerms findMemberTerm(Long termSeq) {
         MemberTerms foundMemberTerms = memberTermsRepository.findMemberTermsByTermsSeq(termSeq);
+        if (foundMemberTerms == null) {
+            throw new MemberTermsNotFoundException();
+        }
+        return foundMemberTerms;
+    }
+
+    private MemberTerms findMemberTerm(String name) {
+        MemberTerms foundMemberTerms = memberTermsRepository.findMemberTermsByName(name);
         if (foundMemberTerms == null) {
             throw new MemberTermsNotFoundException();
         }
