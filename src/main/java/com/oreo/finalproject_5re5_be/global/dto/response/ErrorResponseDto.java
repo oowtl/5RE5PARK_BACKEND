@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.tts.exception;
+package com.oreo.finalproject_5re5_be.global.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class TtsErrorResponse {
+public class ErrorResponseDto {
     private int status;
     private Response response;
 
@@ -31,11 +31,11 @@ public class TtsErrorResponse {
         }
     }
 
-    public static TtsErrorResponse of(int status, String message, List<FieldErrorDetail> fieldErrors) {
-        return new TtsErrorResponse(status, new Response(message, fieldErrors));
+    public static ErrorResponseDto of(int status, String message, List<FieldErrorDetail> fieldErrors) {
+        return new ErrorResponseDto(status, new Response(message, fieldErrors));
     }
 
-    public static TtsErrorResponse of(int status, String message) {
-        return new TtsErrorResponse(status, new Response(message, null));
+    public static ErrorResponseDto of(int status, String message) {
+        return new ErrorResponseDto(status, new Response(message, null));
     }
 }

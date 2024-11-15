@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.tts.exception;
+package com.oreo.finalproject_5re5_be.global.exception;
 
 import lombok.Getter;
 

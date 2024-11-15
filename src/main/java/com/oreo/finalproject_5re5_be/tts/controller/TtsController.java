@@ -1,11 +1,11 @@
 package com.oreo.finalproject_5re5_be.tts.controller;
 
+import com.oreo.finalproject_5re5_be.global.dto.response.ErrorResponseDto;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.tts.exception.ErrorCode;
-import com.oreo.finalproject_5re5_be.tts.exception.TtsErrorResponse;
-import com.oreo.finalproject_5re5_be.tts.exception.TtsException;
+import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,66 +37,66 @@ public class TtsController {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<TtsErrorResponse> runtimeExceptionHandler(RuntimeException e) {
+    public ResponseEntity<ErrorResponseDto> runtimeExceptionHandler(RuntimeException e) {
         log.error("[RuntimeException]", e);
 
-        TtsErrorResponse errorResponse = TtsErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR.getStatus(), ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.of(ErrorCode.INTERNAL_SERVER_ERROR.getStatus(), ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(errorResponse);
+                .body(errorResponseDto);
     }
 
 
-    // TtsException 처리
-    @ExceptionHandler(TtsException.class)
-    public ResponseEntity<TtsErrorResponse> ttsExceptionHandler(TtsException e) {
-        log.error("[TtsException]", e);
+    // BusinessException 처리
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponseDto> ttsExceptionHandler(BusinessException e) {
+        log.error("[BusinessException]", e);
 
-        TtsErrorResponse errorResponse = TtsErrorResponse.of(e.getErrorCode().getStatus(), e.getMessage());
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.of(e.getErrorCode().getStatus(), e.getMessage());
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
-                .body(errorResponse);
+                .body(errorResponseDto);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<TtsErrorResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponseDto> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         log.error("[MethodArgumentNotValidException]", e);
 
         // bindingResult에 에러가 있는 경우
         if (e.getBindingResult().hasErrors()) {
 
             // fieldErrors 생성
-            List<TtsErrorResponse.FieldErrorDetail> fieldErrors = e.getBindingResult().getFieldErrors().stream()
-                    .map(error -> TtsErrorResponse.FieldErrorDetail.of(error.getField(), error.getDefaultMessage()))
+            List<ErrorResponseDto.FieldErrorDetail> fieldErrors = e.getBindingResult().getFieldErrors().stream()
+                    .map(error -> ErrorResponseDto.FieldErrorDetail.of(error.getField(), error.getDefaultMessage()))
                     .collect(Collectors.toList());
 
-            // errorResponse 생성
-            TtsErrorResponse errorResponse = TtsErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE.getStatus(), ErrorCode.INVALID_INPUT_VALUE.getMessage(), fieldErrors);
+            // errorResponseDto 생성
+            ErrorResponseDto errorResponseDto = ErrorResponseDto.of(ErrorCode.INVALID_INPUT_VALUE.getStatus(), ErrorCode.INVALID_INPUT_VALUE.getMessage(), fieldErrors);
 
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(errorResponse);
+                    .body(errorResponseDto);
         }
 
         // bindingResult에 에러가 없는 경우
-        TtsErrorResponse errorResponse = TtsErrorResponse.of(HttpStatus.BAD_REQUEST.value(), "Invalid Request");
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.of(HttpStatus.BAD_REQUEST.value(), "Invalid Request");
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
+                .body(errorResponseDto);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<TtsErrorResponse> constraintViolationExceptionHandler(ConstraintViolationException e) {
+    public ResponseEntity<ErrorResponseDto> constraintViolationExceptionHandler(ConstraintViolationException e) {
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
 
-        List<TtsErrorResponse.FieldErrorDetail> fieldErrors = constraintViolations.stream()
-                .map(violation -> TtsErrorResponse.FieldErrorDetail.of(violation.getPropertyPath().toString(), violation.getMessage()))
+        List<ErrorResponseDto.FieldErrorDetail> fieldErrors = constraintViolations.stream()
+                .map(violation -> ErrorResponseDto.FieldErrorDetail.of(violation.getPropertyPath().toString(), violation.getMessage()))
                 .collect(Collectors.toList());
 
-        TtsErrorResponse errorResponse = TtsErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE.getStatus(), ErrorCode.INVALID_INPUT_VALUE.getMessage(), fieldErrors);
+        ErrorResponseDto errorResponseDto = ErrorResponseDto.of(ErrorCode.INVALID_INPUT_VALUE.getStatus(), ErrorCode.INVALID_INPUT_VALUE.getMessage(), fieldErrors);
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(errorResponse);
+                .body(errorResponseDto);
     }
 
     @Operation(summary = "TTS 문장 생성 요청")
