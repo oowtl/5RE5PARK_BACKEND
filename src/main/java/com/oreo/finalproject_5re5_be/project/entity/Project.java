@@ -53,4 +53,12 @@ public class Project extends BaseEntity {
     @Builder.Default
     @Column(nullable = false, name = "activate")
     private Character proActivate = 'Y';
+
+    public void prePersist() {
+        proUpDate = LocalDateTime.now();
+    }
+
+    public void preUpdate() {
+        proUpDate = LocalDateTime.now();
+    }
 }
