@@ -37,4 +37,5 @@ public interface MemberTermsRepository extends JpaRepository<MemberTerms, Long> 
     // 약관 시퀀스로 조회
     MemberTerms findMemberTermsByTermsSeq(Long termsSeq);
 
+
 }

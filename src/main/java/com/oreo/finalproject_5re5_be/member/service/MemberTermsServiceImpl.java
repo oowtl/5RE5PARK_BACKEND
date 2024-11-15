@@ -70,6 +70,8 @@ public class MemberTermsServiceImpl {
         terms.setTermRegDate(now);
         terms.setTermEndDate(max);
 
+        System.out.println("terms = " + terms);
+
         // 생성한 값을 반환함
         MemberTerms savedMemberTerm = memberTermsRepository.save(terms);
         return savedMemberTerm;
@@ -77,7 +79,17 @@ public class MemberTermsServiceImpl {
 
 
 
-    // 회원 약관 조회
+    // 회원 약관 시퀀스로 조회
+    public MemberTerms read(Long termSeq) {
+        return findMemberTerm(termSeq);
+    }
+
+    // 회원 약관 코드로 조회
+    public MemberTerms read(String name) {
+        return memberTermsRepository.findMemberTermsByName(name);
+    }
+
+
     public List<MemberTerms> readAll() {
         return memberTermsRepository.findAll();
     }
