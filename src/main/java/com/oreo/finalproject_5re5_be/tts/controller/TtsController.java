@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.controller;
 
+import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.ApiResponse;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
@@ -101,7 +102,7 @@ public class TtsController {
 
     @Operation(summary = "TTS 문장 생성 요청")
     @PostMapping("/sentence")
-    public ResponseEntity<ApiResponse<TtsSentenceDto>> registerSentence(
+    public ResponseEntity<ResponseDto<TtsSentenceDto>> registerSentence(
             @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
             @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceCreateRequest createRequest) {
 
@@ -110,6 +111,6 @@ public class TtsController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(HttpStatus.CREATED.value(), response));
+                .body(new ResponseDto<>(HttpStatus.CREATED.value(), response));
     }
 }
