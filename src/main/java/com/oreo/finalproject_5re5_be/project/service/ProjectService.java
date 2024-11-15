@@ -12,7 +12,7 @@ public interface ProjectService {
      * 4. 프로젝트 삭제
      */
     List<ProjectResponse> projectFindAll();
-    void projectSave(String projectName);
+    Long projectSave();
     void projectUpdate(Long projectSeq, String projectName);
-    void projectDelete(Long projectSeq);
+    void projectDelete(List<Long> projectSeq);
 }
