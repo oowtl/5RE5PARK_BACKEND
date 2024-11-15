@@ -22,46 +22,84 @@ import lombok.ToString;
 @ToString
 public class MemberTerms extends BaseEntity  {
 
+
     @Id
-    @Column(name = "terms_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "terms_seq")
     private Long termsSeq;
-    @Column(name = "name", nullable = false)
-    private String name;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "term_code_1")
-    private MemberTermsCondition termCode1;
-    @Column(name = "chk_term_1")
-    private Character chkTerm1;
+    @Column(name = "chk_term_1", nullable = false, length = 1)
+    private String chkTerm1;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "term_code_2")
-    private MemberTermsCondition termCode2;
-    @Column(name = "chk_term_2")
-    private Character chkTerm2;
+    @Column(name = "chk_term_2", nullable = false, length = 1)
+    private String chkTerm2;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "term_code_3")
-    private MemberTermsCondition termCode3;
+    @Column(name = "chk_term_3", nullable = false, length = 1)
+    private String chkTerm3;
 
-    @Column(name = "chk_term_3")
-    private Character chkTerm3;
+    @Column(name = "chk_term_4", nullable = false, length = 1)
+    private String chkTerm4;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "term_code_4")
-    private MemberTermsCondition termCode4;
-    @Column(name = "chk_term_4")
-    private Character chkTerm4;
+    @Column(name = "chk_term_5", nullable = false, length = 1)
+    private String chkTerm5;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "term_code_5")
-    private MemberTermsCondition termCode5;
-    @Column(name = "chk_term_5")
-    private Character chkTerm5;
+    @Column(name = "term_end_date", nullable = false, length = 1)
+    private String termEndDate;
+
+    @Column(name = "reg_date")
+    private LocalDateTime regDate;
+
+    @Column(name = "reg_seq")
+    private Long regSeq;
+
+    @Column(name = "term_cond_seq_1", nullable = false)
+    private Long termCondSeq1;
+
+    @Column(name = "term_cond_seq_2", nullable = false)
+    private Long termCondSeq2;
+
+    @Column(name = "term_cond_seq_3", nullable = false)
+    private Long termCondSeq3;
+
+    @Column(name = "term_cond_seq_4", nullable = false)
+    private Long termCondSeq4;
+
+    @Column(name = "term_cond_seq_5", nullable = false)
+    private Long termCondSeq5;
 
     @Column(name = "term_reg_date", nullable = false)
     private LocalDateTime termRegDate;
-    @Column(name = "term_end_date", nullable = false)
-    private Character chkUse;
+
+    @Column(name = "up_date")
+    private LocalDateTime upDate;
+
+    @Column(name = "up_seq")
+    private Long upSeq;
+
+    @Column(name = "name", nullable = false, length = 255)
+    private String name;
+
+    @Column(name = "chk_use", nullable = false, length = 1)
+    private String chkUse;
+
+    // 외래키 관계 설정
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "term_cond_seq_1", referencedColumnName = "terms_cond_seq", insertable = false, updatable = false)
+    private MemberTermsCondition termCondition1;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "term_cond_seq_2", referencedColumnName = "terms_cond_seq", insertable = false, updatable = false)
+    private MemberTermsCondition termCondition2;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "term_cond_seq_3", referencedColumnName = "terms_cond_seq", insertable = false, updatable = false)
+    private MemberTermsCondition termCondition3;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "term_cond_seq_4", referencedColumnName = "terms_cond_seq", insertable = false, updatable = false)
+    private MemberTermsCondition termCondition4;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "term_cond_seq_5", referencedColumnName = "terms_cond_seq", insertable = false, updatable = false)
+    private MemberTermsCondition termCondition5;
 }
