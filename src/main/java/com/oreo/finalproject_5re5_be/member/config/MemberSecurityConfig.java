@@ -49,6 +49,12 @@ public class MemberSecurityConfig {
 //
 //        return http.build();
 //    }
+// 밑에 개발 어느정도 마무리 되면 주석처리된 부분 주석 해제하고 적용할 예정
+//                        .requestMatchers("/", "/member/**", "/api/member/**", "/api/member-term-condition/**", // 허용되는 URL
+//                                         "/audio/**", "/project/**", "/languagecode/**",
+//                                         "/voice/**", "/style/**", "/vc/**", "/concat/**",
+//                                         "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") // Swagger 관련 URL 허용
+
 
     // SecurityFilterChain을 빈으로 등록
     @Bean
@@ -57,11 +63,8 @@ public class MemberSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/member/**", "/api/member/**", "/api/member-term-condition/**", // 허용되는 URL
-                                         "/audio/**", "/project/**", "/languagecode/**",
-                                         "/voice/**", "/style/**", "/vc/**", "/concat/**",
-                                         "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") // Swagger 관련 URL 허용
-                        .permitAll() // 위 URL들은 인증 없이 접근 가능
+                                .anyRequest() // 개발 단계로 모든 요청 열어둠
+                                .permitAll() // 위 URL들은 인증 없이 접근 가능
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/api/member/login") // 로그인 페이지 경로 설정
