@@ -4,7 +4,7 @@ import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceUpdateRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
@@ -38,20 +38,20 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     }
 
     @Override
-    public TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceCreateRequest createRequest) {
-        // 1. TtsSentenceCreateRequest 유효성 검증 : Text (not blank) => @NotBlank
+    public TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceRequest createRequest) {
+        // 1. TtsSentenceRequest 유효성 검증 : Text (not blank) => @NotBlank
 
         // 2.1 projectSeq 유효성 검증 : not null => @NotNull
         // 2.2. projectSeq : 조회 가능한 projectSeq (존재 여부) 검증 및 할당
         Project project = projectRepository.findById(projectSeq)
                 .orElseThrow(() -> new IllegalArgumentException("projectSeq is invalid"));
 
-        // 3.1 TtsSentenceCreateRequest.voiceSeq 유효성 검증 : not null => @NotNull
+        // 3.1 TtsSentenceRequest.voiceSeq 유효성 검증 : not null => @NotNull
         // 3.2 voiceSeq : 조회 가능한 voiceSeq (존재 여부) 검증 및 할당
         Voice voice = voiceRepository.findByVoiceSeq(createRequest.getVoiceSeq())
                 .orElseThrow(() -> new IllegalArgumentException("voiceSeq is invalid"));
 
-        // 3. TtsSentenceCreateRequest 유효성 검증 : StyleSeq
+        // 3. TtsSentenceRequest 유효성 검증 : StyleSeq
         // 3.1. styleSeq : not null 일 때 styleSeq 유효성 검증 및 할당
         Style style = null;
         if (createRequest.getStyleSeq() != null) {
@@ -59,7 +59,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                     .orElseThrow(() -> new IllegalArgumentException("styleSeq is invalid"));
         }
 
-        // 4. TtsSentenceCreateRequest -> TtsSentence 변환
+        // 4. TtsSentenceRequest -> TtsSentence 변환
         TtsAttributeInfo attribute = createRequest.getAttribute();
         TtsSentence ttsSentence = TtsSentence.builder()
                 .text(createRequest.getText())

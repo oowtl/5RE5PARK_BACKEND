@@ -3,7 +3,7 @@ package com.oreo.finalproject_5re5_be.tts.controller;
 import com.oreo.finalproject_5re5_be.global.dto.response.ErrorResponseDto;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
@@ -103,7 +103,7 @@ public class TtsController {
     @PostMapping("/sentence")
     public ResponseEntity<ResponseDto<TtsSentenceDto>> registerSentence(
             @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
-            @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceCreateRequest createRequest) {
+            @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceRequest createRequest) {
 
         // 문장 생성
         TtsSentenceDto response = ttsSentenceService.addSentence(projectSeq, createRequest);

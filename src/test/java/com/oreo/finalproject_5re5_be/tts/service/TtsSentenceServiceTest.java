@@ -4,7 +4,7 @@ import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceCreateRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceUpdateRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
@@ -78,13 +78,13 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
+        // 2. TtsSentenceRequest 생성하기
         // text가 null 인 경우
-        TtsSentenceCreateRequest nullTextCreateRequest = TtsSentenceCreateRequest.of(1L, 1L, null, 1, ttsAttributeInfo);
+        TtsSentenceRequest nullTextCreateRequest = TtsSentenceRequest.of(1L, 1L, null, 1, ttsAttributeInfo);
         // text가 empty 인 경우
-        TtsSentenceCreateRequest emptyTextCreateRequest = TtsSentenceCreateRequest.of(1L, 1L, "", 1, ttsAttributeInfo);
+        TtsSentenceRequest emptyTextCreateRequest = TtsSentenceRequest.of(1L, 1L, "", 1, ttsAttributeInfo);
         // text가 blank 인 경우
-        TtsSentenceCreateRequest blankTextCreateRequest = TtsSentenceCreateRequest.of(1L, 1L, " ", 1, ttsAttributeInfo);
+        TtsSentenceRequest blankTextCreateRequest = TtsSentenceRequest.of(1L, 1L, " ", 1, ttsAttributeInfo);
 
         // when, then
         // 3. ConstraintViolationException 발생
@@ -103,12 +103,12 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest ttsSentenceCreateRequest = TtsSentenceCreateRequest.of(1L, 1L, "text", 1, ttsAttributeInfo);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest ttsSentenceRequest = TtsSentenceRequest.of(1L, 1L, "text", 1, ttsAttributeInfo);
 
         // when, then
         // 3. ConstraintViolationException 발생
-        assertThrows(ConstraintViolationException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest));
+        assertThrows(ConstraintViolationException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest));
     }
 
     // 3. 필수 정보 유효성 검증 - projectSeq: 조회 가능한 projectSeq (존재 여부)
@@ -121,15 +121,15 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest ttsSentenceCreateRequest = TtsSentenceCreateRequest.of(1L, 1L, "text", 1, ttsAttributeInfo);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest ttsSentenceRequest = TtsSentenceRequest.of(1L, 1L, "text", 1, ttsAttributeInfo);
 
         // 3. project repository findById 메소드가 null을 반환하도록 설정
         when(projectRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when, then
         // 3. IllegalArgumentException 발생
-        assertThrows(IllegalArgumentException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest));
+        assertThrows(IllegalArgumentException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest));
     }
 
     // 4. 필수 정보 유효성 검증 - voiceSeq: not null
@@ -142,8 +142,8 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest nullVoiceSeqCreateRequest = TtsSentenceCreateRequest.of(1L, null, "text", 1, ttsAttributeInfo);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest nullVoiceSeqCreateRequest = TtsSentenceRequest.of(1L, null, "text", 1, ttsAttributeInfo);
 
         // when, then
         // 3. ConstraintViolationException 발생
@@ -161,8 +161,8 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest ttsSentenceCreateRequest = TtsSentenceCreateRequest.of(1L, testVoiceSeq, "text", 1, ttsAttributeInfo);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest ttsSentenceRequest = TtsSentenceRequest.of(1L, testVoiceSeq, "text", 1, ttsAttributeInfo);
 
         // 3. Project 객체 생성하기 및 projectRepository findById 메소드가 객체를 반환
         Project project = Project.builder().proSeq(projectSeq).build();
@@ -173,7 +173,7 @@ class TtsSentenceServiceTest {
 
         // when, then
         // 3. IllegalArgumentException 발생
-        assertThrows(IllegalArgumentException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest));
+        assertThrows(IllegalArgumentException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest));
     }
 
     // 6. 옵션 정보 유효성 검증 - styleSeq: 조회 가능한 스타일 id (존재 여부)
@@ -188,8 +188,8 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest ttsSentenceCreateRequest = TtsSentenceCreateRequest.of(testStyleSeq, testVoiceSeq, "text", 1, ttsAttributeInfo);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest ttsSentenceRequest = TtsSentenceRequest.of(testStyleSeq, testVoiceSeq, "text", 1, ttsAttributeInfo);
 
         // 3. project, voice repository findById 메소드가 객체를 반환하도록 설정
         Project project = Project.builder().proSeq(projectSeq).build();
@@ -204,7 +204,7 @@ class TtsSentenceServiceTest {
 
         // when, then
         // 3. IllegalArgumentException 발생
-        assertThrows(IllegalArgumentException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest));
+        assertThrows(IllegalArgumentException.class, () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest));
     }
 
     // 7. TtsAttributeInfo 유효성 검증 : volume 값이 0보다 작거나 100보다 클 때
@@ -223,9 +223,9 @@ class TtsSentenceServiceTest {
         TtsAttributeInfo minusVolumeAttribute = TtsAttributeInfo.of(testMinusVolume, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
         TtsAttributeInfo plusVolumeAttribute = TtsAttributeInfo.of(testPlusVolume, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest minusVolumeRequest = TtsSentenceCreateRequest.of(testStyleSeq, testVoiceSeq, "test", 1, minusVolumeAttribute);
-        TtsSentenceCreateRequest plusVolumeRequest = TtsSentenceCreateRequest.of(testStyleSeq, testVoiceSeq, "test", 1, plusVolumeAttribute);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest minusVolumeRequest = TtsSentenceRequest.of(testStyleSeq, testVoiceSeq, "test", 1, minusVolumeAttribute);
+        TtsSentenceRequest plusVolumeRequest = TtsSentenceRequest.of(testStyleSeq, testVoiceSeq, "test", 1, plusVolumeAttribute);
 
         // 3. project, voice, style repository findById 메소드가 객체를 반환
         Project project = Project.builder().proSeq(projectSeq).build();
@@ -259,9 +259,9 @@ class TtsSentenceServiceTest {
         TtsAttributeInfo minusStPitchAttribute = TtsAttributeInfo.of(100, 1.0f, testMinusStPitch, "normal", 0, 16000, 0, 0.0f, "wav");
         TtsAttributeInfo plusStPitchAttribute = TtsAttributeInfo.of(100, 1.0f, testPlusStPitch, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest minusStPitchRequest = TtsSentenceCreateRequest.of(testStyleSeq, testVoiceSeq, "test", 1, minusStPitchAttribute);
-        TtsSentenceCreateRequest plusStPitchRequest = TtsSentenceCreateRequest.of(testStyleSeq, testVoiceSeq, "test", 1, plusStPitchAttribute);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest minusStPitchRequest = TtsSentenceRequest.of(testStyleSeq, testVoiceSeq, "test", 1, minusStPitchAttribute);
+        TtsSentenceRequest plusStPitchRequest = TtsSentenceRequest.of(testStyleSeq, testVoiceSeq, "test", 1, plusStPitchAttribute);
 
         // 3. project, voice, style repository findById 메소드가 객체를 반환
         Project project = Project.builder().proSeq(projectSeq).build();
@@ -292,8 +292,8 @@ class TtsSentenceServiceTest {
         // 1. TtsAttributeInfo 생성하기
         TtsAttributeInfo ttsAttributeInfo = TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
 
-        // 2. TtsSentenceCreateRequest 생성하기
-        TtsSentenceCreateRequest ttsSentenceCreateRequest = TtsSentenceCreateRequest.of(testStyleSeq, testVoiceSeq, "text", 1, ttsAttributeInfo);
+        // 2. TtsSentenceRequest 생성하기
+        TtsSentenceRequest ttsSentenceRequest = TtsSentenceRequest.of(testStyleSeq, testVoiceSeq, "text", 1, ttsAttributeInfo);
 
         // 3. project repository findById 메소드가 객체를 반환
         Project project = Project.builder().proSeq(projectSeq).build();
@@ -309,8 +309,8 @@ class TtsSentenceServiceTest {
 
         // 6. ttsSentenceRepository save 메소드가 객체를 반환
         TtsSentence ttsSentence = TtsSentence.builder()
-                .text(ttsSentenceCreateRequest.getText())
-                .sortOrder(ttsSentenceCreateRequest.getOrder())
+                .text(ttsSentenceRequest.getText())
+                .sortOrder(ttsSentenceRequest.getOrder())
                 .volume(ttsAttributeInfo.getVolume())
                 .speed(ttsAttributeInfo.getSpeed())
                 .startPitch(ttsAttributeInfo.getStPitch())
@@ -335,7 +335,7 @@ class TtsSentenceServiceTest {
 
         // when
         // 8. ttsSentenceService addSentence 메소드 호출
-        TtsSentenceDto ttsSentenceResponse = ttsSentenceService.addSentence(projectSeq, ttsSentenceCreateRequest);
+        TtsSentenceDto ttsSentenceResponse = ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest);
 
         // then
         // 9. ttsSentenceResponse 가 null 이 아님
