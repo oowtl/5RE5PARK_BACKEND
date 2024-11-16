@@ -31,5 +31,12 @@ public class Vc extends BaseEntity {
 
     @Column(nullable = false, name = "vc_up_date")
     @LastModifiedDate
-    private LocalDateTime update;
+    private LocalDateTime upDate;
+
+    public void prePersist() {
+        upDate = LocalDateTime.now();
+    }
+    public void preUpdate() {
+        upDate = LocalDateTime.now();
+    }
 }

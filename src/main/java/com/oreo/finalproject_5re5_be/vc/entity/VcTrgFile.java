@@ -31,5 +31,5 @@ public class VcTrgFile extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+    private Vc vc;
 }

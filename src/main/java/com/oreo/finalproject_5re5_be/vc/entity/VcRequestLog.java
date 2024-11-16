@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,8 +35,12 @@ public class VcRequestLog extends BaseEntity {
     private VcSrcFile srcSeq;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+    private Vc vc;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trg_seq")
     private VcTrgFile trgSeq;
+
+    public void prePersist() {
+        requestDate = LocalDateTime.now();
+    }
 }
