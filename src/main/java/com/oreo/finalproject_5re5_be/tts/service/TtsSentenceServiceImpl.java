@@ -5,7 +5,6 @@ import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceUpdateRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
 import com.oreo.finalproject_5re5_be.tts.repository.*;
@@ -96,13 +95,14 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
     /**
      * @param projectSeq
+     * @param tsSeq
      * @param updateRequest
      * @return
      * @apiNote TtsSentence 엔티티 수정
      */
     @Override
-    public TtsSentenceDto updateSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceUpdateRequest updateRequest) {
-        // 1. TtsSentenceUpdateRequest 유효성 검증
+    public TtsSentenceDto updateSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq, @Valid TtsSentenceRequest updateRequest) {
+        // 1. TtsSentenceRequest 유효성 검증
         if (updateRequest == null) {
             throw new IllegalArgumentException("Update request cannot be null");
         }
@@ -120,10 +120,10 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         Style style = styleRepository.findById(updateRequest.getStyleSeq())
                 .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + updateRequest.getStyleSeq()));
 
-        // 3. TtsSentenceUpdateRequest -> TtsSentence 변환
+        // 3. TtsSentenceRequest -> TtsSentence 변환
         // 3.1 TtsSentence 엔티티 조회
-        TtsSentence sentence = ttsSentenceRepository.findById(updateRequest.getTsSeq())
-                .orElseThrow(() -> new EntityNotFoundException("TtsSentence not found with id: " + updateRequest.getTsSeq()));
+        TtsSentence sentence = ttsSentenceRepository.findById(tsSeq)
+                .orElseThrow(() -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
 
         // 3.2 TtsSentence 엔티티 수정
         TtsSentence updateSentence = sentence.toBuilder()
