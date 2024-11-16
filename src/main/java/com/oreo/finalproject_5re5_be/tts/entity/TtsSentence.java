@@ -69,4 +69,13 @@ public class TtsSentence extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "style_seq")
     private Style style;
+
+    public static TtsSentence of (Project project, Voice voice, String text, Integer sortOrder) {
+        return TtsSentence.builder()
+                .project(project)
+                .voice(voice)
+                .text(text)
+                .sortOrder(sortOrder)
+                .build();
+    }
 }
