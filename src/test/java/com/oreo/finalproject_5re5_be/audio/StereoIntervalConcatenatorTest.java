@@ -25,7 +25,7 @@ class StereoIntervalConcatenatorTest {
     @Test
     @DisplayName("스테레오 병합 성공")
     void stereoIntervalConcatenatorTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);
 
         //오디오 불러오기
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
@@ -42,7 +42,7 @@ class StereoIntervalConcatenatorTest {
         );
 
         //스테레오 병합
-        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT);
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 100f);
 
         //테스트
@@ -53,7 +53,7 @@ class StereoIntervalConcatenatorTest {
     @Test
     @DisplayName("스테레오 포맷이면 성공한다.")
     void stereoIntervalConcatenatorFormatTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);
 
         //오디오 불러오기
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
@@ -70,7 +70,7 @@ class StereoIntervalConcatenatorTest {
         );
 
         //스테레오 병합
-        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT);
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 100f);
 
         //테스트
@@ -80,7 +80,7 @@ class StereoIntervalConcatenatorTest {
     @Test
     @DisplayName("스테레오 포맷이 아니면 실패한다.")
     void stereoIntervalConcatenatorFormatFailTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT_SR441_B16);
 
         //오디오 불러오기
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
@@ -97,7 +97,7 @@ class StereoIntervalConcatenatorTest {
         );
 
         //스테레오 병합
-        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.MONO_FORMAT);
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 100f);
 
         //테스트

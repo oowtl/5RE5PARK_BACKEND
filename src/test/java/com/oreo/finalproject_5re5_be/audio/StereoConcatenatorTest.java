@@ -24,7 +24,7 @@ class StereoConcatenatorTest {
     @Test
     @DisplayName("병합한 오디오가 스테레오 포맷이다.")
     void concatenateTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT);// 스테레오 포맷
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);// 스테레오 포맷
         // 오디오 파일 불러오기
         File inputFile = new File("test.mp3");
         byte[] bytes = AudioExtensionConverter.mp3ToWav(inputFile);
@@ -45,13 +45,13 @@ class StereoConcatenatorTest {
         AudioInputStream resample = audioResample.resample(concatenate);
 
         //변환 한 오디오 포맷 확인
-        assertThat(resample.getFormat()).isEqualTo(AudioFormats.STEREO_FORMAT);
+        assertThat(resample.getFormat()).isEqualTo(AudioFormats.STEREO_FORMAT_SR441_B16);
     }
 
     @Test
     @DisplayName("스테레오 포맷 병합에서 모노 타입을 넣으면 null을 반환한다.")
     void concatenateNotStereoTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT_SR441_B16);
 
         // 오디오 파일 불러오기
         File inputFile = new File("test.mp3");
