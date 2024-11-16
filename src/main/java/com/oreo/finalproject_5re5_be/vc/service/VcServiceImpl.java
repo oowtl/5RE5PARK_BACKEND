@@ -3,9 +3,7 @@ package com.oreo.finalproject_5re5_be.vc.service;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
-import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
-import com.oreo.finalproject_5re5_be.vc.dto.response.VcUrlResponse;
-import com.oreo.finalproject_5re5_be.vc.dto.response.VcTextResponse;
+import com.oreo.finalproject_5re5_be.vc.dto.response.*;
 import com.oreo.finalproject_5re5_be.vc.entity.*;
 import com.oreo.finalproject_5re5_be.vc.repository.*;
 import jakarta.validation.Valid;
@@ -70,11 +68,11 @@ public class VcServiceImpl implements VcService{
         log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
         VcSrcFile save = vcSrcFileRepository.save(src);// SRC 객체 저장
         log.info("[vcService] save 확인 : {} ", save);
-        VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
+
+        return VcUrlResponse.builder()//response 객체 생성
                 .seq(save.getSrcSeq())
                 .url(save.getFileUrl())
                 .build();
-        return saveResponse;
     }
 
     /**
@@ -96,11 +94,11 @@ public class VcServiceImpl implements VcService{
                 .extension(vcAudioRequest.getExtension()).build();
         log.info("[vcService] Save trg 생성  : {}", trg); //TRG 객체 생성 확인
         VcTrgFile save = vcTrgFileRepository.save(trg);// TRG 객체 저장
-        VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
+
+        return VcUrlResponse.builder()//response 객체 생성
                 .seq(save.getTrgSeq())
                 .url(save.getFileUrl())
                 .build();
-        return saveResponse;
     }
 
     /**
@@ -125,11 +123,11 @@ public class VcServiceImpl implements VcService{
                 .extension(vcAudioRequest.getExtension()).build();
         log.info("[vcService] Save result 생성 : {}", result); // Result 객체 생성 확인
         VcResultFile save = vcResultFileRepository.save(result);// result 객체 저장
-        VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
+
+        return VcUrlResponse.builder()//response 객체 생성
                 .seq(save.getResSeq())
                 .url(save.getFileUrl())
                 .build();
-        return saveResponse;
     }
 
 
@@ -154,11 +152,11 @@ public class VcServiceImpl implements VcService{
         log.info("[vcService] Save text 생성 : {}", text);//Text 객체 생성 값 확인
 
         VcText save = vcTextRepository.save(text);//Text 객체 저장
-        VcTextResponse saveResponse =  VcTextResponse.builder()//response 객체 생성
+
+        return VcTextResponse.builder()//response 객체 생성
                 .seq(save.getVtSeq())
                 .text(save.getComment())
                 .build();
-        return saveResponse;
     }
 
     /**
@@ -228,11 +226,10 @@ public class VcServiceImpl implements VcService{
         VcSrcFile srcFile = vcSrcFileFind(seq);
         log.info("[vcService] getSrcFile VcSRcFile find : {} ", srcFile);//SRC 값 확인
         //S3 SRC URL 값 출력
-        VcUrlResponse response = VcUrlResponse.builder()
+        return VcUrlResponse.builder()
                 .seq(srcFile.getSrcSeq())
                 .url(srcFile.getFileUrl())
                 .build();
-        return response;
     }
 
     /**
@@ -246,11 +243,10 @@ public class VcServiceImpl implements VcService{
         VcResultFile resultFile = vcResultFind(seq);
         log.info("[vcService] getResultFile ResultFile find : {} ", resultFile);//TRG 값 확인
         //S3 TRG URL 값 출력
-        VcUrlResponse response = VcUrlResponse.builder()
+        return VcUrlResponse.builder()
                 .seq(resultFile.getResSeq())
                 .url(resultFile.getFileUrl())
                 .build();
-        return response;
     }
 
     /**
@@ -259,7 +255,7 @@ public class VcServiceImpl implements VcService{
      * @param text
      */
     @Override
-    public void updateText(@Valid @NotNull Long seq, @Valid @NotNull String text) {
+    public VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text) {
         //Text seq 로 Text 값 조회 검증
         VcText vcText = vcTextFind(seq);
         log.info("[vcService] updateText VcText find : {} ", vcText); //Text 값 확인
@@ -269,7 +265,12 @@ public class VcServiceImpl implements VcService{
                 .comment(text)
                 .build();
         log.info("[vcService] updateText updateText find : {} ", updateText); //변경 객체 값 확인
-        vcTextRepository.save(updateText);//텍스트 값 변경
+        VcText save = vcTextRepository.save(updateText);//텍스트 값 변경
+
+        return VcTextResponse.builder()
+                .seq(save.getVtSeq())
+                .text(save.getComment())
+                .build();
     }
 
     /**
@@ -279,7 +280,7 @@ public class VcServiceImpl implements VcService{
      */
     @Override
     @Transactional
-    public void updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder) {
+    public VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder) {
         //SRC seq 로 SRC 값 조회 검증
         VcSrcFile vcSrcFile = vcSrcFileFind(seq);
         log.info("[vcService] updateRowOrder vcSrcFile find : {} ", vcSrcFile);//SRC 값 확인
@@ -289,7 +290,11 @@ public class VcServiceImpl implements VcService{
                 .rowOrder(rowOrder)
                 .build();
         log.info("[vcService] updateRowOrder updateSrcFile find : {} ", updateSrcFile);// 변경 객체 확인
-        vcSrcFileRepository.save(updateSrcFile);//행순서 변경
+        VcSrcFile save = vcSrcFileRepository.save(updateSrcFile);//행순서 변경
+        return VcRowResponse.builder()
+                .seq(save.getSrcSeq())
+                .rowOrder(save.getRowOrder())
+                .build();
     }
 
     /**
@@ -298,7 +303,7 @@ public class VcServiceImpl implements VcService{
      */
     @Override
     @Transactional
-    public void deleteSrcFile(@Valid @NotNull Long seq) {
+    public VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq) {
         //SRC seq 로 SRC 값 조회 검증
         VcSrcFile vcSrcFile = vcSrcFileFind(seq);
         //활성화 상태 N로 변경
@@ -307,7 +312,11 @@ public class VcServiceImpl implements VcService{
                 .activate('N')
                 .build();
         log.info("[vcService] deleteSrcFile vcSrcFile find : {} ", deleteSrcFile);//변경 확인
-        vcSrcFileRepository.save(deleteSrcFile);//활성화상태 변경
+        VcSrcFile save = vcSrcFileRepository.save(deleteSrcFile);//활성화상태 변경
+        return VcActivateResponse.builder()
+                .seq(save.getSrcSeq())
+                .activate(save.getActivate())
+                .build();
     }
 
     //VcSrcFile 찾는 메서드
