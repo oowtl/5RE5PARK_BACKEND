@@ -60,7 +60,7 @@ class MemberTermsServiceImplTest {
     void 약관_생성_통합_테스트() {
         // 요청 데이터 생성
         MemberTermRequest request = MemberTermRequest.builder()
-                .termName("24년도회원약관A")
+                .name("24년도회원약관A")
                 .memberTermConditionCodes(List.of(dummy.get(0).getCondCode(), dummy.get(1).getCondCode(),
                                                   dummy.get(2).getCondCode(), dummy.get(3).getCondCode(),
                                                   dummy.get(4).getCondCode()))
@@ -81,7 +81,7 @@ class MemberTermsServiceImplTest {
     void 약관_조회_통합_테스트() {
         // 요청 데이터 생성
         MemberTermRequest request = MemberTermRequest.builder()
-                .termName("24년도회원약관A")
+                .name("24년도회원약관A")
                 .memberTermConditionCodes(List.of(dummy.get(0).getCondCode(), dummy.get(1).getCondCode(),
                                                   dummy.get(2).getCondCode(), dummy.get(3).getCondCode(),
                                                   dummy.get(4).getCondCode()))
@@ -103,7 +103,7 @@ class MemberTermsServiceImplTest {
     void 약관_수정_통합_테스트() {
         // 요청 데이터 생성
         MemberTermRequest request = MemberTermRequest.builder()
-                .termName("24년도회원약관A")
+                .name("24년도회원약관A")
                 .memberTermConditionCodes(List.of(dummy.get(0).getCondCode(), dummy.get(1).getCondCode(),
                                                   dummy.get(2).getCondCode(), dummy.get(3).getCondCode(),
                                                   dummy.get(4).getCondCode()))
@@ -133,7 +133,7 @@ class MemberTermsServiceImplTest {
     void 약관_삭제_통합_테스트() {
         // 요청 데이터 생성
         MemberTermRequest request = MemberTermRequest.builder()
-                .termName("24년도회원약관A")
+                .name("24년도회원약관A")
                 .memberTermConditionCodes(List.of(dummy.get(0).getCondCode(), dummy.get(1).getCondCode(),
                                                   dummy.get(2).getCondCode(), dummy.get(3).getCondCode(),
                                                   dummy.get(4).getCondCode()))

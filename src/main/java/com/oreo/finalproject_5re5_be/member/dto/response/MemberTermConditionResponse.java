@@ -3,6 +3,7 @@ package com.oreo.finalproject_5re5_be.member.dto.response;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

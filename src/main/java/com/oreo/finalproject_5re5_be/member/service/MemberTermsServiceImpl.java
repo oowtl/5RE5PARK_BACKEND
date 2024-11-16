@@ -64,7 +64,7 @@ public class MemberTermsServiceImpl {
         terms.setChkUse(chk);
 
         // 약관 이름 세팅함
-        String name = request.getTermName();
+        String name = request.getName();
         terms.setName(name);
 
         // 시간 세팅함

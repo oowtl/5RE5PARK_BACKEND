@@ -8,6 +8,7 @@ import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResp
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ class MemberTermsConditionServiceImplTest {
     @Autowired
     private MemberTermConditionRepository memberTermConditionRepository;
 
+    @Autowired
+    private MemberTermsRepository memberTermsRepository;
+
     private List<MemberTermsCondition> dummy = new ArrayList<>();
 
 
@@ -38,6 +42,7 @@ class MemberTermsConditionServiceImplTest {
 
         // 초가화
         dummy.clear();
+        memberTermsRepository.deleteAll();
         memberTermConditionRepository.deleteAll();
 
         // 더미 생성 및 저장

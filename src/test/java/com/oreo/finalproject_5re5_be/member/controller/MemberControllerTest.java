@@ -2,7 +2,6 @@ package com.oreo.finalproject_5re5_be.member.controller;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oreo.finalproject_5re5_be.member.config.MemberSecurityConfig;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
@@ -25,17 +23,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(MemberController.class)
+@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 class MemberControllerTest {
 
     @Autowired
@@ -50,7 +48,6 @@ class MemberControllerTest {
 
     @DisplayName("회원 가입 처리 성공")
     @Test
-    @WithMockUser
     public void 회원가입_성공() throws Exception {
         // 회원 가입에 필요한 데이터 생성
         List<MemberTermCheckOrNotRequest> memberTerms = createMemberTerms();
@@ -79,7 +76,6 @@ class MemberControllerTest {
         mockMvc.perform(post("/api/member/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(csrf())
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("회원가입이 완료되었습니다"));
@@ -90,7 +86,6 @@ class MemberControllerTest {
 
     @DisplayName("유효성 검증 실패로 인한 회원가입 실패")
     @Test
-    @WithMockUser
     public void 유효성_검증_실패_회원가입_실패() throws Exception {
         // 회원 가입에 필요한 데이터 생성
         List<MemberTermCheckOrNotRequest> memberTerms = createMemberTerms();
@@ -104,7 +99,6 @@ class MemberControllerTest {
         mockMvc.perform(post("/api/member/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(csrf())
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.content").value(expectedErrorMessage));
@@ -112,7 +106,6 @@ class MemberControllerTest {
 
     @DisplayName("회원 단순 조회 성공")
     @Test
-    @WithMockUser
     public void 회원_단순_조회_성공() throws Exception {
         // 회원 단순 조회에 필요한 데이터 생성
         MemberReadResponse memberReadResponse = MemberReadResponse.of("qwerfde2312", "qwedr123@gmail.com",
@@ -134,7 +127,6 @@ class MemberControllerTest {
 
     @DisplayName("회원 단순 조회 실패")
     @Test
-    @WithMockUser
     public void 회원_단순_조회_실패() throws Exception {
         // 서비스 read 호출 시 null 반환하게 세팅
         MemberNotFoundException memberNotFoundException = new MemberNotFoundException();

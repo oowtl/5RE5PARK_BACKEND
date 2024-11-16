@@ -10,12 +10,14 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberTermInvalidException
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
 import com.oreo.finalproject_5re5_be.member.service.MemberTermsServiceImpl;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/member-term")
 public class MemberTermsController {
@@ -49,7 +52,8 @@ public class MemberTermsController {
     }
 
     @ExceptionHandler({
-            MemberTermInvalidException.class
+            MemberTermInvalidException.class,
+            ConstraintViolationException.class
     })
     public ResponseEntity<ErrorResponse> handleInvalidException(RuntimeException e) {
         ErrorResponse errorResponse = ErrorResponse.of(e.getMessage());
@@ -64,13 +68,13 @@ public class MemberTermsController {
         if (result.hasErrors()) {
             // 에러 메시지 생성
             String errorMessage = createErrorMessage(result.getAllErrors());
-
             // 유효성 에러 반환
             throw new MemberTermInvalidException(errorMessage);
         }
 
         // 회원 약관 등록 처리
         MemberTermResponse response = memberTermsService.create(request);
+
         // 등록된 회원 약관 반환
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(response);

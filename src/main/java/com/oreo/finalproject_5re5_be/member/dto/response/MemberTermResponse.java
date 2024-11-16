@@ -3,6 +3,8 @@ package com.oreo.finalproject_5re5_be.member.dto.response;
 
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,9 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class MemberTermResponse {
 
     private Long termSeq;
