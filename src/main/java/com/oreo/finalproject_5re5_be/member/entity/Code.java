@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.dto.request.CodeUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,6 +48,13 @@ public class Code extends BaseEntity {
 
     @Column(name = "comt", length = 250)
     private String comt;
+
+    public void update(CodeUpdateRequest request) {
+        this.name = request.getName();
+        this.ord = request.getOrd();
+        this.chkUse = request.getChkUse();
+        this.comt = request.getComt();
+    }
 
 }
 

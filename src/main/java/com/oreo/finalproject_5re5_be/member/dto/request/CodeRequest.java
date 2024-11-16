@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.dto.request;
 
+import com.oreo.finalproject_5re5_be.member.entity.Code;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
@@ -36,5 +37,15 @@ public class CodeRequest {
     private String comt;
 
 
+    public Code createCodeEntity() {
+        return Code.builder()
+                .cateNum(cateNum)
+                .code(code)
+                .name(name)
+                .ord(ord)
+                .chkUse(chkUse)
+                .comt(comt)
+                .build();
+    }
 
 }
