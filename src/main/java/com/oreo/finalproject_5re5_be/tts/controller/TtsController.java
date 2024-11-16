@@ -112,4 +112,19 @@ public class TtsController {
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto<>(HttpStatus.CREATED.value(), response));
     }
+
+    @Operation(summary = "TTS 문장 수정 요청")
+    @PutMapping("/sentence/{tsSeq}")
+    public ResponseEntity<ResponseDto<TtsSentenceDto>> updateSentence(
+            @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+            @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq,
+            @Parameter(description = "tts 문장 수정 요청 body") @Valid @RequestBody TtsSentenceRequest updateRequest) {
+
+        // 문장 수정
+        TtsSentenceDto response = ttsSentenceService.updateSentence(projectSeq, tsSeq, updateRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto<>(HttpStatus.OK.value(), response));
+    }
 }
