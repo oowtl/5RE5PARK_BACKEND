@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VcTextRepository extends JpaRepository<VcText, Long> {
-    VcText findBySrcSeq_SrcSeq(Long seq);
+    VcText findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(Long seq);
 }

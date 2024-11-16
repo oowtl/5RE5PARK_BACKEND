@@ -3,6 +3,8 @@ package com.oreo.finalproject_5re5_be.vc.service;
 
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
+import com.oreo.finalproject_5re5_be.vc.dto.response.VcUrlResponse;
+import com.oreo.finalproject_5re5_be.vc.dto.response.VcTextResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -35,14 +37,14 @@ public interface VcService {
         삭제 (수정)
         12. SRC 파일 활성화상태 N로 변경
      */
-    void srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest);
-    void trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
-    void resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
-    void textSave(@Valid @NotNull VcTextRequest vcTextRequest);
+    VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest);
+    VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+    VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+    VcTextResponse textSave(@Valid @NotNull VcTextRequest vcTextRequest);
 
     List<VcResponse> getVcResponse(@Valid @NotNull Long ProjectSeq);
-    String getSrcFile(@Valid @NotNull Long seq);
-    String getResultFile(@Valid @NotNull Long seq);
+    VcUrlResponse getSrcFile(@Valid @NotNull Long seq);
+    VcUrlResponse getResultFile(@Valid @NotNull Long seq);
 
     void updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
     void updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
