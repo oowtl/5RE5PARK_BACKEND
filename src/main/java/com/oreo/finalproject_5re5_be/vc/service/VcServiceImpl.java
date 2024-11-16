@@ -6,10 +6,7 @@ import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcUrlResponse;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcTextResponse;
-import com.oreo.finalproject_5re5_be.vc.entity.VcResultFile;
-import com.oreo.finalproject_5re5_be.vc.entity.VcSrcFile;
-import com.oreo.finalproject_5re5_be.vc.entity.VcText;
-import com.oreo.finalproject_5re5_be.vc.entity.VcTrgFile;
+import com.oreo.finalproject_5re5_be.vc.entity.*;
 import com.oreo.finalproject_5re5_be.vc.repository.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -51,17 +48,22 @@ public class VcServiceImpl implements VcService{
     /**
      * Vc SRC 파일 저장
      * @param vcSrcRequest
-     * @return VcSaveResponse
+     * @return VcUrlResponse
      */
     @Override
     public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest) {
         //프로젝트 조회
         Project project = projectRepository.findById(vcSrcRequest.getSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+        Vc vc = Vc.builder()
+                .projectId(project.getProSeq())
+                .project(project)
+                .build();
+        vcRepository.save(vc);
         log.info("[vcService] SrcSave Project find : {} ", project); // 프로젝트 확인
         //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 SRC 객체 생성
         VcSrcFile src = VcSrcFile.builder()
-                .proSeq(project)
+                .vc(vc)
                 .rowOrder(vcSrcRequest.getRowOrder())
                 .fileName(vcSrcRequest.getName())
                 .fileUrl(vcSrcRequest.getFileUrl())
@@ -80,17 +82,22 @@ public class VcServiceImpl implements VcService{
     /**
      * VC Trg 파일 저장
      * @param vcAudioRequest
-     * @return VcSaveResponse
+     * @return VcUrlResponse
      */
     @Override
     public VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest) {
         //프로젝트 조회
         Project project = projectRepository.findById(vcAudioRequest.getSeq1())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+        Vc vc = Vc.builder()
+                .projectId(project.getProSeq())
+                .project(project)
+                .build();
+        vcRepository.save(vc);
         log.info("[vcService] TrgSave Project find : {} ", project); //프로젝트 확인
         //프로젝트 조회한 값과 입력한 값을 저장하기 위한 TRG 객체 생성
         VcTrgFile trg = VcTrgFile.builder()
-                .proSeq(project)
+                .vc(vc)
                 .fileName(vcAudioRequest.getName())
                 .fileUrl(vcAudioRequest.getFileUrl())
                 .fileLength(vcAudioRequest.getLength())
@@ -108,7 +115,7 @@ public class VcServiceImpl implements VcService{
     /**
      * Vc Result 파일 저장 (vc 생성 파일)
      * @param vcAudioRequest
-     * @return VcSaveResponse
+     * @return VcUrlResponse
      */
     @Override
     public VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest) {
@@ -119,10 +126,15 @@ public class VcServiceImpl implements VcService{
         //프로젝트 조회
         Project project = projectRepository.findById(srcFile.getSrcSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+        Vc vc = Vc.builder()
+                .projectId(project.getProSeq())
+                .project(project)
+                .build();
+        vcRepository.save(vc);
         log.info("[vcService] ResultSave Project find : {} ", project);// 프로젝트 확인
         //프로젝트 조회한 값과 SRC 조회한 값, 입력한 값을 저장하기 위한 ResultFile 객체 생성
         VcResultFile result = VcResultFile.builder()
-                .proSeq(project)
+                .vc(vc)
                 .srcSeq(srcFile)
                 .fileName(vcAudioRequest.getName())
                 .fileUrl(vcAudioRequest.getFileUrl())
@@ -153,10 +165,15 @@ public class VcServiceImpl implements VcService{
         //프로젝트 조회
         Project project = projectRepository.findById(srcFile.getSrcSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+        Vc vc = Vc.builder()
+                .projectId(project.getProSeq())
+                .project(project)
+                .build();
+        vcRepository.save(vc);
         log.info("[vcService] TextSave Project find : {} ", project);//프로젝트 확인
         //SRC 조회한 값과 프로젝트 조회한 값, 입력 값 저장하기 위한 TextFile 객체 생성
         VcText text = VcText.builder()
-                .proSeq(project)
+                .vc(vc)
                 .srcSeq(srcFile)
                 .comment(vcTextRequest.getText())
                 .length(String.valueOf(vcTextRequest.getText().length()))
