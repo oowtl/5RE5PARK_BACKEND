@@ -23,7 +23,7 @@ class MonoIntervalConcatenatorTest {
     @Test
     @DisplayName("오디오 병합 테스트 성공한다.")
     void MonoIntervalConcatSuccessTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT_SR441_B16);
 
 
         //오디오 불러오기
@@ -41,7 +41,7 @@ class MonoIntervalConcatenatorTest {
                 );
 
         //병합
-        IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT);
+        IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 10000f);
 
         //테스트
@@ -51,7 +51,7 @@ class MonoIntervalConcatenatorTest {
     @Test
     @DisplayName("오디오 병합 포맷이 같으면 성공")
     void MonoIntervalConcatAudioFormatTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.MONO_FORMAT_SR441_B16);
 
 
         //오디오 불러오기
@@ -69,7 +69,7 @@ class MonoIntervalConcatenatorTest {
         );
 
         //병합
-        IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT);
+        IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         //테스트
@@ -79,7 +79,7 @@ class MonoIntervalConcatenatorTest {
     @Test
     @DisplayName("오디오 병합 포맷이 다르면 실패한다")
     void MonoIntervalConcatFailTest() throws UnsupportedAudioFileException, IOException {
-        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT);
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);
 
 
         //오디오 불러오기
@@ -97,7 +97,7 @@ class MonoIntervalConcatenatorTest {
         );
 
         //병합
-        IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT);
+        IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
         ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         //테스트
