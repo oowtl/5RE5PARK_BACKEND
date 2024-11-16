@@ -2,6 +2,9 @@ package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
+import com.oreo.finalproject_5re5_be.member.dto.response.ErrorResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
@@ -43,98 +46,48 @@ public class MemberTermsController {
             MemberTermsNotFoundException.class,
             MemberTermsConditionNotFoundException.class
     })
-    public ResponseEntity<String> handleNotFoundException(RuntimeException e) {
-        // 비즈니스 예외 발생시 에러 메시지 반환
-        // - 404 Not Found 와 에러 메시지 반환
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                             .body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleNotFoundException(RuntimeException e) {
+        return null;
     }
 
     // 등록
     @PostMapping("/register")
-    public ResponseEntity<MemberTerms> register(@Valid @RequestBody MemberTermRequest request, BindingResult result) {
-        // 유효성 검증 실패시 에러 메시지 반환
-        if (result.hasErrors()) {
-            // 에러 메시지 생성
-            String errorMessage = createErrorMessage(result.getAllErrors());
-            // 응답 데이터 반환
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                 .body(null);
-        }
-
-        // 회원 약관 생성 서비스 호출
-        MemberTerms savedMemberTerms = memberTermsService.create(request);
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(savedMemberTerms);
+    public ResponseEntity<MemberTermResponse> register(@Valid @RequestBody MemberTermRequest request, BindingResult result) {
+        return null;
     }
 
     // 조회
     @GetMapping("/all")
-    public ResponseEntity<List<MemberTerms>> readAll() {
-        // 회원 약관 전체 조회 서비스 호출
-        List<MemberTerms> memberTermsList = memberTermsService.readAll();
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(memberTermsList);
+    public ResponseEntity<MemberTermResponses> readAll() {
+        return null;
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<MemberTerms>> readAvailable() {
-        // 사용 가능한 회원 약관 조회 서비스 호출
-        List<MemberTerms> memberTermsList = memberTermsService.readAvailable();
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(memberTermsList);
+    public ResponseEntity<MemberTermResponses> readAvailable() {
+        return null;
     }
 
     @GetMapping("/not-available")
-    public ResponseEntity<List<MemberTerms>> readNotAvailable() {
-        // 사용 불가능한 회원 약관 조회 서비스 호출
-        List<MemberTerms> memberTermsList = memberTermsService.readNotAvailable();
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(memberTermsList);
+    public ResponseEntity<MemberTermResponses> readNotAvailable() {
+        return null;
     }
 
     @GetMapping("/latest-available")
-    public ResponseEntity<MemberTerms> readLatestAvailable() {
-        // 최신 사용 가능한 회원 약관 조회 서비스 호출
-        MemberTerms memberTerms = memberTermsService.readLatestAvailable();
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(memberTerms);
+    public ResponseEntity<MemberTermResponse> readLatestAvailable() {
+        return null;
     }
 
     // 수정
     @PatchMapping("/{termSeq}")
     public ResponseEntity<Void> update(@PathVariable("termSeq") Long seq, @Valid @RequestBody
             MemberTermUpdateRequest request, BindingResult result) {
-        // 유효성 검증 실패시 에러 메시지 반환
-        if (result.hasErrors()) {
-            // 에러 메시지 생성
-            String errorMessage = createErrorMessage(result.getAllErrors());
-            // 응답 데이터 반환
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);
-        }
-
-        // 회원 약관 수정 서비스 호출
-        memberTermsService.update(seq, request);
-
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                             .build();
+        return null;
     }
 
     // 삭제
     @DeleteMapping("/{termSeq}")
     public ResponseEntity<Void> remove(@PathVariable("termSeq") Long seq) {
-        // 회원 약관 삭제 서비스 호출
-        memberTermsService.remove(seq);
-        // 응답 데이터 반환
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                             .build();
+        return null;
     }
 
     // 유효성 검증 실패시 에러 메시지 생성
