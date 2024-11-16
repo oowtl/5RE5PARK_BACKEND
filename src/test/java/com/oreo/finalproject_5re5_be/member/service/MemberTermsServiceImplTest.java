@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
-import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
@@ -69,11 +69,11 @@ class MemberTermsServiceImplTest {
                 .build();
 
         // 서비스 호출
-        MemberTerms savedMemberTerms = memberTermsService.create(request);
+        MemberTermResponse response = memberTermsService.create(request);
 
         // 결과확인
-        assertNotNull(savedMemberTerms);
-        System.out.println("savedMemberTerms = " + savedMemberTerms);
+        assertNotNull(response);
+        System.out.println("response = " + response);
     }
 
     @DisplayName("회원 약관 조회 통합 테스트")
@@ -90,12 +90,12 @@ class MemberTermsServiceImplTest {
                 .build();
 
         // 데이터 등록
-        MemberTerms savedMemberTerms = memberTermsService.create(request);
+        MemberTermResponse response = memberTermsService.create(request);
 
         // 조회
-        MemberTerms foundMemberTerms = memberTermsService.read(savedMemberTerms.getTermsSeq());
-        assertNotNull(foundMemberTerms);
-        System.out.println("foundMemberTerms = " + foundMemberTerms);
+        MemberTermResponse foundMemberTermResponse = memberTermsService.read(response.getTermSeq());
+        assertNotNull(foundMemberTermResponse);
+        System.out.println("foundMemberTermResponse = " + foundMemberTermResponse);
     }
 
     @DisplayName("회원 약관 수정 통합 테스트")
@@ -112,7 +112,7 @@ class MemberTermsServiceImplTest {
                 .build();
 
         // 데이터 등록
-        MemberTerms savedMemberTerms = memberTermsService.create(request);
+        MemberTermResponse response = memberTermsService.create(request);
 
         // 수정
         MemberTermUpdateRequest updateRequest = MemberTermUpdateRequest.builder()
@@ -120,12 +120,12 @@ class MemberTermsServiceImplTest {
                         .memberTermConditionMandatoryOrNot(List.of('N', 'N', 'N', 'N', 'N'))
                         .build();
 
-        memberTermsService.update(savedMemberTerms.getTermsSeq(), updateRequest);
+        memberTermsService.update(response.getTermSeq(), updateRequest);
 
         // 조회
-        MemberTerms foundMemberTerms = memberTermsService.read(savedMemberTerms.getTermsSeq());
-        assertNotNull(foundMemberTerms);
-        System.out.println("foundMemberTerms = " + foundMemberTerms);
+        MemberTermResponse foundMemberTermResponse = memberTermsService.read(response.getTermSeq());
+        assertNotNull(foundMemberTermResponse);
+        System.out.println("foundMemberTermResponse = " + foundMemberTermResponse);
     }
 
     @DisplayName("회원 약관 삭제 통합 테스트")
@@ -142,14 +142,14 @@ class MemberTermsServiceImplTest {
                 .build();
 
         // 데이터 등록
-        MemberTerms savedMemberTerms = memberTermsService.create(request);
+        MemberTermResponse response = memberTermsService.create(request);
 
         // 삭제
-        memberTermsService.remove(savedMemberTerms.getTermsSeq());
+        memberTermsService.remove(response.getTermSeq());
 
         // 조회
         assertThrows(MemberTermsNotFoundException.class, () -> {
-            memberTermsService.read(savedMemberTerms.getTermsSeq());
+            memberTermsService.read(response.getTermSeq());
         });
     }
 
