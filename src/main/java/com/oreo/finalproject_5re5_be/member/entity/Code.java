@@ -48,18 +48,5 @@ public class Code extends BaseEntity {
     @Column(name = "comt", length = 250)
     private String comt;
 
-    @Column(name = "reg_date")
-    private LocalDateTime regDate;
-
-    @Column(name = "reg_id", length = 20)
-    private String regId;
-
-    @Column(name = "up_date")
-    private LocalDateTime upDate;
-
-    @Column(name = "up_id", length = 20)
-    private String upId;
-
-
 }
 
