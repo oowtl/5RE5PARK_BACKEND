@@ -34,9 +34,6 @@ public class VcRequestLog extends BaseEntity {
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pro_seq")
-    private Vc vc;
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trg_seq")
     private VcTrgFile trgSeq;
 
