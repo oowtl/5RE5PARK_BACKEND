@@ -27,11 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 추후에 응답 데이터 Response 만들어서 반환하도록 리팩토링
- * - 기본처리 틀 잡아 놓기
- */
-
 @RestController
 @RequestMapping("/api/member-term")
 public class MemberTermsController {
