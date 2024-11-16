@@ -235,6 +235,7 @@ class VcServiceImplTest {
                 .build();
 
         when(vcTextRepository.findById(vcText.getVtSeq())).thenReturn(Optional.of(vcText));//text 조회 값 설정
+        when(vcTextRepository.save(any(VcText.class))).thenReturn(vcText);
 
         vcService.updateText(vcText.getVtSeq(), newText);//수정
 
@@ -254,21 +255,23 @@ class VcServiceImplTest {
                 .build();// src 객체 생성
 
         when(vcSrcFileRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(srcFile));//src 조회 값 설정
+        when(vcSrcFileRepository.save(any(VcSrcFile.class))).thenReturn(srcFile);
         vcService.updateRowOrder(srcFile.getSrcSeq(), newRowOrder);//수정
         verify(vcSrcFileRepository, times(1)).save(any(VcSrcFile.class));//수정확인
     }
 
     @Test
     @DisplayName("[VcServiceTest] SRC 행 삭제 (변경) 테스트 - 성공")
-    void deleteSrcFile(){
+    void deleteSrcFile() {
         VcSrcFile srcFile = VcSrcFile.builder().srcSeq(1L).activate('N').build();
 
         when(vcSrcFileRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(srcFile));
+        when(vcSrcFileRepository.save(any(VcSrcFile.class))).thenReturn(srcFile);
         vcService.deleteSrcFile(srcFile.getSrcSeq());
         verify(vcSrcFileRepository, times(1)).save(any(VcSrcFile.class));
     }
 
-    private static Project createProjectBuild(){
+    private static Project createProjectBuild() {
         return Project.builder()
                 .proSeq(1L)
                 .proName("test project")
@@ -276,13 +279,15 @@ class VcServiceImplTest {
                 .proUpDate(LocalDateTime.now())
                 .build();
     }
-    private static Vc createVcBuild(Project project){
+
+    private static Vc createVcBuild(Project project) {
         return Vc.builder()
                 .projectSeq(project.getProSeq())
                 .proSeq(project)
                 .build();
     }
-    private static VcSrcRequest createSrcFileBuildInProject(Vc vc){
+
+    private static VcSrcRequest createSrcFileBuildInProject(Vc vc) {
         return VcSrcRequest.builder()//Src 입력
                 .seq(1L)
                 .seq(vc.getProjectSeq())
@@ -294,7 +299,8 @@ class VcServiceImplTest {
                 .extension("wav")
                 .build();
     }
-    private static VcAudioRequest createAudio(Vc vc){
+
+    private static VcAudioRequest createAudio(Vc vc) {
         return VcAudioRequest.builder()//trg 입력
                 .seq(vc.getProjectSeq()) //proSeq
                 .name("VcAudioTest")
@@ -304,7 +310,8 @@ class VcServiceImplTest {
                 .extension("wav")
                 .build();
     }
-    private VcTextRequest createTextBuildInSrc(VcSrcFile srcFile){
+
+    private VcTextRequest createTextBuildInSrc(VcSrcFile srcFile) {
         return VcTextRequest.builder()//text 객체 생성
                 .seq(srcFile.getSrcSeq())
                 .text("Sample text")
