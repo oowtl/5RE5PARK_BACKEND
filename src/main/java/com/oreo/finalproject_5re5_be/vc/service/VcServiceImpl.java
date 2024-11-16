@@ -95,10 +95,10 @@ public class VcServiceImpl implements VcService{
                 .fileSize(vcAudioRequest.getSize())
                 .extension(vcAudioRequest.getExtension()).build();
         log.info("[vcService] Save trg 생성  : {}", trg); //TRG 객체 생성 확인
-        vcTrgFileRepository.save(trg);// TRG 객체 저장
+        VcTrgFile save = vcTrgFileRepository.save(trg);// TRG 객체 저장
         VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
-                .seq(trg.getTrgSeq())
-                .url(trg.getFileUrl())
+                .seq(save.getTrgSeq())
+                .url(save.getFileUrl())
                 .build();
         return saveResponse;
     }
@@ -124,10 +124,10 @@ public class VcServiceImpl implements VcService{
                 .fileSize(vcAudioRequest.getSize())
                 .extension(vcAudioRequest.getExtension()).build();
         log.info("[vcService] Save result 생성 : {}", result); // Result 객체 생성 확인
-        vcResultFileRepository.save(result);// result 객체 저장
+        VcResultFile save = vcResultFileRepository.save(result);// result 객체 저장
         VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
-                .seq(result.getResSeq())
-                .url(result.getFileUrl())
+                .seq(save.getResSeq())
+                .url(save.getFileUrl())
                 .build();
         return saveResponse;
     }
@@ -153,10 +153,10 @@ public class VcServiceImpl implements VcService{
                 .build();
         log.info("[vcService] Save text 생성 : {}", text);//Text 객체 생성 값 확인
 
-        vcTextRepository.save(text);//Text 객체 저장
+        VcText save = vcTextRepository.save(text);//Text 객체 저장
         VcTextResponse saveResponse =  VcTextResponse.builder()//response 객체 생성
-                .seq(text.getVtSeq())
-                .text(text.getComment())
+                .seq(save.getVtSeq())
+                .text(save.getComment())
                 .build();
         return saveResponse;
     }
