@@ -11,6 +11,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -69,7 +70,8 @@ public class MemberController {
             MemberDuplicatedIdException.class,
             MemberMandatoryTermNotAgreedException.class,
             MemberWrongCountTermCondition.class,
-            UsernameNotFoundException.class
+            UsernameNotFoundException.class,
+            ConstraintViolationException.class
     })
     public ResponseEntity<ErrorResponse> handleWrongRequestException(Exception e) {
         // 비즈니스 예외 발생시 에러 메시지 반환

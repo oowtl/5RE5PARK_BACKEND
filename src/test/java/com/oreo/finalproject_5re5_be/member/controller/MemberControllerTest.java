@@ -96,7 +96,7 @@ class MemberControllerTest {
         // 잘못된 아이디로 설정
         request.setId("잘못된 아이디");
         // 기대하는 에러 메시지 설정
-        String expectedErrorMessage = "데이터 입력 형식이 잘못되었습니다. 상세 내용은 다음과 같습니다.\n아이디는 6~20자의 영문 및 숫자만 허용됩니다.\n";
+        String expectedErrorMessage = "register.memberRegisterRequest.id: 아이디는 6~20자의 영문 및 숫자만 허용됩니다.";
 
         // 컨트롤러로 요청 보내기
         mockMvc.perform(post("/api/member/register")
@@ -105,7 +105,7 @@ class MemberControllerTest {
                         .with(csrf())
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.content").value(expectedErrorMessage));
+                .andExpect(jsonPath("$.message").value(expectedErrorMessage));
     }
 
     @DisplayName("회원 단순 조회 성공")
