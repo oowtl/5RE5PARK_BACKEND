@@ -16,7 +16,7 @@ import lombok.*;
 public class VcSrcFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "src_seq")
+    @Column(name = "src_seq")
     private Long srcSeq;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -24,7 +24,8 @@ public class VcSrcFile extends BaseEntity {
     private Vc vc;
 
     @Column(nullable = false, name = "row_order")
-    private Integer rowOrder;
+    @Builder.Default
+    private Integer rowOrder=1;
     @Column(nullable = false, name = "name")
     private String fileName;
     @Column(nullable = false, name = "file_url")
@@ -44,6 +45,4 @@ public class VcSrcFile extends BaseEntity {
     @Builder.Default
     @Column(nullable = false, name = "dn_stat")
     private Character downloadStatus = 'Y';
-
-
 }

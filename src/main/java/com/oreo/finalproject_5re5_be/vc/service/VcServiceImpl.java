@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -23,23 +24,24 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 public class VcServiceImpl implements VcService{
     private VcRepository vcRepository;
     private VcSrcFileRepository vcSrcFileRepository;
-    private VcTargetFileRepository vcTargetFileRepository;
+    private VcTrgFileRepository vcTrgFileRepository;
     private VcResultFileRepository vcResultFileRepository;
     private VcTextRepository vcTextRepository;
     private ProjectRepository projectRepository;
     @Autowired
     public VcServiceImpl(VcRepository vcRepository,
                          VcSrcFileRepository vcSrcFileRepository,
-                         VcTargetFileRepository vcTargetFileRepository,
+                         VcTrgFileRepository vcTrgFileRepository,
                          VcResultFileRepository vcResultFileRepository,
                          VcTextRepository vcTextRepository,
                          ProjectRepository projectRepository) {
         this.vcRepository = vcRepository;
         this.vcSrcFileRepository = vcSrcFileRepository;
-        this.vcTargetFileRepository = vcTargetFileRepository;
+        this.vcTrgFileRepository = vcTrgFileRepository;
         this.vcResultFileRepository = vcResultFileRepository;
         this.vcTextRepository = vcTextRepository;
         this.projectRepository = projectRepository;
@@ -51,16 +53,11 @@ public class VcServiceImpl implements VcService{
      * @return VcUrlResponse
      */
     @Override
+    @Transactional
     public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest) {
-        //프로젝트 조회
-        Project project = projectRepository.findById(vcSrcRequest.getSeq())
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-        Vc vc = Vc.builder()
-                .projectId(project.getProSeq())
-                .project(project)
-                .build();
-        vcRepository.save(vc);
-        log.info("[vcService] SrcSave Project find : {} ", project); // 프로젝트 확인
+        //프로젝트 조회, 객체 생성후 저장
+        Vc vc = projectFind(vcSrcRequest.getSeq());
+
         //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 SRC 객체 생성
         VcSrcFile src = VcSrcFile.builder()
                 .vc(vc)
@@ -70,8 +67,9 @@ public class VcServiceImpl implements VcService{
                 .fileLength(vcSrcRequest.getLength())
                 .fileSize(vcSrcRequest.getSize())
                 .extension(vcSrcRequest.getExtension()).build();
-        log.info("[vcService] Save src 생성  : {}", src); //SRC 객체 생성 확인
+        log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
         VcSrcFile save = vcSrcFileRepository.save(src);// SRC 객체 저장
+        log.info("[vcService] save 확인 : {} ", save);
         VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
                 .seq(save.getSrcSeq())
                 .url(save.getFileUrl())
@@ -86,15 +84,8 @@ public class VcServiceImpl implements VcService{
      */
     @Override
     public VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest) {
-        //프로젝트 조회
-        Project project = projectRepository.findById(vcAudioRequest.getSeq1())
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-        Vc vc = Vc.builder()
-                .projectId(project.getProSeq())
-                .project(project)
-                .build();
-        vcRepository.save(vc);
-        log.info("[vcService] TrgSave Project find : {} ", project); //프로젝트 확인
+        //프로젝트 조회, 객체 생성후 저장
+        Vc vc = projectFind(vcAudioRequest.getSeq());
         //프로젝트 조회한 값과 입력한 값을 저장하기 위한 TRG 객체 생성
         VcTrgFile trg = VcTrgFile.builder()
                 .vc(vc)
@@ -104,10 +95,10 @@ public class VcServiceImpl implements VcService{
                 .fileSize(vcAudioRequest.getSize())
                 .extension(vcAudioRequest.getExtension()).build();
         log.info("[vcService] Save trg 생성  : {}", trg); //TRG 객체 생성 확인
-        VcTrgFile save = vcTargetFileRepository.save(trg);// TRG 객체 저장
+        vcTrgFileRepository.save(trg);// TRG 객체 저장
         VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
-                .seq(save.getTrgSeq())
-                .url(save.getFileUrl())
+                .seq(trg.getTrgSeq())
+                .url(trg.getFileUrl())
                 .build();
         return saveResponse;
     }
@@ -118,23 +109,14 @@ public class VcServiceImpl implements VcService{
      * @return VcUrlResponse
      */
     @Override
+    @Transactional
     public VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest) {
         //SRCFile 조회
-        VcSrcFile srcFile = vcSrcFileRepository.findById(vcAudioRequest.getSeq1())
-                .orElseThrow(() -> new IllegalArgumentException("SrcFile not found"));
+        VcSrcFile srcFile = vcSrcFileFind(vcAudioRequest.getSeq());
         log.info("[vcService] ResultSave srcFile find : {} ", srcFile);// SRC 확인
-        //프로젝트 조회
-        Project project = projectRepository.findById(srcFile.getSrcSeq())
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-        Vc vc = Vc.builder()
-                .projectId(project.getProSeq())
-                .project(project)
-                .build();
-        vcRepository.save(vc);
-        log.info("[vcService] ResultSave Project find : {} ", project);// 프로젝트 확인
+
         //프로젝트 조회한 값과 SRC 조회한 값, 입력한 값을 저장하기 위한 ResultFile 객체 생성
         VcResultFile result = VcResultFile.builder()
-                .vc(vc)
                 .srcSeq(srcFile)
                 .fileName(vcAudioRequest.getName())
                 .fileUrl(vcAudioRequest.getFileUrl())
@@ -142,10 +124,10 @@ public class VcServiceImpl implements VcService{
                 .fileSize(vcAudioRequest.getSize())
                 .extension(vcAudioRequest.getExtension()).build();
         log.info("[vcService] Save result 생성 : {}", result); // Result 객체 생성 확인
-        VcResultFile save = vcResultFileRepository.save(result);// result 객체 저장
+        vcResultFileRepository.save(result);// result 객체 저장
         VcUrlResponse saveResponse = VcUrlResponse.builder()//response 객체 생성
-                .seq(save.getResSeq())
-                .url(save.getFileUrl())
+                .seq(result.getResSeq())
+                .url(result.getFileUrl())
                 .build();
         return saveResponse;
     }
@@ -157,32 +139,24 @@ public class VcServiceImpl implements VcService{
      * @return VcTextResponse
      */
     @Override
+    @Transactional
     public VcTextResponse textSave(@Valid @NotNull VcTextRequest vcTextRequest) {
         //SRC 조회
-        VcSrcFile srcFile = vcSrcFileRepository.findById(vcTextRequest.getSeq())
-                .orElseThrow(() -> new IllegalArgumentException("SrcFile not found"));
+        VcSrcFile srcFile = vcSrcFileFind(vcTextRequest.getSeq());
         log.info("[vcService] TextSave srcFile find : {} ", srcFile);//SRC 확인
-        //프로젝트 조회
-        Project project = projectRepository.findById(srcFile.getSrcSeq())
-                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
-        Vc vc = Vc.builder()
-                .projectId(project.getProSeq())
-                .project(project)
-                .build();
-        vcRepository.save(vc);
-        log.info("[vcService] TextSave Project find : {} ", project);//프로젝트 확인
+
         //SRC 조회한 값과 프로젝트 조회한 값, 입력 값 저장하기 위한 TextFile 객체 생성
         VcText text = VcText.builder()
-                .vc(vc)
                 .srcSeq(srcFile)
                 .comment(vcTextRequest.getText())
                 .length(String.valueOf(vcTextRequest.getText().length()))
                 .build();
         log.info("[vcService] Save text 생성 : {}", text);//Text 객체 생성 값 확인
-        VcText save = vcTextRepository.save(text);//Text 객체 저장
+
+        vcTextRepository.save(text);//Text 객체 저장
         VcTextResponse saveResponse =  VcTextResponse.builder()//response 객체 생성
-                .seq(save.getVtSeq())
-                .text(save.getComment())
+                .seq(text.getVtSeq())
+                .text(text.getComment())
                 .build();
         return saveResponse;
     }
@@ -193,6 +167,7 @@ public class VcServiceImpl implements VcService{
      * @return List<VcResponse>
      */
     @Override
+    @Transactional
     public List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq) {
         //프로젝트 seq 조회한 값
         List<VcSrcFile> vcSrcFileList = vcSrcFileRepository.findByProjectId(projectSeq);
@@ -250,8 +225,7 @@ public class VcServiceImpl implements VcService{
     @Override
     public VcUrlResponse getSrcFile(@Valid @NotNull Long seq) {
         //SRC seq 로 SRC 값 조회
-        VcSrcFile srcFile = vcSrcFileRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("SrcFile not found"));
+        VcSrcFile srcFile = vcSrcFileFind(seq);
         log.info("[vcService] getSrcFile VcSRcFile find : {} ", srcFile);//SRC 값 확인
         //S3 SRC URL 값 출력
         VcUrlResponse response = VcUrlResponse.builder()
@@ -269,8 +243,7 @@ public class VcServiceImpl implements VcService{
     @Override
     public VcUrlResponse getResultFile(@Valid @NotNull Long seq) {
         //TRG seq 로 TRG 값 조회
-        VcResultFile resultFile = vcResultFileRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("TrgFile not found"));
+        VcResultFile resultFile = vcResultFind(seq);
         log.info("[vcService] getResultFile ResultFile find : {} ", resultFile);//TRG 값 확인
         //S3 TRG URL 값 출력
         VcUrlResponse response = VcUrlResponse.builder()
@@ -288,8 +261,7 @@ public class VcServiceImpl implements VcService{
     @Override
     public void updateText(@Valid @NotNull Long seq, @Valid @NotNull String text) {
         //Text seq 로 Text 값 조회 검증
-        VcText vcText = vcTextRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("text not found"));
+        VcText vcText = vcTextFind(seq);
         log.info("[vcService] updateText VcText find : {} ", vcText); //Text 값 확인
         //변경할 값과 seq 값 변경 객체 생성
         VcText updateText = vcText.toBuilder()
@@ -306,10 +278,10 @@ public class VcServiceImpl implements VcService{
      * @param rowOrder
      */
     @Override
+    @Transactional
     public void updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder) {
         //SRC seq 로 SRC 값 조회 검증
-        VcSrcFile vcSrcFile = vcSrcFileRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("src file not found"));
+        VcSrcFile vcSrcFile = vcSrcFileFind(seq);
         log.info("[vcService] updateRowOrder vcSrcFile find : {} ", vcSrcFile);//SRC 값 확인
         //변경할 행순서 값과 SRC seq 값 변경 객체 생성
         VcSrcFile updateSrcFile = vcSrcFile.toBuilder()
@@ -325,10 +297,10 @@ public class VcServiceImpl implements VcService{
      * @param seq
      */
     @Override
+    @Transactional
     public void deleteSrcFile(@Valid @NotNull Long seq) {
         //SRC seq 로 SRC 값 조회 검증
-        VcSrcFile vcSrcFile = vcSrcFileRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("src file not found"));
+        VcSrcFile vcSrcFile = vcSrcFileFind(seq);
         //활성화 상태 N로 변경
         VcSrcFile deleteSrcFile = vcSrcFile.toBuilder()
                 .srcSeq(vcSrcFile.getSrcSeq())
@@ -336,5 +308,32 @@ public class VcServiceImpl implements VcService{
                 .build();
         log.info("[vcService] deleteSrcFile vcSrcFile find : {} ", deleteSrcFile);//변경 확인
         vcSrcFileRepository.save(deleteSrcFile);//활성화상태 변경
+    }
+
+    //VcSrcFile 찾는 메서드
+    private VcSrcFile vcSrcFileFind(Long seq){
+        return vcSrcFileRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("Src file not found"));
+    }
+    //Project 찾고 vc생성 저장하는 메서드
+    private Vc projectFind(Long seq){
+        Project project = projectRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+        log.info("[vcService] TextSave Project find : {} ", project);//프로젝트 확인
+        Vc vc = Vc.builder()
+                .proSeq(project)
+                .build();
+        vcRepository.save(vc);
+        return vc;
+    }
+    //VcResultFile 찾는 메서드
+    private VcResultFile vcResultFind(Long seq){
+        return vcResultFileRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("ResultFile not found"));
+    }
+    //VcText 찾는 메서드
+    private VcText vcTextFind(Long seq){
+        return vcTextRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("Text not found"));
     }
 }

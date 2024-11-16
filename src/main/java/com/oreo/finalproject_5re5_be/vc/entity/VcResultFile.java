@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class VcResultFile extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "res_seq")
+    @Column(name = "res_seq")
     private Long resSeq;
 
     @Column(nullable = false, name = "name")
@@ -48,9 +48,6 @@ public class VcResultFile extends BaseEntity {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pro_seq")
-    private Vc vc;
 
     public void prePersist() {
         date = LocalDateTime.now();
