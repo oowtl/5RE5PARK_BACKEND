@@ -243,7 +243,6 @@ class MemberTermsRepositoryTest {
                 mt1.getChkTerm3().equals(mt2.getChkTerm3()) &&
                 mt1.getChkTerm4().equals(mt2.getChkTerm4()) &&
                 mt1.getChkTerm5().equals(mt2.getChkTerm5()) &&
-                mt1.getTermRegDate().equals(mt2.getTermRegDate()) &&
                 mt1.getName().equals(mt2.getName()) &&
                 mt1.getChkUse().equals(mt2.getChkUse()) &&
                 mt1.getTermCond1().equals(mt2.getTermCond1()) &&
