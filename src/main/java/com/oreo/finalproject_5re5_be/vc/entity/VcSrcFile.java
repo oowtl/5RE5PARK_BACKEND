@@ -21,7 +21,7 @@ public class VcSrcFile extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+    private Vc vc;
 
     @Column(nullable = false, name = "row_order")
     private Integer rowOrder;
@@ -44,4 +44,6 @@ public class VcSrcFile extends BaseEntity {
     @Builder.Default
     @Column(nullable = false, name = "dn_stat")
     private Character downloadStatus = 'Y';
+
+
 }
