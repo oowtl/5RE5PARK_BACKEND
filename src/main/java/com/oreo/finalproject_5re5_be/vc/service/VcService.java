@@ -2,9 +2,7 @@ package com.oreo.finalproject_5re5_be.vc.service;
 
 
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
-import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
-import com.oreo.finalproject_5re5_be.vc.dto.response.VcUrlResponse;
-import com.oreo.finalproject_5re5_be.vc.dto.response.VcTextResponse;
+import com.oreo.finalproject_5re5_be.vc.dto.response.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -46,8 +44,8 @@ public interface VcService {
     VcUrlResponse getSrcFile(@Valid @NotNull Long seq);
     VcUrlResponse getResultFile(@Valid @NotNull Long seq);
 
-    void updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
-    void updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
+    VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
+    VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
 
-    void deleteSrcFile(@Valid @NotNull Long seq);
+    VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
 }
