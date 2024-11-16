@@ -3,9 +3,8 @@ package com.oreo.finalproject_5re5_be.member.controller;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.ErrorResponse;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionsResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
 import com.oreo.finalproject_5re5_be.member.exception.MemberInvalidTermConditionException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.service.MemberTermsConditionServiceImpl;
@@ -78,7 +77,7 @@ public class MemberTermConditionController {
 
     // 회원 약관 항목 여러개 등록 처리
     @PostMapping("/register-all")
-    public ResponseEntity<MemberTermConditionsResponse> register(@Valid @RequestBody List<MemberTermConditionRequest> requests, BindingResult result) {
+    public ResponseEntity<MemberTermConditionResponses> register(@Valid @RequestBody List<MemberTermConditionRequest> requests, BindingResult result) {
         // 유효성 검증 실패시 에러 메시지 반환
         if (result.hasErrors()) {
             // 에러 메시지 생성
@@ -88,7 +87,7 @@ public class MemberTermConditionController {
         }
 
         // 여러건 등록 처리
-        MemberTermConditionsResponse response = memberTermConditionService.create(requests);
+        MemberTermConditionResponses response = memberTermConditionService.create(requests);
         // 응답 데이터 반환
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(response);
@@ -106,9 +105,9 @@ public class MemberTermConditionController {
 
     // 모든 회원 약관 항목 조회
     @GetMapping("/all")
-    public ResponseEntity<MemberTermConditionsResponse> readAll() {
+    public ResponseEntity<MemberTermConditionResponses> readAll() {
         // 모든 조회 처리
-        MemberTermConditionsResponse response = memberTermConditionService.readAll();
+        MemberTermConditionResponses response = memberTermConditionService.readAll();
         // 응답 데이터 반환
         return ResponseEntity.status(HttpStatus.OK)
                              .body(response);
@@ -116,9 +115,9 @@ public class MemberTermConditionController {
 
     // 사용 가능한 약관 항목 조회
     @GetMapping("/available")
-    public ResponseEntity<MemberTermConditionsResponse> readAvailable() {
+    public ResponseEntity<MemberTermConditionResponses> readAvailable() {
         // 사용 가능한 모든 조회 처리
-        MemberTermConditionsResponse response = memberTermConditionService.readAvailable();
+        MemberTermConditionResponses response = memberTermConditionService.readAvailable();
         // 응답 데이터 반환
         return ResponseEntity.status(HttpStatus.OK)
                              .body(response);
@@ -126,9 +125,9 @@ public class MemberTermConditionController {
 
     // 사용 불가능한 약관 항목 조회
     @GetMapping("/not-available")
-    public ResponseEntity<MemberTermConditionsResponse> readNotAvailable() {
+    public ResponseEntity<MemberTermConditionResponses> readNotAvailable() {
         // 사용 불가능한 모든 조회 처리
-        MemberTermConditionsResponse response = memberTermConditionService.readNotAvailable();
+        MemberTermConditionResponses response = memberTermConditionService.readNotAvailable();
         // 응답 데이터 반환
         return ResponseEntity.status(HttpStatus.OK)
                              .body(response);

@@ -4,6 +4,7 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
+@EqualsAndHashCode
 public class MemberTermConditionResponse {
     private String condCode;
     private String shortCont;

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionsResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
 import java.time.LocalDateTime;
@@ -14,8 +14,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -115,8 +113,8 @@ class MemberTermsConditionServiceImplTest {
             MemberTermConditionResponse memberTermConditionResponse = new MemberTermConditionResponse(memberTermsCondition);
             expectedCreatedDummy.add(memberTermConditionResponse);
         }
-        MemberTermConditionsResponse expectedResponse = new MemberTermConditionsResponse(expectedCreatedDummy);
-        MemberTermConditionsResponse actualResponse = memberTermsConditionService.create(list);
+        MemberTermConditionResponses expectedResponse = new MemberTermConditionResponses(expectedCreatedDummy);
+        MemberTermConditionResponses actualResponse = memberTermsConditionService.create(list);
 
         // 등록된 데이터와 요청한 데이터가 같은지 확인
         assertEquals(expectedResponse.getMemberTermConditionResponses().size(), actualResponse.getMemberTermConditionResponses().size());
@@ -148,12 +146,12 @@ class MemberTermsConditionServiceImplTest {
             expectedMemberTermConditionResponses.add(memberTermConditionResponse);
         }
 
-        MemberTermConditionsResponse foundMemberTermConditionsResponse = memberTermsConditionService.readAll();
+        MemberTermConditionResponses foundMemberTermConditionResponses = memberTermsConditionService.readAll();
 
         // 조회된 데이터와 기대하는 데이터가 같은지 확인
-        assertEquals(expectedMemberTermConditionResponses.size(), foundMemberTermConditionsResponse.getMemberTermConditionResponses().size());
+        assertEquals(expectedMemberTermConditionResponses.size(), foundMemberTermConditionResponses.getMemberTermConditionResponses().size());
         for (int i = 0; i < expectedMemberTermConditionResponses.size(); i++) {
-            assertTrue(isSameMemberTermConditionResponse(expectedMemberTermConditionResponses.get(i), foundMemberTermConditionsResponse.getMemberTermConditionResponses().get(i)));
+            assertTrue(isSameMemberTermConditionResponse(expectedMemberTermConditionResponses.get(i), foundMemberTermConditionResponses.getMemberTermConditionResponses().get(i)));
         }
 
     }
@@ -172,10 +170,10 @@ class MemberTermsConditionServiceImplTest {
         }
 
         // 조회된 데이터와 기대하는 데이터가 같은지 확인
-        MemberTermConditionsResponse foundMemberTermConditionsResponse = memberTermsConditionService.readAvailable();
-        assertEquals(expectedMemberTermConditionResponses.size(), foundMemberTermConditionsResponse.getMemberTermConditionResponses().size());
+        MemberTermConditionResponses foundMemberTermConditionResponses = memberTermsConditionService.readAvailable();
+        assertEquals(expectedMemberTermConditionResponses.size(), foundMemberTermConditionResponses.getMemberTermConditionResponses().size());
         for (int i = 0; i < expectedMemberTermConditionResponses.size(); i++) {
-            assertTrue(isSameMemberTermConditionResponse(expectedMemberTermConditionResponses.get(i), foundMemberTermConditionsResponse.getMemberTermConditionResponses().get(i)));
+            assertTrue(isSameMemberTermConditionResponse(expectedMemberTermConditionResponses.get(i), foundMemberTermConditionResponses.getMemberTermConditionResponses().get(i)));
         }
     }
 
@@ -193,10 +191,10 @@ class MemberTermsConditionServiceImplTest {
         }
 
         // 조회된 데이터와 기대하는 데이터가 같은지 확인
-        MemberTermConditionsResponse foundMemberTermConditionsResponse = memberTermsConditionService.readNotAvailable();
-        assertEquals(expectedMemberTermConditionResponses.size(), foundMemberTermConditionsResponse.getMemberTermConditionResponses().size());
+        MemberTermConditionResponses foundMemberTermConditionResponses = memberTermsConditionService.readNotAvailable();
+        assertEquals(expectedMemberTermConditionResponses.size(), foundMemberTermConditionResponses.getMemberTermConditionResponses().size());
         for (int i = 0; i < expectedMemberTermConditionResponses.size(); i++) {
-            assertTrue(isSameMemberTermConditionResponse(expectedMemberTermConditionResponses.get(i), foundMemberTermConditionsResponse.getMemberTermConditionResponses().get(i)));
+            assertTrue(isSameMemberTermConditionResponse(expectedMemberTermConditionResponses.get(i), foundMemberTermConditionResponses.getMemberTermConditionResponses().get(i)));
         }
     }
 

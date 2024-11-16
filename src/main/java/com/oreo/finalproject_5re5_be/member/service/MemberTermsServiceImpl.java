@@ -3,6 +3,8 @@ package com.oreo.finalproject_5re5_be.member.service;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
@@ -17,11 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-/**
- * 추후에 응답 데이터 Response 만들어서 반환하도록 리팩토링
- * - 기본처리 틀 잡아 놓기
- */
 
 
 @Service
@@ -38,7 +35,7 @@ public class MemberTermsServiceImpl {
 
 
     // 회원 약관 생성
-    public MemberTerms create(MemberTermRequest request) {
+    public MemberTermResponse create(MemberTermRequest request) {
         // 약관 엔티티를 생성함
         MemberTerms terms = new MemberTerms();
         List<MemberTermsCondition> foundMemberTermConditions = findMemberTermsConditions(request.getMemberTermConditionCodes());
@@ -78,36 +75,71 @@ public class MemberTermsServiceImpl {
 
         // 생성한 값을 반환함
         MemberTerms savedMemberTerm = memberTermsRepository.save(terms);
-        return savedMemberTerm;
+        return new MemberTermResponse(savedMemberTerm);
     }
 
 
 
     // 회원 약관 시퀀스로 조회
-    public MemberTerms read(Long termSeq) {
-        return findMemberTerm(termSeq);
+    public MemberTermResponse read(Long termSeq) {
+        MemberTerms foundMemberTerm = findMemberTerm(termSeq);
+        return new MemberTermResponse(foundMemberTerm);
     }
 
     // 회원 약관 코드로 조회
-    public MemberTerms read(String name) {
-        return findMemberTerm(name);
+    public MemberTermResponse read(String name) {
+        MemberTerms foundMemberTerm = findMemberTerm(name);
+        return new MemberTermResponse(foundMemberTerm);
+    }
+
+    public MemberTermResponse readLatestAvailable() {
+        MemberTerms foundMemberTerms = memberTermsRepository.findTopByChkUseOrderByTermRegDateDesc();
+        return new MemberTermResponse(foundMemberTerms);
     }
 
 
-    public List<MemberTerms> readAll() {
-        return memberTermsRepository.findAll();
+    /**
+     * 밑에 코드들 중복, 추후에 리팩토링 처리[]
+     * @return
+     */
+    // 추후에 페이징 처리 필요
+    public MemberTermResponses readAll() {
+        // 모든 회원 약관을 조회한다
+        List<MemberTerms> foundMemberTerms = memberTermsRepository.findAll();
+
+        // 조회된 모든 엔티티를 response로 변환한다
+        List<MemberTermResponse> memberTermResponseList = foundMemberTerms.stream()
+                                                                          .map(MemberTermResponse::new)
+                                                                          .toList();
+
+        // 변환된 모든 response를 하나로 묶은 response에 담아서 반환한다
+        return new MemberTermResponses(memberTermResponseList);
     }
 
-    public MemberTerms readLatestAvailable() {
-        return memberTermsRepository.findTopByChkUseOrderByTermRegDateDesc();
+    // 추후에 페이징 처리 필요
+    public MemberTermResponses readAvailable() {
+        List<MemberTerms> foundMemberTerms = memberTermsRepository.findAvailableMemberTerms();
+
+        // 조회된 모든 엔티티를 response로 변환한다
+        List<MemberTermResponse> memberTermResponseList = foundMemberTerms.stream()
+                .map(MemberTermResponse::new)
+                .toList();
+
+        // 변환된 모든 response를 하나로 묶은 response에 담아서 반환한다
+        return new MemberTermResponses(memberTermResponseList);
     }
 
-    public List<MemberTerms> readAvailable() {
-        return memberTermsRepository.findAvailableMemberTerms();
-    }
+    // 추후에 페이징 처리 필요
+    public MemberTermResponses readNotAvailable() {
+        List<MemberTerms> foundMemberTerms = memberTermsRepository.findNotAvailableMemberTerms();
 
-    public List<MemberTerms> readNotAvailable() {
-        return memberTermsRepository.findNotAvailableMemberTerms();
+        // 조회된 모든 엔티티를 response로 변환한다
+        List<MemberTermResponse> memberTermResponseList = foundMemberTerms.stream()
+                .map(MemberTermResponse::new)
+                .toList();
+
+        // 변환된 모든 response를 하나로 묶은 response에 담아서 반환한다
+        return new MemberTermResponses(memberTermResponseList);
     }
 
     // 회원 약관 수정

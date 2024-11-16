@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionsResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.service.MemberTermsConditionServiceImpl;
@@ -146,8 +146,8 @@ class MemberTermConditionControllerTest {
             savedMemberTermsConditions.add(memberTermConditionResponse);
         }
 
-        MemberTermConditionsResponse memberTermConditionsResponse = new MemberTermConditionsResponse(savedMemberTermsConditions);
-        when(memberTermsConditionService.create(requests)).thenReturn(memberTermConditionsResponse);
+        MemberTermConditionResponses memberTermConditionResponses = new MemberTermConditionResponses(savedMemberTermsConditions);
+        when(memberTermsConditionService.create(requests)).thenReturn(memberTermConditionResponses);
 
 
         // 컨트롤러에 요청 보내고 응답 확인
@@ -243,7 +243,7 @@ class MemberTermConditionControllerTest {
                     memberTermsConditionEntity);
             savedMemberTermsConditions.add(response);
         }
-        MemberTermConditionsResponse response = new MemberTermConditionsResponse(savedMemberTermsConditions);
+        MemberTermConditionResponses response = new MemberTermConditionResponses(savedMemberTermsConditions);
         when(memberTermsConditionService.readAll()).thenReturn(response);
 
         // 컨트롤러에 요청 보내기
@@ -304,7 +304,7 @@ class MemberTermConditionControllerTest {
             savedMemberTermsConditions.add(response);
         }
 
-        MemberTermConditionsResponse response = new MemberTermConditionsResponse(savedMemberTermsConditions);
+        MemberTermConditionResponses response = new MemberTermConditionResponses(savedMemberTermsConditions);
         when(memberTermsConditionService.readAvailable()).thenReturn(response);
 
 
@@ -367,7 +367,7 @@ class MemberTermConditionControllerTest {
             savedMemberTermsConditions.add(response);
         }
 
-        MemberTermConditionsResponse response = new MemberTermConditionsResponse(savedMemberTermsConditions);
+        MemberTermConditionResponses response = new MemberTermConditionResponses(savedMemberTermsConditions);
         when(memberTermsConditionService.readNotAvailable()).thenReturn(response);
 
 

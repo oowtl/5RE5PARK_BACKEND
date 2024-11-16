@@ -3,11 +3,10 @@ package com.oreo.finalproject_5re5_be.member.service;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionsResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,7 @@ public class MemberTermsConditionServiceImpl {
     }
 
     // 1-2. 여러개 회원 약관 항목을 등록한다
-    public MemberTermConditionsResponse create(List<MemberTermConditionRequest> requests) {
+    public MemberTermConditionResponses create(List<MemberTermConditionRequest> requests) {
         // 유효성 검증이 완료된 requests 더미로부터 이터러블 할 수 있는 엔티티 더미를 생성한다
         Stream<MemberTermsCondition> memberTermConditions = requests.stream()
                                                                     .map(MemberTermConditionRequest::createMemberTermsConditionEntity);
@@ -48,7 +47,7 @@ public class MemberTermsConditionServiceImpl {
                                                                                                  .toList();
 
         // 저장된 엔티티 더미를 response로 변환하여 반환한다
-        return new MemberTermConditionsResponse(memberTermCondtionsResponse);
+        return new MemberTermConditionResponses(memberTermCondtionsResponse);
     }
 
     // 2-1. 단건 회원 약관 항목을 조회한다
@@ -66,7 +65,7 @@ public class MemberTermsConditionServiceImpl {
 
     // 2-2. 모든 회원 약관 항목을 조회한다
     @Transactional(readOnly = true)
-    public MemberTermConditionsResponse readAll() {
+    public MemberTermConditionResponses readAll() {
         // 모든 회원 약관 항목을 조회한다
         List<MemberTermsCondition> foundMemberTermsConditions = memberTermConditionRepository.findAll();
         // 조회된 엔티티를 response로 변환하여 반환한다
@@ -74,12 +73,12 @@ public class MemberTermsConditionServiceImpl {
                                                                                                  .map(MemberTermConditionResponse::new)
                                                                                                  .toList();
         // 조회된 엔티티를 response로 변환하여 반환한다
-        return new MemberTermConditionsResponse(memberTermCondtionsResponse);
+        return new MemberTermConditionResponses(memberTermCondtionsResponse);
     }
 
     // 2-2. 사용 가능한 여러개 회원 약관 항목을 조회한다
     @Transactional(readOnly = true)
-    public MemberTermConditionsResponse readAvailable() {
+    public MemberTermConditionResponses readAvailable() {
         // 사용 가능한 여러개 회원 약관 항목을 조회한다
         List<MemberTermsCondition> availableMemberTermsConditions = memberTermConditionRepository.findAvailableMemberTermsConditions();
 
@@ -87,12 +86,12 @@ public class MemberTermsConditionServiceImpl {
         List<MemberTermConditionResponse> memberTermConditionResponses = availableMemberTermsConditions.stream()
                                                                                                       .map(MemberTermConditionResponse::new)
                                                                                                       .toList();
-        return new MemberTermConditionsResponse(memberTermConditionResponses);
+        return new MemberTermConditionResponses(memberTermConditionResponses);
     }
 
     // 2-3. 사용 불가능한 여러개 회원 약관 항목을 조회한다
     @Transactional(readOnly = true)
-    public MemberTermConditionsResponse readNotAvailable() {
+    public MemberTermConditionResponses readNotAvailable() {
         // 사용 가능한 여러개 회원 약관 항목을 조회한다
         List<MemberTermsCondition> availableMemberTermsConditions = memberTermConditionRepository.findNotAvailableMemberTermsConditions();
 
@@ -100,7 +99,7 @@ public class MemberTermsConditionServiceImpl {
         List<MemberTermConditionResponse> memberTermConditionResponses = availableMemberTermsConditions.stream()
                                                                                                        .map(MemberTermConditionResponse::new)
                                                                                                        .toList();
-        return new MemberTermConditionsResponse(memberTermConditionResponses);
+        return new MemberTermConditionResponses(memberTermConditionResponses);
     }
 
     // 3-1. 단건 회원 약관 항목을 수정한다
