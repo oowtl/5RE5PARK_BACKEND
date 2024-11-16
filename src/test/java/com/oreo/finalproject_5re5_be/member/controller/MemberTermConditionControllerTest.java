@@ -4,6 +4,7 @@ package com.oreo.finalproject_5re5_be.member.controller;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,17 +29,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-@RunWith(SpringRunner.class)
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@WebMvcTest(MemberTermConditionController.class)
 class MemberTermConditionControllerTest {
 
     @Autowired
@@ -59,6 +59,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("회원 약관 등록 처리")
     @Test
+    @WithMockUser
     void 회원_약관_등록_처리() throws Exception {
         // 요청 데이터 생성
         MemberTermConditionRequest request = MemberTermConditionRequest.builder()
@@ -83,8 +84,9 @@ class MemberTermConditionControllerTest {
         // 요청 데이터 컨트롤러에 전달
         // 응답 데이터 확인
         mockMvc.perform(post("/api/member-term-condition/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)).with(csrf())
+                        .with(csrf())
                 )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.condCode").value(response.getCondCode()))
@@ -99,6 +101,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("회원 약관 여러개 등록 처리")
     @Test
+    @WithMockUser
     void 회원_여러개_약관_등록_처리() throws Exception {
         // 요청 데이터 여러개 생성
         List<MemberTermConditionRequest> requests = new ArrayList<>();
@@ -152,8 +155,9 @@ class MemberTermConditionControllerTest {
 
         // 컨트롤러에 요청 보내고 응답 확인
         mockMvc.perform(post("/api/member-term-condition/register-all")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requests))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests))
+                        .with(csrf())
                 )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
@@ -161,6 +165,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("회원 약관 조회 처리")
     @Test
+    @WithMockUser
     void 회원_약관_조회_처리() throws Exception {
         // 서비스에서 응답할 데이터 생성
         MemberTermConditionRequest request = MemberTermConditionRequest.builder()
@@ -196,6 +201,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("회원 약관 모두 조회 처리")
     @Test
+    @WithMockUser
     void 회원_약관_모두_조회_처리() throws Exception {
         // 조회될 데이터 생성
         List<MemberTermConditionRequest> dummy = new ArrayList<>();
@@ -255,6 +261,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("사용 가능한 약관 항목 조회 처리")
     @Test
+    @WithMockUser
     void 사용_가능한_약관_항목_조회_처리() throws Exception {
         // 더미 데이터 생성
         List<MemberTermConditionRequest> dummy = new ArrayList<>();
@@ -318,6 +325,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("사용 불가능한 약관 항목 조회 처리")
     @Test
+    @WithMockUser
     void 사용_불가능한_약관_항목_조회_처리() throws Exception {
         // 더미 데이터 생성
         List<MemberTermConditionRequest> dummy = new ArrayList<>();
@@ -381,6 +389,7 @@ class MemberTermConditionControllerTest {
 
     @DisplayName("특정 회원 약관 항목 수정 처리")
     @Test
+    @WithMockUser
     void 특정_회원_약관_항목_수정_처리() throws Exception {
         // 업데이트될 더미 데이터 생성
         String condCode = "mtc01";
@@ -397,14 +406,16 @@ class MemberTermConditionControllerTest {
         // 컨트롤러에 요청 보내기
         // 응답 데이터 확인
         mockMvc.perform(patch("/api/member-term-condition/mtc01")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf())
         )
                 .andExpect(status().isNoContent());
     }
 
     @DisplayName("특정 회원 약관 항목 삭제 처리")
     @Test
+    @WithMockUser
     void 특정_회원_약관_항목_삭제_처리() throws Exception {
         // 삭제될 더미 데이터 생성 및 세팅
         String condCode = "mtc01";
@@ -414,12 +425,15 @@ class MemberTermConditionControllerTest {
 
         // 컨트롤러에 요청 보내기
         // 응답 데이터 확인
-        mockMvc.perform(delete("/api/member-term-condition/mtc01"))
+        mockMvc.perform(delete("/api/member-term-condition/mtc01")
+                        .with(csrf())
+                )
                 .andExpect(status().isNoContent());
     }
 
     @DisplayName("회원 약관 항목 등록 실패시 예외 처리")
     @Test
+    @WithMockUser
     void 회원_약관_항목_등록_실패시_예외_처리() throws Exception{
         // 예외 발생 시킬 더미 데이터 세팅
         MemberTermConditionRequest request = MemberTermConditionRequest.builder()
@@ -432,14 +446,16 @@ class MemberTermConditionControllerTest {
         // 컨트롤러에 요청 보내기
         // 예외 처리 확인
         mockMvc.perform(post("/api/member-term-condition/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf())
         )
                 .andExpect(status().isBadRequest());
     }
 
     @DisplayName("회원 약관 항목 수정 실패시 예외 처리")
     @Test
+    @WithMockUser
     void 회원_약관_항목_수정_실패시_예외_처리() throws Exception {
         // 예외 발생 시킬 더미 데이터 세팅
         MemberTermConditionUpdateRequest request = MemberTermConditionUpdateRequest.builder()
@@ -454,12 +470,14 @@ class MemberTermConditionControllerTest {
         mockMvc.perform(post("/api/member-term-condition/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
+                        .with(csrf())
                 )
                 .andExpect(status().isBadRequest());
     }
 
     @DisplayName("회원 약관 항목 조회 실패시 예외 처리")
     @Test
+    @WithMockUser
     void 회원_약관_항목_조회_실패시_예외_처리() throws Exception {
         // 예외 발생 시킬 더미 데이터 세팅
         String condCode = "mtc01";

@@ -8,12 +8,14 @@ import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResp
 import com.oreo.finalproject_5re5_be.member.exception.MemberInvalidTermConditionException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.service.MemberTermsConditionServiceImpl;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Validated
 @RestController
 @RequestMapping("/api/member-term-condition")
 public class MemberTermConditionController {
@@ -35,8 +37,9 @@ public class MemberTermConditionController {
         this.memberTermConditionService = memberTermConditionService;
     }
 
-    @ExceptionHandler(
-            MemberInvalidTermConditionException.class
+    @ExceptionHandler({
+            MemberInvalidTermConditionException.class,
+            ConstraintViolationException.class}
     )
     public ResponseEntity<ErrorResponse> handleInvalidTermConditionException(RuntimeException e) {
         // 회원 약관 항목 등록 실패시 에러 메시지 반환
