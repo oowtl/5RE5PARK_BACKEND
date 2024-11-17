@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.dto.request;
 
+import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
@@ -49,7 +50,7 @@ public class MemberRegisterRequest {
     private String locaAddr;
     private String detailAddr;
     private String passAddr;
-
+    private Long termSeq;
     @NotNull(message = "필수 동의 항목이 선택되지 않았습니다.")  // 필수값 검증
     private Character chkValid;
 
@@ -95,9 +96,12 @@ public class MemberRegisterRequest {
     }
 
     // 회원 등록 dto로부터 약관 이력 엔티티 생성
-    public MemberTermsHistory createMemberTermsHistoryEntity(Member member) {
+    public MemberTermsHistory createMemberTermsHistoryEntity(Member member, MemberTerms terms) {
         // 회원 약관 이력 엔티티 생성
         MemberTermsHistory memberTermsHistory = new MemberTermsHistory();
+
+        // 회원 약관 세팅
+        memberTermsHistory.setTerms(terms);
 
         // 입력 데이터로 부터 약관 정보를 조회해서 약관 이력 엔티티에 저장
         for (int i = 0; i < memberTermCheckOrNotRequests.size(); i++) {

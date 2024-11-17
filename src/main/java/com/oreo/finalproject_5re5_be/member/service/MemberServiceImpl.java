@@ -2,9 +2,11 @@ package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
+import com.oreo.finalproject_5re5_be.member.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
+import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
@@ -12,6 +14,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgre
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
+import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
@@ -70,10 +73,11 @@ public class MemberServiceImpl implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MemberCategoryRepository memberCategoryRepository;
     private final JavaMailSender mailSender;
+    private final CodeRepository codeRepository;
 
     public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository, MemberRepository memberRepository, MemberStateRepository memberStateRepository,
                              MemberTermsHistoryRepository memberTermsHistoryRepository, MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder,
-            MemberCategoryRepository memberCategoryRepository, JavaMailSender mailSender) {
+            MemberCategoryRepository memberCategoryRepository, JavaMailSender mailSender, CodeRepository codeRepository) {
         this.memberConnectionHistoryRepository = memberConnectionHistoryRepository;
         this.memberRepository = memberRepository;
         this.memberStateRepository = memberStateRepository;
@@ -82,6 +86,7 @@ public class MemberServiceImpl implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
         this.memberCategoryRepository = memberCategoryRepository;
         this.mailSender = mailSender;
+        this.codeRepository = codeRepository;
     }
 
     // 1. 회원가입 : 유효성 검증이 완료된 회원 정보를 통해 회원가입을 처리한다.
@@ -118,9 +123,9 @@ public class MemberServiceImpl implements UserDetailsService {
         // 회원 엔티티 저장
         Member savedMember = saveMember(request);
 //        // 회원 약관 이력 엔티티 저장
-//        saveMemberTermsHistory(request, savedMember);
+        saveMemberTermsHistory(request, savedMember);
 //        // 회원 초기 상태 엔티티 저장
-//        saveInitMemberState(savedMember);
+        saveMemberState(savedMember, "MBS001"); // 초기 상태 코드 : MBS001 - 신규 등록
         return savedMember;
     }
 
@@ -170,30 +175,37 @@ public class MemberServiceImpl implements UserDetailsService {
 
     // 회원 약관 이력 저장
     private MemberTermsHistory saveMemberTermsHistory(MemberRegisterRequest request, Member member) {
+        // 회원 약관 조회
+        MemberTerms foundTerms = memberTermsRepository.findMemberTermsByTermsSeq(request.getTermSeq());
+        if (foundTerms == null) {
+            throw new MemberNotFoundException();
+        }
+
         // 입력 데이터로부터 회원 약관 이력 엔티티 생성
-        MemberTermsHistory memberTermsHistory = request.createMemberTermsHistoryEntity(member);
+        MemberTermsHistory memberTermsHistory = request.createMemberTermsHistoryEntity(member, foundTerms);
+
         // 회원 약관 이력 엔티티 저장
         MemberTermsHistory savedMemberTermsHistory = memberTermsHistoryRepository.save(memberTermsHistory);
+
         return savedMemberTermsHistory;
     }
 
-//    // 회원 상태 업데이트
-//    private MemberState saveInitMemberState(Member member) {
-//        // 신규 등록 회원 상태 조회
-//        MemberCategory memberInitStateCategory = findMemberStateCategory("신규등록");
-//        // 신규 등록 회원 상태 생성
-//        MemberState memberInitState = MemberState.of(member, memberInitStateCategory);
-//        // 회원 상태 엔티티 저장
-//        MemberState savedMemberState = memberStateRepository.save(memberInitState);
-//        return savedMemberState;
-//    }
+    // 회원 상태 업데이트
+    private MemberState saveMemberState(Member member, String code) {
+        // 신규 등록 회원 상태 조회
+        Code foundCode = codeRepository.findCodeByCode(code);
+        if (foundCode == null) {
+            throw new MemberNotFoundException();
+        }
 
-    // 회원 상태 카테고리 조회
-    private MemberCategory findMemberStateCategory(String cateName) {
-        // 회원 상태를 이름으로 조회
-        MemberCategory foundMemberCategory = memberCategoryRepository.findByName(cateName);
-        return foundMemberCategory;
+        // 신규 등록 회원 상태 생성
+        MemberState memberState = MemberState.of(member, foundCode);
+        // 회원 상태 엔티티 저장
+
+        MemberState savedMemberState = memberStateRepository.save(memberState);
+        return savedMemberState;
     }
+
 
 
     // 2. 로그인 : 아이디로 회원 조회하여 UserDetails 반환, 스프링 시큐리티 내부적으로 호출하여 로그인 처리
