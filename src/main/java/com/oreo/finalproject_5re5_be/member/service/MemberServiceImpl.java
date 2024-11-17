@@ -177,16 +177,16 @@ public class MemberServiceImpl implements UserDetailsService {
         return savedMemberTermsHistory;
     }
 
-    // 회원 상태 업데이트
-    private MemberState saveInitMemberState(Member member) {
-        // 신규 등록 회원 상태 조회
-        MemberCategory memberInitStateCategory = findMemberStateCategory("신규등록");
-        // 신규 등록 회원 상태 생성
-        MemberState memberInitState = MemberState.of(member, memberInitStateCategory);
-        // 회원 상태 엔티티 저장
-        MemberState savedMemberState = memberStateRepository.save(memberInitState);
-        return savedMemberState;
-    }
+//    // 회원 상태 업데이트
+//    private MemberState saveInitMemberState(Member member) {
+//        // 신규 등록 회원 상태 조회
+//        MemberCategory memberInitStateCategory = findMemberStateCategory("신규등록");
+//        // 신규 등록 회원 상태 생성
+//        MemberState memberInitState = MemberState.of(member, memberInitStateCategory);
+//        // 회원 상태 엔티티 저장
+//        MemberState savedMemberState = memberStateRepository.save(memberInitState);
+//        return savedMemberState;
+//    }
 
     // 회원 상태 카테고리 조회
     private MemberCategory findMemberStateCategory(String cateName) {

@@ -32,8 +32,8 @@ public class MemberChangeHistory extends BaseEntity {
     private Member member;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cate_code")
-    private MemberCategory chngFieldCode;
+    @JoinColumn(name = "code")
+    private Code chngFieldCode;
 
     @Column(name = "bef_val", nullable = false)
     private String befVal;

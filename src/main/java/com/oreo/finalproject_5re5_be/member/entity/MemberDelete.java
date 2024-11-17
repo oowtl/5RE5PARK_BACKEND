@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -27,9 +28,9 @@ public class MemberDelete extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userSeq;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cate_code")
-    private MemberCategory cateCode;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code")
+    private Code code;
 
     @Column(name = "detail_cont", nullable = false)
     private String detailCont;
