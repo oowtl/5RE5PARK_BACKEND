@@ -30,6 +30,7 @@ public class MemberTermRequest {
     @NotBlank(message = "약관 이름을 입력해 주세요.")
     private String name;
 
+    private String termCode;
 
     @NotNull(message = "사용 가능 여부는 비어 있을 수 없습니다.")
     private Character chkUse;

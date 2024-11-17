@@ -67,6 +67,10 @@ public class MemberTermsServiceImpl {
         String name = request.getName();
         terms.setName(name);
 
+        // 약관 코드 세팅함
+        String termCode = request.getTermCode();
+        terms.setTermCode(termCode);
+
         // 시간 세팅함
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime max = LocalDateTime.MAX;
