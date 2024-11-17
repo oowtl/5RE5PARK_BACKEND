@@ -31,11 +31,11 @@ public class ProjectController {
     }
 
     @GetMapping("")
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
+    public ResponseEntity<ResponseDto<Map<String, List<ProjectResponse>>>> projectGet(
             @SessionAttribute("memberSeq") Long memberSeq){
         List<ProjectResponse> projectResponses = projectService.projectFindAll(memberSeq);
-        Map<String, List<Object>> map = new HashMap<>();
-        map.put("row", Collections.singletonList(projectResponses));
+        Map<String, List<ProjectResponse>> map = new HashMap<>();
+        map.put("row", projectResponses);
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), map));
     }
