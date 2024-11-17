@@ -39,10 +39,11 @@ public class ProjectServiceImpl implements ProjectService {
      * @return List<ProjectResponse>
      */
     @Override
-    public List<ProjectResponse> projectFindAll() {
+    public List<ProjectResponse> projectFindAll(Long memberSeq) {
+        Member member = memberFind(memberSeq);
         //회원 정보로 전체 조회
         List<Project> project = projectRepository
-                .findByMemberSeq(getCurrentUser().getSeq());
+                .findByMemberSeq(member.getSeq());
         //정보를 저장할 리스트 생성
         List<ProjectResponse> projectResponses = new ArrayList<>();
         //project 정보를 모두 넣고
@@ -65,9 +66,9 @@ public class ProjectServiceImpl implements ProjectService {
      * @return Long
      */
     @Override
-    public Long projectSave() {
+    public Long projectSave(Long memberSeq) {
         //회원정보 추출
-        Member member = getCurrentUser();
+        Member member = memberFind(memberSeq);
         //회원정보로 프로젝트 객체 생성
         Project project = Project.builder()
                 .member(member)
@@ -89,8 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
         //프로젝트 길이 제한
         validateProjectName(projectName);
         // 프로젝트 번호로 프로젝트 찾기
-        Project projectFind = projectRepository.findById(projectSeq)
-                .orElseThrow(() -> new IllegalArgumentException("project not found"));
+        Project projectFind = projectFind(projectSeq);
         //프로젝트 찾은 번호로 받은 프로젝트명으로 변경
         Project project = projectFind.toBuilder()
                 .proSeq(projectSeq)
@@ -108,8 +108,7 @@ public class ProjectServiceImpl implements ProjectService {
     public void projectDelete(List<Long> projectSeq) {
         //리스트로 받은 프로젝트 번호를 조회
         for (int i = 0; i < projectSeq.size(); i++) {
-            Project projectFind = projectRepository.findById(projectSeq.get(i))
-                    .orElseThrow(() -> new IllegalArgumentException("src file not found"));
+            Project projectFind = projectFind(projectSeq.get(i));
             //프로젝트들의 상태를 N으로 변경
             Project project = projectFind.toBuilder()
                     .proSeq(projectSeq.get(i))
@@ -136,9 +135,18 @@ public class ProjectServiceImpl implements ProjectService {
         //아이디로 회원정보 조회
         Member member = memberRepository.findById(userId);
         if(member==null){
-            throw new UsernameNotFoundException("유저 정보가 없습니다.");
+            throw new UsernameNotFoundException("Member not found");
         }
         //회원정보 리턴
         return member;
+    }
+
+    private Project projectFind(Long seq){
+        return projectRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("project not found"));
+    }
+    private Member memberFind(Long seq){
+        return memberRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
     }
 }

@@ -11,8 +11,8 @@ public interface ProjectService {
      * 3. 프로젝트 이름 변경
      * 4. 프로젝트 삭제
      */
-    List<ProjectResponse> projectFindAll();
-    Long projectSave();
+    List<ProjectResponse> projectFindAll(Long memberSeq);
+    Long projectSave(Long memberSeq);
     void projectUpdate(Long projectSeq, String projectName);
     void projectDelete(List<Long> projectSeq);
 }
