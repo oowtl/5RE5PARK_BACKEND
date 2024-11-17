@@ -413,7 +413,7 @@ class MemberServiceImplTest {
                 .passAddr("서초대로 59-32")
                 .locaAddr("서초동")
                 .detailAddr("서초동 123-456")
-                .termSeq(1L)
+                .termCode("TERM001")
                 .build();
 
         return request;
@@ -433,6 +433,8 @@ class MemberServiceImplTest {
         term1.setTermCond3(termCond3);
         term1.setTermCond4(termCond4);
         term1.setTermCond5(termCond5);
+
+        term1.setTermCode("TERM001");
 
         // 약관에 필요한 기본값 세팅
         term1.setChkTerm1('Y');

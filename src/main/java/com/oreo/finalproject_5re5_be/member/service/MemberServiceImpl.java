@@ -13,6 +13,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailExcep
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
@@ -177,9 +178,9 @@ public class MemberServiceImpl implements UserDetailsService {
     // 회원 약관 이력 저장
     private MemberTermsHistory saveMemberTermsHistory(MemberRegisterRequest request, Member member) {
         // 회원 약관 조회
-        MemberTerms foundTerms = memberTermsRepository.findMemberTermsByTermsSeq(request.getTermSeq());
+        MemberTerms foundTerms = memberTermsRepository.findMemberTermsByTermCode(request.getTermCode());
         if (foundTerms == null) {
-            throw new MemberNotFoundException();
+            throw new MemberTermsNotFoundException();
         }
 
         // 입력 데이터로부터 회원 약관 이력 엔티티 생성

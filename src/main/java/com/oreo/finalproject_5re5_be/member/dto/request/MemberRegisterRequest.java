@@ -50,7 +50,7 @@ public class MemberRegisterRequest {
     private String locaAddr;
     private String detailAddr;
     private String passAddr;
-    private Long termSeq;
+    private String termCode;
     @NotNull(message = "필수 동의 항목이 선택되지 않았습니다.")  // 필수값 검증
     private Character chkValid;
 
