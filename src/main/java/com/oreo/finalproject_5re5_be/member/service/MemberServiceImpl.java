@@ -8,6 +8,7 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
+import com.oreo.finalproject_5re5_be.member.exception.CodeNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
@@ -195,7 +196,7 @@ public class MemberServiceImpl implements UserDetailsService {
         // 신규 등록 회원 상태 조회
         Code foundCode = codeRepository.findCodeByCode(code);
         if (foundCode == null) {
-            throw new MemberNotFoundException();
+            throw new CodeNotFoundException();
         }
 
         // 신규 등록 회원 상태 생성

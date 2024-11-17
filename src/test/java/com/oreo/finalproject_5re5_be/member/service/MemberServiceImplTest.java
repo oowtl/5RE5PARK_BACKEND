@@ -91,6 +91,7 @@ class MemberServiceImplTest {
         memberRepository.deleteAll();
         memberTermsHistoryRepository.deleteAll();
         memberStateRepository.deleteAll();
+        memberTermsRepository.deleteAll();
         memberTermsConditionRepository.deleteAll();
         codeRepository.deleteAll();
 
