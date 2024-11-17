@@ -83,7 +83,7 @@ public class CodeServiceImpl {
     }
 
     // 각 파트별 모든 코드 조회
-    public CodeResponses readAllCodeByPart(String cateNum) {
+    public CodeResponses readAllByCateNum(String cateNum) {
         // 전달 받은 파트에 해당하는 모든 코드 엔티티를 조회한다
         List<Code> foundCodes = codeRepository.findCodesByCateNum(cateNum);
         // 리스트에 담는다
