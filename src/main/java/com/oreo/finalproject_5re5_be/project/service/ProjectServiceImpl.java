@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Transactional
 public class ProjectServiceImpl implements ProjectService {
     private ProjectRepository projectRepository;
     private MemberRepository memberRepository;
@@ -39,6 +41,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @return List<ProjectResponse>
      */
     @Override
+    @Transactional
     public List<ProjectResponse> projectFindAll(Long memberSeq) {
         Member member = memberFind(memberSeq);
         //회원 정보로 전체 조회
@@ -105,6 +108,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @param projectSeq
      */
     @Override
+    @Transactional
     public void projectDelete(List<Long> projectSeq) {
         //리스트로 받은 프로젝트 번호를 조회
         for (int i = 0; i < projectSeq.size(); i++) {
