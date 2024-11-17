@@ -1,18 +1,26 @@
 package com.oreo.finalproject_5re5_be.tts.service;
 
+import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
+import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
 import com.oreo.finalproject_5re5_be.tts.repository.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
 
 
 @Slf4j
@@ -47,7 +55,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 3.1 TtsSentenceRequest.voiceSeq 유효성 검증 : not null => @NotNull
         // 3.2 voiceSeq : 조회 가능한 voiceSeq (존재 여부) 검증 및 할당
-        Voice voice = voiceRepository.findByVoiceSeq(createRequest.getVoiceSeq())
+        Voice voice = voiceRepository.findById(createRequest.getVoiceSeq())
                 .orElseThrow(() -> new IllegalArgumentException("voiceSeq is invalid"));
 
         // 3. TtsSentenceRequest 유효성 검증 : StyleSeq
@@ -152,4 +160,75 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 5. TtsSentenceResponse 변환
         return TtsSentenceDto.of(updatedSentence);
     }
+
+    /**
+     * @param projectSeq
+     * @param batchRequest
+     * @return
+     * @apiNote TtsSentence 엔티티 Batch 저장
+     */
+    @Override
+    public TtsSentenceListDto batchSaveSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceBatchRequest batchRequest) {
+        // 1. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
+        List<TtsSentenceBatchInfo> batchList = batchRequest.getSentenceList();
+
+        // 2. TtsSentenceDto List 변환
+        List<TtsSentenceDto> batchedList = batchList.stream()
+                .map(batchInfo -> toSentenceDto(projectSeq, batchInfo))
+                .toList();
+
+        return new TtsSentenceListDto(batchedList);
+    }
+
+    // batchInfo -> sentenceDto 변환
+    private TtsSentenceDto toSentenceDto(Long projectSeq, TtsSentenceBatchInfo batchInfo) {
+        SentenceInfo sentenceInfo = batchInfo.getSentence();
+
+        // 1. TtsSentenceRequest 유효성 검증
+        if (sentenceInfo == null) {
+            throw new TtsSentenceInValidInput("SentenceInfo is null");
+        }
+
+        // 2. sentenceInfo -> TtsSentenceRequest 변환
+        TtsSentenceRequest sentenceRequest = TtsSentenceRequest.builder()
+                .text(sentenceInfo.getText())
+                .voiceSeq(sentenceInfo.getVoiceSeq())
+                .styleSeq(sentenceInfo.getStyleSeq())
+                .order(sentenceInfo.getOrder())
+                .attribute(sentenceInfo.getTtsAttributeInfo())
+                .build();
+
+        // 3. BatchProcessType 에 따른 분기처리
+        // 3.1 CREATE : addSentence
+        if (batchInfo.getBatchProcessType() == BatchProcessType.CREATE) {
+            return addSentence(projectSeq, sentenceRequest);
+        }
+
+        // 3.2 UPDATE : updateSentence
+        if (batchInfo.getBatchProcessType() == BatchProcessType.UPDATE) {
+            return updateSentence(projectSeq, sentenceInfo.getTsSeq(), sentenceRequest);
+        }
+
+        // 3.3 해당하는 BatchProcessType 가 없으면 예외 발생
+        throw new TtsSentenceInValidInput("BatchProcessType is invalid");
+    }
+
+    // 유효한 프로젝트인지 확인
+    private Project getValidProject(Long projectSeq) {
+        return projectRepository.findById(projectSeq)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectSeq));
+    }
+
+    // 유효한 음성인지 확인
+    private Voice getValidVoice(Long voiceSeq) {
+        return voiceRepository.findById(voiceSeq)
+                .orElseThrow(() -> new EntityNotFoundException("Voice not found with id: " + voiceSeq));
+    }
+
+    // 유효한 스타일인지 확인
+    private Style getValidStyle(Long styleSeq) {
+        return styleRepository.findById(styleSeq)
+                .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + styleSeq));
+    }
+
 }
