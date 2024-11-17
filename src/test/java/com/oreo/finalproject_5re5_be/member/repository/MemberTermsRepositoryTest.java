@@ -76,6 +76,7 @@ class MemberTermsRepositoryTest {
         term1.setTermRegDate(LocalDateTime.now().minusDays(10)); // 당일 기준 10일 이전에 등록했다고 가정
         term1.setName("24년도회원약관A");
         term1.setChkUse('Y');
+        term1.setTermCode("TERMS001");
 
         // 2번 약관 만들기 : Y - Y - Y - Y - Y
         // 2번 약관 사용 불가
@@ -94,6 +95,7 @@ class MemberTermsRepositoryTest {
         term2.setTermRegDate(LocalDateTime.now().minusDays(5)); // 당일 기준 5일 이전에 등록했다고 가정
         term2.setName("24년도회원약관B");
         term2.setChkUse('N');
+        term2.setTermCode("TERMS002");
 
         // 3번 약관 만들기 : N - N - N - Y - Y
         term3.setTermCond1(termCond1);
@@ -111,6 +113,7 @@ class MemberTermsRepositoryTest {
         term3.setTermRegDate(LocalDateTime.now().minusDays(3)); // 당일 기준 3일 이전에 등록했다고 가정
         term3.setName("24년도회원약관C");
         term3.setChkUse('Y');
+        term3.setTermCode("TERMS003");
 
 
         // 약관 저장
