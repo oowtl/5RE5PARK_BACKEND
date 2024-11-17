@@ -34,6 +34,7 @@ public class CodeController {
 
     private final CodeServiceImpl codeService;
 
+
     public CodeController(CodeServiceImpl codeService) {
         this.codeService = codeService;
     }
@@ -83,8 +84,8 @@ public class CodeController {
     }
 
     // 시퀀스로 특정 코드 조회
-    @GetMapping("/{codeSeq}")
-    public ResponseEntity<CodeResponse> read(@PathVariable Long codeSeq) {
+    @GetMapping("/seq/{codeSeq}")
+    public ResponseEntity<CodeResponse> readBySeq(@PathVariable Long codeSeq) {
         // 서비스를 호출하여 시퀀스로 특정 코드를 조회한다
         CodeResponse response = codeService.read(codeSeq);
         // 조회된 코드를 반환한다
@@ -94,7 +95,7 @@ public class CodeController {
 
     // 코드 번호로 특정 코드 조회
     @GetMapping("/{code}")
-    public ResponseEntity<CodeResponse> read(@PathVariable String code) {
+    public ResponseEntity<CodeResponse> readByCode(@PathVariable String code) {
         // 서비스를 호출하여 코드 번호로 특정 코드를 조회한다
         CodeResponse response = codeService.read(code);
         // 조회된 코드를 반환한다
@@ -128,7 +129,7 @@ public class CodeController {
         // 서비스를 호출하여 코드를 수정한다
         codeService.update(codeSeq, request);
         // 수정된 코드를 반환한다
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
     }
 
@@ -138,7 +139,7 @@ public class CodeController {
         // 서비스를 호출하여 코드를 삭제한다
         codeService.delete(codeSeq);
         // 삭제된 코드를 반환한다
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
     }
 }
