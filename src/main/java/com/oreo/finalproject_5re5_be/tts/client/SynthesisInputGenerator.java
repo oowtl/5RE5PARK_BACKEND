@@ -19,6 +19,6 @@ public class SynthesisInputGenerator {
 
     // 텍스트 길이 검증 메서드
     private static boolean checkInvalidText(String text) {
-        return !text.isEmpty() && !text.isBlank() && text.length() <= TEXT_MAX_LEN;
+        return text.isEmpty() || text.isBlank() || text.length() > TEXT_MAX_LEN;
     }
 }
