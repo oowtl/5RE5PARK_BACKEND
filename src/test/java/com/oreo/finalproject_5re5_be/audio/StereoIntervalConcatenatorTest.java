@@ -16,10 +16,128 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class StereoIntervalConcatenatorTest {
+
+
+    @Test
+    @DisplayName("오디오 포맷이 스테레오 SR441_B16이다.")
+    void monoIntervalConcatenatorFormat_SR441_B16() throws UnsupportedAudioFileException, IOException {
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);
+
+
+        //오디오 불러오기
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
+        ByteArrayInputStream byteArrayInputStream1 = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("test.mp3")));
+
+        //오디오 스트림 변환
+        AudioInputStream t1 = AudioSystem.getAudioInputStream(byteArrayInputStream);
+        AudioInputStream t2 = AudioSystem.getAudioInputStream(byteArrayInputStream1);
+
+        //AudioProperties 타입으로 리스트에 넣기
+        List<AudioProperties> audioInputStream = List.of(
+                new AudioProperties(audioResample.resample(t1), 3000f),
+                new AudioProperties(audioResample.resample(t2), 500f)
+        );
+
+        //병합
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 10000f);
+
+        AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
+        //테스트
+        assertThat(resample.getFormat()).isEqualTo(AudioFormats.STEREO_FORMAT_SR441_B16);
+    }
+
+    @Test
+    @DisplayName("오디오 포맷이 스테레오 SR441_B32이다.")
+    void monoIntervalConcatenatorFormat_SR441_B32() throws UnsupportedAudioFileException, IOException {
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B32);
+
+
+        //오디오 불러오기
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
+        ByteArrayInputStream byteArrayInputStream1 = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("test.mp3")));
+
+        //오디오 스트림 변환
+        AudioInputStream t1 = AudioSystem.getAudioInputStream(byteArrayInputStream);
+        AudioInputStream t2 = AudioSystem.getAudioInputStream(byteArrayInputStream1);
+
+        //AudioProperties 타입으로 리스트에 넣기
+        List<AudioProperties> audioInputStream = List.of(
+                new AudioProperties(audioResample.resample(t1), 3000f),
+                new AudioProperties(audioResample.resample(t2), 500f)
+        );
+
+        //병합
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B32);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+
+        AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
+        //테스트
+        assertThat(resample.getFormat()).isEqualTo(AudioFormats.STEREO_FORMAT_SR441_B32);
+    }
+
+    @Test
+    @DisplayName("오디오 포맷이 스테레오 SR240_B32이다.")
+    void monoIntervalConcatenatorFormat_SR240_B32() throws UnsupportedAudioFileException, IOException {
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR240_B32);
+
+
+        //오디오 불러오기
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
+        ByteArrayInputStream byteArrayInputStream1 = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("test.mp3")));
+
+        //오디오 스트림 변환
+        AudioInputStream t1 = AudioSystem.getAudioInputStream(byteArrayInputStream);
+        AudioInputStream t2 = AudioSystem.getAudioInputStream(byteArrayInputStream1);
+
+        //AudioProperties 타입으로 리스트에 넣기
+        List<AudioProperties> audioInputStream = List.of(
+                new AudioProperties(audioResample.resample(t1), 3000f),
+                new AudioProperties(audioResample.resample(t2), 500f)
+        );
+
+        //병합
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR240_B32);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+
+        AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
+        //테스트
+        assertThat(resample.getFormat()).isEqualTo(AudioFormats.STEREO_FORMAT_SR240_B32);
+    }
+
+    @Test
+    @DisplayName("오디오 포맷이 스테레오 SR240_B16이다.")
+    void monoIntervalConcatenatorFormat_SR240_B16() throws UnsupportedAudioFileException, IOException {
+        AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR240_B16);
+
+
+        //오디오 불러오기
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("ttsoutput.mp3")));
+        ByteArrayInputStream byteArrayInputStream1 = new ByteArrayInputStream(AudioExtensionConverter.mp3ToWav(new File("test.mp3")));
+
+        //오디오 스트림 변환
+        AudioInputStream t1 = AudioSystem.getAudioInputStream(byteArrayInputStream);
+        AudioInputStream t2 = AudioSystem.getAudioInputStream(byteArrayInputStream1);
+
+        //AudioProperties 타입으로 리스트에 넣기
+        List<AudioProperties> audioInputStream = List.of(
+                new AudioProperties(audioResample.resample(t1), 3000f),
+                new AudioProperties(audioResample.resample(t2), 500f)
+        );
+
+        //병합
+        IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR240_B16);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+
+        AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
+        //테스트
+        assertThat(resample.getFormat()).isEqualTo(AudioFormats.STEREO_FORMAT_SR240_B16);
+    }
+
 
 
     @Test
