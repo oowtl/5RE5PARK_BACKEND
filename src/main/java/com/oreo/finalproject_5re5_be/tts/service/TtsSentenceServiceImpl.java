@@ -147,8 +147,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 4. TtsSentence 저장
         TtsSentence updatedSentence = ttsSentenceRepository.save(updateSentence);
 
-        System.out.println("updatedSentence = " + updatedSentence);
-
         // 5. TtsSentenceResponse 변환
         return TtsSentenceDto.of(updatedSentence);
     }
