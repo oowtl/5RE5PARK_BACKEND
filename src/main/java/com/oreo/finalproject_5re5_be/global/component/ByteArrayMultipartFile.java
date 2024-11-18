@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.tts.service;
+package com.oreo.finalproject_5re5_be.global.component;
 
 import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
