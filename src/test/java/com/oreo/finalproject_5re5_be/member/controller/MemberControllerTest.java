@@ -148,35 +148,30 @@ class MemberControllerTest {
                 MemberTermCheckOrNotRequest.builder()
                                             .termCondCode(1L)
                                             .agreed('Y')
-                                            .isMandatory(true)
                                             .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
                                         .termCondCode(2L)
                                         .agreed('Y')
-                                        .isMandatory(true)
                                         .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
                                         .termCondCode(3L)
                                         .agreed('Y')
-                                        .isMandatory(true)
                                         .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
                                         .termCondCode(4L)
                                         .agreed('N')
-                                        .isMandatory(false)
                                         .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
                                         .termCondCode(5L)
                                         .agreed('N')
-                                        .isMandatory(false)
                                         .build());
 
         return memberTermCheckOrNotRequests;
@@ -189,7 +184,6 @@ class MemberControllerTest {
                                                             .password("asdf12341234@")
                                                             .email("asdf3214@gmail.com")
                                                             .name("홍길동")
-                                                            .birthDate("1990-01-01")
                                                             .userRegDate(LocalDateTime.now())
                                                             .chkValid('Y')
                                                             .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
