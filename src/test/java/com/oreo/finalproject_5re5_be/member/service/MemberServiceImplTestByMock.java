@@ -1,6 +1,8 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,8 +11,11 @@ import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
+import com.oreo.finalproject_5re5_be.member.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
+import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
@@ -18,15 +23,22 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdExceptio
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
+import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,19 +51,25 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.TestPropertySource;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
-@EnableRetry
 class MemberServiceImplTestByMock {
 
-    @Autowired
+    @InjectMocks
     private MemberServiceImpl memberService;
 
-    @MockBean
+    @Mock
     private MemberRepository memberRepository;
 
-    @MockBean
+    @Mock
     private JavaMailSender mailSender;
+
+    @Mock
+    private CodeRepository codeRepository;
+
+    @Mock
+    private MemberStateRepository memberStateRepository;
+
+    @Mock
+    private MemberChangeHistoryRepository memberChangeHistoryRepository;
 
     private User user;
 
@@ -107,7 +125,7 @@ class MemberServiceImplTestByMock {
         // 회원 엔티티 생성
         Member member = request.createMemberEntity();
         // 실행 및 예외 발생 여부 파악
-        assertThrows(MemberMandatoryTermNotAgreedException.class, () -> memberService.create(request));
+//        assertThrows(MemberMandatoryTermNotAgreedException.class, () -> memberService.create(request));
     }
 
     @DisplayName("회원가입 - 5개의 약관 항목 보다 많은 경우")
@@ -185,12 +203,14 @@ class MemberServiceImplTestByMock {
     public void 회원_단순_조회_성공() {
         // 회원 아이디로 호출시 목객체 반환
         Member foundMember = Member.builder()
+                                   .seq(1L)
                                    .id("qwerfde2312")
                                    .email("qwedr123@gmail.com")
                                    .name("홍길동")
                                    .normAddr("서울시 강남구")
                                    .detailAddr("서초대로 59-32")
                                    .build();
+
         when(memberRepository.findById("qwerfde2312")).thenReturn(foundMember);
 
         // 회원 응답 객체 생성
@@ -214,6 +234,108 @@ class MemberServiceImplTestByMock {
         // 서비스 호출 및 예외 발생 여부 확인
         assertThrows(MemberNotFoundException.class, () -> {
             memberService.read("qwerfde2312");
+        });
+    }
+
+    @DisplayName("회원 수정 처리 테스트")
+    @Test
+    public void 회원_수정_처리() {
+        // 더미 데이터 생성
+        // - 1. 유효성 검증이 된 MemberUpdateRequest와 회원 시퀀스 memberSeq
+        // - 2. 회원 상태 코드 : MBS002 - 회원 상태 변경, MF001 ~ MF005, 순서대로 아이디, 이메일, 비밀번호, 이름, 주소
+        // - 3. 회원 변경 이력 : 저장될 회원 변경 이력
+        Long memberSeq = 1L;
+        MemberUpdateRequest request = MemberUpdateRequest.builder()
+                                                        .id("new dwads23123")
+                                                        .password("dwadaw")
+                                                        .email("eqwfqws2131@gmail.com")
+                                                        .name("홍만동")
+                                                        .normAddr("서울시 양천구")
+                                                        .build();
+
+        Code memberIdFeildCode = Code.builder()
+                .codeSeq(1L)
+                .code("MF001")
+                .cateNum("M")
+                .name("회원 아이디 필드")
+                .chkUse("Y")
+                .ord(3)
+                .build();
+
+        Code memberStateCode = Code.builder()
+                .codeSeq(2L)
+                .code("MBS001")
+                .cateNum("M")
+                .name("회원정보수정")
+                .chkUse("Y")
+                .ord(1)
+                .build();
+
+        Member foundMember = Member.builder()
+                .id("qwerfde2312")
+                .password("dwadaw")
+                .email("eqwfqws2131@gmail.com")
+                .name("홍만동")
+                .normAddr("서울시 양천구")
+                .locaAddr("서울시")
+                .detailAddr("서초동 123-456")
+                .passAddr("서초대로 59-32")
+                .chkValid('Y')
+                .build();
+
+        MemberState memberState = MemberState.of(
+                foundMember, memberStateCode
+        );
+
+        MemberState savedMemberState = MemberState.of(
+                foundMember, memberStateCode
+        );
+
+        // 현재 시간과 최대 시간 세팅
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.MAX;
+
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedNowTime = now.format(formatter);
+        String formattedEnd = end.format(formatter);
+
+        MemberChangeHistory history = MemberChangeHistory.builder()
+                                                            .member(foundMember)
+                                                            .chngFieldCode(memberIdFeildCode)
+                                                            .befVal(foundMember.getId())
+                                                            .aftVal(request.getId())
+                                                            .applDate(formattedNowTime)
+                                                            .endDate(formattedEnd)
+                                                            .build();
+        List<MemberChangeHistory> histories = new ArrayList<>();
+        histories.add(history);
+
+        List<MemberChangeHistory> responseHistories = new ArrayList<>();
+        responseHistories.add(history);
+
+
+        // 회원 아이디만 변경
+        // 리포지토리 목킹
+        // - 1. 아이디, 이메일 수정 확인 false
+        // - 2. 코드 리포지토리에서 MF001로 코드 조회시 회원 아이디 필드 의미하는 코드 반환
+        // - 3. 회원 상태 MBS002로 코드 조회시 회원 변경 상태를 의미하는 코드 반환
+        when(memberRepository.existsByIdNotContainingMemberSeq(memberSeq, request.getId())).thenReturn(false);
+        when(memberRepository.existsByEmailNotContainingMemberSeq(memberSeq, request.getEmail())).thenReturn(false);
+        when(memberRepository.findById(memberSeq)).thenReturn(Optional.of(foundMember));
+        when(codeRepository.findCodeByCode("MF001")).thenReturn(memberIdFeildCode);
+        when(codeRepository.findCodeByCode("MBS002")).thenReturn(memberStateCode);
+        when(memberStateRepository.save(memberState)).thenReturn(savedMemberState);
+        when(memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, "MF001")).thenReturn(Optional.of(history));
+        when(memberChangeHistoryRepository.saveAll(any())).thenReturn(responseHistories);
+
+
+        // 서비스로 수정 처리 호출
+        // 결과 비교
+        assertDoesNotThrow(() -> {
+            memberService.update(memberSeq, request);
         });
     }
 

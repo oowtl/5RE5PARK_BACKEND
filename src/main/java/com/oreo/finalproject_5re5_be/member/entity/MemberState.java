@@ -13,6 +13,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,6 +22,7 @@ import lombok.ToString;
 @Table(name = "member_state")
 @Getter @Setter
 @ToString
+@EqualsAndHashCode(callSuper = false)
 public class MemberState extends BaseEntity {
 
     @Id
