@@ -302,11 +302,29 @@ public class MemberServiceImpl implements UserDetailsService {
     public void update(Long memberSeq, MemberUpdateRequest request) {
         // 5-1. 전달받은 데이터가 유효한지 검증한다
         // 5-2. 아이디, 이메일을 수정할 경우, 다른 회원과 중복된 아이디, 이메일이 있는지 확인한다
+        boolean isDuplicatedId = memberRepository.existsByIdNotContainingMemberSeq(memberSeq, request.getId());
+        if (isDuplicatedId) {
+            throw new MemberDuplicatedIdException();
+        }
+
+        boolean isDuplicatedEmail = memberRepository.existsByEmailNotContainingMemberSeq(memberSeq, request.getEmail());
+        if (isDuplicatedEmail) {
+            throw new MemberDuplicatedEmailException();
+        }
+
         // 5-3. 회원 시퀀스로 엔티티를 조회한다
+        Member foundMember = memberRepository.findById(memberSeq)
+                                             .orElseThrow(MemberNotFoundException::new);
+
         // 5-4. 해당 엔티티를 수정한다
+        foundMember.update(request);
+
         // 5-5. 회원 상태를 변경한다
+        saveMemberState(foundMember, "MBS002"); // 변경 상태 코드 : MBS002 - 정보 변경
+
         // 5-6. 회원 변경 이력을 기록한다
     }
+
 
     // 6. 회원 탈퇴(유해기간 30일 설정, 그 이후에 삭제)
 
