@@ -57,8 +57,8 @@ public class MemberTerms extends BaseEntity{
     @Column(name = "chk_term_5")
     private Character chkTerm5;
 
-    @Column(name = "term_end_date")
-    private LocalDateTime termEndDate;
+//    @Column(name = "term_end_date")
+//    private LocalDateTime termEndDate;
 
     @Column(name = "term_reg_date", nullable = false)
     private LocalDateTime termRegDate;
@@ -105,10 +105,8 @@ public class MemberTerms extends BaseEntity{
 
         // 시간 세팅함
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime max = LocalDateTime.MAX;
 
         this.setTermRegDate(now);
-        this.setTermEndDate(max);
     }
 
 }

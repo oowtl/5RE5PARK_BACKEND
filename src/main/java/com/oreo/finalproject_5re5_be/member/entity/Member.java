@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -55,4 +56,11 @@ public class Member extends BaseEntity {
     private String detailAddr;
 
 
+    public void update(MemberUpdateRequest request) {
+        this.id = request.getId();
+        this.email = request.getEmail();
+        this.password = request.getPassword();
+        this.name = request.getName();
+        this.normAddr = request.getNormAddr();
+    }
 }

@@ -41,7 +41,6 @@ public class MemberTermResponse {
         this.chkTerm3 = memberTerms.getChkTerm3();
         this.chkTerm4 = memberTerms.getChkTerm4();
         this.chkTerm5 = memberTerms.getChkTerm5();
-        this.termEndDate = memberTerms.getTermEndDate();
         this.termRegDate = memberTerms.getTermRegDate();
         this.name = memberTerms.getName();
         this.chkUse = memberTerms.getChkUse();

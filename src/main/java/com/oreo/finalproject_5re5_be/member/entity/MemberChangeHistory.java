@@ -12,7 +12,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -20,6 +23,9 @@ import lombok.ToString;
 @Entity
 @Table(name = "member_change_history")
 @Getter @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class MemberChangeHistory extends BaseEntity {
     @Id
@@ -31,7 +37,7 @@ public class MemberChangeHistory extends BaseEntity {
     @JoinColumn(name = "member_seq")
     private Member member;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "code")
     private Code chngFieldCode;
 
@@ -40,7 +46,7 @@ public class MemberChangeHistory extends BaseEntity {
     @Column(name = "aft_val", nullable = false)
     private String aftVal;
     @Column(name = "appl_date", nullable = false)
-    private LocalDateTime applDate;
+    private String applDate;
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private String endDate;
 }

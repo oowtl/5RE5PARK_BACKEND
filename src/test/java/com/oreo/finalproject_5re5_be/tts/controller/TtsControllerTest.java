@@ -482,11 +482,159 @@ class TtsControllerTest {
     }
 
     /*
-    *  [ tts 생성 컨트롤러 테스트 ]
-    *  1. 존재하는 tts 행 seq로 TTS 생성 요청
-    *  2. 존재하지 않는 tts 행 seq로 TTS 생성 요청
-    *  3. 잘못된 행 seq 값으로 요청
-    * */
+    테스트 시나리오: 컨트롤러 메서드 `getSentence`
+
+    1. **성공적인 조회**
+    - 조건:
+    - 유효한 `projectSeq`와 `tsSeq`가 제공됨.
+    - 제공된 `tsSeq`에 해당하는 `TtsSentence`가 존재하며, `TtsSentenceDto`로 변환이 성공.
+    - 기대 결과:
+    - HTTP 상태 코드 200 반환.
+    - 응답에 `TtsSentenceDto` 객체가 포함됨.
+
+    2. **유효성 검증 실패**
+    2.1. **`projectSeq` 유효성 검증 실패**
+    - 조건:
+    - `projectSeq`가 1보다 작은 값이 제공됨.
+    - 기대 결과:
+    - HTTP 상태 코드 400 반환.
+    - 에러 메시지에 "projectSeq is invalid" 포함.
+
+    2.2. **`tsSeq` 유효성 검증 실패**
+    - 조건:
+    - `tsSeq`가 1보다 작은 값이 제공됨.
+    - 기대 결과:
+    - HTTP 상태 코드 400 반환.
+    - 에러 메시지에 "tsSeq is invalid" 포함.
+
+    3. **`TtsSentence`를 찾을 수 없음**
+    - 조건:
+    - 유효한 `projectSeq`와 `tsSeq`가 제공되었으나, `tsSeq`에 해당하는 `TtsSentence`가 데이터베이스에 존재하지 않음.
+    - 기대 결과:
+    - HTTP 상태 코드 404 반환.
+    - 에러 메시지에 "TtsSentence not found with id: <tsSeq>" 포함.
+
+    4. **내부 서버 에러**
+    - 조건:
+    - `TtsSentenceService.getSentence` 호출 중 예외 발생 (예: 데이터베이스 연결 문제 등).
+    - 기대 결과:
+    - HTTP 상태 코드 500 반환.
+    - 에러 메시지에 "Internal Server Error" 포함.
+    */
+    // 1. 성공적인 조회
+    @Test
+    @DisplayName("getSentence - 성공적인 조회")
+    @WithMockUser
+    void getSentence_Success() throws Exception {
+        // given: 유효한 projectSeq와 tsSeq 설정
+        Long projectSeq = 1L;
+        Long tsSeq = 1L;
+        Long voiceSeq = 1L;
+        String updatedText = "Updated Text";
+
+        Project project = createProject(projectSeq);
+        Voice voice = createVoice(voiceSeq);
+
+        // TtsSentenceDto 객체 생성
+        TtsSentence sentence = createTtsSentence(project, tsSeq, voice, updatedText);
+        TtsSentenceDto response = TtsSentenceDto.of(sentence);
+
+        Mockito.when(ttsSentenceService.getSentence(projectSeq, tsSeq)).thenReturn(response);
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then: 응답 검증
+                .andExpect(status().isOk()) // HTTP 상태 200 확인
+                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value()))) // 응답 상태 코드 검증
+                .andExpect(jsonPath("$.response.sentence.tsSeq", is(tsSeq.intValue()))) // 반환된 데이터의 tsSeq 검증
+                .andExpect(jsonPath("$.response.sentence.text", is(updatedText))); // 반환된 데이터의 텍스트 검증
+    }
+
+    // 2.1 projectSeq 유효성 검증 실패
+    @Test
+    @DisplayName("getSentence - projectSeq 유효성 검증 실패")
+    @WithMockUser
+    void getSentence_InvalidProjectSeq() throws Exception {
+        // given: 유효하지 않은 projectSeq 설정
+        Long projectSeq = 0L;
+        Long tsSeq = 1L;
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then: 응답 검증
+                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
+                .andExpect(jsonPath("$.status", is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))) // 응답 상태 코드 검증
+                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage()))); // 에러 메시지 검증
+    }
+
+    // 2.2 tsSeq 유효성 검증 실패
+    @Test
+    @DisplayName("getSentence - tsSeq 유효성 검증 실패")
+    @WithMockUser
+    void getSentence_InvalidTsSeq() throws Exception {
+        // given: 유효하지 않은 tsSeq 설정
+        Long projectSeq = 1L;
+        Long tsSeq = 0L;
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then: 응답 검증
+                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
+                .andExpect(jsonPath("$.status", is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))) // 응답 상태 코드 검증
+                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage()))); // 에러 메시지 검증
+    }
+
+    // 3. TtsSentence를 찾을 수 없음
+    @Test
+    @DisplayName("getSentence - TtsSentence를 찾을 수 없음")
+    @WithMockUser
+    void getSentence_NotFound() throws Exception {
+        // given: 유효한 projectSeq와 tsSeq 설정, 데이터베이스에 존재하지 않는 tsSeq
+        Long projectSeq = 1L;
+        Long tsSeq = 999L;
+
+        Mockito.when(ttsSentenceService.getSentence(projectSeq, tsSeq))
+                .thenThrow(new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then: 응답 검증
+                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())) // HTTP 상태 404 확인
+                .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))) // 응답 상태 코드 검증
+                .andExpect(jsonPath("$.response.message", is("TtsSentence not found with id: " + tsSeq))); // 에러 메시지 검증
+    }
+
+    // 4. 내부 서버 에러
+    @Test
+    @DisplayName("getSentence - 내부 서버 에러")
+    @WithMockUser
+    void getSentence_InternalServerError() throws Exception {
+        // given: 유효한 projectSeq와 tsSeq 설정, 내부 서버 에러 시뮬레이션
+        Long projectSeq = 1L;
+        Long tsSeq = 1L;
+
+        Mockito.when(ttsSentenceService.getSentence(projectSeq, tsSeq))
+                .thenThrow(new RuntimeException("Unexpected server error"));
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then: 응답 검증
+                .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())) // HTTP 상태 500 확인
+                .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))) // 응답 상태 코드 검증
+                .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage()))); // 에러 메시지 검증
+    }
+
+    /*
+     *  [ tts 생성 컨트롤러 테스트 ]
+     *  1. 존재하는 tts 행 seq로 TTS 생성 요청
+     *  2. 존재하지 않는 tts 행 seq로 TTS 생성 요청
+     *  3. 잘못된 행 seq 값으로 요청
+     * */
     @WithMockUser
     @Test
     @DisplayName("tts 생성 컨트롤러 테스트 - 존재하는 tts 행 seq로 TTS 생성")
@@ -556,181 +704,6 @@ class TtsControllerTest {
     }
 
 
-
-    /*
-    테스트 시나리오: batchSave 메서드 테스트
-
-    1. 성공 케이스
-    - 조건:
-    - 유효한 projectSeq와 batchRequest가 주어짐.
-    - batchRequest의 sentenceList가 유효한 데이터를 포함함.
-    - 기대 결과:
-    - HTTP 상태 201(Created) 반환.
-    - JSON 응답에 올바른 TtsSentenceListDto 데이터 포함.
-
-    2. 유효성 검증 실패
-    2.1 잘못된 projectSeq
-    - 조건:
-    - projectSeq가 1 미만으로 설정됨.
-    - 기대 결과:
-    - HTTP 상태 400(Bad Request) 반환.
-    - JSON 응답에 유효성 검증 실패 메시지 포함.
-
-    2.2 sentenceList가 null
-    - 조건:
-    - batchRequest의 sentenceList가 null로 설정됨.
-    - 기대 결과:
-    - HTTP 상태 400(Bad Request) 반환.
-    - JSON 응답에 예외 메시지 포함.
-
-    3. Mock 데이터 생성
-    - Mock BatchRequest:
-    - 유효한 sentenceList와 데이터를 포함한 TtsSentenceBatchRequest를 생성.
-    - Mock BatchInfo:
-    - 유효한 SentenceInfo와 BatchProcessType을 포함한 TtsSentenceBatchInfo를 생성.
-    - Mock TtsSentenceListDto:
-    - Mock TtsSentenceDto를 포함하는 TtsSentenceListDto를 생성하여 응답 데이터를 시뮬레이션.
-    */
-
-    // 1. 성공 케이스
-    @Test
-    @DisplayName("batchSave - 성공 케이스")
-    @WithMockUser
-    void batchSave_Success() throws Exception {
-        // given: 유효한 projectSeq와 batchRequest 생성
-        Long projectSeq = 1L;
-        Long voiceSeq = 1L;
-        Long styleSeq = 1L;
-        String text = "Test text";
-
-        Project project = createProject(projectSeq);
-        Voice voice = createVoice(voiceSeq);
-        Style style = createStyle(styleSeq);
-        TtsAttributeInfo attributeInfo = createAttributeInfo();
-
-        // 1. BatchRequest 만들기
-        List<TtsSentenceBatchInfo> batchList = IntStream.range(0, 10)
-                .mapToObj(repeatCount -> {
-                    Long tsSeq = (long) repeatCount;
-                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
-
-                    // TtsSentenceBatchInfo 생성 후 batchList에 추가
-                    // batchList에 추가할 때마다 processType을 번갈아가며 설정
-                    BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
-                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
-                })
-                .toList();
-
-        TtsSentenceBatchRequest batchRequest = createBatchRequest(batchList);
-
-        // 2. 응답 생성
-        List<TtsSentenceDto> SentenceList = IntStream.range(0, 10)
-                .mapToObj(repeatCount -> {
-                    Long tsSeq = (long) repeatCount;
-                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
-                    return TtsSentenceDto.builder()
-                            .sentence(sentenceInfo)
-                            .build();
-                })
-                .toList();
-
-        TtsSentenceListDto response = TtsSentenceListDto.builder()
-                .sentenceList(SentenceList)
-                .build();
-
-        // Mock 서비스 동작 설정
-        when(ttsSentenceService.batchSaveSentence(eq(projectSeq), any(TtsSentenceBatchRequest.class)))
-                .thenReturn(response);
-
-        // when: 컨트롤러 호출
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/batch", projectSeq)
-                        .contentType(MediaType.APPLICATION_JSON) // JSON 타입 설정
-                        .content(objectMapper.writeValueAsString(batchRequest)) // 요청 본문 데이터
-                        .with(csrf())) // CSRF 추가
-                // then: 예상 응답 검증
-                .andExpect(status().isOk()) // HTTP 상태 201 확인
-                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())) // 응답 상태 코드 확인
-                .andExpect(jsonPath("$.response.sentenceList").exists()) // 응답에 sentences 필드가 존재하는지 확인
-                .andExpect(jsonPath("$.response.sentenceList[0].sentence.text").value(text)); // 반환된 데이터 검증
-    }
-
-    @Test
-    @DisplayName("batchSave - 유효성 검증 실패 (잘못된 projectSeq)")
-    @WithMockUser
-    void batchSave_InvalidProjectSeq() throws Exception {
-        // given: 잘못된 projectSeq 설정
-        Long invalidProjectSeq = 0L;
-        Long voiceSeq = 1L;
-        Long styleSeq = 1L;
-        String text = "Test text";
-        TtsAttributeInfo attributeInfo = createAttributeInfo();
-
-        // BatchRequest 생성
-        List<TtsSentenceBatchInfo> batchList = IntStream.range(0, 10)
-                .mapToObj(repeatCount -> {
-                    Long tsSeq = (long) repeatCount;
-                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
-
-                    // TtsSentenceBatchInfo 생성 후 batchList에 추가
-                    // batchList에 추가할 때마다 processType을 번갈아가며 설정
-                    BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
-                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
-                })
-                .toList();
-
-        TtsSentenceBatchRequest batchRequest = createBatchRequest(batchList);
-
-        // when: 컨트롤러 호출
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/batch", invalidProjectSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(batchRequest))
-                        .with(csrf()))
-                // then: 유효성 검증 실패 상태 및 메시지 확인
-                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
-                .andExpect(jsonPath("$.response").exists())// 에러 메시지 필드 확인
-                .andExpect(jsonPath("$.response.message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage())); // 에러 메시지 확인
-    }
-
-    @Test
-    @DisplayName("batchSave - 서비스 예외 발생 (존재하지 않는 Project)")
-    @WithMockUser
-    void batchSave_NonExistentProject() throws Exception {
-        // given: 존재하지 않는 projectSeq 설정
-        Long projectSeq = 9999L;
-        Long voiceSeq = 1L;
-        Long styleSeq = 1L;
-        String text = "Test text";
-        TtsAttributeInfo attributeInfo = createAttributeInfo();
-
-        // BatchRequest 생성
-        List<TtsSentenceBatchInfo> batchList = IntStream.range(0, 10)
-                .mapToObj(repeatCount -> {
-                    Long tsSeq = (long) repeatCount;
-                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
-
-                    // TtsSentenceBatchInfo 생성 후 batchList에 추가
-                    // batchList에 추가할 때마다 processType을 번갈아가며 설정
-                    BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
-                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
-                })
-                .toList();
-
-        TtsSentenceBatchRequest batchRequest = createBatchRequest(batchList);
-
-        // 서비스에서 예외 발생하도록 설정
-        when(ttsSentenceService.batchSaveSentence(eq(projectSeq), any(TtsSentenceBatchRequest.class)))
-                .thenThrow(new EntityNotFoundException());
-
-        // when: 컨트롤러 호출
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/batch", projectSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(batchRequest))
-                        .with(csrf()))
-                // then: 예상 에러 상태 및 메시지 확인
-                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())) // HTTP 상태 404 확인
-                .andExpect(jsonPath("$.response").exists())
-                .andExpect(jsonPath("$.response.message").value(ErrorCode.ENTITY_NOT_FOUND.getMessage())); // 에러 메시지 확인
-    }
 
 
     private static TtsAttributeInfo createAttributeInfo() {
