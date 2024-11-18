@@ -24,18 +24,22 @@ import lombok.ToString;
 public class MemberDelete extends BaseEntity {
 
     @Id
-    @Column(name = "member_seq")
+    @Column(name = "del_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userSeq;
+    private Long delSeq;
+
+    private Long memberSeq; // 기존의 회원 시퀀스
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "code")
-    private Code code;
+    private Code code; // 회원 삭제 유형 코드
 
     @Column(name = "detail_cont", nullable = false)
-    private String detailCont;
-    @Column(name = "chk_use", nullable = false)
-    private Character chkUse;
+    private String detailCont; // 회원 삭제 사유
+
+    @Column(name = "chk_use")
+    private Character chkUse; // 적용 유무
+
     @Column(name = "appl_date", nullable = false)
-    private LocalDateTime applDate;
+    private String applDate;
 }
