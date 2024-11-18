@@ -1,9 +1,9 @@
 package com.oreo.finalproject_5re5_be.tts.service;
 
-import com.oreo.finalproject_5re5_be.audio.AudioDurationUtil;
-import com.oreo.finalproject_5re5_be.audio.dto.response.AudioFileInfo;
-import com.oreo.finalproject_5re5_be.audio.service.AudioInfo;
-import com.oreo.finalproject_5re5_be.s3.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
+import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioDurationUtil;
+import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import com.oreo.finalproject_5re5_be.tts.client.AudioConfigGenerator;
 import com.oreo.finalproject_5re5_be.tts.client.GoogleTTSService;
 import com.oreo.finalproject_5re5_be.tts.client.SynthesisInputGenerator;
