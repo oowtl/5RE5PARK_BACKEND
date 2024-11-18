@@ -9,8 +9,6 @@ import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberConnectionHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberDelete;
-import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
-import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
@@ -90,7 +88,6 @@ public class MemberServiceImpl implements UserDetailsService {
     private final CodeRepository codeRepository;
     private final MemberChangeHistoryRepository memberChangeHistoryRepository;
     private final MemberDeleteRepository memberDeleteRepository;
-    private final MemberChangeHistoryRepository memberChangeHistoryRepository;
 
 
     public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository, MemberRepository memberRepository, MemberStateRepository memberStateRepository,
