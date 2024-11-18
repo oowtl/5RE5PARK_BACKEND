@@ -524,10 +524,11 @@ class TtsControllerTest {
         // given: 유효한 projectSeq와 tsSeq 설정
         Long projectSeq = 1L;
         Long tsSeq = 1L;
+        Long voiceSeq = 1L;
         String updatedText = "Updated Text";
 
-        Project project = createProject();
-        Voice voice = createVoice();
+        Project project = createProject(projectSeq);
+        Voice voice = createVoice(voiceSeq);
 
         // TtsSentenceDto 객체 생성
         TtsSentence sentence = createTtsSentence(project, tsSeq, voice, updatedText);
