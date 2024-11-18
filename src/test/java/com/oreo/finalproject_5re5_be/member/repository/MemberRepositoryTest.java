@@ -17,6 +17,10 @@ class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private MemberChangeHistoryRepository memberChangeHistoryRepository;
+
+
     private Member member1;
     private Member member2;
 
@@ -26,7 +30,9 @@ class MemberRepositoryTest {
         assertNotNull(memberRepository);
 
         // 초기화
+        memberChangeHistoryRepository.deleteAll();
         memberRepository.deleteAll();
+
 
         // 더미 데이터 생성 및 저장
         createDummy();

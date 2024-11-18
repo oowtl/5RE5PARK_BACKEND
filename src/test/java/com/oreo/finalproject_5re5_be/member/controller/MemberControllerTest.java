@@ -1,9 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
@@ -138,6 +141,32 @@ class MemberControllerTest {
         mockMvc.perform(get("/api/member/read/qwerfde2312"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(expectedErrorMessage));;
+    }
+
+    @DisplayName("회원 수정 처리 성공")
+    @Test
+    @WithMockUser
+    public void 회원_수정_처리() throws Exception {
+        // 서비스에서 update() 호출 시 정상 처리되게 목킹
+        Long memberSeq = 1L;
+        MemberUpdateRequest request = MemberUpdateRequest.builder()
+                .id("newdwads23123")
+                .password("dwadaw123212!!!")
+                .email("eqwfqws2131@gmail.com")
+                .name("홍만동")
+                .normAddr("서울시 양천구")
+                .build();
+
+        doNothing().when(memberService).update(memberSeq, request);
+
+        // 컨트롤러에 요청 보내기
+        mockMvc.perform(patch("/api/member/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf())
+        )
+                .andExpect(status().isNoContent());
+
     }
 
     private List<MemberTermCheckOrNotRequest> createMemberTerms() {

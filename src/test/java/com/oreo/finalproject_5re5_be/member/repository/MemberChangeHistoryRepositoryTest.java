@@ -31,6 +31,9 @@ class MemberChangeHistoryRepositoryTest {
 
     private List<MemberChangeHistory> dummy = new ArrayList<>();
 
+    private Member member;
+    private Code code;
+
     @BeforeEach
     void setUp() {
         // 자동 주입 확인
@@ -49,18 +52,23 @@ class MemberChangeHistoryRepositoryTest {
         createMember();
         createDummy();
 
+        assertNotNull(code);
+        assertNotNull(member);
+
+
     }
 
     @Test
     @DisplayName("회원 가장 최근 변경 이력 조회")
     void 회원_가장_최근_변경_이력_조회() {
+
         // 변경 이력 여러개를 등록함
         List<MemberChangeHistory> memberChangeHistories = memberChangeHistoryRepository.saveAll(dummy);
         assertEquals(dummy.size(), memberChangeHistories.size());
 
 
         // 가장 최근 이력을 조회하는 쿼리 실행
-        MemberChangeHistory foundLatestHistory = memberChangeHistoryRepository.findLatestHistoryByIdAndCode(1L,"MF001" ).get();
+        MemberChangeHistory foundLatestHistory = memberChangeHistoryRepository.findLatestHistoryByIdAndCode(member.getSeq(),code.getCode()).get();
 
         // 결과 비교
         assertNotNull(foundLatestHistory);
@@ -69,7 +77,7 @@ class MemberChangeHistoryRepositoryTest {
     }
 
     private void createCode() {
-        Code code = Code.builder()
+        Code dummy = Code.builder()
                         .codeSeq(1L)
                         .cateNum("MB")
                         .code("MF001")
@@ -78,12 +86,14 @@ class MemberChangeHistoryRepositoryTest {
                         .chkUse("Y")
                         .comt("회원 아이디 필드입니다.")
                         .build();
-        Code savedCode = codeRepository.save(code);
+
+        Code savedCode = codeRepository.save(dummy);
         assertNotNull(savedCode);
+        code = savedCode;
     }
 
     private void createMember() {
-        Member member = Member.builder()
+        Member dummy = Member.builder()
                             .id("qwerfde2312")
                             .password("asdf12341234@")
                             .email("qwefghnm1212@gmail.com")
@@ -94,8 +104,9 @@ class MemberChangeHistoryRepositoryTest {
                             .passAddr("서초대로 59-32")
                             .chkValid('Y')
                             .build();
-        Member savedMember = memberRepository.save(member);
+        Member savedMember = memberRepository.save(dummy);
         assertNotNull(savedMember);
+        member = savedMember;
     }
 
     private void createDummy() {
@@ -110,13 +121,11 @@ class MemberChangeHistoryRepositoryTest {
         String formattedDateTime = now.format(formatter);
         String formattedEnd = end.format(formatter);
 
-        // 코드 조회
-        Code code = codeRepository.findCodeByCode("MF001");
 
         // 더미 데이터 생성
         dummy.add(MemberChangeHistory.builder()
-                                    .member(memberRepository.findById(1L).get())
-                                    .chngFieldCode(codeRepository.findById(1L).get())
+                                    .member(member)
+                                    .chngFieldCode(code)
                                     .befVal("qwerfde2312")
                                     .aftVal("(1)new qwerfde2312")
                                     .chngFieldCode(code)
@@ -125,8 +134,8 @@ class MemberChangeHistoryRepositoryTest {
                                     .build());
 
         dummy.add(MemberChangeHistory.builder()
-                                    .member(memberRepository.findById(1L).get())
-                                    .chngFieldCode(codeRepository.findById(1L).get())
+                                    .member(member)
+                                    .chngFieldCode(code)
                                     .befVal("(1)new qwerfde2312")
                                     .aftVal("(2)new qwerfde2312")
                                     .chngFieldCode(code)
@@ -135,8 +144,8 @@ class MemberChangeHistoryRepositoryTest {
                                     .build());
 
         dummy.add(MemberChangeHistory.builder()
-                                    .member(memberRepository.findById(1L).get())
-                                    .chngFieldCode(codeRepository.findById(1L).get())
+                                    .member(member)
+                                    .chngFieldCode(code)
                                     .befVal("(2)new qwerfde2312")
                                     .aftVal("(3)new qwerfde2312")
                                     .chngFieldCode(code)
