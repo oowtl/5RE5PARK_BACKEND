@@ -130,7 +130,7 @@ public class MemberController {
                              .body(response);
     }
 
-    // 회원 상세 조회 처리
+
     // 회원 프로필 정보 조회 처리(회원 단순 조회, 회원 프로젝트 내역 조회)
 
 

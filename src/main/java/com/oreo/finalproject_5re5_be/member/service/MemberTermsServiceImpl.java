@@ -75,7 +75,6 @@ public class MemberTermsServiceImpl {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime max = LocalDateTime.MAX;
         terms.setTermRegDate(now);
-        terms.setTermEndDate(max);
 
         // 생성한 값을 반환함
         MemberTerms savedMemberTerm = memberTermsRepository.save(terms);

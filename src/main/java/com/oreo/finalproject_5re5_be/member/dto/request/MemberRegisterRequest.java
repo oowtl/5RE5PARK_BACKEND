@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,10 +44,6 @@ public class MemberRegisterRequest {
     @NotBlank(message = "주소를 입력해주세요.")  // 필수값, 빈 값은 허용하지 않음
     private String normAddr;
 
-    @NotBlank(message = "생년월일을 입력해주세요.")  // 필수값, 빈 값은 허용하지 않음
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "생년월일은 'YYYY-MM-DD' 형식으로 입력해주세요.")  // 생년월일 형식 검증
-    private String birthDate;
-
     private String locaAddr;
     private String detailAddr;
     private String passAddr;
@@ -70,7 +67,6 @@ public class MemberRegisterRequest {
                 .name(name)
                 .normAddr(normAddr)
                 .memberRegDate(now)
-                .birthDate(birthDate)
                 .locaAddr(locaAddr)
                 .detailAddr(detailAddr)
                 .passAddr(passAddr)
@@ -113,9 +109,17 @@ public class MemberRegisterRequest {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.MAX;
 
+
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedDateTime = now.format(formatter);
+        String formattedEnd = end.format(formatter);
+
         // 시간 세팅
-        memberTermsHistory.setHistRegDate(now);
-        memberTermsHistory.setHistEndDate(end);
+        memberTermsHistory.setHistRegDate(formattedDateTime);
+        memberTermsHistory.setHistEndDate(formattedEnd);
 
         // 회원 세팅
         memberTermsHistory.setMember(member);

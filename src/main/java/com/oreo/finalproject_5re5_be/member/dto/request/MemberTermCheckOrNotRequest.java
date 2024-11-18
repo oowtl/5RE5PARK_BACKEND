@@ -12,14 +12,9 @@ import lombok.ToString;
 public class MemberTermCheckOrNotRequest {
     private Long termCondCode;
     private Character agreed;
-    private Boolean isMandatory;
 
-    // 서비스 정책 사항에 부합한 약관 동의 여부 확인
+    // 추후에 서비스 정책 사항에 부합한 약관 동의 여부 확인 로직 추가
     public boolean isValid() {
-        if (isMandatory) {
-            return agreed != null && agreed.equals('Y');
-        }
-
         return agreed != null;
     }
 }

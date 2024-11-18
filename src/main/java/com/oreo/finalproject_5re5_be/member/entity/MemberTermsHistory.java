@@ -45,9 +45,9 @@ public class MemberTermsHistory extends BaseEntity {
     private MemberTerms terms;
 
     @Column(name = "hist_reg_date", nullable = false)
-    private LocalDateTime histRegDate;
+    private String histRegDate;
     @Column(name = "hist_end_date", nullable = false)
-    private LocalDateTime histEndDate;
+    private String histEndDate;
     @Column(name = "chk_term_1", nullable = false)
     private Character chkTerm1; // 'Y' or 'N'
     @Column(name = "chk_term_2", nullable = false)

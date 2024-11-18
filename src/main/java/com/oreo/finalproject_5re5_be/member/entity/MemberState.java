@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,9 +37,9 @@ public class MemberState extends BaseEntity {
     private Code code;
 
     @Column(name = "appl_date", nullable = false)
-    private LocalDateTime applDate;
+    private String applDate;
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private String endDate;
 
     public static MemberState of(Member member, Code code) {
         MemberState memberState = new MemberState();
@@ -47,11 +48,18 @@ public class MemberState extends BaseEntity {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime end = LocalDateTime.MAX;
 
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedDateTime = now.format(formatter);
+        String formattedEnd = end.format(formatter);
+
         // 회원 상태에 생성된 회원과 신규 등록 회원 카테고리 그리고 시간 세팅
         memberState.setMember(member);
         memberState.setCode(code);
-        memberState.setApplDate(now);
-        memberState.setEndDate(end);
+        memberState.setApplDate(formattedDateTime);
+        memberState.setEndDate(formattedEnd);
 
 
         return memberState;

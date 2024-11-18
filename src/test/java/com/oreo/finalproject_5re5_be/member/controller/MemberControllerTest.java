@@ -146,38 +146,38 @@ class MemberControllerTest {
         memberTermCheckOrNotRequests = new ArrayList<>();
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(1L)
-                        .agreed('Y')
-                        .isMandatory(true)
-                        .build());
+                                            .termCondCode(1L)
+                                            .agreed('Y')
+                                            .isMandatory(true)
+                                            .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(2L)
-                        .agreed('Y')
-                        .isMandatory(true)
-                        .build());
+                                        .termCondCode(2L)
+                                        .agreed('Y')
+                                        .isMandatory(true)
+                                        .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(3L)
-                        .agreed('Y')
-                        .isMandatory(true)
-                        .build());
+                                        .termCondCode(3L)
+                                        .agreed('Y')
+                                        .isMandatory(true)
+                                        .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(4L)
-                        .agreed('N')
-                        .isMandatory(false)
-                        .build());
+                                        .termCondCode(4L)
+                                        .agreed('N')
+                                        .isMandatory(false)
+                                        .build());
 
         memberTermCheckOrNotRequests.add(
                 MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(5L)
-                        .agreed('N')
-                        .isMandatory(false)
-                        .build());
+                                        .termCondCode(5L)
+                                        .agreed('N')
+                                        .isMandatory(false)
+                                        .build());
 
         return memberTermCheckOrNotRequests;
     }
@@ -185,19 +185,19 @@ class MemberControllerTest {
     private MemberRegisterRequest createMemberRegisterRequest(
             List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("qwerfde2312")
-                .password("asdf12341234@")
-                .email("asdf3214@gmail.com")
-                .name("홍길동")
-                .birthDate("1990-01-01")
-                .userRegDate(LocalDateTime.now())
-                .chkValid('Y')
-                .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
-                .normAddr("서울시 강남구")
-                .passAddr("서초대로 59-32")
-                .locaAddr("서초동")
-                .detailAddr("서초동 123-456")
-                .build();
+                                                            .id("qwerfde2312")
+                                                            .password("asdf12341234@")
+                                                            .email("asdf3214@gmail.com")
+                                                            .name("홍길동")
+                                                            .birthDate("1990-01-01")
+                                                            .userRegDate(LocalDateTime.now())
+                                                            .chkValid('Y')
+                                                            .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
+                                                            .normAddr("서울시 강남구")
+                                                            .passAddr("서초대로 59-32")
+                                                            .locaAddr("서초동")
+                                                            .detailAddr("서초동 123-456")
+                                                            .build();
 
         return request;
     }
