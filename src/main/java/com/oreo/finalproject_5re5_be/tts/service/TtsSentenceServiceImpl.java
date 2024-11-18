@@ -152,4 +152,14 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 5. TtsSentenceResponse 변환
         return TtsSentenceDto.of(updatedSentence);
     }
+
+    @Override
+    public TtsSentenceDto getSentence(Long projectSeq, Long tsSeq) {
+
+        // 1. TtsSentence 엔티티 조회
+        TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
+                .orElseThrow(() -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+
+        return TtsSentenceDto.of(ttsSentence);
+    }
 }
