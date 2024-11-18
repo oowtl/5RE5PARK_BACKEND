@@ -3,8 +3,10 @@ package com.oreo.finalproject_5re5_be.tts.client;
 import com.google.api.gax.rpc.InvalidArgumentException;
 import com.google.cloud.texttospeech.v1.*;
 import com.google.protobuf.ByteString;
+import com.oreo.finalproject_5re5_be.tts.service.ByteArrayMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class GoogleTTSService {
@@ -23,6 +25,15 @@ public class GoogleTTSService {
         } catch (InvalidArgumentException e) {
             throw new Exception("TTS 요청 파라미터가 잘못되었습니다.", e);
         }
+    }
+
+
+    public MultipartFile makeToMultipartFile(SynthesisInput input, VoiceSelectionParams voice, AudioConfig audioConfig, String ttsFileName) throws Exception {
+        byte[] result = make(input, voice, audioConfig);
+        return new ByteArrayMultipartFile(
+                result, ttsFileName + ".wav", "audio/wav"
+
+        );
     }
 
 }
