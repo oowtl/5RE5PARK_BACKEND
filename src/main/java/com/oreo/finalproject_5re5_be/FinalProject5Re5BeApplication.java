@@ -4,9 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableRetry // 재시도 복구를 위한 어노테이션
+@EnableScheduling // 스케줄링 처리를 위한 어노테이션
 @SpringBootApplication
-@EnableRetry
 public class FinalProject5Re5BeApplication {
 
     public static void main(String[] args) {

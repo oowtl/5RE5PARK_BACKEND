@@ -1,6 +1,8 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
+import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,4 +44,18 @@ public class MemberDelete extends BaseEntity {
 
     @Column(name = "appl_date", nullable = false)
     private String applDate;
+
+    public static MemberDelete of(Long memberSeq, MemberRemoveRequest request, Code code) {
+        MemberDelete memberDelete = new MemberDelete();
+
+        // 현재 시간 세팅
+        LocalDateTime now = LocalDateTime.now();
+
+        memberDelete.setMemberSeq(memberSeq);
+        memberDelete.setCode(code);
+        memberDelete.setChkUse('N');
+
+
+        return memberDelete;
+    }
 }

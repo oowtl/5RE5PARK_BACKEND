@@ -1,10 +1,14 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
+import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
+import com.oreo.finalproject_5re5_be.member.entity.MemberConnectionHistory;
+import com.oreo.finalproject_5re5_be.member.entity.MemberDelete;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
@@ -22,6 +26,7 @@ import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
@@ -38,6 +43,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -80,24 +86,26 @@ public class MemberServiceImpl implements UserDetailsService {
     private final MemberTermsHistoryRepository memberTermsHistoryRepository;
     private final MemberTermsRepository memberTermsRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MemberCategoryRepository memberCategoryRepository;
     private final JavaMailSender mailSender;
     private final CodeRepository codeRepository;
     private final MemberChangeHistoryRepository memberChangeHistoryRepository;
+    private final MemberDeleteRepository memberDeleteRepository;
+    private final MemberChangeHistoryRepository memberChangeHistoryRepository;
+
 
     public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository, MemberRepository memberRepository, MemberStateRepository memberStateRepository,
                              MemberTermsHistoryRepository memberTermsHistoryRepository, MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder,
-            MemberCategoryRepository memberCategoryRepository, JavaMailSender mailSender, CodeRepository codeRepository,
-            MemberChangeHistoryRepository memberChangeHistoryRepository) {
+                             MemberCategoryRepository memberCategoryRepository, JavaMailSender mailSender, CodeRepository codeRepository,
+                             MemberDeleteRepository memberDeleteRepository, MemberChangeHistoryRepository memberChangeHistoryRepository) {
         this.memberConnectionHistoryRepository = memberConnectionHistoryRepository;
         this.memberRepository = memberRepository;
         this.memberStateRepository = memberStateRepository;
         this.memberTermsHistoryRepository = memberTermsHistoryRepository;
         this.memberTermsRepository = memberTermsRepository;
         this.passwordEncoder = passwordEncoder;
-        this.memberCategoryRepository = memberCategoryRepository;
         this.mailSender = mailSender;
         this.codeRepository = codeRepository;
+        this.memberDeleteRepository = memberDeleteRepository;
         this.memberChangeHistoryRepository = memberChangeHistoryRepository;
     }
 
@@ -479,9 +487,24 @@ public class MemberServiceImpl implements UserDetailsService {
     // - 해당 회원을 비활성 회원으로 업데이트한다
     // - 30일 유해 기간을 설정한다(현재 시간 등록)
     // - 회원 삭제 유형 코드와 사유를 기록한다
+    public void remove(Long memberSeq, MemberRemoveRequest request) {
+        // - 해당 회원을 조회한다
+        Member foundMember = memberRepository.findById(memberSeq)
+                                             .orElseThrow(MemberNotFoundException::new);
+
+        // - 해당 회원을 비활성 회원으로 업데이트한다
+        Code removeMemberCode = codeRepository.findCodeByCode("MBS003"); // 회원 비활성 코드
+        MemberState memberState = MemberState.of(foundMember, removeMemberCode);
+        memberStateRepository.save(memberState);
+
+        // - 30일 유해 기간을 설정한다(현재 시간 등록)
+        // - 회원 삭제 유형 코드와 사유를 기록한다
+        MemberDelete memberDelete = MemberDelete.of(memberSeq, request, removeMemberCode);
+        memberDeleteRepository.save(memberDelete);
+    }
 
 
-    // (2) 새벽 4:00 마다 삭제 회원 중 유해기간 30일이 지난 회원들을 삭제(스프링 스케쥴러 적용)
+    // (2) 매주 일요일 새벽 4:00 마다 삭제 회원 중 유해기간 30일이 지난 회원들을 삭제(스프링 스케쥴러 적용)
     // - applDate가 현재와 30일 차이 나는 회원을 대상으로 한다
     // - 회원을 삭제한다
     // - 회원의 상태를 삭제한다
@@ -489,6 +512,52 @@ public class MemberServiceImpl implements UserDetailsService {
     // - 회원의 접속 이력을 삭제한다
     // - 회원의 변경 이력을 삭제한다
     // - 회원 삭제 테이블에 처리 완료 체크표시 넣기
+    @Scheduled(cron = "0 0 4 ? * SUN", zone = "Asia/Seoul")
+    public void checkRemovedMember() {
+        // 현재 시간 조회
+        LocalDateTime now = LocalDateTime.now();
 
+
+        // - applDate가 현재와 30일 차이 나는 회원을 대상으로 한다
+        List<MemberDelete> foundAllDeletedMembers = memberDeleteRepository.findAll();
+        List<MemberDelete> candidates = foundAllDeletedMembers.stream()
+                                                             .filter(m -> {
+                                                                 LocalDateTime applDate = LocalDateTime.parse(m.getApplDate());
+                                                                 return applDate.isBefore(now.minusMonths(1)) || applDate.isEqual(now.minusMonths(1));
+                                                             })
+                                                            .toList();
+
+        // 삭제 대상 회원을 반복해서 삭제 처리한다
+        for (MemberDelete candidate : candidates) {
+            // - 회원을 삭제한다
+            Member foundMember = memberRepository.findById(candidate.getMemberSeq())
+                                                 .orElseThrow(MemberNotFoundException::new);
+
+            memberRepository.delete(foundMember);
+
+            // - 회원의 상태를 삭제한다
+            List<MemberState> foundMemberStates = memberStateRepository.findByMemberSeq(candidate.getMemberSeq());
+            memberStateRepository.deleteAll(foundMemberStates);
+
+
+            // - 회원의 약관 이력을 삭제한다
+            List<MemberTermsHistory> foundMemberTermsHistories = memberTermsHistoryRepository.findByMemberSeq(candidate.getMemberSeq());
+            memberTermsHistoryRepository.deleteAll(foundMemberTermsHistories);
+
+            // - 회원의 접속 이력을 삭제한다
+            List<MemberConnectionHistory> foundMemberConnectionsHistories = memberConnectionHistoryRepository.findMemberConnectionHistoriesByMemberSeq(candidate.getMemberSeq());
+            memberConnectionHistoryRepository.deleteAll(foundMemberConnectionsHistories);
+
+            // - 회원의 변경 이력을 삭제한다
+            // - 회원 삭제 테이블에 처리 완료 체크표시 넣기
+            List<MemberChangeHistory> foundMemberChangeHistories = memberChangeHistoryRepository.findMemberChangeHistoriesByMemberSeq(candidate.getMemberSeq());
+            memberChangeHistoryRepository.deleteAll(foundMemberChangeHistories);
+
+            // 회원 삭제 데이터 업데이트
+            Code memberDeleteCode = codeRepository.findCodeByCode("MBS999");
+            candidate.setCode(memberDeleteCode);
+            candidate.setChkUse('Y');
+        }
+    }
 
 }
