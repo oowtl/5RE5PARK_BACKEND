@@ -3,9 +3,10 @@ package com.oreo.finalproject_5re5_be.tts.controller;
 import com.oreo.finalproject_5re5_be.global.dto.response.ErrorResponseDto;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
+import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
+import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +22,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,9 +33,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/project/{projectSeq}/tts")
 public class TtsController {
     private final TtsSentenceService ttsSentenceService;
+    private final TtsMakeService ttsMakeService;
 
-    public TtsController(TtsSentenceService ttsSentenceService) {
+    public TtsController(TtsSentenceService ttsSentenceService, TtsMakeService ttsMakeService) {
         this.ttsSentenceService = ttsSentenceService;
+        this.ttsMakeService = ttsMakeService;
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -126,5 +130,15 @@ public class TtsController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ResponseDto<>(HttpStatus.OK.value(), response));
+    }
+
+    @GetMapping("sentence/{tsSeq}/maketts")
+    public ResponseEntity<TtsSentenceDto> makeTts(
+            @PathVariable Long tsSeq) {
+
+        TtsSentenceDto ttsSentenceDto = ttsMakeService.makeTts(tsSeq);
+
+        return ResponseEntity.ok()
+                .body(ttsSentenceDto);
     }
 }
