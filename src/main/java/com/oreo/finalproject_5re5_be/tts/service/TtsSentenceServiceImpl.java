@@ -239,4 +239,18 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         return TtsSentenceDto.of(ttsSentence);
     }
+
+    @Override
+    public TtsSentenceListDto getSentenceList(Long projectSeq) {
+
+        // 1. Project 엔티티 조회
+        Project project = projectRepository.findById(projectSeq)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectSeq));
+
+        // 2. Project 에 연관된 TtsSentence 리스트 조회
+        List<TtsSentence> ttsSentenceList = ttsSentenceRepository.findAllByProject(project);
+
+        // 3. TtsSentenceDto 리스트 변환 및 반환
+        return TtsSentenceListDto.of(ttsSentenceList);
+    }
 }
