@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
@@ -61,9 +61,10 @@ class MemberSecurityConfigTest {
     @DisplayName("로그인 성공 테스트")
     void 로그인_성공() throws Exception {
         // 회원 약관 동의 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 회원 가입 정보 생성
-        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
+                memberTermCheckOrNotRequests);
         // 가입 정보로 부터 회원 엔티티 생성
         Member foundMember = memberRegisterRequest.createMemberEntity();
         // 비밀번호 암호화 처리 후 저장
@@ -93,9 +94,10 @@ class MemberSecurityConfigTest {
     @DisplayName("로그인 실패 테스트, 로그인 실패시 로그인 페이지로 리디렉션")
     void 로그인_실패() throws Exception {
         // 회원 약관 동의 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 회원 가입 정보 생성
-        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
+                memberTermCheckOrNotRequests);
         // 가입 정보로 부터 회원 엔티티 생성
         Member foundMember = memberRegisterRequest.createMemberEntity();
         // 비밀번호 암호화 처리 후 저장
@@ -153,7 +155,7 @@ class MemberSecurityConfigTest {
     }
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(
-            List<MemberTermRequest> memberTermRequests) {
+            List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
         var request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
@@ -162,7 +164,7 @@ class MemberSecurityConfigTest {
                 .birthDate("1990-01-01")
                 .userRegDate(LocalDateTime.now())
                 .chkValid('Y')
-                .memberTermRequests(memberTermRequests)
+                .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
                 .normAddr("서울시 강남구")
                 .passAddr("서초대로 59-32")
                 .locaAddr("서초동")
@@ -172,45 +174,45 @@ class MemberSecurityConfigTest {
         return request;
     }
 
-    private List<MemberTermRequest> retryableCreateMemberMemberTerms() {
-        List<MemberTermRequest> memberTermRequests = new ArrayList<>();
+    private List<MemberTermCheckOrNotRequest> retryableCreateMemberMemberTerms() {
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = new ArrayList<>();
         // 약관 동의 내용 설정
-        memberTermRequests = new ArrayList<>();
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests = new ArrayList<>();
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(1L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(2L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(3L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(4L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(5L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        return memberTermRequests;
+        return memberTermCheckOrNotRequests;
     }
 }

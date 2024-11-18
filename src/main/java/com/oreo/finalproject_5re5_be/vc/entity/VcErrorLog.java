@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,5 +34,9 @@ public class VcErrorLog extends BaseEntity {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+    private Vc vc;
+
+    public void prePersist() {
+        date = LocalDateTime.now();
+    }
 }

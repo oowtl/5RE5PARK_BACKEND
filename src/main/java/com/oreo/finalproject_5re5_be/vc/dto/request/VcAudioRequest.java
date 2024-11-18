@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class VcAudioRequest {
     @NotNull(message = "seq 필드는 null 일 수 없습니다.")
-    private Long seq1;
+    private Long seq;
     @Size(max = 255, message = "name 필드는 최대 255자 까지 가능합니다.")
     @NotNull(message = "name 필드는 null 일 수 없습니다.")
     private String name;

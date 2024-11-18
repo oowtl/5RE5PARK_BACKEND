@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberCategory;
@@ -10,7 +9,6 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
-import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
@@ -21,7 +19,6 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import jakarta.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -105,7 +102,7 @@ public class MemberServiceImpl implements UserDetailsService {
         }
 
         // 회원가입 처리, 서버 내부 예외 발생시 재시도를 통한 복구 작업 진행
-        return RetryableCreateMember(request);
+        return retryableCreateMember(request);
     }
 
     // 1-2. 회원가입 처리, 서버 내부 예외 발생시 재시도를 통한 복구 작업 진행
@@ -115,7 +112,7 @@ public class MemberServiceImpl implements UserDetailsService {
             maxAttempts = MAX_RETRY,
             backoff = @Backoff(delay = RETRY_DELAY)
     )
-    public Member RetryableCreateMember(MemberRegisterRequest request) {
+    public Member retryableCreateMember(MemberRegisterRequest request) {
         // 비밀번호 암호화
         encodePassword(request);
         // 회원 엔티티 저장

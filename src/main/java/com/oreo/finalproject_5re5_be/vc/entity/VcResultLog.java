@@ -31,5 +31,9 @@ public class VcResultLog extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+    private Vc vc;
+
+    public void prePersist() {
+        date = LocalDateTime.now();
+    }
 }

@@ -11,6 +11,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.mail.MailSendException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {
@@ -67,7 +70,8 @@ public class MemberController {
             MemberDuplicatedIdException.class,
             MemberMandatoryTermNotAgreedException.class,
             MemberWrongCountTermCondition.class,
-            UsernameNotFoundException.class
+            UsernameNotFoundException.class,
+            ConstraintViolationException.class
     })
     public ResponseEntity<ErrorResponse> handleWrongRequestException(Exception e) {
         // 비즈니스 예외 발생시 에러 메시지 반환
