@@ -66,6 +66,7 @@ class MemberTermsServiceImplTest {
                                                   dummy.get(4).getCondCode()))
                 .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y', 'Y'))
                 .chkUse('Y')
+                .termCode("TERMS001")
                 .build();
 
         // 서비스 호출
@@ -87,6 +88,7 @@ class MemberTermsServiceImplTest {
                                                   dummy.get(4).getCondCode()))
                 .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y', 'Y'))
                 .chkUse('Y')
+                .termCode("TERMS001")
                 .build();
 
         // 데이터 등록
@@ -109,6 +111,7 @@ class MemberTermsServiceImplTest {
                                                   dummy.get(4).getCondCode()))
                 .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y', 'Y'))
                 .chkUse('Y')
+                .termCode("TERMS001")
                 .build();
 
         // 데이터 등록
@@ -139,6 +142,7 @@ class MemberTermsServiceImplTest {
                                                   dummy.get(4).getCondCode()))
                 .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y', 'Y'))
                 .chkUse('Y')
+                .termCode("TERMS001")
                 .build();
 
         // 데이터 등록

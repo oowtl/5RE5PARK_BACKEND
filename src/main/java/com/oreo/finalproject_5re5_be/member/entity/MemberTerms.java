@@ -39,6 +39,9 @@ public class MemberTerms extends BaseEntity{
     @Column(name = "terms_seq")
     private Long termsSeq;
 
+    @Column(name = "term_code", nullable = false)
+    private String termCode;
+
     @Column(name = "chk_term_1")
     private Character chkTerm1;
 

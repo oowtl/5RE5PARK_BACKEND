@@ -1,10 +1,16 @@
 package com.oreo.finalproject_5re5_be.tts.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
+import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
@@ -21,9 +27,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -90,6 +101,7 @@ class TtsControllerTest {
     public void registerSentence_successfulCreation() throws Exception {
         // given - 유효한 프로젝트 ID와 문장 생성 요청 객체 초기화
         Long projectSeq = 1L;
+        Long voiceSeq = 1L;
 
         // 1. 요청 객체 생성
         // 속성 정보 객체 생성
@@ -99,16 +111,16 @@ class TtsControllerTest {
 
         // 2. 응답 객체 생성
         // voice 객체 생성
-        Voice voice = createVoice();
+        Voice voice = createVoice(voiceSeq);
         // project 객체 생성
-        Project project = createProject();
+        Project project = createProject(projectSeq);
         // TtsSentence 객체 생성
         TtsSentence ttsSentence = createTtsSentence(voice, project);
         // TtsSentenceDto 객체 생성
         TtsSentenceDto response = TtsSentenceDto.of(ttsSentence);
 
         // 3. TtsSentenceService의 addSentence 메서드에 대한 모의 동작 설정
-        Mockito.when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenReturn(response); // 응답 객체 반환
+        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenReturn(response); // 응답 객체 반환
 
         // when
         // 4. 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
@@ -196,7 +208,7 @@ class TtsControllerTest {
 
 
         // When - 서비스에서 예외 발생을 설정
-        Mockito.when(ttsSentenceService.addSentence(eq(invalidProjectSeq), any(TtsSentenceRequest.class))).thenThrow(new IllegalArgumentException("projectSeq is invalid"));
+        when(ttsSentenceService.addSentence(eq(invalidProjectSeq), any(TtsSentenceRequest.class))).thenThrow(new IllegalArgumentException("projectSeq is invalid"));
 
         // Then - 요청 전송 및 응답 검증
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", invalidProjectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf()))
@@ -221,7 +233,7 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(-1L).text("Valid text").attribute(attributeInfo).build();
 
         // When - 서비스에서 예외 발생을 설정
-        Mockito.when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
+        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
 
         // Then - 요청 전송 및 응답 검증
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())).andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
@@ -237,7 +249,7 @@ class TtsControllerTest {
         TtsSentenceRequest request = TtsSentenceRequest.builder().voiceSeq(1L).styleSeq(-1L).text("Valid text").build();
 
         // When - 서비스에서 예외 발생을 설정
-        Mockito.when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
+        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
 
         // Then - 요청 전송 및 응답 검증
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)).with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())).andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
@@ -281,7 +293,7 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L).text("Valid text").build();
 
         // When - 서비스에서 런타임 예외 발생을 설정
-        Mockito.when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new RuntimeException("Unexpected error"));
+        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new RuntimeException("Unexpected error"));
 
         // Then - 요청 전송 및 응답 검증
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf())).andExpect(status().isInternalServerError()).andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
@@ -344,6 +356,7 @@ class TtsControllerTest {
         // given
         Long projectSeq = 1L;
         Long tsSeq = 1L;
+        Long voiceSeq = 1L;
         String updatedText = "Updated text";
 
         // 1. 요청 객체 생성
@@ -351,13 +364,13 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
         // 2. 응답 객체 생성
-        Voice voice = createVoice();
-        Project project = createProject();
+        Voice voice = createVoice(voiceSeq);
+        Project project = createProject(projectSeq);
         TtsSentence sentence = createTtsSentence(project, tsSeq, voice, updatedText);
         TtsSentenceDto response = TtsSentenceDto.of(sentence);
 
         // mock 서비스 동작 설정
-        Mockito.when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
+        when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
                 .thenReturn(response);
 
         // when
@@ -425,7 +438,7 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
         // mock 서비스 동작 설정
-        Mockito.when(ttsSentenceService.updateSentence(eq(nonExistentProjectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
+        when(ttsSentenceService.updateSentence(eq(nonExistentProjectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
                 .thenThrow(new EntityNotFoundException("Project not found with id: " + nonExistentProjectSeq));
 
         // when, then
@@ -451,7 +464,7 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
         // mock 서비스 동작 설정
-        Mockito.when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
+        when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
         // when, then
@@ -462,6 +475,182 @@ class TtsControllerTest {
                 .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
                 .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())))
                 .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
+    }
+
+
+    /*
+    테스트 시나리오: batchSave 메서드 테스트
+
+    1. 성공 케이스
+    - 조건:
+    - 유효한 projectSeq와 batchRequest가 주어짐.
+    - batchRequest의 sentenceList가 유효한 데이터를 포함함.
+    - 기대 결과:
+    - HTTP 상태 201(Created) 반환.
+    - JSON 응답에 올바른 TtsSentenceListDto 데이터 포함.
+
+    2. 유효성 검증 실패
+    2.1 잘못된 projectSeq
+    - 조건:
+    - projectSeq가 1 미만으로 설정됨.
+    - 기대 결과:
+    - HTTP 상태 400(Bad Request) 반환.
+    - JSON 응답에 유효성 검증 실패 메시지 포함.
+
+    2.2 sentenceList가 null
+    - 조건:
+    - batchRequest의 sentenceList가 null로 설정됨.
+    - 기대 결과:
+    - HTTP 상태 400(Bad Request) 반환.
+    - JSON 응답에 예외 메시지 포함.
+
+    3. Mock 데이터 생성
+    - Mock BatchRequest:
+    - 유효한 sentenceList와 데이터를 포함한 TtsSentenceBatchRequest를 생성.
+    - Mock BatchInfo:
+    - 유효한 SentenceInfo와 BatchProcessType을 포함한 TtsSentenceBatchInfo를 생성.
+    - Mock TtsSentenceListDto:
+    - Mock TtsSentenceDto를 포함하는 TtsSentenceListDto를 생성하여 응답 데이터를 시뮬레이션.
+    */
+
+    // 1. 성공 케이스
+    @Test
+    @DisplayName("batchSave - 성공 케이스")
+    @WithMockUser
+    void batchSave_Success() throws Exception {
+        // given: 유효한 projectSeq와 batchRequest 생성
+        Long projectSeq = 1L;
+        Long voiceSeq = 1L;
+        Long styleSeq = 1L;
+        String text = "Test text";
+
+        Project project = createProject(projectSeq);
+        Voice voice = createVoice(voiceSeq);
+        Style style = createStyle(styleSeq);
+        TtsAttributeInfo attributeInfo = createAttributeInfo();
+
+        // 1. BatchRequest 만들기
+        List<TtsSentenceBatchInfo> batchList = IntStream.range(0, 10)
+                .mapToObj(repeatCount -> {
+                    Long tsSeq = (long) repeatCount;
+                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
+
+                    // TtsSentenceBatchInfo 생성 후 batchList에 추가
+                    // batchList에 추가할 때마다 processType을 번갈아가며 설정
+                    BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
+                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
+                })
+                .toList();
+
+        TtsSentenceBatchRequest batchRequest = createBatchRequest(batchList);
+
+        // 2. 응답 생성
+        List<TtsSentenceDto> SentenceList = IntStream.range(0, 10)
+                .mapToObj(repeatCount -> {
+                    Long tsSeq = (long) repeatCount;
+                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
+                    return TtsSentenceDto.builder()
+                            .sentence(sentenceInfo)
+                            .build();
+                })
+                .toList();
+
+        TtsSentenceListDto response = TtsSentenceListDto.builder()
+                .sentenceList(SentenceList)
+                .build();
+
+        // Mock 서비스 동작 설정
+        when(ttsSentenceService.batchSaveSentence(eq(projectSeq), any(TtsSentenceBatchRequest.class)))
+                .thenReturn(response);
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/batch", projectSeq)
+                        .contentType(MediaType.APPLICATION_JSON) // JSON 타입 설정
+                        .content(objectMapper.writeValueAsString(batchRequest)) // 요청 본문 데이터
+                        .with(csrf())) // CSRF 추가
+                // then: 예상 응답 검증
+                .andExpect(status().isOk()) // HTTP 상태 201 확인
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())) // 응답 상태 코드 확인
+                .andExpect(jsonPath("$.response.sentenceList").exists()) // 응답에 sentences 필드가 존재하는지 확인
+                .andExpect(jsonPath("$.response.sentenceList[0].sentence.text").value(text)); // 반환된 데이터 검증
+    }
+
+    @Test
+    @DisplayName("batchSave - 유효성 검증 실패 (잘못된 projectSeq)")
+    @WithMockUser
+    void batchSave_InvalidProjectSeq() throws Exception {
+        // given: 잘못된 projectSeq 설정
+        Long invalidProjectSeq = 0L;
+        Long voiceSeq = 1L;
+        Long styleSeq = 1L;
+        String text = "Test text";
+        TtsAttributeInfo attributeInfo = createAttributeInfo();
+
+        // BatchRequest 생성
+        List<TtsSentenceBatchInfo> batchList = IntStream.range(0, 10)
+                .mapToObj(repeatCount -> {
+                    Long tsSeq = (long) repeatCount;
+                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
+
+                    // TtsSentenceBatchInfo 생성 후 batchList에 추가
+                    // batchList에 추가할 때마다 processType을 번갈아가며 설정
+                    BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
+                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
+                })
+                .toList();
+
+        TtsSentenceBatchRequest batchRequest = createBatchRequest(batchList);
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/batch", invalidProjectSeq)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(batchRequest))
+                        .with(csrf()))
+                // then: 유효성 검증 실패 상태 및 메시지 확인
+                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
+                .andExpect(jsonPath("$.response").exists())// 에러 메시지 필드 확인
+                .andExpect(jsonPath("$.response.message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage())); // 에러 메시지 확인
+    }
+
+    @Test
+    @DisplayName("batchSave - 서비스 예외 발생 (존재하지 않는 Project)")
+    @WithMockUser
+    void batchSave_NonExistentProject() throws Exception {
+        // given: 존재하지 않는 projectSeq 설정
+        Long projectSeq = 9999L;
+        Long voiceSeq = 1L;
+        Long styleSeq = 1L;
+        String text = "Test text";
+        TtsAttributeInfo attributeInfo = createAttributeInfo();
+
+        // BatchRequest 생성
+        List<TtsSentenceBatchInfo> batchList = IntStream.range(0, 10)
+                .mapToObj(repeatCount -> {
+                    Long tsSeq = (long) repeatCount;
+                    SentenceInfo sentenceInfo = createSentenceInfo(tsSeq, voiceSeq, styleSeq, text, repeatCount, attributeInfo);
+
+                    // TtsSentenceBatchInfo 생성 후 batchList에 추가
+                    // batchList에 추가할 때마다 processType을 번갈아가며 설정
+                    BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
+                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
+                })
+                .toList();
+
+        TtsSentenceBatchRequest batchRequest = createBatchRequest(batchList);
+
+        // 서비스에서 예외 발생하도록 설정
+        when(ttsSentenceService.batchSaveSentence(eq(projectSeq), any(TtsSentenceBatchRequest.class)))
+                .thenThrow(new EntityNotFoundException());
+
+        // when: 컨트롤러 호출
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/batch", projectSeq)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(batchRequest))
+                        .with(csrf()))
+                // then: 예상 에러 상태 및 메시지 확인
+                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())) // HTTP 상태 404 확인
+                .andExpect(jsonPath("$.response").exists())
+                .andExpect(jsonPath("$.response.message").value(ErrorCode.ENTITY_NOT_FOUND.getMessage())); // 에러 메시지 확인
     }
 
 
@@ -487,15 +676,21 @@ class TtsControllerTest {
                 .build(); // 유효한 요청 객체 초기화
     }
 
-    private static Voice createVoice() {
-        return Voice.builder().voiceSeq(1L) // 목소리 ID 설정
+    private static Voice createVoice(Long voiceSeq) {
+        return Voice.builder().voiceSeq(voiceSeq) // 목소리 ID 설정
                 .name("Valid voice") // 목소리 이름 설정
                 .build();
     }
 
-    private static Project createProject() {
-        return Project.builder().proSeq(1L) // 프로젝트 ID 설정
+    private static Project createProject(Long projectSeq) {
+        return Project.builder().proSeq(projectSeq) // 프로젝트 ID 설정
                 .proName("Valid project") // 프로젝트 이름 설정
+                .build();
+    }
+
+    private static Style createStyle(Long styleSeq) {
+        return Style.builder().styleSeq(styleSeq) // 스타일 ID 설정
+                .name("Valid style") // 스타일 이름 설정
                 .build();
     }
 
@@ -505,5 +700,23 @@ class TtsControllerTest {
 
     private static TtsSentence createTtsSentence(Project project, Long tsSeq, Voice voice, String text) {
         return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(1).volume(50).speed(1.0f).voice(voice).project(project).build();
+    }
+
+
+    private static TtsSentenceBatchRequest createBatchRequest(List<TtsSentenceBatchInfo> batchList) {
+        return TtsSentenceBatchRequest.builder()
+                .sentenceList(batchList)
+                .build();
+    }
+
+    private static SentenceInfo createSentenceInfo(Long tsSeq, Long voiceSeq, Long styleSeq, String text, int order, TtsAttributeInfo attributeInfo) {
+        return SentenceInfo.builder()
+                .tsSeq(tsSeq)
+                .voiceSeq(voiceSeq)
+                .styleSeq(styleSeq)
+                .text(text)
+                .order(order)
+                .ttsAttributeInfo(attributeInfo)
+                .build();
     }
 }

@@ -8,6 +8,7 @@ import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResp
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 class MemberTermsConditionServiceImplTest {
+
+    @Autowired
+    private MemberTermsHistoryRepository memberTermsHistoryRepository;
 
     @Autowired
     private MemberTermsConditionServiceImpl memberTermsConditionService;
@@ -42,6 +46,7 @@ class MemberTermsConditionServiceImplTest {
 
         // 초가화
         dummy.clear();
+        memberTermsHistoryRepository.deleteAll();
         memberTermsRepository.deleteAll();
         memberTermConditionRepository.deleteAll();
 

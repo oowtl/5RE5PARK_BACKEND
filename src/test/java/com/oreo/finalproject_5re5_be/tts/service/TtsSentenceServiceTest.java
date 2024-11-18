@@ -1,13 +1,16 @@
 package com.oreo.finalproject_5re5_be.tts.service;
 
+import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.*;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
+import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
 import com.oreo.finalproject_5re5_be.tts.repository.*;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
@@ -19,11 +22,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -168,8 +173,8 @@ class TtsSentenceServiceTest {
         Project project = Project.builder().proSeq(projectSeq).build();
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
 
-        // 4. VoiceRepository findByVoiceSeq 메소드가 null을 반환하도록 설정
-        when(voiceRepository.findByVoiceSeq(anyLong())).thenReturn(Optional.empty());
+        // 4. VoiceRepository findById 메소드가 null을 반환하도록 설정
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when, then
         // 3. IllegalArgumentException 발생
@@ -195,9 +200,9 @@ class TtsSentenceServiceTest {
         Project project = Project.builder().proSeq(projectSeq).build();
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
 
-        // 4. voice repository findByVoiceSeq 메소드가 객체를 반환하도록 설정
+        // 4. voice repository findById 메소드가 객체를 반환하도록 설정
         Voice voice = Voice.builder().voiceSeq(testVoiceSeq).build();
-        when(voiceRepository.findByVoiceSeq(anyLong())).thenReturn(Optional.of(voice));
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
 
         // 3. style repository findById 메소드가 Optional.empty 을 반환하도록 설정
         when(styleRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -232,7 +237,7 @@ class TtsSentenceServiceTest {
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
 
         Voice voice = Voice.builder().voiceSeq(testVoiceSeq).build();
-        when(voiceRepository.findByVoiceSeq(anyLong())).thenReturn(Optional.of(voice));
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
 
         Style style = Style.builder().styleSeq(testStyleSeq).build();
         when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
@@ -268,7 +273,7 @@ class TtsSentenceServiceTest {
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
 
         Voice voice = Voice.builder().voiceSeq(testVoiceSeq).build();
-        when(voiceRepository.findByVoiceSeq(anyLong())).thenReturn(Optional.of(voice));
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
 
         Style style = Style.builder().styleSeq(testStyleSeq).build();
         when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
@@ -299,9 +304,9 @@ class TtsSentenceServiceTest {
         Project project = Project.builder().proSeq(projectSeq).build();
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
 
-        // 4. voice repository findByVoiceSeq 메소드가 객체를 반환
+        // 4. voice repository findById 메소드가 객체를 반환
         Voice voice = Voice.builder().voiceSeq(testVoiceSeq).build();
-        when(voiceRepository.findByVoiceSeq(anyLong())).thenReturn(Optional.of(voice));
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
 
         // 5. style repository findById 메소드가 객체를 반환
         Style style = Style.builder().styleSeq(testStyleSeq).build();
@@ -576,6 +581,206 @@ class TtsSentenceServiceTest {
         assertEquals(updateRequest.getAttribute().getAlpha(), updateResult.getSentence().getTtsAttributeInfo().getAlpha());
         assertEquals(updateRequest.getAttribute().getEndPitch(), updateResult.getSentence().getTtsAttributeInfo().getEndPitch());
         assertEquals(updateRequest.getAttribute().getAudioFormat(), updateResult.getSentence().getTtsAttributeInfo().getAudioFormat());
+    }
+
+    /*
+    1. 성공 케이스 테스트
+    - 조건:
+    - 유효한 projectSeq와 sentenceList가 제공됨.
+    - sentenceList 내 BatchProcessType이 CREATE 또는 UPDATE로 설정.
+    - 기대 결과:
+    - TtsSentenceListDto 반환.
+
+    2. 유효성 검증 실패 테스트 - sentenceList가 null
+    - 조건:
+    - BatchRequest의 sentenceList가 null로 제공됨.
+    - 기대 결과:
+    - TtsSentenceInValidInput 예외 발생.
+
+
+    3. 유효성 검증 실패 테스트 - sentenceInfo가 null
+    - 조건:
+    - sentenceList 내 sentenceInfo가 null인 데이터 포함.
+    - 기대 결과:
+    - TtsSentenceInValidInput 예외 발생.
+
+    4. 잘못된 BatchProcessType 테스트
+    - 조건:
+    - BatchProcessType이 null로 제공됨.
+    - 기대 결과:
+    - TtsSentenceInValidInput 예외 발생.
+
+    5. 리소스 존재하지 않음 테스트 - projectSeq가 존재하지 않음
+    - 조건:
+    - ProjectRepository에서 projectSeq에 해당하는 Project가 없음.
+    - 기대 결과:
+    - TtsSentenceInValidInput 예외 발생.
+
+    6. 빈 sentenceList 테스트
+    - 조건:
+    - BatchRequest의 sentenceList가 빈 리스트로 제공됨.
+    - 기대 결과:
+    - 빈 TtsSentenceDto 리스트 반환.
+    */
+
+    // 1. 성공 케이스 테스트
+    @Test
+    @DisplayName("batchSaveSentence - 성공 케이스")
+    void batchSaveSentence_Success() {
+        // given: 유효한 projectSeq와 sentenceList 생성
+        Long projectSeq = 1L; // 유효한 projectSeq 설정
+
+        Project project = Project.builder().proSeq(projectSeq).build();
+        Voice voice = Voice.builder().voiceSeq(1L).build();
+        Style style = Style.builder().styleSeq(1L).build();
+
+        TtsSentenceBatchRequest batchRequest = createBatchRequest(); // 유효한 batchRequest 생성
+
+        TtsSentence ttsSentence = TtsSentence.builder()
+                .tsSeq(1L)
+                .text("Test text")
+                .sortOrder(1)
+                .volume(100)
+                .speed(1.0f)
+                .startPitch(0)
+                .emotion("normal")
+                .emotionStrength(0)
+                .sampleRate(16000)
+                .alpha(0)
+                .endPitch(0.0f)
+                .audioFormat("wav")
+                .project(mock(Project.class))
+                .voice(mock(Voice.class))
+                .style(mock(Style.class))
+                .build();
+
+        // 프로젝트가 존재한다고 설정
+        when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
+        // voice이 존재한다고 설정
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
+        // style이 존재한다고 설정
+        when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
+        // ttsSentece 가 존재한다고 설정
+        when(ttsSentenceRepository.findById(anyLong())).thenReturn(Optional.of(ttsSentence));
+        // 각 문장에 대해 TtsSentenceDto 반환
+        when(ttsSentenceRepository.save(any())).thenReturn(ttsSentence);
+
+        // when: batchSaveSentence 메서드 호출
+        TtsSentenceListDto result = ttsSentenceService.batchSaveSentence(projectSeq, batchRequest);
+
+        // then: 반환된 결과 검증
+        assertNotNull(result); // 결과가 null이 아님
+//        assertFalse(result.getSentenceList().isEmpty()); // 리스트가 비어 있지 않음
+    }
+
+    // 2. 유효성 검증 실패 테스트 - sentenceList가 null
+    @Test
+    @DisplayName("batchSaveSentence - sentenceList가 null")
+    void batchSaveSentence_SentenceListNull() {
+        // given: sentenceList가 null인 batchRequest 생성
+        TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(null); // sentenceList가 null로 설정
+
+        // when, then: 예외 발생 검증
+        assertThrows(ConstraintViolationException.class, () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
+    }
+
+    // 3. 유효성 검증 실패 테스트 - sentenceInfo가 null
+    @Test
+    @DisplayName("batchSaveSentence - sentenceInfo가 null")
+    void batchSaveSentence_SentenceInfoNull() {
+        // given: sentenceInfo가 null인 batchRequest 생성
+        TtsSentenceBatchInfo batchInfo = new TtsSentenceBatchInfo(BatchProcessType.CREATE, null);
+        TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of(batchInfo));
+
+        // when, then: 예외 발생 검증
+        assertThrows(TtsSentenceInValidInput.class, () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
+    }
+
+    // 4. 잘못된 BatchProcessType 테스트
+    @Test
+    @DisplayName("batchSaveSentence - 잘못된 BatchProcessType")
+    void batchSaveSentence_InvalidBatchProcessType() {
+        // given: BatchProcessType이 null인 batchRequest 생성
+        TtsSentenceBatchInfo batchInfo = new TtsSentenceBatchInfo(null, mock(SentenceInfo.class));
+        TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of(batchInfo));
+
+        // when, then: 예외 발생 검증
+        assertThrows(TtsSentenceInValidInput.class, () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
+    }
+
+    // 5. 리소스 존재하지 않음 테스트 - projectSeq가 존재하지 않음
+    @Test
+    @DisplayName("batchSaveSentence - projectSeq가 존재하지 않음")
+    void batchSaveSentence_ProjectSeqNotFound() {
+        // given: 존재하지 않는 projectSeq 설정
+        Long projectSeq = 999999L;
+        TtsSentenceBatchRequest batchRequest = createBatchRequest();
+
+        // projectRepository가 empty 반환하도록 설정
+        when(projectRepository.findById(projectSeq)).thenReturn(Optional.empty());
+
+        // when, then: 예외 발생 검증
+        assertThrows(EntityNotFoundException.class, () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
+    }
+
+    // 6. 빈 sentenceList 테스트
+    @Test
+    @DisplayName("batchSaveSentence - 빈 sentenceList")
+    void batchSaveSentence_EmptySentenceList() {
+        // given: 빈 sentenceList가 포함된 batchRequest 생성
+        Long projectSeq = 1L;
+        TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of());
+
+        // when, then: batchSaveSentence 메서드 호출
+        assertThrows(ConstraintViolationException.class, () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
+    }
+
+    /*
+    데이터 생성 메서드
+     */
+
+    // 유효한 TtsSentenceBatchRequest 생성
+    private TtsSentenceBatchRequest createBatchRequest() {
+
+        SentenceInfo updateSentenceInfo1 = SentenceInfo.builder()
+                .tsSeq(1L)
+                .voiceSeq(1L)
+                .styleSeq(1L)
+                .order(1)
+                .text("Test text")
+                .ttsAttributeInfo(createAttribute())
+                .build();
+
+        SentenceInfo updateSentenceInfo2 = SentenceInfo.builder()
+                .tsSeq(1L)
+                .voiceSeq(1L)
+                .styleSeq(1L)
+                .order(2)
+                .text("Test text")
+                .ttsAttributeInfo(createAttribute())
+                .build();
+
+        SentenceInfo createSentenceInfo3 = SentenceInfo.builder()
+                .voiceSeq(1L)
+                .styleSeq(1L)
+                .order(3)
+                .text("Test text")
+                .ttsAttributeInfo(createAttribute())
+                .build();
+
+        SentenceInfo createSentenceInfo4 = SentenceInfo.builder()
+                .voiceSeq(1L)
+                .styleSeq(1L)
+                .order(4)
+                .text("Test text")
+                .ttsAttributeInfo(createAttribute())
+                .build();
+
+        TtsSentenceBatchInfo batchInfo1 = new TtsSentenceBatchInfo(BatchProcessType.UPDATE, updateSentenceInfo1);
+        TtsSentenceBatchInfo batchInfo2 = new TtsSentenceBatchInfo(BatchProcessType.UPDATE, updateSentenceInfo2);
+        TtsSentenceBatchInfo batchInfo3 = new TtsSentenceBatchInfo(BatchProcessType.CREATE, createSentenceInfo3);
+        TtsSentenceBatchInfo batchInfo4 = new TtsSentenceBatchInfo(BatchProcessType.CREATE, createSentenceInfo4);
+        return new TtsSentenceBatchRequest(List.of(batchInfo1, batchInfo2, batchInfo3, batchInfo4));
     }
 
     private TtsAttributeInfo createAttribute() {

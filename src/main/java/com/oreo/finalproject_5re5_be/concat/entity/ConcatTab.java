@@ -31,9 +31,6 @@ public class ConcatTab extends BaseEntity {
 
     @Column(name = "front_silence")
     private Float frontSilence;
-
-    @Column(name = "back_silence")
-    private Float backSilence;
 }
 
 
