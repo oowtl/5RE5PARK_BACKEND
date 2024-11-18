@@ -3,9 +3,11 @@ package com.oreo.finalproject_5re5_be.tts.controller;
 import com.oreo.finalproject_5re5_be.global.dto.response.ErrorResponseDto;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -122,6 +124,20 @@ public class TtsController {
 
         // 문장 수정
         TtsSentenceDto response = ttsSentenceService.updateSentence(projectSeq, tsSeq, updateRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto<>(HttpStatus.OK.value(), response));
+    }
+
+    @Operation(summary = "TTS 현재 상태 저장 (저장 및 수정)")
+    @PostMapping("/batch")
+    public ResponseEntity<ResponseDto<TtsSentenceListDto>> batchSave(
+            @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+            @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceBatchRequest batchRequest) {
+
+        // 문장 생성 및 수정
+        TtsSentenceListDto response = ttsSentenceService.batchSaveSentence(projectSeq, batchRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
