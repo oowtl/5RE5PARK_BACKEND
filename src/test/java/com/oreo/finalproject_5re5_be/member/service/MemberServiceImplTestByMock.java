@@ -2,17 +2,13 @@ package com.oreo.finalproject_5re5_be.member.service;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.doNothing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
@@ -23,7 +19,6 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgre
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
-import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,14 +27,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -74,9 +66,10 @@ class MemberServiceImplTestByMock {
     @Test
     public void 중복된_이메일_예외_발생() {
         // 회원 약관 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 회원 입력 데이터 생성
-        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(
+                memberTermCheckOrNotRequests);
         // 회원 엔티티 생성
         Member member = request.createMemberEntity();
         // 이메일 중복시 해당 회원 엔티티 반환하게 세팅
@@ -89,9 +82,10 @@ class MemberServiceImplTestByMock {
     @Test
     public void 중복된_아이디_예외_발생() {
         // 회원 약관 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 회원 입력 데이터 생성
-        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(
+                memberTermCheckOrNotRequests);
         // 회원 엔티티 생성
         Member member = request.createMemberEntity();
         // 아이디 중복시 해당 회원 엔티티 반환하게 세팅
@@ -104,11 +98,12 @@ class MemberServiceImplTestByMock {
     @Test
     public void 필수_약관_미동의_예외_발생() {
         // 회원 약관 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 필수 약관 미동의로 변경
-        memberTermRequests.get(0).setAgreed('N');
+        memberTermCheckOrNotRequests.get(0).setAgreed('N');
         // 회원 입력 데이터 생성
-        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(
+                memberTermCheckOrNotRequests);
         // 회원 엔티티 생성
         Member member = request.createMemberEntity();
         // 실행 및 예외 발생 여부 파악
@@ -119,15 +114,16 @@ class MemberServiceImplTestByMock {
     @Test
     public void 약관_항목_초과_예외_발생() {
         // 회원 약관 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 회원 약관 추가 6개로 세팅
-        memberTermRequests.add(MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(MemberTermCheckOrNotRequest.builder()
                         .termCondCode(6L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
         // 회원 입력 데이터 생성
-        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(memberTermRequests);
+        MemberRegisterRequest request = retryableCreateMemberMemberRegisterRequest(
+                memberTermCheckOrNotRequests);
         // 회원 엔티티 생성
         Member member = request.createMemberEntity();
         // 실행 및 예외 발생 여부 파악
@@ -145,10 +141,10 @@ class MemberServiceImplTestByMock {
     @Test
     public void 스프링시큐리티_회원_조회_성공() {
         // 회원 약관 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 회원 입력 데이터 생성
         MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
-                memberTermRequests);
+                memberTermCheckOrNotRequests);
         // 입력 데이터로부터 회원 엔티티 생성
         Member foundMember = memberRegisterRequest.createMemberEntity();
 
@@ -164,10 +160,10 @@ class MemberServiceImplTestByMock {
     @Test
     public void 스프링시큐리티_회원_조회_실패() {
         // 회원 약관 정보 생성
-        List<MemberTermRequest> memberTermRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
         // 입력 데이터로부터 회원 엔티티 생성
         MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
-                memberTermRequests);
+                memberTermCheckOrNotRequests);
         // 입력 데이터로부터 회원 엔티티 생성
         Member foundMember = memberRegisterRequest.createMemberEntity();
         // "qwerfde2312" 조회시 null 반환하게 세팅
@@ -223,7 +219,7 @@ class MemberServiceImplTestByMock {
     }
 
 
-    private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermRequest> memberTermRequests) {
+    private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
         var request = MemberRegisterRequest.builder()
                 .id("qwerfde2312")
                 .password("asdf12341234@")
@@ -232,7 +228,7 @@ class MemberServiceImplTestByMock {
                 .birthDate("1990-01-01")
                 .userRegDate(LocalDateTime.now())
                 .chkValid('Y')
-                .memberTermRequests(memberTermRequests)
+                .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
                 .normAddr("서울시 강남구")
                 .passAddr("서초대로 59-32")
                 .locaAddr("서초동")
@@ -242,46 +238,46 @@ class MemberServiceImplTestByMock {
         return request;
     }
 
-    private List<MemberTermRequest> retryableCreateMemberMemberTerms() {
-        List<MemberTermRequest> memberTermRequests = new ArrayList<>();
+    private List<MemberTermCheckOrNotRequest> retryableCreateMemberMemberTerms() {
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = new ArrayList<>();
         // 약관 동의 내용 설정
-        memberTermRequests = new ArrayList<>();
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests = new ArrayList<>();
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(1L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(2L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(3L)
                         .agreed('Y')
                         .isMandatory(true)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(4L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        memberTermRequests.add(
-                MemberTermRequest.builder()
+        memberTermCheckOrNotRequests.add(
+                MemberTermCheckOrNotRequest.builder()
                         .termCondCode(5L)
                         .agreed('N')
                         .isMandatory(false)
                         .build());
 
-        return memberTermRequests;
+        return memberTermCheckOrNotRequests;
     }
 
     private boolean isSameMemberFields(Member member, MemberRegisterRequest request) {
@@ -296,13 +292,13 @@ class MemberServiceImplTestByMock {
                 member.getPassAddr().equals(request.getPassAddr());
     }
 
-    private boolean isSameMemberTermsHistoryFields(MemberTermsHistory memberTermsHistory, List<MemberTermRequest> memberTermRequests) {
+    private boolean isSameMemberTermsHistoryFields(MemberTermsHistory memberTermsHistory, List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
         // 약관 동의 내역 비교
-        return memberTermsHistory.getChkTerm1().equals(memberTermRequests.get(0).getAgreed()) &&
-                memberTermsHistory.getChkTerm2().equals(memberTermRequests.get(1).getAgreed()) &&
-                memberTermsHistory.getChkTerm3().equals(memberTermRequests.get(2).getAgreed()) &&
-                memberTermsHistory.getChkTerm4().equals(memberTermRequests.get(3).getAgreed()) &&
-                memberTermsHistory.getChkTerm5().equals(memberTermRequests.get(4).getAgreed());
+        return memberTermsHistory.getChkTerm1().equals(memberTermCheckOrNotRequests.get(0).getAgreed()) &&
+                memberTermsHistory.getChkTerm2().equals(memberTermCheckOrNotRequests.get(1).getAgreed()) &&
+                memberTermsHistory.getChkTerm3().equals(memberTermCheckOrNotRequests.get(2).getAgreed()) &&
+                memberTermsHistory.getChkTerm4().equals(memberTermCheckOrNotRequests.get(3).getAgreed()) &&
+                memberTermsHistory.getChkTerm5().equals(memberTermCheckOrNotRequests.get(4).getAgreed());
     }
 
     // 추후에 해당 부분 문제 해결 : 회원 상태 어떻게 비교할지 고민하기

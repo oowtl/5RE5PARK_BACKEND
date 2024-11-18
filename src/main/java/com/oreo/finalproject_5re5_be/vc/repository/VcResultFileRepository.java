@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VcResultFileRepository extends JpaRepository<VcResultFile, Long> {
-    VcResultFile findBySrcSeq_SrcSeq(Long srcSeq);
+    VcResultFile findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(Long srcSeq);
 }

@@ -56,7 +56,7 @@ public class MemberRegisterRequest {
     private LocalDateTime userRegDate;
 
     @NotEmpty(message = "필수 약관 동의 항목이 비어 있습니다.")  // 약관 요청 리스트가 비어 있으면 오류
-    private List<@Valid MemberTermRequest> memberTermRequests;  // 리스트의 각 항목에 대해 검증
+    private List<@Valid MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests;  // 리스트의 각 항목에 대해 검증
 
     // Member 엔티티로 변환
     public Member createMemberEntity() {
@@ -80,7 +80,7 @@ public class MemberRegisterRequest {
 
     // 약관 동의 항목 검증
     public void checkValidTerms() {
-        for (MemberTermRequest term : memberTermRequests) {
+        for (MemberTermCheckOrNotRequest term : memberTermCheckOrNotRequests) {
             if (!term.isValid()) {
                 throw new MemberMandatoryTermNotAgreedException();
             }
@@ -89,7 +89,7 @@ public class MemberRegisterRequest {
 
     // 약관 동의 항목 개수 검증
     public void checkValidTermsCount() {
-        if (!(memberTermRequests.size() == 5)) {
+        if (!(memberTermCheckOrNotRequests.size() == 5)) {
             throw new MemberWrongCountTermCondition();
         }
     }
@@ -100,8 +100,8 @@ public class MemberRegisterRequest {
         MemberTermsHistory memberTermsHistory = new MemberTermsHistory();
 
         // 입력 데이터로 부터 약관 정보를 조회해서 약관 이력 엔티티에 저장
-        for (int i = 0; i < memberTermRequests.size(); i++) {
-            MemberTermRequest term = memberTermRequests.get(i);
+        for (int i = 0; i < memberTermCheckOrNotRequests.size(); i++) {
+            MemberTermCheckOrNotRequest term = memberTermCheckOrNotRequests.get(i);
             memberTermsHistory.addMemberTermCondition(i + 1, term.getAgreed());
         }
 

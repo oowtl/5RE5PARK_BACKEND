@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.audio;
 
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

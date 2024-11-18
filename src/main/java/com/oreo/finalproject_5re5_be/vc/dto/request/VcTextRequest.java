@@ -10,8 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VcTextRequest {
-    @NotNull(message = "srcSeq 필드는 null 일 수 없습니다.")
     private Long seq;
-    @NotNull(message = "text 필드는 null 일 수 없습니다.")
     private String text;
 }

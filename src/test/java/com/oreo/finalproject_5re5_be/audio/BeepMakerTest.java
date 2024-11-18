@@ -1,5 +1,7 @@
 package com.oreo.finalproject_5re5_be.audio;
 
+import com.oreo.finalproject_5re5_be.global.component.audio.BeepMaker;
+import com.oreo.finalproject_5re5_be.global.component.audio.SoundPlayer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;

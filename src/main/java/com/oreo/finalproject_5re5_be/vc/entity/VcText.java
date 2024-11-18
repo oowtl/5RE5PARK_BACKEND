@@ -40,7 +40,8 @@ public class VcText extends BaseEntity {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pro_seq")
-    private Project proSeq;
+
+    public void prePersist() {
+        vtDate = LocalDateTime.now();
+    }
 }
