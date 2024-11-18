@@ -132,13 +132,20 @@ public class TtsController {
                 .body(new ResponseDto<>(HttpStatus.OK.value(), response));
     }
 
-    @GetMapping("sentence/{tsSeq}/maketts")
-    public ResponseEntity<TtsSentenceDto> makeTts(
-            @PathVariable Long tsSeq) {
+    @GetMapping("/sentence/{tsSeq}/maketts")
+    public ResponseEntity<ResponseDto<TtsSentenceDto>> makeTts(
+            @Min(value = 1L) @PathVariable Long tsSeq) {
 
+        // tts 생성
         TtsSentenceDto ttsSentenceDto = ttsMakeService.makeTts(tsSeq);
 
-        return ResponseEntity.ok()
-                .body(ttsSentenceDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ResponseDto<>(
+                                HttpStatus.CREATED.value(),
+                                ttsSentenceDto
+                        )
+                );
     }
 }
