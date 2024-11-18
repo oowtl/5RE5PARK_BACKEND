@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Component
+@Slf4j
 public class S3Service {
     @Autowired
     private AmazonS3 s3Client;
@@ -81,5 +83,37 @@ public class S3Service {
             throw new IOException("파일 다운로드 실패");
         }
         return file;
+    }
+
+    /**
+     * File folder = new File("경로")
+     * 파일 삭제
+     * @param folder
+     */
+    public void deleteFolder(File folder) {
+        if (folder.exists()) {
+            // 폴더 안의 파일과 서브 디렉토리 삭제
+            File[] files = folder.listFiles();
+            if (files != null) { // 폴더에 내용물이 있을 경우
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        // 서브 디렉토리 재귀 삭제
+                        deleteFolder(file);
+                    } else {
+                        // 파일 삭제
+                        file.delete();
+                        log.info("파일 삭제됨: {}", file.getAbsolutePath());
+                    }
+                }
+            }
+            // 폴더 자체 삭제
+            if (folder.delete()) {
+                log.info("폴더 삭제됨: {}", folder.getAbsolutePath());
+            } else {
+                throw new IllegalArgumentException("폴더 삭제 실패: " + folder.getAbsolutePath());
+            }
+        } else {
+            throw new IllegalArgumentException("폴더가 존재하지 않음: " + folder.getAbsolutePath());
+        }
     }
 }
