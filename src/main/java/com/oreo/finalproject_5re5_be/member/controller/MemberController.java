@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.ErrorResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
@@ -26,6 +27,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -128,6 +130,17 @@ public class MemberController {
         // 응답 반환
         return ResponseEntity.ok()
                              .body(response);
+    }
+
+    // 회원 수정 처리
+    @PatchMapping("/{memberSeq}")
+    public ResponseEntity<Void> update(@PathVariable("memberSeq") Long memberSeq, @Valid @RequestBody
+            MemberUpdateRequest request) {
+        // 수정 처리
+        memberService.update(memberSeq, request);
+        // 응답 반환
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                            .build();
     }
 
 
