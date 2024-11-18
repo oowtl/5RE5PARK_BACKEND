@@ -21,7 +21,6 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundExcepti
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberCategoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
@@ -92,7 +91,7 @@ public class MemberServiceImpl implements UserDetailsService {
 
     public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository, MemberRepository memberRepository, MemberStateRepository memberStateRepository,
                              MemberTermsHistoryRepository memberTermsHistoryRepository, MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder,
-                             MemberCategoryRepository memberCategoryRepository, JavaMailSender mailSender, CodeRepository codeRepository,
+                             JavaMailSender mailSender, CodeRepository codeRepository,
                              MemberDeleteRepository memberDeleteRepository, MemberChangeHistoryRepository memberChangeHistoryRepository) {
         this.memberConnectionHistoryRepository = memberConnectionHistoryRepository;
         this.memberRepository = memberRepository;
