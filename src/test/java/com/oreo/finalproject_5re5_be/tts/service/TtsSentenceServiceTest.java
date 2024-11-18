@@ -77,7 +77,7 @@ class TtsSentenceServiceTest {
     // 1. 필수 정보 유효성 검증 - text: not null
     @Test
     @DisplayName("필수 정보 유효성 검증 - text: not blank")
-    public void validateTextNotBlank() {
+    void validateTextNotBlank() {
         // given
         Long projectSeq = 99999L;
 
@@ -109,7 +109,7 @@ class TtsSentenceServiceTest {
     // 2. 필수 정보 유효성 검증 - projectSeq: not null
     @Test
     @DisplayName("필수 정보 유효성 검증 - projectSeq: not null")
-    public void validateProjectSeqNotNull() {
+    void validateProjectSeqNotNull() {
         // given
         Long projectSeq = null;
 
@@ -130,7 +130,7 @@ class TtsSentenceServiceTest {
     // 3. 필수 정보 유효성 검증 - projectSeq: 조회 가능한 projectSeq (존재 여부)
     @Test
     @DisplayName("필수 정보 유효성 검증 - projectSeq: 조회 가능한 projectSeq (존재 여부)")
-    public void validateProjectSeqExist() {
+    void validateProjectSeqExist() {
         // given
         Long projectSeq = 99999L;
 
@@ -154,7 +154,7 @@ class TtsSentenceServiceTest {
     // 4. 필수 정보 유효성 검증 - voiceSeq: not null
     @Test
     @DisplayName("필수 정보 유효성 검증 - voiceSeq: not blank")
-    public void validateVoiceSeqNotNull() {
+    void validateVoiceSeqNotNull() {
         // given
         Long projectSeq = 99999L;
 
@@ -175,7 +175,7 @@ class TtsSentenceServiceTest {
     // 5. 필수 정보 유효성 검증 - voiceSeq: 조회 가능한 voiceSeq (존재 여부)
     @Test
     @DisplayName("필수 정보 유효성 검증 - voiceSeq: 조회 가능한 voiceSeq (존재 여부)")
-    public void validateVoiceSeqExist() {
+    void validateVoiceSeqExist() {
         // given
         Long projectSeq = 99999L;
         Long testVoiceSeq = 99999L;
@@ -204,7 +204,7 @@ class TtsSentenceServiceTest {
     // 6. 옵션 정보 유효성 검증 - styleSeq: 조회 가능한 스타일 id (존재 여부)
     @Test
     @DisplayName("옵션 정보 유효성 검증 - styleSeq: 조회 가능한 스타일 id (존재 여부)")
-    public void validateStyleSeqExist() {
+    void validateStyleSeqExist() {
         // given
         Long projectSeq = 99999L;
         Long testVoiceSeq = 99999L;
@@ -238,7 +238,7 @@ class TtsSentenceServiceTest {
     // 7. TtsAttributeInfo 유효성 검증 : volume 값이 0보다 작거나 100보다 클 때
     @Test
     @DisplayName("TtsAttributeInfo 유효성 검증 : volume 값이 0보다 작거나 100보다 클 때")
-    public void validateVolumeConstraint() {
+    void validateVolumeConstraint() {
         // given
         Long projectSeq = 99999L;
         Long testVoiceSeq = 99999L;
@@ -280,7 +280,7 @@ class TtsSentenceServiceTest {
     // 8. TtsAttributeInfo 유효성 검증 : stPitch 값이 -20보다 작거나 20보다 클 때
     @Test
     @DisplayName("TtsAttributeInfo 유효성 검증 : stPitch 값이 -20보다 작거나 20보다 클 때")
-    public void validateStartPitchConstraint() {
+    void validateStartPitchConstraint() {
         // given
         Long projectSeq = 99999L;
         Long testVoiceSeq = 99999L;
@@ -323,7 +323,7 @@ class TtsSentenceServiceTest {
     // 1. TtsSentence 추가 성공
     @Test
     @DisplayName("TtsSentence 추가 성공")
-    public void addSentenceSuccess() {
+    void addSentenceSuccess() {
         // given
         Long projectSeq = 99999L;
         Long testVoiceSeq = 99999L;
@@ -416,7 +416,7 @@ class TtsSentenceServiceTest {
     // 1. 필수 정보 유효성 검증 : projectSeq가 null일 때
     @Test
     @DisplayName("필수 정보 유효성 검증 : projectSeq가 null일 때")
-    public void updateValidateProjectSeqNotNull() {
+    void updateValidateProjectSeqNotNull() {
         // given: projectSeq가 null이고, updateRequest에는 필요한 필드가 유효한 값으로 설정됨
         Long projectSeq = null;
         Long sentenceSeq = 1L;
@@ -435,7 +435,7 @@ class TtsSentenceServiceTest {
     // 2. 필수 정보 유효성 검증 : projectSeq가 존재하지 않을 때
     @Test
     @DisplayName("필수 정보 유효성 검증 : projectSeq가 존재하지 않을 때")
-    public void updateValidateProjectSeqExists() {
+    void updateValidateProjectSeqExists() {
         // given: projectSeq가 데이터베이스에 존재하지 않음
         Long projectSeq = 99999L;
         Long tsSeq = 1L;
@@ -458,7 +458,7 @@ class TtsSentenceServiceTest {
     // 3. 필수 정보 유효성 검증 : voiceSeq가 null일 때
     @Test
     @DisplayName("필수 정보 유효성 검증 : voiceSeq가 null일 때")
-    public void updateValidateVoiceSeqNotNull() {
+    void updateValidateVoiceSeqNotNull() {
         // given
         Long projectSeq = 1L;
         Long sentenceSeq = 1L;
@@ -487,7 +487,7 @@ class TtsSentenceServiceTest {
     // 4. 필수 정보 유효성 검증 : voiceSeq가 존재하지 않을 때
     @Test
     @DisplayName("필수 정보 유효성 검증 : voiceSeq가 존재하지 않을 때")
-    public void validateVoiceSeqExists() {
+    void validateVoiceSeqExists() {
         // given: voiceSeq가 데이터베이스에 존재하지 않음
         Long projectSeq = 1L;
         Long tsSeq = 1L;
@@ -520,7 +520,7 @@ class TtsSentenceServiceTest {
     // 5. 옵션 정보 유효성 검증 : styleSeq가 존재하지 않을 때
     @Test
     @DisplayName("옵션 정보 유효성 검증 : styleSeq가 존재하지 않을 때")
-    public void validateStyleSeqExists() {
+    void validateStyleSeqExists() {
         // given: styleSeq가 데이터베이스에 존재하지 않음
         Long projectSeq = 1L;
         Long tsSeq = 1L;
@@ -554,7 +554,7 @@ class TtsSentenceServiceTest {
     // 6. TtsSentence 수정 성공
     @Test
     @DisplayName("TtsSentence 수정 성공")
-    public void updateSentenceSuccess() {
+    void updateSentenceSuccess() {
         // given: 유효한 projectSeq, voiceSeq, styleSeq와 수정 요청 생성
         Long projectSeq = 1L;
         Long tsSeq = 1L;
@@ -929,7 +929,7 @@ class TtsSentenceServiceTest {
         Long tsSeq = null;
 
         // when, then: getSentence 호출 시 IllegalArgumentException 발생 여부 검증
-        ConstraintViolationException exception = assertThrows(ConstraintViolationException.class,
+        assertThrows(ConstraintViolationException.class,
             () -> ttsSentenceService.getSentence(1L, tsSeq));
     }
 
