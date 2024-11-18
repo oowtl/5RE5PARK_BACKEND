@@ -231,4 +231,14 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                 .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + styleSeq));
     }
 
+
+    @Override
+    public TtsSentenceDto getSentence(Long projectSeq, Long tsSeq) {
+
+        // 1. TtsSentence 엔티티 조회
+        TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
+                .orElseThrow(() -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+
+        return TtsSentenceDto.of(ttsSentence);
+    }
 }
