@@ -58,12 +58,18 @@ public class S3Service {
         return s3Client.getUrl(buketName, key).toString();
     }
 
+    /**
+     * 키 값은 주소에서 버킷주소 뒤로 [폴더/파일명] 입력
+     * @param key
+     * @return file
+     * @throws IOException
+     */
     public File downloadFile(String key) throws IOException {
         GetObjectRequest getObjectRequest = new GetObjectRequest(buketName, key);
 
         S3ObjectInputStream inputStream = s3Client.getObject(getObjectRequest).getObjectContent();
-        File file = new File(Paths.get("downloads", key).toString()); // 로컬에 저장할 경로
-
+        File file = new File(Paths.get("file", key).toString()); // 로컬에 저장할 경로
+        file.getParentFile().mkdirs();// [file/폴더/파일명 이렇게 생성됨]
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             byte[] buffer = new byte[1024];
             int length;
