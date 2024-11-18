@@ -1,22 +1,31 @@
 package com.oreo.finalproject_5re5_be.tts.controller;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
-import com.oreo.finalproject_5re5_be.project.entity.Project;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
-import com.oreo.finalproject_5re5_be.tts.entity.Style;
-import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
-import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
+import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
+import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,20 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TtsController.class)
 class TtsControllerTest {
@@ -98,7 +93,7 @@ class TtsControllerTest {
     @WithMockUser
     @Test
     @DisplayName("성공적인 문장 생성 요청 테스트")
-    public void registerSentence_successfulCreation() throws Exception {
+    void registerSentence_successfulCreation() throws Exception {
         // given - 유효한 프로젝트 ID와 문장 생성 요청 객체 초기화
         Long projectSeq = 1L;
         Long voiceSeq = 1L;
@@ -141,7 +136,7 @@ class TtsControllerTest {
     @Test
     @WithMockUser
     @DisplayName("유효성 검증 에러 - 텍스트 필드 누락")
-    public void registerSentence_validationErrorForMissingTextField() throws Exception {
+    void registerSentence_validationErrorForMissingTextField() throws Exception {
         // given - 유효한 프로젝트 ID와 텍스트 필드가 누락된 요청 객체 초기화
         Long projectSeq = 1L;
 
@@ -173,7 +168,7 @@ class TtsControllerTest {
     @Test
     @DisplayName("유효성 검증 에러 - voiceSeq 필드 누락")
     @WithMockUser
-    public void registerSentence_validationErrorForMissingVoiceSeqField() throws Exception {
+    void registerSentence_validationErrorForMissingVoiceSeqField() throws Exception {
         // Given - 유효한 프로젝트 ID와 voiceSeq 필드가 누락된 요청 객체 초기화
         Long projectSeq = 1L;
 
@@ -204,7 +199,7 @@ class TtsControllerTest {
     @Test
     @DisplayName("유효성 검증 에러 - 잘못된 projectSeq")
     @WithMockUser
-    public void registerSentence_validationErrorForInvalidProjectSeq() throws Exception {
+    void registerSentence_validationErrorForInvalidProjectSeq() throws Exception {
         // Given - 잘못된 projectSeq 설정
         Long invalidProjectSeq = -100L;
 
@@ -224,8 +219,6 @@ class TtsControllerTest {
                 post("/api/project/{projectSeq}/tts/sentence", invalidProjectSeq).contentType(
                         MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
                     .with(csrf()))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.response.message", is("projectSeq is invalid")));
             .andExpect(status().is(
                 ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
             .andExpect(
@@ -236,7 +229,7 @@ class TtsControllerTest {
     @Test
     @DisplayName("유효성 검증 에러 - voiceSeq 로 Voice 엔티티를 찾을 수 없는 경우")
     @WithMockUser
-    public void registerSentence_notFoundVoiceEntity() throws Exception {
+    void registerSentence_notFoundVoiceEntity() throws Exception {
         // Given
         Long projectSeq = 1L;
 
@@ -262,7 +255,7 @@ class TtsControllerTest {
     @Test
     @DisplayName("유효성 검증 에러 - 잘못된 styleSeq")
     @WithMockUser
-    public void registerSentence_notFoundStyleEntity() throws Exception {
+    void registerSentence_notFoundStyleEntity() throws Exception {
         // Given - 유효한 projectSeq와 잘못된 styleSeq 설정
         Long projectSeq = 1L;
         TtsSentenceRequest request = TtsSentenceRequest.builder().voiceSeq(1L).styleSeq(-1L)
@@ -283,7 +276,7 @@ class TtsControllerTest {
     @Test
     @DisplayName("유효성 검증 에러 - 잘못된 속성 값")
     @WithMockUser
-    public void registerSentence_validationErrorForInvalidAttributeFields() throws Exception {
+    void registerSentence_validationErrorForInvalidAttributeFields() throws Exception {
         // Given - 유효한 projectSeq와 잘못된 속성 값 설정
         Long projectSeq = 1L;
 
@@ -316,7 +309,7 @@ class TtsControllerTest {
     @Test
     @DisplayName("내부 서버 에러 테스트")
     @WithMockUser
-    public void registerSentence_internalServerError() throws Exception {
+    void registerSentence_internalServerError() throws Exception {
         // Given - 유효한 projectSeq와 요청 객체 설정
         Long projectSeq = 1L;
         TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L)
@@ -386,7 +379,7 @@ class TtsControllerTest {
     @WithMockUser
     @Test
     @DisplayName("성공적인 문장 수정 요청 테스트")
-    public void updateSentence_successfulUpdate() throws Exception {
+    void updateSentence_successfulUpdate() throws Exception {
         // given
         Long projectSeq = 1L;
         Long tsSeq = 1L;
@@ -426,7 +419,7 @@ class TtsControllerTest {
     @WithMockUser
     @Test
     @DisplayName("유효성 검증 실패 - PathVariable이 1 미만")
-    public void updateSentence_validationErrorForInvalidPathVariable() throws Exception {
+    void updateSentence_validationErrorForInvalidPathVariable() throws Exception {
         // given
         Long invalidProjectSeq = 0L;
         Long invalidTsSeq = 0L;
@@ -447,7 +440,7 @@ class TtsControllerTest {
     @WithMockUser
     @Test
     @DisplayName("유효성 검증 실패 - RequestBody 필드 누락")
-    public void updateSentence_validationErrorForInvalidRequestBody() throws Exception {
+    void updateSentence_validationErrorForInvalidRequestBody() throws Exception {
         // given
         Long projectSeq = 1L;
         Long tsSeq = 1L;
@@ -467,7 +460,7 @@ class TtsControllerTest {
     @WithMockUser
     @Test
     @DisplayName("존재하지 않는 projectSeq로 인한 예외")
-    public void updateSentence_notFoundProjectSeq() throws Exception {
+    void updateSentence_notFoundProjectSeq() throws Exception {
         // given
         Long nonExistentProjectSeq = 99999L;
         Long tsSeq = 1L;
@@ -496,7 +489,7 @@ class TtsControllerTest {
     @WithMockUser
     @Test
     @DisplayName("예외 처리 - RuntimeException 발생")
-    public void updateSentence_internalServerError() throws Exception {
+    void updateSentence_internalServerError() throws Exception {
         // given
         Long projectSeq = 1L;
         Long tsSeq = 1L;
@@ -729,11 +722,9 @@ class TtsControllerTest {
         int repeatCount = 10;
         Long projectSeq = 1L;
         Long voiceSeq = 1L;
-        Long styleSeq = 1L;
 
         Project project = createProject(projectSeq);
         Voice voice = createVoice(voiceSeq);
-        Style style = createStyle(styleSeq);
 
         List<TtsSentence> ttsSentenceList = IntStream.range(0, repeatCount)
             .mapToObj(i -> createTtsSentence(project, (long) i, voice, "Test sentence " + i, i))
@@ -804,7 +795,8 @@ class TtsControllerTest {
         mockMvc.perform(get("/api/project/{projectSeq}/tts", invalidProjectSeq)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
-            .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
     // 5. 내부 서버 에러
@@ -822,7 +814,8 @@ class TtsControllerTest {
         mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
-            .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
 
 
@@ -860,12 +853,6 @@ class TtsControllerTest {
             .build();
     }
 
-    private static Style createStyle(Long styleSeq) {
-        return Style.builder().styleSeq(styleSeq) // 스타일 ID 설정
-            .name("Valid style") // 스타일 이름 설정
-            .build();
-    }
-
     private static TtsSentence createTtsSentence(Voice voice, Project project) {
         return TtsSentence.builder().text("Sample TtsSentence").sortOrder(1).volume(50).speed(1.0f)
             .voice(voice).project(project).build();
@@ -881,25 +868,5 @@ class TtsControllerTest {
         String text, int order) {
         return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(order).volume(50).speed(1.0f)
             .voice(voice).project(project).build();
-    }
-
-
-    private static TtsSentenceBatchRequest createBatchRequest(
-        List<TtsSentenceBatchInfo> batchList) {
-        return TtsSentenceBatchRequest.builder()
-            .sentenceList(batchList)
-            .build();
-    }
-
-    private static SentenceInfo createSentenceInfo(Long tsSeq, Long voiceSeq, Long styleSeq,
-        String text, int order, TtsAttributeInfo attributeInfo) {
-        return SentenceInfo.builder()
-            .tsSeq(tsSeq)
-            .voiceSeq(voiceSeq)
-            .styleSeq(styleSeq)
-            .text(text)
-            .order(order)
-            .ttsAttributeInfo(attributeInfo)
-            .build();
     }
 }
