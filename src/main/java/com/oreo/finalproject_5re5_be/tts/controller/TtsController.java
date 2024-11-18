@@ -157,4 +157,17 @@ public class TtsController {
                 .status(HttpStatus.OK)
                 .body(new ResponseDto<>(HttpStatus.OK.value(), response));
     }
+
+    @Operation(summary = "프로젝트 TTS 조회")
+    @GetMapping("")
+    public ResponseEntity<ResponseDto<TtsSentenceListDto>> getSentenceList(
+            @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq) {
+
+        // 프로젝트 TTS 조회
+        TtsSentenceListDto response = ttsSentenceService.getSentenceList(projectSeq);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto<>(HttpStatus.OK.value(), response));
+    }
 }
