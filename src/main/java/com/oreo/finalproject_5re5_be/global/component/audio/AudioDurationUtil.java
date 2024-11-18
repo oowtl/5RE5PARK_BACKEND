@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.audio;
+package com.oreo.finalproject_5re5_be.global.component.audio;
 
 import org.springframework.web.multipart.MultipartFile;
 
