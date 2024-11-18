@@ -538,7 +538,7 @@ class TtsControllerTest {
                     // TtsSentenceBatchInfo 생성 후 batchList에 추가
                     // batchList에 추가할 때마다 processType을 번갈아가며 설정
                     BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
-                    return createBatchInfo(processType, sentenceInfo);
+                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
                 })
                 .toList();
 
@@ -595,7 +595,7 @@ class TtsControllerTest {
                     // TtsSentenceBatchInfo 생성 후 batchList에 추가
                     // batchList에 추가할 때마다 processType을 번갈아가며 설정
                     BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
-                    return createBatchInfo(processType, sentenceInfo);
+                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
                 })
                 .toList();
 
@@ -632,7 +632,7 @@ class TtsControllerTest {
                     // TtsSentenceBatchInfo 생성 후 batchList에 추가
                     // batchList에 추가할 때마다 processType을 번갈아가며 설정
                     BatchProcessType processType = repeatCount % 2 == 0 ? BatchProcessType.CREATE : BatchProcessType.UPDATE;
-                    return createBatchInfo(processType, sentenceInfo);
+                    return TtsSentenceBatchInfo.of(processType, sentenceInfo);
                 })
                 .toList();
 
@@ -718,13 +718,5 @@ class TtsControllerTest {
                 .order(order)
                 .ttsAttributeInfo(attributeInfo)
                 .build();
-    }
-
-    private static TtsSentenceBatchInfo createBatchInfo(BatchProcessType batchProcessType, SentenceInfo sentenceInfo) {
-        return TtsSentenceBatchInfo.builder()
-                .batchProcessType(batchProcessType)
-                .sentence(sentenceInfo)
-                .build();
-
     }
 }
