@@ -16,6 +16,7 @@ import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
+import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -119,18 +120,21 @@ class TtsControllerTest {
         TtsSentenceDto response = TtsSentenceDto.of(ttsSentence);
 
         // 3. TtsSentenceService의 addSentence 메서드에 대한 모의 동작 설정
-        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenReturn(response); // 응답 객체 반환
+        when(ttsSentenceService.addSentence(eq(projectSeq),
+            any(TtsSentenceRequest.class))).thenReturn(response); // 응답 객체 반환
 
         // when
         // 4. 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq) // URL 설정
-                        .contentType(MediaType.APPLICATION_JSON)                // 요청 본문 타입 설정
-                        .content(objectMapper.writeValueAsString(requestBody))      // 요청 본문으로 JSON 데이터를 직렬화하여 전송
-                        .with(csrf()))                                          // CSRF 토큰 추가
-                // Then - 예상 응답 상태와 JSON 구조 확인
-                .andExpect(status().isCreated())                                   // HTTP 상태 201 확인
-                .andExpect(jsonPath("$.status", is(HttpStatus.CREATED.value())))// 응답의 상태가 200인지 확인
-                .andExpect(jsonPath("$.response.sentence").exists());         // JSON 응답에 sentence 필드가 존재하는지 확인
+                .contentType(MediaType.APPLICATION_JSON)                // 요청 본문 타입 설정
+                .content(
+                    objectMapper.writeValueAsString(requestBody))      // 요청 본문으로 JSON 데이터를 직렬화하여 전송
+                .with(csrf()))                                          // CSRF 토큰 추가
+            // Then - 예상 응답 상태와 JSON 구조 확인
+            .andExpect(status().isCreated())                                   // HTTP 상태 201 확인
+            .andExpect(jsonPath("$.status", is(HttpStatus.CREATED.value())))// 응답의 상태가 200인지 확인
+            .andExpect(
+                jsonPath("$.response.sentence").exists());         // JSON 응답에 sentence 필드가 존재하는지 확인
     }
 
     // 2. 텍스트 필드 누락으로 인한 유효성 검증 에러 테스트
@@ -146,21 +150,23 @@ class TtsControllerTest {
         TtsAttributeInfo attributeInfo = createAttributeInfo();
 
         // 텍스트 필드가 없는 요청 객체 생성
-        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L) // 유효한 voiceSeq 설정
-                .styleSeq(1L) // 유효한 styleSeq 설정
-                .text(null)   // 텍스트 필드 누락
-                .order(1)     // 표시 순서 설정
-                .attribute(attributeInfo) // 빈 속성 정보 설정
-                .build();
+        TtsSentenceRequest requestBody = TtsSentenceRequest.builder()
+            .voiceSeq(1L) // 유효한 voiceSeq 설정
+            .styleSeq(1L) // 유효한 styleSeq 설정
+            .text(null)   // 텍스트 필드 누락
+            .order(1)     // 표시 순서 설정
+            .attribute(attributeInfo) // 빈 속성 정보 설정
+            .build();
 
         // when
         // 2. 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq) // URL 설정
-                        .contentType(MediaType.APPLICATION_JSON)              // 요청 본문 타입 설정
-                        .content(objectMapper.writeValueAsString(requestBody)) // 요청 본문으로 JSON 데이터를 직렬화하여 전송
-                        .with(csrf()))
-                // Then - 예상 응답 상태와 오류 메시지 확인
-                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())).andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+                .contentType(MediaType.APPLICATION_JSON)              // 요청 본문 타입 설정
+                .content(objectMapper.writeValueAsString(requestBody)) // 요청 본문으로 JSON 데이터를 직렬화하여 전송
+                .with(csrf()))
+            // Then - 예상 응답 상태와 오류 메시지 확인
+            .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())).andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
     // 3. voiceSeq 필드 누락으로 인한 유효성 검증 에러 테스트
@@ -174,21 +180,24 @@ class TtsControllerTest {
         TtsAttributeInfo attributeInfo = createAttributeInfo();
 
         // 텍스트 필드가 없는 요청 객체 생성
-        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(null) // voiceSeq 필드 누락
-                .styleSeq(1L) // 유효한 styleSeq 설정
-                .text("sample text")   // 텍스트 필드 누락
-                .order(1)     // 표시 순서 설정
-                .attribute(attributeInfo) // 빈 속성 정보 설정
-                .build();
+        TtsSentenceRequest requestBody = TtsSentenceRequest.builder()
+            .voiceSeq(null) // voiceSeq 필드 누락
+            .styleSeq(1L) // 유효한 styleSeq 설정
+            .text("sample text")   // 텍스트 필드 누락
+            .order(1)     // 표시 순서 설정
+            .attribute(attributeInfo) // 빈 속성 정보 설정
+            .build();
 
         // When - 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq) // URL 설정
-                        .contentType(MediaType.APPLICATION_JSON)              // 요청 본문 타입 설정
-                        .content(objectMapper.writeValueAsString(requestBody)) // 요청 본문으로 JSON 데이터를 직렬화하여 전송
-                        .with(csrf()))
-                // Then - 예상 응답 상태와 오류 메시지 확인
-                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
-                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+                .contentType(MediaType.APPLICATION_JSON)              // 요청 본문 타입 설정
+                .content(objectMapper.writeValueAsString(requestBody)) // 요청 본문으로 JSON 데이터를 직렬화하여 전송
+                .with(csrf()))
+            // Then - 예상 응답 상태와 오류 메시지 확인
+            .andExpect(status().is(
+                ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
     // 4. 잘못된 projectSeq로 인한 유효성 검증 에러 테스트
@@ -205,16 +214,22 @@ class TtsControllerTest {
         // 문장 생성 요청 객체 생성
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
-
         // When - 서비스에서 예외 발생을 설정
-        when(ttsSentenceService.addSentence(eq(invalidProjectSeq), any(TtsSentenceRequest.class))).thenThrow(new IllegalArgumentException("projectSeq is invalid"));
+        when(ttsSentenceService.addSentence(eq(invalidProjectSeq),
+            any(TtsSentenceRequest.class))).thenThrow(
+            new IllegalArgumentException("projectSeq is invalid"));
 
         // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", invalidProjectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf()))
+        mockMvc.perform(
+                post("/api/project/{projectSeq}/tts/sentence", invalidProjectSeq).contentType(
+                        MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+                    .with(csrf()))
 //                .andExpect(status().isBadRequest())
 //                .andExpect(jsonPath("$.response.message", is("projectSeq is invalid")));
-                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
-                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+            .andExpect(status().is(
+                ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
     // 5. voiceSeq 로 Voice 엔티티를 찾을 수 없는 경우
@@ -229,13 +244,18 @@ class TtsControllerTest {
         TtsAttributeInfo attributeInfo = createAttributeInfo();
 
         // 문장 생성 요청 객체 생성
-        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(-1L).text("Valid text").attribute(attributeInfo).build();
+        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(-1L)
+            .text("Valid text").attribute(attributeInfo).build();
 
         // When - 서비스에서 예외 발생을 설정
-        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
+        when(ttsSentenceService.addSentence(eq(projectSeq),
+            any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
 
         // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())).andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
+                    MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+                .with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+            .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
     }
 
     // 6. styleSeq로 Style 엔티티를 찾을 수 없는 경우
@@ -245,13 +265,18 @@ class TtsControllerTest {
     public void registerSentence_notFoundStyleEntity() throws Exception {
         // Given - 유효한 projectSeq와 잘못된 styleSeq 설정
         Long projectSeq = 1L;
-        TtsSentenceRequest request = TtsSentenceRequest.builder().voiceSeq(1L).styleSeq(-1L).text("Valid text").build();
+        TtsSentenceRequest request = TtsSentenceRequest.builder().voiceSeq(1L).styleSeq(-1L)
+            .text("Valid text").build();
 
         // When - 서비스에서 예외 발생을 설정
-        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
+        when(ttsSentenceService.addSentence(eq(projectSeq),
+            any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
 
         // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)).with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())).andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
+                    MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))
+                .with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+            .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
     }
 
     // 7. 잘못된 속성 값으로 인한 유효성 검증 에러 테스트
@@ -264,22 +289,27 @@ class TtsControllerTest {
 
         // 속성 정보 객체 생성
         TtsAttributeInfo attributeInfo = TtsAttributeInfo.builder().volume(200) // 유효 범위 초과 설정
-                .speed(1.0f) // 유효한 speed 설정
-                .stPitch(0)  // 유효한 stPitch 설정
-                .emotion("neutral") // 유효한 emotion 설정
-                .emotionStrength(100) // 유효한 emotionStrength 설정
-                .sampleRate(16000) // 유효한 sampleRate 설정
-                .alpha(0) // 유효한 alpha 설정
-                .endPitch(0.0f) // 유효한 endPitch 설정
-                .audioFormat("wav") // 유효한 audioFormat 설정
-                .build(); // 유효한 속성 정보 초기화
+            .speed(1.0f) // 유효한 speed 설정
+            .stPitch(0)  // 유효한 stPitch 설정
+            .emotion("neutral") // 유효한 emotion 설정
+            .emotionStrength(100) // 유효한 emotionStrength 설정
+            .sampleRate(16000) // 유효한 sampleRate 설정
+            .alpha(0) // 유효한 alpha 설정
+            .endPitch(0.0f) // 유효한 endPitch 설정
+            .audioFormat("wav") // 유효한 audioFormat 설정
+            .build(); // 유효한 속성 정보 초기화
 
-        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L).text("Valid text").attribute(attributeInfo) // 유효 범위 초과 설정
-                .build();
+        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L)
+            .text("Valid text").attribute(attributeInfo) // 유효 범위 초과 설정
+            .build();
 
         // When - 서비스에서 예외 발생을 설정
         // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf())).andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())).andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
+                    MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+                .with(csrf())).andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
     // 8. 내부 서버 에러 테스트
@@ -289,13 +319,18 @@ class TtsControllerTest {
     public void registerSentence_internalServerError() throws Exception {
         // Given - 유효한 projectSeq와 요청 객체 설정
         Long projectSeq = 1L;
-        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L).text("Valid text").build();
+        TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(1L)
+            .text("Valid text").build();
 
         // When - 서비스에서 런타임 예외 발생을 설정
-        when(ttsSentenceService.addSentence(eq(projectSeq), any(TtsSentenceRequest.class))).thenThrow(new RuntimeException("Unexpected error"));
+        when(ttsSentenceService.addSentence(eq(projectSeq),
+            any(TtsSentenceRequest.class))).thenThrow(new RuntimeException("Unexpected error"));
 
         // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody)).with(csrf())).andExpect(status().isInternalServerError()).andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
+                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+            .with(csrf())).andExpect(status().isInternalServerError()).andExpect(
+            jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
 
     /*
@@ -369,20 +404,21 @@ class TtsControllerTest {
         TtsSentenceDto response = TtsSentenceDto.of(sentence);
 
         // mock 서비스 동작 설정
-        when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
-                .thenReturn(response);
+        when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq),
+            any(TtsSentenceRequest.class)))
+            .thenReturn(response);
 
         // when
         mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestBody))
-                        .with(csrf()))
-                // then
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
-                .andExpect(jsonPath("$.response.sentence.text", is(sentence.getText())))
-                .andExpect(jsonPath("$.response.sentence.order", is(sentence.getSortOrder())))
-                .andDo(print());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody))
+                .with(csrf()))
+            // then
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
+            .andExpect(jsonPath("$.response.sentence.text", is(sentence.getText())))
+            .andExpect(jsonPath("$.response.sentence.order", is(sentence.getSortOrder())))
+            .andDo(print());
 
     }
 
@@ -398,12 +434,13 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
         // when, then
-        mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", invalidProjectSeq, invalidTsSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestBody))
-                        .with(csrf()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+        mockMvc.perform(
+                put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", invalidProjectSeq, invalidTsSeq)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(requestBody))
+                    .with(csrf()))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
     // 2.2. RequestBody 유효성 검증 실패 - 필드 누락
@@ -414,15 +451,16 @@ class TtsControllerTest {
         // given
         Long projectSeq = 1L;
         Long tsSeq = 1L;
-        TtsSentenceRequest invalidRequestBody = TtsSentenceRequest.builder().build(); // 필드가 없는 요청 객체
+        TtsSentenceRequest invalidRequestBody = TtsSentenceRequest.builder()
+            .build(); // 필드가 없는 요청 객체
 
         // when, then
         mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequestBody))
-                        .with(csrf()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequestBody))
+                .with(csrf()))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
     // 3.1. 존재하지 않는 projectSeq
@@ -437,17 +475,21 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
         // mock 서비스 동작 설정
-        when(ttsSentenceService.updateSentence(eq(nonExistentProjectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
-                .thenThrow(new EntityNotFoundException("Project not found with id: " + nonExistentProjectSeq));
+        when(ttsSentenceService.updateSentence(eq(nonExistentProjectSeq), eq(tsSeq),
+            any(TtsSentenceRequest.class)))
+            .thenThrow(
+                new EntityNotFoundException("Project not found with id: " + nonExistentProjectSeq));
 
         // when, then
-        mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", nonExistentProjectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestBody))
-                        .with(csrf()))
-                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
-                .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
-                .andExpect(jsonPath("$.response.message", is("Project not found with id: " + nonExistentProjectSeq)));
+        mockMvc.perform(
+                put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", nonExistentProjectSeq, tsSeq)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(requestBody))
+                    .with(csrf()))
+            .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+            .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
+            .andExpect(jsonPath("$.response.message",
+                is("Project not found with id: " + nonExistentProjectSeq)));
     }
 
     // 4. 예외 처리 - RuntimeException 발생
@@ -463,17 +505,19 @@ class TtsControllerTest {
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
         // mock 서비스 동작 설정
-        when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq), any(TtsSentenceRequest.class)))
-                .thenThrow(new RuntimeException("Unexpected error"));
+        when(ttsSentenceService.updateSentence(eq(projectSeq), eq(tsSeq),
+            any(TtsSentenceRequest.class)))
+            .thenThrow(new RuntimeException("Unexpected error"));
 
         // when, then
         mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestBody))
-                        .with(csrf()))
-                .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
-                .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())))
-                .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody))
+                .with(csrf()))
+            .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
+            .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())))
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
 
     /*
@@ -538,12 +582,13 @@ class TtsControllerTest {
 
         // when: 컨트롤러 호출
         mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // then: 응답 검증
-                .andExpect(status().isOk()) // HTTP 상태 200 확인
-                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value()))) // 응답 상태 코드 검증
-                .andExpect(jsonPath("$.response.sentence.tsSeq", is(tsSeq.intValue()))) // 반환된 데이터의 tsSeq 검증
-                .andExpect(jsonPath("$.response.sentence.text", is(updatedText))); // 반환된 데이터의 텍스트 검증
+                .contentType(MediaType.APPLICATION_JSON))
+            // then: 응답 검증
+            .andExpect(status().isOk()) // HTTP 상태 200 확인
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value()))) // 응답 상태 코드 검증
+            .andExpect(
+                jsonPath("$.response.sentence.tsSeq", is(tsSeq.intValue()))) // 반환된 데이터의 tsSeq 검증
+            .andExpect(jsonPath("$.response.sentence.text", is(updatedText))); // 반환된 데이터의 텍스트 검증
     }
 
     // 2.1 projectSeq 유효성 검증 실패
@@ -557,11 +602,13 @@ class TtsControllerTest {
 
         // when: 컨트롤러 호출
         mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // then: 응답 검증
-                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
-                .andExpect(jsonPath("$.status", is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))) // 응답 상태 코드 검증
-                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage()))); // 에러 메시지 검증
+                .contentType(MediaType.APPLICATION_JSON))
+            // then: 응답 검증
+            .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
+            .andExpect(
+                jsonPath("$.status", is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))) // 응답 상태 코드 검증
+            .andExpect(jsonPath("$.response.message",
+                is(ErrorCode.INVALID_INPUT_VALUE.getMessage()))); // 에러 메시지 검증
     }
 
     // 2.2 tsSeq 유효성 검증 실패
@@ -575,11 +622,13 @@ class TtsControllerTest {
 
         // when: 컨트롤러 호출
         mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // then: 응답 검증
-                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
-                .andExpect(jsonPath("$.status", is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))) // 응답 상태 코드 검증
-                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage()))); // 에러 메시지 검증
+                .contentType(MediaType.APPLICATION_JSON))
+            // then: 응답 검증
+            .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())) // HTTP 상태 400 확인
+            .andExpect(
+                jsonPath("$.status", is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))) // 응답 상태 코드 검증
+            .andExpect(jsonPath("$.response.message",
+                is(ErrorCode.INVALID_INPUT_VALUE.getMessage()))); // 에러 메시지 검증
     }
 
     // 3. TtsSentence를 찾을 수 없음
@@ -592,15 +641,17 @@ class TtsControllerTest {
         Long tsSeq = 999L;
 
         Mockito.when(ttsSentenceService.getSentence(projectSeq, tsSeq))
-                .thenThrow(new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+            .thenThrow(new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
 
         // when: 컨트롤러 호출
         mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // then: 응답 검증
-                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())) // HTTP 상태 404 확인
-                .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))) // 응답 상태 코드 검증
-                .andExpect(jsonPath("$.response.message", is("TtsSentence not found with id: " + tsSeq))); // 에러 메시지 검증
+                .contentType(MediaType.APPLICATION_JSON))
+            // then: 응답 검증
+            .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus())) // HTTP 상태 404 확인
+            .andExpect(
+                jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))) // 응답 상태 코드 검증
+            .andExpect(jsonPath("$.response.message",
+                is("TtsSentence not found with id: " + tsSeq))); // 에러 메시지 검증
     }
 
     // 4. 내부 서버 에러
@@ -613,81 +664,242 @@ class TtsControllerTest {
         Long tsSeq = 1L;
 
         Mockito.when(ttsSentenceService.getSentence(projectSeq, tsSeq))
-                .thenThrow(new RuntimeException("Unexpected server error"));
+            .thenThrow(new RuntimeException("Unexpected server error"));
 
         // when: 컨트롤러 호출
         mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
-                        .contentType(MediaType.APPLICATION_JSON))
-                // then: 응답 검증
-                .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())) // HTTP 상태 500 확인
-                .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))) // 응답 상태 코드 검증
-                .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage()))); // 에러 메시지 검증
+                .contentType(MediaType.APPLICATION_JSON))
+            // then: 응답 검증
+            .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())) // HTTP 상태 500 확인
+            .andExpect(jsonPath("$.status",
+                is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))) // 응답 상태 코드 검증
+            .andExpect(jsonPath("$.response.message",
+                is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage()))); // 에러 메시지 검증
+    }
+
+    /*
+    테스트 시나리오: getSentenceList 컨트롤러 메서드
+
+    1. **성공적인 조회**
+    - 조건:
+    - 유효한 `projectSeq`가 제공됨.
+    - `projectSeq`에 해당하는 프로젝트가 존재.
+    - 해당 프로젝트에 연관된 `TtsSentence` 엔티티들이 존재.
+    - 기대 결과:
+    - HTTP 상태 코드 200 반환.
+    - 응답 본문에 `TtsSentenceListDto` 객체 포함.
+    - `TtsSentenceListDto`의 `sentences` 필드가 `TtsSentenceDto` 리스트를 포함.
+
+    2. **프로젝트를 찾을 수 없음**
+    - 조건:
+    - 유효한 `projectSeq`가 제공되었으나, 데이터베이스에 해당 프로젝트가 존재하지 않음.
+    - 기대 결과:
+    - HTTP 상태 코드 404 반환.
+    - 응답 본문에 `"Project not found with id: <projectSeq>"` 포함.
+
+    3. **TtsSentence 리스트가 없음**
+    - 조건:
+    - 유효한 `projectSeq`가 제공되고, 프로젝트가 존재.
+    - 해당 프로젝트에 연관된 `TtsSentence` 엔티티가 없음.
+    - 기대 결과:
+    - HTTP 상태 코드 200 반환.
+    - 응답 본문에 비어 있는 `TtsSentenceListDto` 객체 포함.
+
+    4. **유효성 검증 실패 - 잘못된 `projectSeq`**
+    - 조건:
+    - `projectSeq`가 1보다 작은 값으로 제공됨 (예: `0` 또는 `-1`).
+    - 기대 결과:
+    - HTTP 상태 코드 400 반환.
+    - 응답 본문에 `"projectSeq is invalid"` 메시지 포함.
+
+    5. **내부 서버 에러**
+    - 조건:
+    - 서비스 계층에서 예기치 못한 예외 발생 (예: 데이터베이스 연결 문제 등).
+    - 기대 결과:
+    - HTTP 상태 코드 500 반환.
+    - 응답 본문에 `"Internal Server Error"` 포함.
+    */
+
+    // 1. 성공적인 조회
+    @Test
+    @WithMockUser
+    @DisplayName("getSentenceList - 성공적인 조회")
+    void getSentenceList_Success() throws Exception {
+        // given
+        int repeatCount = 10;
+        Long projectSeq = 1L;
+        Long voiceSeq = 1L;
+        Long styleSeq = 1L;
+
+        Project project = createProject(projectSeq);
+        Voice voice = createVoice(voiceSeq);
+        Style style = createStyle(styleSeq);
+
+        List<TtsSentence> ttsSentenceList = IntStream.range(0, repeatCount)
+            .mapToObj(i -> createTtsSentence(project, (long) i, voice, "Test sentence " + i, i))
+            .toList();
+
+        TtsSentenceListDto response = TtsSentenceListDto.of(ttsSentenceList);
+
+        when(ttsSentenceService.getSentenceList(projectSeq)).thenReturn(response);
+
+        // when, then
+        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
+            .andExpect(jsonPath("$.response.sentenceList[0].sentence.tsSeq", is(0)))
+            .andExpect(jsonPath("$.response.sentenceList[1].sentence.text", is("Test sentence 1")));
+    }
+
+    // 2. 프로젝트를 찾을 수 없음
+    @Test
+    @WithMockUser
+    @DisplayName("getSentenceList - 프로젝트를 찾을 수 없음")
+    void getSentenceList_ProjectNotFound() throws Exception {
+        // given
+        Long projectSeq = 999L;
+
+        when(ttsSentenceService.getSentenceList(projectSeq))
+            .thenThrow(new EntityNotFoundException());
+
+        // when, then
+        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+            .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
+            .andExpect(
+                jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
+    }
+
+    // 3. TtsSentence 리스트가 없음
+    @Test
+    @WithMockUser
+    @DisplayName("getSentenceList - TtsSentence 리스트가 없음")
+    void getSentenceList_EmptyList() throws Exception {
+        // given
+        Long projectSeq = 1L;
+
+        TtsSentenceListDto response = TtsSentenceListDto.of(Collections.emptyList());
+
+        when(ttsSentenceService.getSentenceList(projectSeq)).thenReturn(response);
+
+        // when, then
+        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
+            .andExpect(jsonPath("$.response.sentenceList").isEmpty());
+    }
+
+    // 4. 유효성 검증 실패 - 잘못된 projectSeq
+    @Test
+    @WithMockUser
+    @DisplayName("getSentenceList - 유효성 검증 실패")
+    void getSentenceList_InvalidProjectSeq() throws Exception {
+        // given
+        Long invalidProjectSeq = 0L;
+
+        // when, then
+        mockMvc.perform(get("/api/project/{projectSeq}/tts", invalidProjectSeq)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
+            .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+    }
+
+    // 5. 내부 서버 에러
+    @Test
+    @WithMockUser
+    @DisplayName("getSentenceList - 내부 서버 에러")
+    void getSentenceList_InternalServerError() throws Exception {
+        // given
+        Long projectSeq = 1L;
+
+        when(ttsSentenceService.getSentenceList(projectSeq))
+            .thenThrow(new RuntimeException("Unexpected error"));
+
+        // when, then
+        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
+            .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
 
 
     private static TtsAttributeInfo createAttributeInfo() {
         return TtsAttributeInfo.builder().volume(100) // 유효한 volume 설정
-                .speed(1.0f) // 유효한 speed 설정
-                .stPitch(0)  // 유효한 stPitch 설정
-                .emotion("neutral") // 유효한 emotion 설정
-                .emotionStrength(100) // 유효한 emotionStrength 설정
-                .sampleRate(16000) // 유효한 sampleRate 설정
-                .alpha(0) // 유효한 alpha 설정
-                .endPitch(0.0f) // 유효한 endPitch 설정
-                .audioFormat("wav") // 유효한 audioFormat 설정
-                .build(); // 유효한 속성 정보 초기화
+            .speed(1.0f) // 유효한 speed 설정
+            .stPitch(0)  // 유효한 stPitch 설정
+            .emotion("neutral") // 유효한 emotion 설정
+            .emotionStrength(100) // 유효한 emotionStrength 설정
+            .sampleRate(16000) // 유효한 sampleRate 설정
+            .alpha(0) // 유효한 alpha 설정
+            .endPitch(0.0f) // 유효한 endPitch 설정
+            .audioFormat("wav") // 유효한 audioFormat 설정
+            .build(); // 유효한 속성 정보 초기화
     }
 
     private static TtsSentenceRequest createSentenceRequest(TtsAttributeInfo attributeInfo) {
         return TtsSentenceRequest.builder().voiceSeq(1L) // 유효한 voiceSeq 설정
-                .styleSeq(1L) // 유효한 styleSeq 설정
-                .text("Valid text") // 유효한 텍스트 설정
-                .order(1) // 표시 순서 설정
-                .attribute(attributeInfo) // 유효한 속성 정보 설정
-                .build(); // 유효한 요청 객체 초기화
+            .styleSeq(1L) // 유효한 styleSeq 설정
+            .text("Valid text") // 유효한 텍스트 설정
+            .order(1) // 표시 순서 설정
+            .attribute(attributeInfo) // 유효한 속성 정보 설정
+            .build(); // 유효한 요청 객체 초기화
     }
 
     private static Voice createVoice(Long voiceSeq) {
         return Voice.builder().voiceSeq(voiceSeq) // 목소리 ID 설정
-                .name("Valid voice") // 목소리 이름 설정
-                .build();
+            .name("Valid voice") // 목소리 이름 설정
+            .build();
     }
 
     private static Project createProject(Long projectSeq) {
         return Project.builder().proSeq(projectSeq) // 프로젝트 ID 설정
-                .proName("Valid project") // 프로젝트 이름 설정
-                .build();
+            .proName("Valid project") // 프로젝트 이름 설정
+            .build();
     }
 
     private static Style createStyle(Long styleSeq) {
         return Style.builder().styleSeq(styleSeq) // 스타일 ID 설정
-                .name("Valid style") // 스타일 이름 설정
-                .build();
+            .name("Valid style") // 스타일 이름 설정
+            .build();
     }
 
     private static TtsSentence createTtsSentence(Voice voice, Project project) {
-        return TtsSentence.builder().text("Sample TtsSentence").sortOrder(1).volume(50).speed(1.0f).voice(voice).project(project).build();
+        return TtsSentence.builder().text("Sample TtsSentence").sortOrder(1).volume(50).speed(1.0f)
+            .voice(voice).project(project).build();
     }
 
-    private static TtsSentence createTtsSentence(Project project, Long tsSeq, Voice voice, String text) {
-        return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(1).volume(50).speed(1.0f).voice(voice).project(project).build();
+    private static TtsSentence createTtsSentence(Project project, Long tsSeq, Voice voice,
+        String text) {
+        return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(1).volume(50).speed(1.0f)
+            .voice(voice).project(project).build();
+    }
+
+    private static TtsSentence createTtsSentence(Project project, Long tsSeq, Voice voice,
+        String text, int order) {
+        return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(order).volume(50).speed(1.0f)
+            .voice(voice).project(project).build();
     }
 
 
-    private static TtsSentenceBatchRequest createBatchRequest(List<TtsSentenceBatchInfo> batchList) {
+    private static TtsSentenceBatchRequest createBatchRequest(
+        List<TtsSentenceBatchInfo> batchList) {
         return TtsSentenceBatchRequest.builder()
-                .sentenceList(batchList)
-                .build();
+            .sentenceList(batchList)
+            .build();
     }
 
-    private static SentenceInfo createSentenceInfo(Long tsSeq, Long voiceSeq, Long styleSeq, String text, int order, TtsAttributeInfo attributeInfo) {
+    private static SentenceInfo createSentenceInfo(Long tsSeq, Long voiceSeq, Long styleSeq,
+        String text, int order, TtsAttributeInfo attributeInfo) {
         return SentenceInfo.builder()
-                .tsSeq(tsSeq)
-                .voiceSeq(voiceSeq)
-                .styleSeq(styleSeq)
-                .text(text)
-                .order(order)
-                .ttsAttributeInfo(attributeInfo)
-                .build();
+            .tsSeq(tsSeq)
+            .voiceSeq(voiceSeq)
+            .styleSeq(styleSeq)
+            .text(text)
+            .order(order)
+            .ttsAttributeInfo(attributeInfo)
+            .build();
     }
 }
