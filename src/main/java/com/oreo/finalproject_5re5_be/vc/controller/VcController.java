@@ -6,11 +6,13 @@ import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcAudioRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcSrcRequest;
+import com.oreo.finalproject_5re5_be.vc.dto.request.VcSrcUrlRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcTextRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcActivateResponse;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcTextResponse;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcUrlResponse;
+import com.oreo.finalproject_5re5_be.vc.service.VcApiService;
 import com.oreo.finalproject_5re5_be.vc.service.VcService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,12 +37,17 @@ public class VcController {
     private VcService vcService;
     private AudioInfo audioInfo;
     private S3Service s3Service;
+    private VcApiService vcApiService;
 
     @Autowired
-    public VcController(VcService vcService, AudioInfo audioInfo, S3Service s3Service) {
+    public VcController(VcService vcService,
+                        AudioInfo audioInfo,
+                        S3Service s3Service,
+                        VcApiService vcApiService) {
         this.vcService = vcService;
         this.audioInfo = audioInfo;
         this.s3Service = s3Service;
+        this.vcApiService = vcApiService;
     }
 
     @Operation(
@@ -108,39 +115,52 @@ public class VcController {
     )
     @PostMapping("/{srcSeq}/result")
     public ResponseEntity<ResponseDto<Map<String,Object>>> resultSave(
-            @Valid @Parameter(description = "Src Seq") @PathVariable Long srcSeq,
-                                             @RequestParam("src url")String url,
+//            @Valid @Parameter(description = "Src Seq") @PathVariable Long srcSeq,
+//                                             @RequestParam("src url")String url,
+            @Valid @RequestBody List<VcSrcUrlRequest> vcSrcUrlRequest,
                                              @Valid @RequestParam("trg file") MultipartFile trgFile) {
-        String key = url.substring(url.lastIndexOf("/") + 1); //키값만 잘라서 사용하게 변경해야함
-        MultipartFile srcFile;
-        MultipartFile resultFile;
-        try {
-            srcFile = (MultipartFile) s3Service.downloadFile(key);//url에서 파일을 다운로드
-            //srcFile +  trgFile = result file VC API 사용에정
+        List<String> keys = new ArrayList<>();//url의 뒤에 값을 저장할 배열
+        for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
+            //순서대로 짤라서 keys에 저장
+            String key = vcSrcUrlRequest.get(i).getUrl().substring(
+                    vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
+            keys.add(key);
+        }
 
-            //Result파일 설정 API에서 나올 값
-            resultFile = null;
-            //S3에 결과 파일 저장
-            String resultUrl = s3Service.upload(resultFile, "vc/result");
-            //결과 파일 데이터 추출
-            AudioFileInfo info = audioInfo.extractAudioFileInfo(resultFile);
-            //VcAudio 객체 생성
-            VcAudioRequest result = VcAudioRequest.builder()
-                    .seq(srcSeq)
-                    .name(info.getName())
-                    .fileUrl(resultUrl)
-                    .length(info.getLength())
-                    .size(info.getSize())
-                    .extension(info.getExtension())
-                    .build();
-            vcService.resultSave(result);//저장
+        Map<String, Object> map = new HashMap<>();//응답값 생성
+        List<MultipartFile> resultFiles = new ArrayList<>();//파일 저장 배열 생성
+        try {
+            for (int i = 0; i < keys.size(); i++) {
+                //타겟 파일을 VC API 를 통해 ID로 변경
+                String trgID = vcApiService.trgIdCreate(trgFile);
+                //url에서 파일을 다운로드
+                MultipartFile srcFile = (MultipartFile) s3Service.downloadFile(keys.get(i));
+                //srcFile +  trgFile = result file VC API 사용
+                MultipartFile resultFile = vcApiService.resultFileCreate(srcFile, trgID);
+                //생성된 파일들 배열 형태로 저장 추후에 프론트와 상의후 파일로 응답할수 있기때문에
+                resultFiles.add(resultFile);
+                //S3에 결과 파일 저장
+                String resultUrl = s3Service.upload(resultFile, "vc/result");
+                //결과 파일 데이터 추출
+                AudioFileInfo info = audioInfo.extractAudioFileInfo(resultFile);
+                //VcAudio 객체 생성
+                VcAudioRequest result = VcAudioRequest.builder()
+                        .seq(vcSrcUrlRequest.get(i).getSeq())
+                        .name(info.getName())
+                        .fileUrl(resultUrl)
+                        .length(info.getLength())
+                        .size(info.getSize())
+                        .extension(info.getExtension())
+                        .build();
+                VcUrlResponse vcUrlResponse = vcService.resultSave(result);//저장
+                map.put("resultUrl"+vcSrcUrlRequest.get(i).getSeq(),
+                        vcUrlResponse);//입력된 시퀀스 값으로 result 값 저장
+            }
+            map.put("message", "result 파일 저장이 완료되었습니다.");//완료 메시지
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         //응답 생성
-        Map<String, Object> map = new HashMap<>();
-        map.put("converted_vocie", resultFile);
-        map.put("message", "result 파일 저장이 완료되었습니다.");
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), map));
     }
