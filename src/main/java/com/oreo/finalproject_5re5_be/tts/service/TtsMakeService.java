@@ -51,7 +51,7 @@ public class TtsMakeService {
 
     // TTS 생성 서비스
     @Transactional
-    public TtsSentenceDto makeTts(@NotNull Long sentenceSeq) throws Exception {
+    public TtsSentenceDto makeTts(@NotNull Long sentenceSeq) {
         // 0. sentenceSeq 로 행 정보 조회
         TtsSentence ttsSentence = ttsSentenceRepository.findById(sentenceSeq)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 TTS 행입니다. id:"+sentenceSeq));
@@ -75,7 +75,7 @@ public class TtsMakeService {
     }
 
     // TTS 생성
-    private MultipartFile makeTtsAudioFile(@NotNull TtsSentence ttsSentence) throws Exception {
+    private MultipartFile makeTtsAudioFile(@NotNull TtsSentence ttsSentence) {
         // 행 정보로부터 Voice 정보 얻기
         Voice voice = voiceRepository.findByVoiceSeq(ttsSentence.getVoice().getVoiceSeq())
                 .orElseThrow(() -> new EntityNotFoundException("voice 정보를 찾을 수 없습니다."));
