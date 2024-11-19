@@ -5,9 +5,11 @@ import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
+import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
+import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,9 +42,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class TtsController {
 
     private final TtsSentenceService ttsSentenceService;
+    private final TtsMakeService ttsMakeService;
 
-    public TtsController(TtsSentenceService ttsSentenceService) {
+    public TtsController(TtsSentenceService ttsSentenceService, TtsMakeService ttsMakeService) {
         this.ttsSentenceService = ttsSentenceService;
+        this.ttsMakeService = ttsMakeService;
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -191,5 +195,22 @@ public class TtsController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(new ResponseDto<>(HttpStatus.OK.value(), response));
+    }
+
+    @GetMapping("/sentence/{tsSeq}/maketts")
+    public ResponseEntity<ResponseDto<TtsSentenceDto>> makeTts(
+            @Min(value = 1L) @PathVariable Long tsSeq) {
+
+        // tts 생성
+        TtsSentenceDto ttsSentenceDto = ttsMakeService.makeTts(tsSeq);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ResponseDto<>(
+                                HttpStatus.CREATED.value(),
+                                ttsSentenceDto
+                        )
+                );
     }
 }

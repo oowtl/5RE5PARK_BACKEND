@@ -31,10 +31,10 @@ public class AudioConfigGenerator {
         // 2. 객체 생성
         return AudioConfig.newBuilder()
                 .setAudioEncoding(AudioEncoding.LINEAR16)
-                .setVolumeGainDb(speed)
+                .setVolumeGainDb(volume)
                 .setPitch(pitch)
                 .setSampleRateHertz(SAMPLING_RATE)
-                .setSpeakingRate(volume)
+                .setSpeakingRate(speed)
                 .build();
     }
 

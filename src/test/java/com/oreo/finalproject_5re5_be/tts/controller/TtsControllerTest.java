@@ -13,15 +13,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
+import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
+import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
+import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
+import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +46,20 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(TtsController.class)
 class TtsControllerTest {
 
@@ -48,6 +71,9 @@ class TtsControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private TtsMakeService ttsMakeService;
 
     /*
     TtsController 테스트 클래스
@@ -818,6 +844,82 @@ class TtsControllerTest {
                 jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
 
+    /*
+     *  [ tts 생성 컨트롤러 테스트 ]
+     *  1. 존재하는 tts 행 seq로 TTS 생성 요청
+     *  2. 존재하지 않는 tts 행 seq로 TTS 생성 요청
+     *  3. 잘못된 행 seq 값으로 요청
+     * */
+    @WithMockUser
+    @Test
+    @DisplayName("tts 생성 컨트롤러 테스트 - 존재하는 tts 행 seq로 TTS 생성")
+    public void makeTtsTest() throws Exception {
+        // 1. tts sentence seq 설정
+        Long projectSeq = 1L;
+        Long tsSeq = 1L;
+        Long voiceSeq =1L;
+
+        // 2. 응답 객체 생성
+        // TtsSentence 객체 생성
+        TtsSentence ttsSentence = createTtsSentence(tsSeq, createProject(projectSeq), createVoice(voiceSeq), createTtsAudioFile());
+        // TtsSentenceDto 객체 생성
+        TtsSentenceDto response = TtsSentenceDto.of(ttsSentence);
+
+        // 3. TtsMakeService의 makeTts 메서드에 대한 모의 동작 설정
+        Mockito.when(ttsMakeService.makeTts(eq(tsSeq))).thenReturn(response); // 응답 객체 반환
+
+        // 4. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                // 5. 응답 상태와 데이터 확인
+                .andExpect(status().isCreated())                                             // HTTP 상태 201 확인
+                .andExpect(jsonPath("$.status", is(HttpStatus.CREATED.value())))    // 응답 데이터의 상태값이 201인지 확인
+                .andExpect(jsonPath("$.response.sentence").exists());               // JSON 응답에 sentence 필드가 존재하는지
+    }
+
+    @WithMockUser
+    @Test
+    @DisplayName("tts 생성 컨트롤러 테스트 - 존재하는 tts 행 seq로 TTS 생성")
+    public void makeTtsTestNotExistSentence() throws Exception {
+        // 1. tts sentence seq 설정
+        Long tsSeq = 1L;
+        Long projectSeq = 1L;
+
+        // 3. TtsMakeService의 makeTts 메서드 결과로 EntityNotFoundException 예외를 발생하도록 설정
+        String errorMassage = "존재하지 않는 TTS 행입니다. id:"+tsSeq;
+        Mockito.when(ttsMakeService.makeTts(eq(tsSeq))).thenThrow(new EntityNotFoundException(errorMassage));
+
+        // 4. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                // 5. 응답 상태와 데이터 확인
+                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+                .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
+                .andExpect(jsonPath("$.response.message", is(errorMassage)));
+    }
+
+
+    @WithMockUser
+    @Test
+    @DisplayName("tts 생성 컨트롤러 테스트 -잘못된 행 seq 값으로 요청")
+    public void makeTtsTestInvalidSentenceSeq() throws Exception {
+        // 1. tts sentence seq 설정
+        Long tsSeq = -1L;
+        Long projectSeq = 1L;
+
+        // 2. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
+        mockMvc.perform(get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                // 3. 응답 상태가 bad request여야 함
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+    }
+
+
+
 
     private static TtsAttributeInfo createAttributeInfo() {
         return TtsAttributeInfo.builder().volume(100) // 유효한 volume 설정
@@ -853,6 +955,25 @@ class TtsControllerTest {
             .build();
     }
 
+    private static Style createStyle(Long styleSeq) {
+        return Style.builder().styleSeq(styleSeq) // 스타일 ID 설정
+                .name("Valid style") // 스타일 이름 설정
+                .build();
+    }
+
+    private static TtsAudioFile createTtsAudioFile() {
+        return TtsAudioFile.builder()
+                .audioName("project-1-tts-1")
+                .audioPath("/tts/123123_porject-1-tts-1.wav")
+                .audioExtension(".wav")
+                .audioSize("194.3KB")
+                .audioTime(100)
+                .audioPlayYn('y')
+                .downloadCount(0)
+                .downloadYn('y')
+                .build();
+    }
+
     private static TtsSentence createTtsSentence(Voice voice, Project project) {
         return TtsSentence.builder().text("Sample TtsSentence").sortOrder(1).volume(50).speed(1.0f)
             .voice(voice).project(project).build();
@@ -868,5 +989,11 @@ class TtsControllerTest {
         String text, int order) {
         return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(order).volume(50).speed(1.0f)
             .voice(voice).project(project).build();
+    }
+
+    private static TtsSentence createTtsSentence(Long tsSeq, Project project, Voice voice, TtsAudioFile ttsAudioFile) {
+        return TtsSentence.builder()
+                .tsSeq(tsSeq).project(project).voice(voice).ttsAudiofile(ttsAudioFile)
+                .build();
     }
 }

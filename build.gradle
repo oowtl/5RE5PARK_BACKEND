@@ -29,11 +29,12 @@ dependencies {
     // DEVELOP
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-test'
 
     //확장자 변경 라이브러리
     // https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi
     implementation 'com.googlecode.soundlibs:mp3spi:1.9.5-1'
-
+    implementation 'com.googlecode.soundlibs:jlayer:1.0.1.4'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -90,6 +91,11 @@ dependencies {
     // AWS
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
     implementation 'com.amazonaws:aws-java-sdk-s3'
+
+    //http request
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
+    implementation 'org.apache.httpcomponents:httpmime:4.5.13'
 }
 
 test {

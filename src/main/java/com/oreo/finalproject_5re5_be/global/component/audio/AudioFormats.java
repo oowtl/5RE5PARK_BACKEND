@@ -5,6 +5,17 @@ import javax.sound.sampled.AudioFormat;
 public final class AudioFormats {
     private AudioFormats() {}
 
+    public static final AudioFormat MONO_FORMAT_SR441_B32= new AudioFormat(
+            AudioFormat.Encoding.PCM_SIGNED,
+            44100, // 44.1kHz로 변환
+            32,    // 16비트
+            1,     // 모노
+            4,     // 2 bytes/frame
+            44100, // frame rate와 샘플링 레이트 일치
+            false  // 리틀 엔디안
+    );
+
+
     public static final AudioFormat MONO_FORMAT_SR441_B16 = new AudioFormat(
             AudioFormat.Encoding.PCM_SIGNED,
             44100, // 44.1kHz로 변환
@@ -12,6 +23,16 @@ public final class AudioFormats {
             1,     // 모노
             2,     // 2 bytes/frame
             44100, // frame rate와 샘플링 레이트 일치
+            false  // 리틀 엔디안
+    );
+
+    public static final AudioFormat MONO_FORMAT_SR240_B32 = new AudioFormat(
+            AudioFormat.Encoding.PCM_SIGNED,
+            24000, // 44.1kHz로 변환
+            32,    // 16비트
+            1,     // 모노
+            4,     // 2 bytes/frame
+            24000, // frame rate와 샘플링 레이트 일치
             false  // 리틀 엔디안
     );
 
@@ -25,6 +46,16 @@ public final class AudioFormats {
             false  // 리틀 엔디안
     );
 
+    public static final AudioFormat STEREO_FORMAT_SR441_B32 = new AudioFormat(
+            AudioFormat.Encoding.PCM_SIGNED,
+            44100, // 44.1kHz로 변환
+            32,    // 16비트
+            2,     // 스테레오
+            8,     // 4 bytes/frame
+            44100, // frame rate와 샘플링 레이트 일치
+            false  // 리틀 엔디안
+    );
+
     public static final AudioFormat STEREO_FORMAT_SR441_B16 = new AudioFormat(
             AudioFormat.Encoding.PCM_SIGNED,
             44100, // 44.1kHz로 변환
@@ -32,6 +63,16 @@ public final class AudioFormats {
             2,     // 스테레오
             4,     // 4 bytes/frame
             44100, // frame rate와 샘플링 레이트 일치
+            false  // 리틀 엔디안
+    );
+
+    public static final AudioFormat STEREO_FORMAT_SR240_B32 = new AudioFormat(
+            AudioFormat.Encoding.PCM_SIGNED,
+            24000, // 44.1kHz로 변환
+            32,    // 16비트
+            2,     // 스테레오
+            8,     // 4 bytes/frame
+            24000, // frame rate와 샘플링 레이트 일치
             false  // 리틀 엔디안
     );
 
