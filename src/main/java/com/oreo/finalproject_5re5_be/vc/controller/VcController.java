@@ -113,28 +113,23 @@ public class VcController {
             summary = "Result 파일 저장(VC 생성)",
             description = "src seq 와 파일을 받아 Result 파일을 S3와 DB에 저장합니다."
     )
-    @PostMapping("/{srcSeq}/result")
+    @PostMapping("/result")
     public ResponseEntity<ResponseDto<Map<String,Object>>> resultSave(
 //            @Valid @Parameter(description = "Src Seq") @PathVariable Long srcSeq,
 //                                             @RequestParam("src url")String url,
             @Valid @RequestBody List<VcSrcUrlRequest> vcSrcUrlRequest,
                                              @Valid @RequestParam("trg file") MultipartFile trgFile) {
-        List<String> keys = new ArrayList<>();//url의 뒤에 값을 저장할 배열
-        for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
-            //순서대로 짤라서 keys에 저장
-            String key = vcSrcUrlRequest.get(i).getUrl().substring(
-                    vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
-            keys.add(key);
-        }
-
         Map<String, Object> map = new HashMap<>();//응답값 생성
         List<MultipartFile> resultFiles = new ArrayList<>();//파일 저장 배열 생성
         try {
-            for (int i = 0; i < keys.size(); i++) {
+            for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
+                //순서대로 짤라서 keys에 저장
+                String key = vcSrcUrlRequest.get(i).getUrl().substring(
+                        vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
                 //타겟 파일을 VC API 를 통해 ID로 변경
                 String trgID = vcApiService.trgIdCreate(trgFile);
                 //url에서 파일을 다운로드
-                MultipartFile srcFile = (MultipartFile) s3Service.downloadFile(keys.get(i));
+                MultipartFile srcFile = (MultipartFile) s3Service.downloadFile(key);
                 //srcFile +  trgFile = result file VC API 사용
                 MultipartFile resultFile = vcApiService.resultFileCreate(srcFile, trgID);
                 //생성된 파일들 배열 형태로 저장 추후에 프론트와 상의후 파일로 응답할수 있기때문에
@@ -158,7 +153,7 @@ public class VcController {
             }
             map.put("message", "result 파일 저장이 완료되었습니다.");//완료 메시지
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         //응답 생성
         return ResponseEntity.ok()

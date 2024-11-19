@@ -44,7 +44,7 @@ public class VcApiServiceImpl implements VcApiService{
             builder.addBinaryBody(
                     "files",                         // 필드 이름
                     file.getInputStream(),           // 파일 데이터
-                    ContentType.create("audio/wav"), // MIME 타입
+                    ContentType.create(file.getContentType()), // MIME 타입
                     file.getOriginalFilename()       // 파일 이름
             );//파일 입력
             post.setEntity(builder.build());
@@ -83,7 +83,7 @@ public class VcApiServiceImpl implements VcApiService{
             builder.addBinaryBody(
                     "audio",                         // 필드 이름
                     file.getInputStream(),           // 파일 데이터
-                    ContentType.create("audio/wav"), // MIME 타입
+                    ContentType.create(file.getContentType()), // MIME 타입
                     file.getOriginalFilename()       // 파일 이름
             );//파일 값 입력
             //요청

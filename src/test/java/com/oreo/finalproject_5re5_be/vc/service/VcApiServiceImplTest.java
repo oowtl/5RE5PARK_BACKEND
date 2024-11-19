@@ -75,31 +75,31 @@
 //        return destinationFile.getAbsolutePath();
 //    }
 //    @Test
-//    @Disabled
-//    @DisabledOnOs({OS.LINUX})
 //    @DisplayName("타겟파일을 ID로 만들고 ID와 소스파일로 결과 파일을 만드는 테스트 코드")
 //    public void resultTest() throws IOException {
-//        FileInputStream inputStream = new FileInputStream("");//Trg 파일 입력
+//        File file = new File("jangminwoo.m4a");
+//        FileInputStream inputStream = new FileInputStream(file);//Trg 파일 입력
 //
 //        // MockMultipartFile 생성
 //        MultipartFile multipartFile = new MockMultipartFile(
-//                "test",                       // 필드 이름
+//                file.getName(),                       // 필드 이름
 //                "test.wav",                   // 파일 이름
-//                "text/plain",                 // MIME 타입
+//                "audio/wav",                 // MIME 타입
 //                inputStream                   // 파일 데이터
 //        );
 //        String s = vcApiService.trgIdCreate(multipartFile);//trg ID 생성
 //
-//        FileInputStream inputStream2 = new FileInputStream("");//소스파일 입력
+//        File file2 = new File("junrujang.mp3");
+//        FileInputStream inputStream2 = new FileInputStream(file2);//소스파일 입력
 //
 //        // MockMultipartFile 생성
 //        MultipartFile multipartFile2 = new MockMultipartFile(
-//                "test",                       // 필드 이름
+//                file2.getName(),                       // 필드 이름
 //                "test.wav",                   // 파일 이름
-//                "text/plain",                 // MIME 타입
+//                "audio/wav",                 // MIME 타입
 //                inputStream2                  // 파일 데이터
 //        );
-//        MultipartFile file = vcApiService.resultFileCreate(multipartFile2, s);//Trg Id 소스파일로 결과 파일 생성
-//        saveMultipartFileToProjectRoot(file, "result.mp3");//파일 저장
+//        MultipartFile multipartFile1 = vcApiService.resultFileCreate(multipartFile2, s);//Trg Id 소스파일로 결과 파일 생성
+//        saveMultipartFileToProjectRoot(multipartFile1, "result.mp3");//파일 저장
 //    }
 //}
