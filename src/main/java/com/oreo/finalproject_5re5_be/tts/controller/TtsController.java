@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -212,5 +213,22 @@ public class TtsController {
                                 ttsSentenceDto
                         )
                 );
+    }
+
+    @Operation(summary = "TTS 문장 삭제 요청")
+    @DeleteMapping("/sentence/{tsSeq}")
+    public ResponseEntity<ResponseDto<String>> deleteSentence(
+        @ Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+        @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq) {
+
+        // 문장 삭제
+        boolean response = ttsSentenceService.deleteSentence(projectSeq, tsSeq);
+
+        // 응답 메시지
+        String message = response ? "삭제 성공" : "삭제 실패";
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(new ResponseDto<>(HttpStatus.OK.value(), message));
     }
 }
