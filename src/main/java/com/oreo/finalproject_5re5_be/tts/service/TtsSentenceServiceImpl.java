@@ -253,4 +253,17 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 3. TtsSentenceDto 리스트 변환 및 반환
         return TtsSentenceListDto.of(ttsSentenceList);
     }
+
+    @Override
+    public boolean deleteSentence(Long projectSeq, Long tsSeq) {
+        // 1. TtsSentence 엔티티 조회
+        TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
+                .orElseThrow(EntityNotFoundException::new);
+
+        // 2. TtsSentence 삭제 (TtsSentence 만 삭제)
+        ttsSentenceRepository.delete(ttsSentence);
+
+        // 3. 결과 반환
+        return true;
+    }
 }
