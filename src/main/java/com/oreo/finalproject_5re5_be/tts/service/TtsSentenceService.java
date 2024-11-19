@@ -12,4 +12,5 @@ public interface TtsSentenceService {
     TtsSentenceDto updateSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq, @Valid TtsSentenceRequest updateRequest);
     TtsSentenceListDto batchSaveSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceBatchRequest batchRequest);
     TtsSentenceDto getSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq);
+    TtsSentenceListDto getSentenceList(@Valid @NotNull Long projectSeq);
 }
