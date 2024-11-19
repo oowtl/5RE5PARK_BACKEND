@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.ErrorResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
@@ -25,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -143,8 +145,15 @@ public class MemberController {
                             .build();
     }
 
+    @DeleteMapping("/{memberSeq}")
+    public ResponseEntity<Void> remove(@PathVariable("memberSeq") Long memberSeq, @Valid @RequestBody MemberRemoveRequest request) {
+        // 삭제 처리
+        memberService.remove(memberSeq, request);
+        // 응답 반환
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
 
-    // 회원 프로필 정보 조회 처리(회원 단순 조회, 회원 프로젝트 내역 조회)
 
 
     // 유효성 검증 실패시 에러 메시지 생성
