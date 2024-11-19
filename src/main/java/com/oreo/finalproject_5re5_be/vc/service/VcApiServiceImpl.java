@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -47,11 +49,19 @@ public class VcApiServiceImpl implements VcApiService{
                     ContentType.create(file.getContentType()), // MIME 타입
                     file.getOriginalFilename()       // 파일 이름
             );//파일 입력
+            // remove_background_noise 추가
+            builder.addTextBody("remove_background_noise", "true", ContentType.TEXT_PLAIN);
             post.setEntity(builder.build());
 
             // 요청 실행 및 응답 처리
             try (CloseableHttpResponse response = httpClient.execute(post)) {
-                trgId = extractValue(new String(response.getEntity().getContent().readAllBytes()),"voice_id");
+                int statusCode = response.getStatusLine().getStatusCode(); // 상태 코드 확인
+                String responseBody = new String(response.getEntity().getContent().readAllBytes()); // 응답 본문 읽기
+                if (statusCode >= 400) { // 클라이언트 또는 서버 오류
+                    log.error("Error occurred: Status code {}, Response body: {}", statusCode, trgId);
+                    throw new IllegalArgumentException("Request failed with status code: " + statusCode);
+                }
+                trgId = extractValue(responseBody, "voice_id");
                 if (trgId == null){
                     throw new IllegalArgumentException("voice_id is null");
                 }
@@ -63,6 +73,7 @@ public class VcApiServiceImpl implements VcApiService{
         log.info("trgIdResult : {} ", trgId);
         return trgId;
     }
+
 
     @Override
     public MultipartFile resultFileCreate(MultipartFile file, String trgId) {
@@ -86,10 +97,18 @@ public class VcApiServiceImpl implements VcApiService{
                     ContentType.create(file.getContentType()), // MIME 타입
                     file.getOriginalFilename()       // 파일 이름
             );//파일 값 입력
+
+            // remove_background_noise 추가
+            builder.addTextBody("remove_background_noise", "true", ContentType.TEXT_PLAIN);
             //요청
             post.setEntity(builder.build());
             // 요청 실행 및 응답 처리
             try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode(); // 상태 코드 확인
+                if (statusCode >= 400) { // 클라이언트 또는 서버 오류
+                    log.error("Error occurred: Status code {}, Response body: {}", statusCode);
+                    throw new IllegalArgumentException("Request failed with status code: " + statusCode);
+                }
                 //응답 오디오 inputStream
                 InputStream inputStream = response.getEntity().getContent();
 
@@ -108,6 +127,51 @@ public class VcApiServiceImpl implements VcApiService{
         return multipartFile;
     }
 
+    @Override
+    public List<MultipartFile> resultFileCreate(List<MultipartFile> files, String trgId) {
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            for (MultipartFile file : files) {
+                if(file.isEmpty()) {//파일이 없을경우 에러
+                    throw new VcAPIFilesIsEmptyException("vc api empty file");
+                }
+                //api 주소 값 입력, 나오는 오디오 포켓은 mp3_44100_192 지정
+                String url = vcUrl + "/speech-to-speech/"+trgId+"?output_format=mp3_44100_192";
+                HttpPost post = new HttpPost(url);
+                //api 키 값 입력
+                post.setHeader("xi-api-key", vcApiKey);
+
+                // Multipart 요청 작성
+                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                //요청할 값
+                builder.addBinaryBody(
+                        "audio",                         // 필드 이름
+                        file.getInputStream(),           // 파일 데이터
+                        ContentType.create(file.getContentType()), // MIME 타입
+                        file.getOriginalFilename()       // 파일 이름
+                );//파일 값 입력
+                //요청
+                post.setEntity(builder.build());
+                // 요청 실행 및 응답 처리
+                try (CloseableHttpResponse response = httpClient.execute(post)) {
+                    //응답 오디오 inputStream
+                    InputStream inputStream = response.getEntity().getContent();
+
+                    String filename = "response.wav";
+                    log.info("input stream : {} ", inputStream);
+                    MultipartFile multipartFile = convertInputStreamToMultipartFile(inputStream,
+                            filename,
+                            "audio/wav");//multipartfile로 변경
+                    multipartFiles.add(multipartFile);
+                    // 서버가 반환한 파일 이름 (수동 설정)
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return multipartFiles;
+    }
     // JSON에서 특정 키의 값을 추출하는 간단한 메서드
     private static String extractValue(String json, String key) {
         String keyPattern = "\"" + key + "\":\"";

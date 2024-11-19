@@ -2,6 +2,8 @@ package com.oreo.finalproject_5re5_be.vc.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface VcApiService {
     /**
      * 1. TRG ID 값 생성 및 추출
@@ -9,4 +11,5 @@ public interface VcApiService {
      */
     String trgIdCreate(MultipartFile file);
     MultipartFile resultFileCreate(MultipartFile file, String trgId);
+    List<MultipartFile> resultFileCreate(List<MultipartFile> files, String trgId);
 }

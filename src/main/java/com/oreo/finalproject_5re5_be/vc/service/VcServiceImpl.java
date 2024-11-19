@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.vc.service;
 
+import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
@@ -74,6 +75,33 @@ public class VcServiceImpl implements VcService{
                 .url(save.getFileUrl())
                 .build();
     }
+    @Override
+    @Transactional
+    public List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequests) {
+        List<VcUrlResponse> srcUrl = new ArrayList<>();
+        for (VcSrcRequest vcSrcRequest : vcSrcRequests) {
+            //프로젝트 조회, 객체 생성후 저장
+            Vc vc = projectFind(vcSrcRequest.getSeq());
+
+            //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 SRC 객체 생성
+            VcSrcFile src = VcSrcFile.builder()
+                    .vc(vc)
+                    .rowOrder(vcSrcRequest.getRowOrder())
+                    .fileName(vcSrcRequest.getName())
+                    .fileUrl(vcSrcRequest.getFileUrl())
+                    .fileLength(vcSrcRequest.getLength())
+                    .fileSize(vcSrcRequest.getSize())
+                    .extension(vcSrcRequest.getExtension()).build();
+            log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
+            VcSrcFile save = vcSrcFileRepository.save(src);// SRC 객체 저장
+            log.info("[vcService] save 확인 : {} ", save);
+            srcUrl.add(VcUrlResponse.builder()//response 객체 생성
+                    .seq(save.getSrcSeq())
+                    .url(save.getFileUrl())
+                    .build());
+        }
+        return srcUrl;
+    }
 
     /**
      * VC Trg 파일 저장
@@ -130,6 +158,32 @@ public class VcServiceImpl implements VcService{
                 .build();
     }
 
+    @Transactional
+    public List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests) {
+        List<VcUrlResponse> resultFiles = new ArrayList<>();
+        for (VcAudioRequest vcAudioRequest : vcAudioRequests) {
+            //SRCFile 조회
+            VcSrcFile srcFile = vcSrcFileFind(vcAudioRequest.getSeq());
+            log.info("[vcService] ResultSave srcFile find : {} ", srcFile);// SRC 확인
+
+            //프로젝트 조회한 값과 SRC 조회한 값, 입력한 값을 저장하기 위한 ResultFile 객체 생성
+            VcResultFile result = VcResultFile.builder()
+                    .srcSeq(srcFile)
+                    .fileName(vcAudioRequest.getName())
+                    .fileUrl(vcAudioRequest.getFileUrl())
+                    .fileLength(vcAudioRequest.getLength())
+                    .fileSize(vcAudioRequest.getSize())
+                    .extension(vcAudioRequest.getExtension()).build();
+            log.info("[vcService] Save result 생성 : {}", result); // Result 객체 생성 확인
+            VcResultFile save = vcResultFileRepository.save(result);// result 객체 저장
+            resultFiles.add(VcUrlResponse.builder()//response 객체 생성
+                    .seq(save.getResSeq())
+                    .url(save.getFileUrl())
+                    .build());
+        }
+        return resultFiles;
+    }
+
 
     /**
      * Text 저장 기능
@@ -158,6 +212,40 @@ public class VcServiceImpl implements VcService{
                 .text(save.getComment())
                 .build();
     }
+
+    /**
+     * 리스트로 텍스트 저장
+     * @param vcTextRequests
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequests) {
+        List<VcTextResponse> textReturn = new ArrayList<>();
+        for (VcTextRequest vcTextRequest : vcTextRequests) {
+            //SRC 조회
+            VcSrcFile srcFile = vcSrcFileFind(vcTextRequest.getSeq());
+
+            log.info("[vcService] TextSave srcFile find : {} ", srcFile);//SRC 확인
+
+            //SRC 조회한 값과 프로젝트 조회한 값, 입력 값 저장하기 위한 TextFile 객체 생성
+            VcText text = VcText.builder()
+                    .srcSeq(srcFile)
+                    .comment(vcTextRequest.getText())
+                    .length(String.valueOf(vcTextRequest.getText().length()))
+                    .build();
+            log.info("[vcService] Save text 생성 : {}", text);//Text 객체 생성 값 확인
+
+            VcText save = vcTextRepository.save(text);//Text 객체 저장
+
+            textReturn.add(VcTextResponse.builder()//response 객체 생성
+                    .seq(save.getVtSeq())
+                    .text(save.getComment())
+                    .build());
+        }
+        return textReturn;
+    }
+
 
     /**
      * 프로젝트 VC 탭 조회 기능
@@ -319,6 +407,33 @@ public class VcServiceImpl implements VcService{
                 .build();
     }
 
+    /**
+     * 삭제 리스트로 변경
+     * @param seqs
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs) {
+        List<VcActivateResponse> vcActivateResponseList = new ArrayList<>();
+        for (Long seq : seqs) {
+            //SRC seq 로 SRC 값 조회 검증
+            VcSrcFile vcSrcFile = vcSrcFileFind(seq);
+            //활성화 상태 N로 변경
+            VcSrcFile deleteSrcFile = vcSrcFile.toBuilder()
+                    .srcSeq(vcSrcFile.getSrcSeq())
+                    .activate('N')
+                    .build();
+            log.info("[vcService] deleteSrcFile vcSrcFile find : {} ", deleteSrcFile);//변경 확인
+            VcSrcFile save = vcSrcFileRepository.save(deleteSrcFile);//활성화상태 변경
+            vcActivateResponseList.add(VcActivateResponse.builder()
+                    .seq(save.getSrcSeq())
+                    .activate(save.getActivate())
+                    .build());
+        }
+        return vcActivateResponseList;
+    }
+
     //VcSrcFile 찾는 메서드
     private VcSrcFile vcSrcFileFind(Long seq){
         return vcSrcFileRepository.findById(seq)
@@ -329,11 +444,10 @@ public class VcServiceImpl implements VcService{
         Project project = projectRepository.findById(seq)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
         log.info("[vcService] TextSave Project find : {} ", project);//프로젝트 확인
-        Vc vc = Vc.builder()
+        Vc vcSave = vcRepository.save(Vc.builder()
                 .proSeq(project)
-                .build();
-        vcRepository.save(vc);
-        return vc;
+                .build());
+        return vcSave;
     }
     //VcResultFile 찾는 메서드
     private VcResultFile vcResultFind(Long seq){
@@ -345,4 +459,97 @@ public class VcServiceImpl implements VcService{
         return vcTextRepository.findById(seq)
                 .orElseThrow(() -> new IllegalArgumentException("Text not found"));
     }
+
+    /**
+     * VCSrcRequest 객체 생성
+     * @param audioFileInfos
+     * @param upload
+     * @param proSeq
+     * @return
+     */
+    @Override
+    public List<VcSrcRequest> vcSrcRequestBuilder(List<AudioFileInfo> audioFileInfos,
+                                                          List<String> upload,
+                                                          Long proSeq){
+        List<VcSrcRequest> requests = new ArrayList<>();
+        for (int i = 0; i < audioFileInfos.size(); i++) {
+            AudioFileInfo info = audioFileInfos.get(i);
+            String fileUrl = upload.get(i);
+            VcSrcRequest request = VcSrcRequest.builder()
+                    .seq(proSeq)
+                    .rowOrder(1)
+                    .name(info.getName())
+                    .fileUrl(fileUrl)
+                    .length(info.getLength())
+                    .size(info.getSize())
+                    .extension(info.getExtension())
+                    .build();
+            requests.add(request);
+        }
+        return requests;
+    }
+
+    /**
+     * VcAudioRequest 객체 생성
+     * @param proSeq
+     * @param info
+     * @param url
+     * @return
+     */
+    @Override
+    public VcAudioRequest audioRequestBuilder(Long proSeq, AudioFileInfo info, String url) {
+        return VcAudioRequest.builder()
+                .seq(proSeq)
+                .name(info.getName())
+                .fileUrl(url)
+                .length(info.getLength())
+                .size(info.getSize())
+                .extension(info.getExtension())
+                .build();
+    }
+
+    /**
+     * VCAudioRequest 객체 생성
+     * @param vcSrcUrlRequest
+     * @param info
+     * @param url
+     * @return
+     */
+    @Override
+    public List<VcAudioRequest> audioRequestBuilder(List<VcSrcUrlRequest> vcSrcUrlRequest, List<AudioFileInfo> info, List<String> url) {
+        List<VcAudioRequest> result = new ArrayList<>();
+        for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
+            VcAudioRequest vc = VcAudioRequest.builder()
+                    .seq(vcSrcUrlRequest.get(i).getSeq())
+                    .name(info.get(i).getName())
+                    .fileUrl(url.get(i))
+                    .length(info.get(i).getLength())
+                    .size(info.get(i).getSize())
+                    .extension(info.get(i).getExtension())
+                    .build();
+            result.add(vc);
+        }
+        return result;
+    }
+
+    /**
+     * VcTextRequest 객체 생성
+     * @param srcSeq
+     * @param text
+     * @return
+     */
+    @Override
+    public List<VcTextRequest> vcTextResponses(List<Long> srcSeq, List<String> text) {
+        List<VcTextRequest> vcTextResponses = new ArrayList<>();
+        for (int i = 0; i < srcSeq.size(); i++) {
+            VcTextRequest textRequest = VcTextRequest.builder()//Text 객체 생성
+                    .seq(srcSeq.get(i))
+                    .text(text.get(i))
+                    .build();
+            vcTextResponses.add(textRequest);
+        }
+        return vcTextResponses;
+    }
+
+
 }

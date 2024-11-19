@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.vc.service;
 
 
+import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
 import jakarta.validation.Valid;
@@ -40,7 +41,13 @@ public interface VcService {
     VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
     VcTextResponse textSave(@Valid @NotNull VcTextRequest vcTextRequest);
 
-    List<VcResponse> getVcResponse(@Valid @NotNull Long ProjectSeq);
+    //리스트로 뽑기 위해 오버로딩하여 추가 작성
+    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest);
+    List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequest);
+    List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests);
+
+    List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq);
+
     VcUrlResponse getSrcFile(@Valid @NotNull Long seq);
     VcUrlResponse getResultFile(@Valid @NotNull Long seq);
 
@@ -48,4 +55,14 @@ public interface VcService {
     VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
 
     VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
+    List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs);
+
+    List<VcSrcRequest> vcSrcRequestBuilder(List<AudioFileInfo> audioFileInfos,
+                                                   List<String> upload,
+                                                   Long proSeq);
+
+    VcAudioRequest audioRequestBuilder(Long proSeq, AudioFileInfo info, String url);
+    List<VcAudioRequest> audioRequestBuilder(List<VcSrcUrlRequest> vcSrcUrlRequest, List<AudioFileInfo> info, List<String> url);
+
+    List<VcTextRequest> vcTextResponses(List<Long> srcSeq, List<String> text);
 }

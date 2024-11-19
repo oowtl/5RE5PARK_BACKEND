@@ -25,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -58,27 +59,13 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> srcSave(@Valid @Parameter(description = "프로젝트 ID")
                                                                         @PathVariable Long proSeq,
                                                                    @Valid @RequestParam List<MultipartFile> file) {
-        List<VcUrlResponse> responses = new ArrayList<>();
-        for (int i = 0; i < file.size(); i++) {
-            //들어온 파일을 검사해서 확장자, 길이, 이름, 크기를 추출
-            AudioFileInfo info = audioInfo.extractAudioFileInfo(file.get(i));
-            //파일을 S3에 업로드
-            String fileUrl = s3Service.upload(file.get(i), "vc/src");
-            //DB에 저장할 객체 생성
-            VcSrcRequest request = VcSrcRequest.builder()
-                    .seq(proSeq)
-                    .rowOrder(1)
-                    .name(info.getName())
-                    .fileUrl(fileUrl)
-                    .length(info.getLength())
-                    .size(info.getSize())
-                    .extension(info.getExtension())
-                    .build();
-            VcUrlResponse response = vcService.srcSave(request);//저장
-            responses.add(response);//배열로 저장
-        }
+        List<AudioFileInfo> audioFileInfos = audioInfo.extractAudioFileInfo(file);//배열로 받은 파일 정보 추출
+        List<String> upload = s3Service.upload(file, "vc/src");//파일 업로드
+        //저장을 위한 파일 정보로 객체 생성
+        List<VcSrcRequest> vcSrcRequests = vcService.vcSrcRequestBuilder(audioFileInfos, upload, proSeq);
+        List<VcUrlResponse> vcUrlResponses = vcService.srcSave(vcSrcRequests);//객체 저장
         return ResponseEntity.ok()
-                .body(new ResponseDto<>(HttpStatus.OK.value(),mapCreate(responses,
+                .body(new ResponseDto<>(HttpStatus.OK.value(),mapCreate(vcUrlResponses,
                         "src 파일 저장 완료되었습니다.")));
     }
 
@@ -96,14 +83,7 @@ public class VcController {
         //파일을 S3에 업로드
         String trgUrl = s3Service.upload(file, "vc/trg");
         //DB에 저장할 객체 생성
-        VcAudioRequest trg = VcAudioRequest.builder()
-                .seq(proSeq)
-                .name(info.getName())
-                .fileUrl(trgUrl)
-                .length(info.getLength())
-                .size(info.getSize())
-                .extension(info.getExtension())
-                .build();
+        VcAudioRequest trg = vcService.audioRequestBuilder(proSeq, info, trgUrl);
         vcService.trgSave(trg);//저장
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), "TRG 파일 저장이 완료되었습니다."));
@@ -117,44 +97,30 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String,Object>>> resultSave(
 //            @Valid @Parameter(description = "Src Seq") @PathVariable Long srcSeq,
 //                                             @RequestParam("src url")String url,
-            @Valid @RequestBody List<VcSrcUrlRequest> vcSrcUrlRequest,
-                                             @Valid @RequestParam("trg file") MultipartFile trgFile) {
+            @Valid @RequestParam List<VcSrcUrlRequest> vcSrcUrlRequest,
+                                             @Valid @RequestParam("trg file") MultipartFile trgFile)  {
         Map<String, Object> map = new HashMap<>();//응답값 생성
         List<MultipartFile> resultFiles = new ArrayList<>();//파일 저장 배열 생성
+        String trgId = vcApiService.trgIdCreate(trgFile);//TRG ID 생성
+        List<MultipartFile> srcFile = null;
         try {
-            for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
-                //순서대로 짤라서 keys에 저장
-                String key = vcSrcUrlRequest.get(i).getUrl().substring(
-                        vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
-                //타겟 파일을 VC API 를 통해 ID로 변경
-                String trgID = vcApiService.trgIdCreate(trgFile);
-                //url에서 파일을 다운로드
-                MultipartFile srcFile = (MultipartFile) s3Service.downloadFile(key);
-                //srcFile +  trgFile = result file VC API 사용
-                MultipartFile resultFile = vcApiService.resultFileCreate(srcFile, trgID);
-                //생성된 파일들 배열 형태로 저장 추후에 프론트와 상의후 파일로 응답할수 있기때문에
-                resultFiles.add(resultFile);
-                //S3에 결과 파일 저장
-                String resultUrl = s3Service.upload(resultFile, "vc/result");
-                //결과 파일 데이터 추출
-                AudioFileInfo info = audioInfo.extractAudioFileInfo(resultFile);
-                //VcAudio 객체 생성
-                VcAudioRequest result = VcAudioRequest.builder()
-                        .seq(vcSrcUrlRequest.get(i).getSeq())
-                        .name(info.getName())
-                        .fileUrl(resultUrl)
-                        .length(info.getLength())
-                        .size(info.getSize())
-                        .extension(info.getExtension())
-                        .build();
-                VcUrlResponse vcUrlResponse = vcService.resultSave(result);//저장
-                map.put("resultUrl"+vcSrcUrlRequest.get(i).getSeq(),
-                        vcUrlResponse);//입력된 시퀀스 값으로 result 값 저장
-            }
-            map.put("message", "result 파일 저장이 완료되었습니다.");//완료 메시지
+            srcFile = s3Service.downloadFile(vcSrcUrlRequest);//SRC 파일 다운로드(서버에 저장)
+            s3Service.deleteFolder(new File("file"));//SRC 파일 삭제(서버에서 삭제)
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+        //결과 파일 생성(VC API)
+        List<MultipartFile> resultFile = vcApiService.resultFileCreate(srcFile, trgId);
+        //결과 s3 저장
+        List<String> resultUrl = s3Service.upload(resultFiles, "vc/result");
+        //결과 파일 정보 추출
+        List<AudioFileInfo> info = audioInfo.extractAudioFileInfo(resultFile);
+        //결과 파일 정보들 가지고 객체 생성
+        List<VcAudioRequest> requests = vcService.audioRequestBuilder(vcSrcUrlRequest, info, resultUrl);
+        //객체 저장
+        List<VcUrlResponse> vcUrlResponses = vcService.resultSave(requests);
+        map.put("result", vcUrlResponses);
+        map.put("message", "result 파일 저장이 완료되었습니다.");//완료 메시지
         //응답 생성
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), map));
@@ -168,18 +134,13 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> textSave(@Valid @Parameter(description = "Src Seq")
                                                                                @RequestParam  List<Long> srcSeq,
                                            @Valid @RequestBody List<String> text){
-        List<VcTextResponse> responses = new ArrayList<>();
-        for (int i = 0; i < srcSeq.size(); i++) {
-            VcTextRequest textRequest = VcTextRequest.builder()//Text 객체 생성
-                    .seq(srcSeq.get(i))
-                    .text(text.get(i))
-                    .build();
-            VcTextResponse vcTextResponse = vcService.textSave(textRequest);//저장
-            responses.add(vcTextResponse);//응답 값 저장
-        }
+        //객체 생성
+        List<VcTextRequest> vcTextRequests = vcService.vcTextResponses(srcSeq, text);
+        //저장
+        List<VcTextResponse> vcTextResponses = vcService.textSave(vcTextRequests);
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
-                        mapCreate(responses,
+                        mapCreate(vcTextResponses,
                         "text 저장 완료되었습니다.")));
     }
 
@@ -231,16 +192,11 @@ public class VcController {
     )
     @DeleteMapping("/src")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(@Valid @RequestBody List<Long> srcSeq){
-        List<VcActivateResponse> responses = new ArrayList<>();
-        for (int i = 0; i < srcSeq.size(); i++) {
-            //srcSeq 로 그 값의 active 값 변경
-            VcActivateResponse vcActivateResponse =
-                    vcService.deleteSrcFile(srcSeq.get(i));
-            responses.add(vcActivateResponse);
-        }
+        //삭제 호출
+        List<VcActivateResponse> vcActivateResponses = vcService.deleteSrcFile(srcSeq);
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
-                                mapCreate(responses,
+                                mapCreate(vcActivateResponses,
                                         "SRC 행 삭제 완료되었습니다.")));
     }
 
