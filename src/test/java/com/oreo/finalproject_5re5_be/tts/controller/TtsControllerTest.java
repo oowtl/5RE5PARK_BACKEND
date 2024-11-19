@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,21 +14,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
-import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
-import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
-import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
-import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
@@ -45,20 +40,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TtsController.class)
 class TtsControllerTest {
@@ -962,7 +943,7 @@ class TtsControllerTest {
         Long projectSeq = 1L;
         Long tsSeq = 1L;
 
-        Mockito.when(ttsSentenceService.deleteSentence(eq(projectSeq), eq(tsSeq))).thenReturn(true);
+        Mockito.when(ttsSentenceService.deleteSentence(projectSeq, tsSeq)).thenReturn(true);
 
         // when, then
         mockMvc.perform(delete("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
