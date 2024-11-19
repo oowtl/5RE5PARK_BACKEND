@@ -1,8 +1,10 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,12 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
+import com.oreo.finalproject_5re5_be.member.entity.MemberConnectionHistory;
+import com.oreo.finalproject_5re5_be.member.entity.MemberDelete;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
@@ -25,18 +30,26 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
+import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,6 +58,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -59,8 +74,6 @@ class MemberServiceImplTestByMock {
     @Mock
     private MemberRepository memberRepository;
 
-    @Mock
-    private JavaMailSender mailSender;
 
     @Mock
     private CodeRepository codeRepository;
@@ -70,6 +83,15 @@ class MemberServiceImplTestByMock {
 
     @Mock
     private MemberChangeHistoryRepository memberChangeHistoryRepository;
+
+    @Mock
+    private MemberDeleteRepository memberDeleteRepository;
+
+    @Mock
+    private MemberTermsHistoryRepository memberTermsHistoryRepository;
+
+    @Mock
+    private MemberConnectionHistoryRepository memberConnectionHistoryRepository;
 
     private User user;
 
@@ -339,21 +361,188 @@ class MemberServiceImplTestByMock {
         });
     }
 
+    @DisplayName("회원 삭제 처리(비활성 상태 전환)")
+    @Test
+    void 회원_삭제_처리_비활성_상태_전환() {
+        // 유효한 데이터를 전달받음 -> memberSeq, MemberRemoveRequest
+        Long memberSeq = 1L;
+        MemberRemoveRequest request = MemberRemoveRequest.builder()
+                                                        .code("MBD001") // 서비스 이용 불만족
+                                                        .detailCont("해당 서비스가 제가 생각했던 서비스가 아니네요. 실망했습니다")
+                                                        .build();
+
+        // 응답 데이터 세팅
+        Member foundMember = Member.builder()
+                                    .id("qwerfde2312")
+                                    .password("dwadaw")
+                                    .email("eqwfqws2131@gmail.com")
+                                    .name("홍만동")
+                                    .normAddr("서울시 양천구")
+                                    .locaAddr("서울시")
+                                    .detailAddr("서초동 123-456")
+                                    .passAddr("서초대로 59-32")
+                                    .chkValid('Y')
+                                    .build();
+
+        Code removeMemberCode = Code.builder()
+                                    .codeSeq(1L)
+                                    .code("MBS003")
+                                    .cateNum("M")
+                                    .name("회원 비활성화")
+                                    .chkUse("Y")
+                                    .ord(1)
+                                    .build();
+
+        MemberState memberState = MemberState.of(foundMember, removeMemberCode);
+        MemberState savedMemberState = MemberState.of(foundMember, removeMemberCode);
+        MemberDelete memberDelete = MemberDelete.of(memberSeq, request, removeMemberCode);
+        MemberDelete savedMemberDelete = MemberDelete.of(memberSeq, request, removeMemberCode);
+
+        // 리포지토리 목킹
+        // - 1. 시퀀스로 회원 조회 -> foundMember
+        // - 2. MBS003 코드 조회(회원 비활성화) -> removeMemberCode
+        // - 3. 회원 비활성 상태 엔티티 생성 -> memberState
+        // - 4. 회원 30일 유해 기간 설정, 회원 삭제 유형 코드와 사유 기록 -> MemberDelete
+        when(memberRepository.findById(memberSeq)).thenReturn(Optional.of(foundMember));
+        when(codeRepository.findCodeByCode("MBS003")).thenReturn(removeMemberCode);
+        when(memberStateRepository.save(memberState)).thenReturn(savedMemberState);
+        when(memberDeleteRepository.save(any())).thenReturn(savedMemberDelete);
+
+
+        // 서비스 호출
+        // 결과 비교 -> 예외 발생 x
+        assertDoesNotThrow(() -> {
+            memberService.remove(memberSeq, request);
+        });
+    }
+
+
+    @DisplayName("스케줄러 테스트, checkRemovedMember 메서드가 매시 새벽 4시에 실행되야 함")
+    @Test
+    void 스케줄러_회원_삭제_처리() throws Exception {
+        // 매일 새벽 4시를 의미하는 cron 표현식
+        String cronExpression = "0 0 4 * * *";
+
+        // Cron 트리거 생성 : 위에서 작성한 cron 표현식으로 다음 실행 시간을 계산할 객체
+        CronTrigger trigger = new CronTrigger(cronExpression);
+
+        // 테스트 시작 시간 설정 (2024년 10월 20일 새벽 3시 59분 59초)
+        Date startTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse("2024/10/20 03:59:59");
+
+        // 스케쥴링 컨텍스트 초기화
+        SimpleTriggerContext context = new SimpleTriggerContext();
+        context.update(startTime, startTime, startTime);
+
+        // 예상되는 실행 시간 목록
+        List<String> expectedTimes = Arrays.asList(
+                "2024/10/20 04:00:00",  // 첫 실행 시간
+                "2024/10/21 04:00:00",  // 두 번째 실행 시간
+                "2024/10/22 04:00:00"   // 세 번째 실행 시간
+        );
+
+        // 동작 수행
+        for (String expectedTime : expectedTimes) {
+            Date nextExecutionTime = trigger.nextExecutionTime(context);
+
+            // 결과 비교
+            String actualTime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(nextExecutionTime);
+            assertEquals(expectedTime, actualTime);
+
+            // 다음 실행 시간 업데이트
+            context.update(nextExecutionTime, nextExecutionTime, nextExecutionTime);
+        }
+    }
+
+    @DisplayName("회원 스케줄링 삭제 호출 여부 확인")
+    @Test
+    void 회원_스케줄링_삭제_호출_처리() {
+        // 더미 데이터 세팅
+        Long memberSeq1 = 1L;
+        Member foundMember = Member.builder()
+                                    .seq(memberSeq1)
+                                    .id("qwerfde2312")
+                                    .password("dwadaw")
+                                    .email("eqwfqws2131@gmail.com")
+                                    .name("홍만동")
+                                    .normAddr("서울시 양천구")
+                                    .locaAddr("서울시")
+                                    .detailAddr("서초동 123-456")
+                                    .passAddr("서초대로 59-32")
+                                    .chkValid('Y')
+                                    .build();
+
+        List<MemberConnectionHistory> connectionHistories = new ArrayList<>();
+        List<MemberTermsHistory> termsHistories = new ArrayList<>();
+        List<MemberChangeHistory> changeHistories = new ArrayList<>();
+
+
+        MemberRemoveRequest request1 = MemberRemoveRequest.builder()
+                                                        .code("MBD001") // 서비스 이용 불만족
+                                                        .detailCont("해당 서비스가 제가 생각했던 서비스가 아니네요. 실망했습니다")
+                                                        .build();
+
+        Code removeReasonCode1 = Code.builder()
+                                    .codeSeq(1L)
+                                    .code("MBD001")
+                                    .cateNum("M")
+                                    .name("서비스 이용 불만족")
+                                    .chkUse("Y")
+                                    .ord(1)
+                                    .build();
+
+
+
+        MemberDelete memberDelete1 = MemberDelete.of(memberSeq1, request1, removeReasonCode1);
+
+        // 현재 기준 30일 지난 시점으로 변경하기
+        LocalDateTime beforeMonth = LocalDateTime.now().minusMonths(1);
+
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedBeforeMonth = beforeMonth.format(formatter);
+
+        // 적용 시간 세팅
+        memberDelete1.setApplDate(formattedBeforeMonth);
+
+
+        List<MemberDelete> foundDeleteMembers = Arrays.asList(
+                memberDelete1
+        );
+
+        when(memberDeleteRepository.findAll()).thenReturn(foundDeleteMembers);
+        when(memberRepository.findById(memberSeq1)).thenReturn(Optional.of(foundMember));
+        when(memberConnectionHistoryRepository.findMemberConnectionHistoriesByMemberSeq(memberSeq1)).thenReturn(connectionHistories);
+        when(memberTermsHistoryRepository.findByMemberSeq(memberSeq1)).thenReturn(termsHistories);
+        when(memberChangeHistoryRepository.findMemberChangeHistoriesByMemberSeq(memberSeq1)).thenReturn(changeHistories);
+
+        // 스케줄러 메서드 직접 호출
+        memberService.checkRemovedMember();
+
+        // 검증 - 예상되는 동작 (삭제 메서드 호출 여부 등)
+        verify(memberRepository, times(1)).delete(any(Member.class));
+        verify(memberStateRepository, times(1)).deleteAll(anyList());
+        verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
+        verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
+        verify(memberChangeHistoryRepository, times(1)).deleteAll(anyList());
+        verify(codeRepository, times(1)).findCodeByCode("MBS999");
+    }
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
         var request = MemberRegisterRequest.builder()
-                .id("qwerfde2312")
-                .password("asdf12341234@")
-                .email("asdf3214@gmail.com")
-                .name("홍길동")
-                .userRegDate(LocalDateTime.now())
-                .chkValid('Y')
-                .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
-                .normAddr("서울시 강남구")
-                .passAddr("서초대로 59-32")
-                .locaAddr("서초동")
-                .detailAddr("서초동 123-456")
-                .build();
+                                            .id("qwerfde2312")
+                                            .password("asdf12341234@")
+                                            .email("asdf3214@gmail.com")
+                                            .name("홍길동")
+                                            .userRegDate(LocalDateTime.now())
+                                            .chkValid('Y')
+                                            .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
+                                            .normAddr("서울시 강남구")
+                                            .passAddr("서초대로 59-32")
+                                            .locaAddr("서초동")
+                                            .detailAddr("서초동 123-456")
+                                            .build();
 
         return request;
     }

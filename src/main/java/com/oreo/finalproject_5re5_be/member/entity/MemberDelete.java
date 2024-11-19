@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,6 +25,7 @@ import lombok.ToString;
 @Table(name = "member_delete")
 @Getter @Setter
 @ToString
+@EqualsAndHashCode(callSuper = false)
 public class MemberDelete extends BaseEntity {
 
     @Id
@@ -48,13 +51,20 @@ public class MemberDelete extends BaseEntity {
     public static MemberDelete of(Long memberSeq, MemberRemoveRequest request, Code code) {
         MemberDelete memberDelete = new MemberDelete();
 
-        // 현재 시간 세팅
+        // 현재 시간 조회
         LocalDateTime now = LocalDateTime.now();
+
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedNow = now.format(formatter);
 
         memberDelete.setMemberSeq(memberSeq);
         memberDelete.setCode(code);
         memberDelete.setChkUse('N');
-
+        memberDelete.setApplDate(formattedNow);
+        memberDelete.setDetailCont(request.getDetailCont());
 
         return memberDelete;
     }

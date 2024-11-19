@@ -495,12 +495,13 @@ public class MemberServiceImpl implements UserDetailsService {
 
         // - 30일 유해 기간을 설정한다(현재 시간 등록)
         // - 회원 삭제 유형 코드와 사유를 기록한다
-        MemberDelete memberDelete = MemberDelete.of(memberSeq, request, removeMemberCode);
+        Code removeReaseonCode = codeRepository.findCodeByCode(request.getCode());
+        MemberDelete memberDelete = MemberDelete.of(memberSeq, request, removeReaseonCode);
         memberDeleteRepository.save(memberDelete);
     }
 
 
-    // (2) 매주 일요일 새벽 4:00 마다 삭제 회원 중 유해기간 30일이 지난 회원들을 삭제(스프링 스케쥴러 적용)
+    // (2) 매일 새벽 4:00 마다 삭제 회원 중 유해기간 30일이 지난 회원들을 삭제(스프링 스케쥴러 적용)
     // - applDate가 현재와 30일 차이 나는 회원을 대상으로 한다
     // - 회원을 삭제한다
     // - 회원의 상태를 삭제한다
@@ -508,7 +509,7 @@ public class MemberServiceImpl implements UserDetailsService {
     // - 회원의 접속 이력을 삭제한다
     // - 회원의 변경 이력을 삭제한다
     // - 회원 삭제 테이블에 처리 완료 체크표시 넣기
-    @Scheduled(cron = "0 0 4 ? * SUN", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
     public void checkRemovedMember() {
         // 현재 시간 조회
         LocalDateTime now = LocalDateTime.now();
@@ -518,7 +519,8 @@ public class MemberServiceImpl implements UserDetailsService {
         List<MemberDelete> foundAllDeletedMembers = memberDeleteRepository.findAll();
         List<MemberDelete> candidates = foundAllDeletedMembers.stream()
                                                              .filter(m -> {
-                                                                 LocalDateTime applDate = LocalDateTime.parse(m.getApplDate());
+                                                                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                                                 LocalDateTime applDate = LocalDateTime.parse(m.getApplDate(), formatter);
                                                                  return applDate.isBefore(now.minusMonths(1)) || applDate.isEqual(now.minusMonths(1));
                                                              })
                                                             .toList();
