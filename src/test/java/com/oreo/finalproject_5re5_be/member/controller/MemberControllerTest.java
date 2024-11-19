@@ -4,6 +4,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
@@ -166,6 +168,31 @@ class MemberControllerTest {
                 .with(csrf())
         )
                 .andExpect(status().isNoContent());
+
+    }
+
+    @DisplayName("회원 삭제 처리 성공")
+    @Test
+    @WithMockUser
+    void 삭제_처리() throws Exception {
+        // 서비스에서 remove() 호출시 정상 처리되게 목킹
+        Long memberSeq = 1L;
+        MemberRemoveRequest request = MemberRemoveRequest.builder()
+                .code("MBD001") // 서비스 이용 불만족
+                .detailCont("해당 서비스가 제가 생각했던 서비스가 아니네요. 실망했습니다")
+                .build();
+
+        // 서비스 목킹
+        doNothing().when(memberService).remove(memberSeq, request);
+
+        // 컨트롤러에 요청 보내기
+        mockMvc.perform(delete("/api/member/" + memberSeq)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf())
+        )
+                .andExpect(status().isNoContent());
+
 
     }
 
