@@ -918,8 +918,118 @@ class TtsControllerTest {
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
+    /*
+    테스트 시나리오: deleteSentence 컨트롤러 메서드
 
+    1. **성공적인 삭제**
+    - 조건:
+    - 유효한 `projectSeq`와 `tsSeq`가 제공됨.
+    - 제공된 `tsSeq`에 해당하는 `TtsSentence` 엔티티가 존재하며 삭제 성공.
+    - 기대 결과:
+    - HTTP 상태 코드 200 반환.
+    - 응답 메시지 `"삭제 성공"` 포함.
 
+    2. **TtsSentence를 찾을 수 없음**
+    - 조건:
+    - 유효한 `projectSeq`와 `tsSeq`가 제공되었으나, 데이터베이스에 해당 `tsSeq`에 대한 `TtsSentence` 엔티티가 존재하지 않음.
+    - 기대 결과:
+    - HTTP 상태 코드 404 반환.
+    - 응답 메시지 `"Entity not found"` 포함.
+
+    3. **유효성 검증 실패 - 잘못된 PathVariable**
+    - 조건:
+    - `projectSeq`가 1보다 작은 값으로 제공됨 (예: `0` 또는 `-1`).
+    - 또는 `tsSeq`가 1보다 작은 값으로 제공됨 (예: `0` 또는 `-1`).
+    - 기대 결과:
+    - HTTP 상태 코드 400 반환.
+    - 응답 본문에 `"projectSeq is invalid"` 또는 `"tsSeq is invalid"` 메시지 포함.
+
+    4. **내부 서버 에러**
+    - 조건:
+    - 서비스 계층에서 예기치 못한 예외 발생 (예: 데이터베이스 연결 문제 등).
+    - 기대 결과:
+    - HTTP 상태 코드 500 반환.
+    - 응답 메시지 `"Internal Server Error"` 포함.
+
+    */
+
+    // 1. 성공적인 삭제
+    @Test
+    @DisplayName("deleteSentence - 성공적인 삭제")
+    @WithMockUser
+    void deleteSentence_Success() throws Exception {
+        // given
+        Long projectSeq = 1L;
+        Long tsSeq = 1L;
+
+        Mockito.when(ttsSentenceService.deleteSentence(eq(projectSeq), eq(tsSeq))).thenReturn(true);
+
+        // when, then
+        mockMvc.perform(delete("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                .with(csrf()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
+            .andExpect(jsonPath("$.response", is("삭제 성공")));
+    }
+
+    // 2. TtsSentence를 찾을 수 없음
+    @Test
+    @DisplayName("deleteSentence - TtsSentence를 찾을 수 없음")
+    @WithMockUser
+    void deleteSentence_NotFound() throws Exception {
+        // given
+        Long projectSeq = 1L;
+        Long tsSeq = 999L;
+
+//        Mockito.when(ttsSentenceService.deleteSentence(eq(projectSeq), eq(tsSeq)))
+        Mockito.when(ttsSentenceService.deleteSentence(projectSeq, tsSeq))
+            .thenThrow(new EntityNotFoundException());
+
+        // when, then
+        mockMvc.perform(delete("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                .with(csrf()))
+            .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+            .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
+            .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
+    }
+
+    // 3. 유효성 검증 실패 - 잘못된 PathVariable
+    @Test
+    @DisplayName("deleteSentence - 잘못된 PathVariable")
+    @WithMockUser
+    void deleteSentence_InvalidPathVariable() throws Exception {
+        // given
+        Long invalidProjectSeq = 0L;
+        Long invalidTsSeq = -1L;
+
+        // when, then
+        mockMvc.perform(delete("/api/project/{projectSeq}/tts/sentence/{tsSeq}", invalidProjectSeq, invalidTsSeq)
+                .with(csrf()))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())))
+            .andExpect(jsonPath("$.response").exists());
+    }
+
+    // 4. 내부 서버 에러
+    @Test
+    @DisplayName("deleteSentence - 내부 서버 에러")
+    @WithMockUser
+    void deleteSentence_InternalServerError() throws Exception {
+        // given
+        Long projectSeq = 1L;
+        Long tsSeq = 1L;
+
+        Mockito.when(ttsSentenceService.deleteSentence(projectSeq, tsSeq))
+            .thenThrow(new RuntimeException("Unexpected error"));
+
+        // when, then
+        mockMvc.perform(delete("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
+                .with(csrf()))
+            .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
+            .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())))
+            .andExpect(jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
+    }
+    
 
     private static TtsAttributeInfo createAttributeInfo() {
         return TtsAttributeInfo.builder().volume(100) // 유효한 volume 설정
