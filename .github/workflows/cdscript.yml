@@ -1,0 +1,37 @@
+name: CD
+
+# 1. 이벤트 설정
+on:
+  # PR 요청이 들어올 때 빌드와 테스트 실행
+  push:
+    branches:
+      - main
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name : build and test
+        run: ./gradlew build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
+          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
+          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
+          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
+          script: |
+            # 스크립트 실행할 곳으로 이동
+            cd /home/ubuntu/app
+            # 8080포트 사용중인 프로세스 확인
+            PID=$(lsof -t -i:8080)
+            
+            # 포트가 사용 중인 경우 프로세스 종료
+            if [ -n "$PID" ]; then
+              echo "8080 포트를 사용중인 프로세스 (PID: $PID)를 종료합니다."
+            else
+              echo "8080 포트는 사용 중이지 않습니다."
+            fi
+            
+            #배포 스크립트 실행
+            bash ./deploy.sh
