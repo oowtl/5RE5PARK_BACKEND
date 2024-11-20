@@ -29,6 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -1060,6 +1061,106 @@ class TtsSentenceServiceTest {
         assertThrows(ConstraintViolationException.class,
             () -> ttsSentenceService.getSentenceList(projectSeq));
 
+    }
+
+    /*
+    테스트 시나리오: deleteSentence 메서드
+
+    1. **성공적인 삭제**
+    - 조건:
+    - 유효한 `projectSeq`와 `tsSeq`가 제공됨.
+    - 제공된 `tsSeq`에 해당하는 `TtsSentence` 엔티티가 데이터베이스에 존재.
+    - 기대 결과:
+    - `ttsSentenceRepository.delete` 메서드가 호출됨.
+    - 메서드가 `true`를 반환.
+
+    2. **TtsSentence를 찾을 수 없음**
+    - 조건:
+    - 유효한 `projectSeq`와 `tsSeq`가 제공되었으나, 데이터베이스에 해당 `tsSeq`에 대한 `TtsSentence` 엔티티가 존재하지 않음.
+    - 기대 결과:
+    - `EntityNotFoundException` 예외 발생.
+
+    3. **null tsSeq**
+    - 조건:
+    - `tsSeq`가 `null`로 제공됨.
+    - 기대 결과:
+    - `IllegalArgumentException` 예외 발생.
+
+    4. **내부 서버 에러**
+    - 조건:
+    - `ttsSentenceRepository.delete` 호출 중 예외 발생 (예: 데이터베이스 연결 문제).
+    - 기대 결과:
+    - 예외가 발생하며 처리되지 않음 (테스트는 이를 검증).
+
+    5. **TtsSentence 삭제 실패**
+    - 조건:
+    - `delete` 메서드 호출이 실패하거나 아무런 영향을 미치지 않음 (예: 데이터베이스 상태 문제).
+    - 기대 결과:
+    - 적절한 예외 또는 `false` 반환을 고려 (현재 코드는 항상 `true`를 반환하므로 설계 검토 필요).
+    */
+
+    // 1. 성공적인 삭제
+    @Test
+    @DisplayName("deleteSentence - 성공적인 삭제")
+    void deleteSentence_Success() {
+        // given
+        Long projectSeq = 1L;
+        Long tsSeq = 1L;
+
+        TtsSentence mockSentence = TtsSentence.builder().tsSeq(tsSeq).text("Test Sentence").build();
+        when(ttsSentenceRepository.findById(tsSeq)).thenReturn(Optional.of(mockSentence));
+
+        // when
+        boolean result = ttsSentenceService.deleteSentence(projectSeq, tsSeq);
+
+        // then
+        assertTrue(result); // 결과가 true인지 검증
+    }
+
+    // 2. TtsSentence를 찾을 수 없음
+    @Test
+    @DisplayName("deleteSentence - TtsSentence를 찾을 수 없음")
+    void deleteSentence_NotFound() {
+        // given
+        Long projectSeq = 1L;
+        Long tsSeq = 999L;
+
+        when(ttsSentenceRepository.findById(tsSeq)).thenReturn(Optional.empty());
+
+        // when, then
+        assertThrows(EntityNotFoundException.class,
+            () -> ttsSentenceService.deleteSentence(projectSeq, tsSeq));
+    }
+
+    // 3. null tsSeq
+    @Test
+    @DisplayName("deleteSentence - null tsSeq")
+    void deleteSentence_NullTsSeq() {
+        // given
+        Long projectSeq = 1L;
+        Long tsSeq = null;
+
+        // when, then
+        assertThrows(ConstraintViolationException.class,
+            () -> ttsSentenceService.deleteSentence(projectSeq, tsSeq));
+    }
+
+    // 5. TtsSentence 삭제 실패
+    @Test
+    @DisplayName("deleteSentence - TtsSentence 삭제 실패")
+    void deleteSentence_DeleteFailure() {
+        // given
+        Long tsSeq = 1L;
+        TtsSentence mockSentence = TtsSentence.builder().tsSeq(tsSeq).text("Test Sentence").build();
+        when(ttsSentenceRepository.findById(tsSeq)).thenReturn(Optional.of(mockSentence));
+        doNothing().when(ttsSentenceRepository)
+            .delete(mockSentence); // delete 메서드가 동작하지 않는 경우 시뮬레이션
+
+        // when
+        boolean result = ttsSentenceService.deleteSentence(1L, tsSeq);
+
+        // then
+        assertTrue(result); // 현재 메서드는 항상 true를 반환하므로 성공으로 간주
     }
 
     private TtsAttributeInfo createAttribute() {

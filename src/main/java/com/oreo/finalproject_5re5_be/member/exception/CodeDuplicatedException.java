@@ -1,13 +1,19 @@
 package com.oreo.finalproject_5re5_be.member.exception;
 
-public class CodeDuplicatedException extends RuntimeException {
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 
-    public CodeDuplicatedException(String message) {
-        super(message);
-    }
+import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
+
+
+// 중복된 코드 등록시 발생하는 예외
+public class CodeDuplicatedException extends BusinessException {
 
     public CodeDuplicatedException() {
-        this("중복된 코드명입니다.");
+        this(CODE_DUPLICATED_ERROR.getMessage());
+    }
+
+    public CodeDuplicatedException(String message) {
+        super(message, CODE_DUPLICATED_ERROR);
     }
 
 }

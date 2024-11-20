@@ -1,13 +1,17 @@
 package com.oreo.finalproject_5re5_be.member.exception;
 
-public class MemberInvalidTermConditionException extends RuntimeException {
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 
-        public MemberInvalidTermConditionException() {
-            this("약관이 유효하지 않습니다.");
-        }
+import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
 
-        public MemberInvalidTermConditionException(String message) {
-            super(message);
-        }
+public class MemberInvalidTermConditionException extends BusinessException {
+
+    public MemberInvalidTermConditionException() {
+        this(MEMBER_INVALID_TERM_CONDITION_ERROR.getMessage());
+    }
+
+    public MemberInvalidTermConditionException(String message) {
+        super(message, MEMBER_INVALID_TERM_CONDITION_ERROR);
+    }
 
 }
