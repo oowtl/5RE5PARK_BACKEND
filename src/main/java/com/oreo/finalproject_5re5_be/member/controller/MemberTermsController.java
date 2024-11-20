@@ -45,8 +45,8 @@ public class MemberTermsController {
 
     private final MemberTermsServiceImpl memberTermsService;
 
-    @Operation(summary = "회원 약관 등록 처리")
-    @PostMapping("/register")
+//    @Operation(summary = "회원 약관 등록 처리")
+//    @PostMapping("/register")
     public ResponseEntity<MemberTermResponse> register(@Valid @RequestBody MemberTermRequest request) {
         // 회원 약관 등록 처리
         MemberTermResponse response = memberTermsService.create(request);
@@ -55,8 +55,8 @@ public class MemberTermsController {
                              .body(response);
     }
 
-    @Operation(summary = "등록된 모든 회원 약관 조회")
-    @GetMapping("/all")
+//    @Operation(summary = "등록된 모든 회원 약관 조회")
+//    @GetMapping("/all")
     public ResponseEntity<MemberTermResponses> readAll() {
         // 모든 회원 약관에 대해 조회
         MemberTermResponses memberTermResponses = memberTermsService.readAll();
@@ -65,8 +65,8 @@ public class MemberTermsController {
                              .body(memberTermResponses);
     }
 
-    @Operation(summary = "등록된 모든 회원 약관 중 사용 가능한 모든 약관 조회")
-    @GetMapping("/available")
+//    @Operation(summary = "등록된 모든 회원 약관 중 사용 가능한 모든 약관 조회")
+//    @GetMapping("/available")
     public ResponseEntity<MemberTermResponses> readAvailable() {
         // 사용 가능한 약관에 대해 조회
         MemberTermResponses memberTermResponses = memberTermsService.readAvailable();
@@ -75,8 +75,8 @@ public class MemberTermsController {
                 .body(memberTermResponses);
     }
 
-    @Operation(summary = "등록된 모든 회원 약관 중 사용 불가능한 모든 약관 조회")
-    @GetMapping("/not-available")
+//    @Operation(summary = "등록된 모든 회원 약관 중 사용 불가능한 모든 약관 조회")
+//    @GetMapping("/not-available")
     public ResponseEntity<MemberTermResponses> readNotAvailable() {
         // 사용 불가능한 약관에 대해 조회
         MemberTermResponses memberTermResponses = memberTermsService.readNotAvailable();
@@ -85,8 +85,8 @@ public class MemberTermsController {
                 .body(memberTermResponses);
     }
 
-    @Operation(summary = "등록된 모든 회원 약관 중 사용 불가능한 모든 약관 조회")
-    @GetMapping("/latest-available")
+//    @Operation(summary = "등록된 모든 회원 약관 중 사용 불가능한 모든 약관 조회")
+//    @GetMapping("/latest-available")
     public ResponseEntity<MemberTermResponse> readLatestAvailable() {
         // 가장 최근에 사용 가능한 약관 조회
         MemberTermResponse response = memberTermsService.readLatestAvailable();
@@ -95,8 +95,8 @@ public class MemberTermsController {
                              .body(response);
     }
 
-    @Operation(summary = "등록된 회원 약관 수정 처리")
-    @PatchMapping("/{termSeq}")
+//    @Operation(summary = "등록된 회원 약관 수정 처리")
+//    @PatchMapping("/{termSeq}")
     public ResponseEntity<Void> update(@Parameter(description = "Member Term 시퀀스") @Min(value = 1L, message = "회원 약관의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("termSeq") Long termSeq, @Valid @RequestBody MemberTermUpdateRequest request) {
         // 수정 처리
         memberTermsService.update(termSeq, request);
@@ -105,8 +105,8 @@ public class MemberTermsController {
                              .build();
     }
 
-    @Operation(summary = "등록된 회원 약관 삭제 처리")
-    @DeleteMapping("/{termSeq}")
+//    @Operation(summary = "등록된 회원 약관 삭제 처리")
+//    @DeleteMapping("/{termSeq}")
     public ResponseEntity<Void> remove(@Parameter(description = "Member Term 시퀀스") @Min(value = 1L, message = "회원 약관의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("termSeq") Long seq) {
         // 삭제 처리
         memberTermsService.remove(seq);

@@ -47,8 +47,8 @@ public class CodeController {
 
     private final CodeServiceImpl codeService;
 
-    @Operation(summary = "코드 등록")
-    @PostMapping("/register")
+//    @Operation(summary = "코드 등록")
+//    @PostMapping("/register")
     public ResponseEntity<CodeResponse> create(@RequestBody @Valid CodeRequest request) {
         // 서비스를 호출하여 코드를 등록한다
         CodeResponse response = codeService.create(request);
@@ -58,8 +58,8 @@ public class CodeController {
 
     }
 
-    @Operation(summary = "등록된 모든 코드 조회")
-    @GetMapping("/all")
+//    @Operation(summary = "등록된 모든 코드 조회")
+//    @GetMapping("/all")
     public ResponseEntity<CodeResponses> readAll() {
         // 서비스를 호출하여 모든 코드를 조회한다
         CodeResponses responses = codeService.readAll();
@@ -68,8 +68,8 @@ public class CodeController {
                              .body(responses);
     }
 
-    @Operation(summary = "시퀀스로 특정 코드 조회")
-    @GetMapping("/seq/{codeSeq}")
+//    @Operation(summary = "시퀀스로 특정 코드 조회")
+//    @GetMapping("/seq/{codeSeq}")
     public ResponseEntity<CodeResponse> readBySeq(@Parameter(description = "Code 시퀀스") @Min(value = 1L, message = "코드 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("codeSeq") Long codeSeq) {
         // 서비스를 호출하여 시퀀스로 특정 코드를 조회한다
         CodeResponse response = codeService.read(codeSeq);
@@ -78,8 +78,8 @@ public class CodeController {
                              .body(response);
     }
 
-    @Operation(summary = "코드 번호로 특정 코드 조회")
-    @GetMapping("/{code}")
+//    @Operation(summary = "코드 번호로 특정 코드 조회")
+//    @GetMapping("/{code}")
     public ResponseEntity<CodeResponse> readByCode(@Parameter(description = "Code의 코드번호") @PathVariable("code") String code) {
         // 서비스를 호출하여 코드 번호로 특정 코드를 조회한다
         CodeResponse response = codeService.read(code);
@@ -88,8 +88,8 @@ public class CodeController {
                              .body(response);
     }
 
-    @Operation(summary = "각 파트(cateNum)으로 사용 가능한 코드 조회")
-    @GetMapping("/{cateNum}/available")
+//    @Operation(summary = "각 파트(cateNum)으로 사용 가능한 코드 조회")
+//    @GetMapping("/{cateNum}/available")
     public ResponseEntity<CodeResponses> readAvailable(@Parameter(description = "Code의 파트별 번호") @PathVariable("cateNum") String cateNum) {
         // 서비스를 호출하여 각 파트별 사용 가능한 코드를 조회한다
         CodeResponses responses = codeService.readAvailableCodeByCateNum(cateNum);
@@ -98,8 +98,8 @@ public class CodeController {
                              .body(responses);
     }
 
-    @Operation(summary = "각 파트(cateNum)으로 모든 코드 조회")
-    @GetMapping("/{cateNum}/all")
+//    @Operation(summary = "각 파트(cateNum)으로 모든 코드 조회")
+//    @GetMapping("/{cateNum}/all")
     public ResponseEntity<CodeResponses> readAll(@Parameter(description = "Code의 파트별 번호") @PathVariable("cateNum") String cateNum) {
         // 서비스를 호출하여 각 파트별 모든 코드를 조회한다
         CodeResponses responses = codeService.readAllByCateNum(cateNum);
@@ -108,8 +108,8 @@ public class CodeController {
                              .body(responses);
     }
 
-    @Operation(summary = "특정 코드 수정 처리")
-    @PatchMapping("/{codeSeq}")
+//    @Operation(summary = "특정 코드 수정 처리")
+//    @PatchMapping("/{codeSeq}")
     public ResponseEntity<Void> update(@Parameter(description = "Code 시퀀스") @Min(value = 1L, message = "코드 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("codeSeq") Long codeSeq, @Valid @RequestBody CodeUpdateRequest request) {
         // 서비스를 호출하여 코드를 수정한다
         codeService.update(codeSeq, request);
@@ -118,8 +118,8 @@ public class CodeController {
                              .build();
     }
 
-    @Operation(summary = "특정 코드 삭제 처리")
-    @DeleteMapping("/{codeSeq}")
+//    @Operation(summary = "특정 코드 삭제 처리")
+//    @DeleteMapping("/{codeSeq}")
     public ResponseEntity<Void> delete(@Parameter(description = "Code 시퀀스") @Min(value = 1L, message = "코드 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("codeSeq")  Long codeSeq) {
         // 서비스를 호출하여 코드를 삭제한다
         codeService.delete(codeSeq);

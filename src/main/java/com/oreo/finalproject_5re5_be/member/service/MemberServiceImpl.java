@@ -309,6 +309,19 @@ public class MemberServiceImpl implements UserDetailsService {
                                      foundMember.getDetailAddr());
     }
 
+    public MemberReadResponse read(Long memberSeq) {
+        // 회원 아이디로 조회
+        Member foundMember = memberRepository.findBySeq(memberSeq);
+        // 해당 아이디로 회원을 찾지 못한 경우 예외 발생
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+
+        // 조회된 회원 정보를 바탕으로 응답 객체 생성
+        return MemberReadResponse.of(foundMember.getId(), foundMember.getEmail(),
+                foundMember.getName(), foundMember.getNormAddr(),
+                foundMember.getDetailAddr());
+    }
 
 
     // 5. 회원정보 수정
