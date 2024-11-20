@@ -29,7 +29,7 @@ public class VoiceRepositoryFindTest {
      * 1. 유효한 언어, 스타일 정보로 조회
      * 2. 없는 언어 정보, 유효한 스타일 정보로 조회
      * 3. 유효한 언어 정보, 없는 스타일 정보로 조회
-     * 4. 없는 언어 정보, 없는 스타일 정보로 조회(예정)
+     * 4. 조건 null 값으로 조회
      * */
 
     // 1. 유효한 언어, 스타일 정보로 조회
@@ -44,10 +44,10 @@ public class VoiceRepositoryFindTest {
 
         // 목소리 데이터 4개 삽입
         List<Voice> voiceList = List.of(
-                creatVoice(savedLanguage1, savedStyle1, 'y', 0),
-                creatVoice(savedLanguage1, savedStyle2, 'y', 1),
-                creatVoice(savedLanguage2, savedStyle2, 'y', 2),
-                creatVoice(savedLanguage2, savedStyle2, 'y', 3)
+                createVoice(savedLanguage1, savedStyle1, 'y', 0),
+                createVoice(savedLanguage1, savedStyle2, 'y', 1),
+                createVoice(savedLanguage2, savedStyle2, 'y', 2),
+                createVoice(savedLanguage2, savedStyle2, 'y', 3)
         );
         List<Voice> savedVoiceList = voiceRepository.saveAll(voiceList);
 
@@ -84,8 +84,8 @@ public class VoiceRepositoryFindTest {
 
         // 목소리 데이터 2개 삽입
         List<Voice> voiceList = List.of(
-                creatVoice(savedLanguage, savedStyle, 'y', 0),
-                creatVoice(savedLanguage, savedStyle, 'y', 1)
+                createVoice(savedLanguage, savedStyle, 'y', 0),
+                createVoice(savedLanguage, savedStyle, 'y', 1)
         );
         List<Voice> savedVoiceList = voiceRepository.saveAll(voiceList);
         assertNotNull(savedVoiceList);
@@ -112,17 +112,33 @@ public class VoiceRepositoryFindTest {
         assertNotNull(savedStyle);
 
         // 목소리 데이터 1개 삽입
-        Voice savedVoice = voiceRepository.save(creatVoice(savedLanguage, savedStyle, 'y', 1));
+        Voice savedVoice = voiceRepository.save(createVoice(savedLanguage, savedStyle, 'y', 1));
         assertNotNull(savedVoice.getVoiceSeq());
 
         // 존재하지 않는 언어 정보, 유효한 스타일 정보로 조회시 예외 발생
         assertThrows(InvalidDataAccessApiUsageException.class, ()-> voiceRepository.findAllByLanguageAndStyleAndEnabled(savedLanguage, invalidStyle, 'y'));
     }
 
-    // 4. 없는 언어 정보, 없는 스타일 정보로 조회(예정)
+    // 4. null 값으로 조회
+    @Test
+    @DisplayName("voice 조회 테스트 - null 값으로 조회")
+    public void voicefindByLangAndStyleTest_null() {
+        // 유효한 언어, 스타일 정보 생성
+        Language savedLanguage = languageRepository.save(createLanguage(11));
+        Style savedStyle = styleRepository.save(createStyle(22));
+        assertNotNull(savedStyle);
+
+        // 목소리 데이터 1개 삽입
+        Voice savedVoice = voiceRepository.save(createVoice(savedLanguage, savedStyle, 'y', 1));
+        assertNotNull(savedVoice.getVoiceSeq());
+
+        // 언어, 스타일 정보를 null 값으로 전달하여 조회시 빈 리스트 반환하는지 검증
+        List<Voice> findVoiceList = voiceRepository.findAllByLanguageAndStyleAndEnabled(null, null, 'y');
+        assertTrue(findVoiceList.isEmpty());
+    }
 
     // 목소리 엔티티 생성 메서드
-    private Voice creatVoice(Language language, Style style, char enabled, int i) {
+    private Voice createVoice(Language language, Style style, char enabled, int i) {
         return Voice.builder()
                 .name("test-voice-name"+i)
                 .age(i+10)
