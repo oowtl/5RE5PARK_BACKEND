@@ -3,13 +3,11 @@ package com.oreo.finalproject_5re5_be.concat.entity;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @ToString
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "concat_tab_log")
