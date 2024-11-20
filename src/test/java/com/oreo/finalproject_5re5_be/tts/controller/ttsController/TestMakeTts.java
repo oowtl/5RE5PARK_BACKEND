@@ -16,6 +16,7 @@ import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
+import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,6 +33,9 @@ class TestMakeTts {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private TtsSentenceService ttsSentenceService;
 
     @MockBean
     private TtsMakeService ttsMakeService;

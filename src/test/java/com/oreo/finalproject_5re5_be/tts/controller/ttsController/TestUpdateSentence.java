@@ -20,6 +20,7 @@ import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class TestUpdateSentence {
 
     @MockBean
     private TtsSentenceService ttsSentenceService;
+
+    @MockBean
+    private TtsMakeService ttsMakeService;
 
     @Autowired
     private ObjectMapper objectMapper;

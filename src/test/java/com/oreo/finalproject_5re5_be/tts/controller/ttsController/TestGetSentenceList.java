@@ -13,6 +13,7 @@ import com.oreo.finalproject_5re5_be.tts.controller.TtsController;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import com.oreo.finalproject_5re5_be.tts.service.TtsMakeService;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,9 @@ class TestGetSentenceList {
 
     @MockBean
     private TtsSentenceService ttsSentenceService;
+
+    @MockBean
+    private TtsMakeService ttsMakeService;
 
     /*
     테스트 시나리오: getSentenceList 컨트롤러 메서드
