@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @ToString
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "audio_file")
@@ -20,8 +21,13 @@ public class AudioFile extends BaseEntity {
     private Long audioFileSeq;
 
     @OneToOne()
-    @JoinColumn(name = "concat_row_Seq")
-    private ConcatRow concatRowSeq;
+    @JoinColumn(name = "concat_row_seq")
+    private ConcatRow concatRow;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "audio_format_seq")
+    private AudioFormat audioFormat;
+
 
     private String audioUrl;
     private String extension;
