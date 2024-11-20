@@ -1,13 +1,19 @@
 package com.oreo.finalproject_5re5_be.member.exception;
 
-public class CodeNotFoundException extends RuntimeException {
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 
-    public CodeNotFoundException(String message) {
-        super(message);
-    }
+import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
+;
+
+// 입력값으로부터 코드를 찾지 못했을 때 발생하는 예외
+public class CodeNotFoundException extends BusinessException {
 
     public CodeNotFoundException() {
-        this("코드를 찾을 수 없습니다.");
+        this(CODE_NOT_FOUND_ERROR.getMessage());
+    }
+
+    public CodeNotFoundException(String message) {
+        super(message, MEMBER_NOT_FOUND_ERROR);
     }
 
 }

@@ -1,13 +1,18 @@
 package com.oreo.finalproject_5re5_be.member.exception;
 
-public class MemberNotFoundException extends RuntimeException {
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 
-    public MemberNotFoundException(String message) {
-        super(message);
-    }
+import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
+
+// 입력값으로부터 회원을 찾지 못했을 때 발생하는 예외
+public class MemberNotFoundException extends BusinessException {
 
     public MemberNotFoundException() {
-        this("회원이 존재하지 않습니다.");
+        this(MEMBER_NOT_FOUND_ERROR.getMessage());
+    }
+
+    public MemberNotFoundException(String message) {
+        super(message, MEMBER_NOT_FOUND_ERROR);
     }
 
 }

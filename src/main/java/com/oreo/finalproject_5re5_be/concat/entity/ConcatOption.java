@@ -10,6 +10,7 @@ import lombok.*;
 
 @ToString
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "concat_option")

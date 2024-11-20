@@ -7,6 +7,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    @Query( "SELECT m " +
+            "FROM Member m " +
+            "WHERE m.seq = :memberSeq " )
+    public Member findBySeq(Long memberSeq);
     public Member findByEmail(String email);
     public Member findById(String id);
     public boolean existsByEmail(String email);
