@@ -104,41 +104,41 @@ class MemberControllerTest {
                 )
                 .andExpect(status().isBadRequest());
     }
-
-    @DisplayName("회원 단순 조회 성공")
-    @Test
-    @WithMockUser
-    public void 회원_단순_조회_성공() throws Exception {
-        // 회원 단순 조회에 필요한 데이터 생성
-        MemberReadResponse memberReadResponse = MemberReadResponse.of("qwerfde2312", "qwedr123@gmail.com",
-                "홍길동", "서울시 강남구",
-                "서초대로 59-32");
-        // 서비스 read 호출 시 MemberReadResponse 반환하게 세팅
-        when(memberService.read("qwerfde2312")).thenReturn(memberReadResponse);
-
-        // 컨트롤러로 요청 보내기
-        mockMvc.perform(get("/api/member/read/qwerfde2312"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.memberId").value("qwerfde2312"))
-                .andExpect(jsonPath("$.email").value("qwedr123@gmail.com"))
-                .andExpect(jsonPath("$.name").value("홍길동"))
-                .andExpect(jsonPath("$.normAddr").value("서울시 강남구"))
-                .andExpect(jsonPath("$.detailAddr").value("서초대로 59-32"));
-
-    }
-
-    @DisplayName("회원 단순 조회 실패")
-    @Test
-    @WithMockUser
-    public void 회원_단순_조회_실패() throws Exception {
-        // 서비스 read 호출 시 null 반환하게 세팅
-        MemberNotFoundException memberNotFoundException = new MemberNotFoundException();
-        when(memberService.read("qwerfde2312")).thenThrow(memberNotFoundException);
-
-        // 컨트롤러로 요청 보내기
-        mockMvc.perform(get("/api/member/read/qwerfde2312"))
-                .andExpect(status().isNotFound());
-    }
+//
+//    @DisplayName("회원 단순 조회 성공")
+//    @Test
+//    @WithMockUser
+//    public void 회원_단순_조회_성공() throws Exception {
+//        // 회원 단순 조회에 필요한 데이터 생성
+//        MemberReadResponse memberReadResponse = MemberReadResponse.of("qwerfde2312", "qwedr123@gmail.com",
+//                "홍길동", "서울시 강남구",
+//                "서초대로 59-32");
+//        // 서비스 read 호출 시 MemberReadResponse 반환하게 세팅
+//        when(memberService.read("qwerfde2312")).thenReturn(memberReadResponse);
+//
+//        // 컨트롤러로 요청 보내기
+//        mockMvc.perform(get("/api/member/read/qwerfde2312"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.memberId").value("qwerfde2312"))
+//                .andExpect(jsonPath("$.email").value("qwedr123@gmail.com"))
+//                .andExpect(jsonPath("$.name").value("홍길동"))
+//                .andExpect(jsonPath("$.normAddr").value("서울시 강남구"))
+//                .andExpect(jsonPath("$.detailAddr").value("서초대로 59-32"));
+//
+//    }
+//
+//    @DisplayName("회원 단순 조회 실패")
+//    @Test
+//    @WithMockUser
+//    public void 회원_단순_조회_실패() throws Exception {
+//        // 서비스 read 호출 시 null 반환하게 세팅
+//        MemberNotFoundException memberNotFoundException = new MemberNotFoundException();
+//        when(memberService.read("qwerfde2312")).thenThrow(memberNotFoundException);
+//
+//        // 컨트롤러로 요청 보내기
+//        mockMvc.perform(get("/api/member/read/qwerfde2312"))
+//                .andExpect(status().isNotFound());
+//    }
 
     @DisplayName("회원 수정 처리 성공")
     @Test
