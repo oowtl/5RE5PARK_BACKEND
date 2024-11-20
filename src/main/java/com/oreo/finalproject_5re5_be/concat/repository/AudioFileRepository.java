@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.concat.repository;
 
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
-import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
-    @Query("SELECT cr FROM concat_row cr WHERE cr.audioFile.audioFileSeq = :audioFileSeq")
-    ConcatRow findConcatRowByAudioFile(Long audioFileSeq);
 
     Optional<AudioFile> findByAudioUrl(String audioUrl);
 
