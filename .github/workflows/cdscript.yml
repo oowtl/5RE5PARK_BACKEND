@@ -7,11 +7,24 @@ on:
     branches:
       - main
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      EMAIL_TITLE: ${{ secrets.EMAIL_TITLE }}
+      EMAIL_CONTENT_TEMPLATE: ${{ secrets.EMAIL_CONTENT_TEMPLATE }}
+      SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+      AWS_S3_ACCESSKEY: ${{ secrets.AWS_S3_ACCESSKEY }}
+      AWS_S3_SECRETKEY: ${{ secrets.AWS_S3_SECRETKEY }}
+      AWS_S3_BUKET_NAME: ${{ secrets.AWS_S3_BUKET_NAME }}
+      AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+      VC_URL: ${{ secrets.VC_URL }}
+      VC_APIKEY: ${{ secrets.VC_APIKEY }}
 
-    steps:
-      # 1. 코드 체크아웃
+
+
+    steps:      # 1. 코드 체크아웃
       - name: Check out code
         uses: actions/checkout@v4
 
@@ -46,19 +59,16 @@ jobs:
       - name: Build and Test
         run: ./gradlew build
 
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: appleboy/ssh-action@master # ssh 접속 오픈소스
         with:
           host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
           username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
           key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
           port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
+          timeout: 120s
+          debug: true # 디버그 모드 활성화
           script: |
-            # 스크립트 실행할 곳으로 이동
-            cd /home/ubuntu/app
             # 8080포트 사용중인 프로세스 확인
             PID=$(lsof -t -i:8080)
             
@@ -69,5 +79,10 @@ jobs:
               echo "8080 포트는 사용 중이지 않습니다."
             fi
             
-            #배포 스크립트 실행
-            bash ./deploy.sh
+            # 스크립트 실행할 곳으로 이동
+            cd /home/ubuntu/app
+            
+            # 새로운 배포 스크립트 백그라운드 실행
+            echo "deploy.sh를 백그라운드에서 실행합니다."
+            nohup ./deploy.sh > deploy.log 2>&1 &
+            echo "새로운 deploy.sh가 실행 중입니다."
