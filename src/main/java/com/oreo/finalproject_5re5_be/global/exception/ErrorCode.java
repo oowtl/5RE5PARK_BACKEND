@@ -24,6 +24,7 @@ public enum ErrorCode {
     // 코드 예외 상태 코드 정의
     CODE_NOT_FOUND_ERROR(404, "해당 코드를 찾을 수 없습니다. 코드 정보를 다시 확인해 주세요."),
     CODE_DUPLICATED_ERROR(409, "이미 사용중인 코드명입니다. 다른 코드명을 사용해 주세요."),
+    CODE_INVALID_INPUT_VALUE_ERROR(400, "코드 입력값이 올바르지 않습니다."),
 
 
 
