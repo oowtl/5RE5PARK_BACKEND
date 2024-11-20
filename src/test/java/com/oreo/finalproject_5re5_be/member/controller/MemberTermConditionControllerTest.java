@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
 
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
@@ -482,11 +484,14 @@ class MemberTermConditionControllerTest {
         // 예외 발생 시킬 더미 데이터 세팅
         String condCode = "mtc01";
         // 서비스에서 예외 발생하게 설정
-        when(memberTermsConditionService.read(condCode)).thenThrow(MemberTermsConditionNotFoundException.class);
+        when(memberTermsConditionService.read(condCode)).thenThrow(new MemberTermsConditionNotFoundException());
 
         // 컨트롤러에 요청 보내기
         // 예외 처리 확인
-        mockMvc.perform(get("/api/member-term-condition/mtc01"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/member-term-condition/mtc01")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(MEMBER_TERM_NOT_FOUND_ERROR.getStatus()))
+                .andExpect(jsonPath("$.status").value(MEMBER_TERM_NOT_FOUND_ERROR.getStatus()))
+                .andExpect(jsonPath("$.response.message").value(MEMBER_TERM_NOT_FOUND_ERROR.getMessage()));
     }
 }

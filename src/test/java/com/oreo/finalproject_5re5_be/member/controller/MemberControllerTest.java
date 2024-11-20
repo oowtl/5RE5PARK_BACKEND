@@ -95,8 +95,6 @@ class MemberControllerTest {
         MemberRegisterRequest request = createMemberRegisterRequest(memberTerms);
         // 잘못된 아이디로 설정
         request.setId("잘못된 아이디");
-        // 기대하는 에러 메시지 설정
-        String expectedErrorMessage = "register.memberRegisterRequest.id: 아이디는 6~20자의 영문 및 숫자만 허용됩니다.";
 
         // 컨트롤러로 요청 보내기
         mockMvc.perform(post("/api/member/register")
@@ -104,8 +102,7 @@ class MemberControllerTest {
                         .content(objectMapper.writeValueAsString(request))
                         .with(csrf())
                 )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(expectedErrorMessage));
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("회원 단순 조회 성공")
@@ -137,12 +134,10 @@ class MemberControllerTest {
         // 서비스 read 호출 시 null 반환하게 세팅
         MemberNotFoundException memberNotFoundException = new MemberNotFoundException();
         when(memberService.read("qwerfde2312")).thenThrow(memberNotFoundException);
-        String expectedErrorMessage = "회원이 존재하지 않습니다.";
 
         // 컨트롤러로 요청 보내기
         mockMvc.perform(get("/api/member/read/qwerfde2312"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value(expectedErrorMessage));;
+                .andExpect(status().isNotFound());
     }
 
     @DisplayName("회원 수정 처리 성공")

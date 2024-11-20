@@ -1,5 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.CODE_INVALID_INPUT_VALUE_ERROR;
+import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+
+import com.oreo.finalproject_5re5_be.global.dto.response.ErrorResponseDto;
+import com.oreo.finalproject_5re5_be.global.dto.response.ErrorResponseDto.FieldErrorDetail;
+import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
 import com.oreo.finalproject_5re5_be.member.dto.request.CodeRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.CodeUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.CodeResponse;
@@ -8,13 +14,19 @@ import com.oreo.finalproject_5re5_be.member.service.CodeServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;

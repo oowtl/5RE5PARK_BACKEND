@@ -8,6 +8,7 @@ import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
 public class MemberTermsConditionNotFoundException extends BusinessException {
     public MemberTermsConditionNotFoundException() {
         this(MEMBER_TERMS_CONDITION_NOT_FOUND_ERROR.getMessage());
+        System.out.println("ghcnfehla");
     }
 
     public MemberTermsConditionNotFoundException(String message) {
