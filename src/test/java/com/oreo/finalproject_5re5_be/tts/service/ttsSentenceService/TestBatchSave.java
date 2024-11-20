@@ -17,10 +17,13 @@ import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
 import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsProgressStatusRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
@@ -55,6 +58,9 @@ class TestBatchSave {
 
     @MockBean
     private StyleRepository styleRepository;
+
+    @MockBean
+    private TtsProgressStatusRepository ttsProgressStatusRepository;
 
     /*
     1. 성공 케이스 테스트
@@ -127,6 +133,11 @@ class TestBatchSave {
             .style(mock(Style.class))
             .build();
 
+        TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()
+            .ttsSentence(ttsSentence)
+            .progressStatus(TtsProgressStatusCode.CREATED)
+            .build();
+
         // 프로젝트가 존재한다고 설정
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
         // voice이 존재한다고 설정
@@ -137,6 +148,8 @@ class TestBatchSave {
         when(ttsSentenceRepository.findById(anyLong())).thenReturn(Optional.of(ttsSentence));
         // 각 문장에 대해 TtsSentenceDto 반환
         when(ttsSentenceRepository.save(any())).thenReturn(ttsSentence);
+        // ttsProgressStatus 가 존재한다고 설정
+        when(ttsProgressStatusRepository.save(any())).thenReturn(ttsProgressStatus);
 
         // when: batchSaveSentence 메서드 호출
         TtsSentenceListDto result = ttsSentenceService.batchSaveSentence(projectSeq, batchRequest);
