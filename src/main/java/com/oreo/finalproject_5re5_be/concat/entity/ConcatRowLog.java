@@ -1,19 +1,14 @@
 package com.oreo.finalproject_5re5_be.concat.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
-
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @ToString
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "concat_row_log")
