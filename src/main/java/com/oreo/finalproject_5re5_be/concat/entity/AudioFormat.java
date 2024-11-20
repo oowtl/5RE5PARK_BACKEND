@@ -17,14 +17,6 @@ public class AudioFormat extends BaseEntity {
     @Column(name = "audio_format_seq")
     private Long audioFormatSeq;
 
-
-    @OneToOne(mappedBy = "audioFormat")
-    private AudioFile audioFile;
-
-    @OneToOne(mappedBy = "audioFormat")
-    private ConcatResult concatResult;
-
-
     private String encoding;
     private Integer sampleRate;
     private Short sampleSizeBit;
