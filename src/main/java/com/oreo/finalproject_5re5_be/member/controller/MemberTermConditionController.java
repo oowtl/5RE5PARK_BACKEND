@@ -41,8 +41,8 @@ public class MemberTermConditionController {
     private final MemberTermsConditionServiceImpl memberTermConditionService;
 
 
-    @Operation(summary = "회원 약관 항목 등록 처리")
-    @PostMapping("/register")
+//    @Operation(summary = "회원 약관 항목 등록 처리")
+//    @PostMapping("/register")
     public ResponseEntity<MemberTermConditionResponse> register(@Valid @RequestBody MemberTermConditionRequest request) {
         // 단건 등록 처리
         MemberTermConditionResponse response = memberTermConditionService.create(request);
@@ -51,8 +51,8 @@ public class MemberTermConditionController {
                              .body(response);
     }
 
-    @Operation(summary = "회원 약관 항목 여러개 등록 처리")
-    @PostMapping("/register-all")
+//    @Operation(summary = "회원 약관 항목 여러개 등록 처리")
+//    @PostMapping("/register-all")
     public ResponseEntity<MemberTermConditionResponses> register(@Valid @RequestBody List<MemberTermConditionRequest> requests) {
         // 여러건 등록 처리
         MemberTermConditionResponses response = memberTermConditionService.create(requests);
@@ -61,8 +61,8 @@ public class MemberTermConditionController {
                              .body(response);
     }
 
-    @Operation(summary = "특정 회원 약관 항목 조회")
-    @GetMapping("/{condCode}")
+//    @Operation(summary = "특정 회원 약관 항목 조회")
+//    @GetMapping("/{condCode}")
     public ResponseEntity<MemberTermConditionResponse> read(@PathVariable("condCode") String condCode) {
         // 단건 조회 처리
         MemberTermConditionResponse response = memberTermConditionService.read(condCode);
@@ -71,8 +71,8 @@ public class MemberTermConditionController {
                              .body(response);
     }
 
-    @Operation(summary = "모든 회원 약관 항목 조회")
-    @GetMapping("/all")
+//    @Operation(summary = "모든 회원 약관 항목 조회")
+//    @GetMapping("/all")
     public ResponseEntity<MemberTermConditionResponses> readAll() {
         // 모든 조회 처리
         MemberTermConditionResponses response = memberTermConditionService.readAll();
@@ -81,8 +81,8 @@ public class MemberTermConditionController {
                              .body(response);
     }
 
-    @Operation(summary = "사용 가능한 약관 항목 조회")
-    @GetMapping("/available")
+//    @Operation(summary = "사용 가능한 약관 항목 조회")
+//    @GetMapping("/available")
     public ResponseEntity<MemberTermConditionResponses> readAvailable() {
         // 사용 가능한 모든 조회 처리
         MemberTermConditionResponses response = memberTermConditionService.readAvailable();
@@ -91,8 +91,8 @@ public class MemberTermConditionController {
                              .body(response);
     }
 
-    @Operation(summary = "사용 불가능한 약관 항목 조회")
-    @GetMapping("/not-available")
+//    @Operation(summary = "사용 불가능한 약관 항목 조회")
+//    @GetMapping("/not-available")
     public ResponseEntity<MemberTermConditionResponses> readNotAvailable() {
         // 사용 불가능한 모든 조회 처리
         MemberTermConditionResponses response = memberTermConditionService.readNotAvailable();
@@ -101,8 +101,8 @@ public class MemberTermConditionController {
                              .body(response);
     }
 
-    @Operation(summary = "특정 약관 항목 수정")
-    @PatchMapping("/{condCode}")
+//    @Operation(summary = "특정 약관 항목 수정")
+//    @PatchMapping("/{condCode}")
     public ResponseEntity<Void> update(@PathVariable("condCode") String condCode, @RequestBody @Valid MemberTermConditionUpdateRequest request) {
         // 수정 처리
         memberTermConditionService.update(condCode, request);
@@ -112,8 +112,8 @@ public class MemberTermConditionController {
                              .build();
     }
 
-    @Operation(summary = "특정 약관 항목 삭제")
-    @DeleteMapping("/{condCode}")
+//    @Operation(summary = "특정 약관 항목 삭제")
+//    @DeleteMapping("/{condCode}")
     public ResponseEntity<Void> remove(@PathVariable("condCode") String condCode) {
         // 삭제 처리
         memberTermConditionService.remove(condCode);

@@ -63,7 +63,7 @@ public class MemberController {
     }
 
     @Operation(summary = "이메일 인증 번호 발송 처리")
-    @GetMapping("/verify-email")
+    @PostMapping("/verify-email")
     public ResponseEntity<String> verifyEmail(@RequestBody String email) {
         // 인증번호 생성 및 유저에게 이메일 발송
         String verificationCode = memberService.sendVerificationCode(email);
@@ -74,10 +74,10 @@ public class MemberController {
 
 
     @Operation(summary = "회원 단순 조회 처리")
-    @GetMapping("/read/{memberId}")
-    public ResponseEntity<MemberReadResponse> read(@PathVariable("memberId") String memberId) {
+    @GetMapping("/read/{memberSeq}")
+    public ResponseEntity<MemberReadResponse> read(@Parameter(description = "Member 시퀀스") @Min(value = 1L, message = "회원의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("memberSeq") Long memberSeq) {
         // 회원 조회
-        MemberReadResponse response = memberService.read(memberId);
+        MemberReadResponse response = memberService.read(memberSeq);
         // 응답 반환
         return ResponseEntity.ok()
                              .body(response);
