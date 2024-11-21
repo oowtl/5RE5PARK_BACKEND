@@ -20,7 +20,7 @@ public class Voice extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long voiceSeq;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "gender")
@@ -32,11 +32,18 @@ public class Voice extends BaseEntity {
     @Column(name = "dscp")
     private String description;
 
+    @Column(name = "use_cnt")
+    private Integer useCnt;
+
+    @Column(name = "recm_yn")
+    private char isRecommend;
+
     @Column(name = "enabled")
     private char enabled;
 
-    @Column(name = "server", nullable = false)
-    private String server;
+    @Enumerated(EnumType.STRING)
+    @Column(name="server", nullable = false)
+    private ServerCode server;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "lang_seq")
