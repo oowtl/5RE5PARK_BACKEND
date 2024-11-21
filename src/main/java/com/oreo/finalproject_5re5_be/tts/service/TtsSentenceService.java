@@ -14,4 +14,5 @@ public interface TtsSentenceService {
     TtsSentenceDto getSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq);
     TtsSentenceListDto getSentenceList(@Valid @NotNull Long projectSeq);
     boolean deleteSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq);
+    TtsSentenceDto patchSentenceOrder(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq, @Valid @NotNull Integer order);
 }
