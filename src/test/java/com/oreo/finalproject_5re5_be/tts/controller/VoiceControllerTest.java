@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.dto.response.VoiceListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
+import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.service.VoiceService;
@@ -131,9 +132,7 @@ class VoiceControllerTest {
                 .name("style-name"+seq)
                 .mood("style-mood"+seq)
                 .description("style-desc"+seq)
-                .isRecommend('n')
                 .contents("contents-test"+seq)
-                .useCnt(seq.intValue())
                 .build();
     }
 
@@ -154,10 +153,12 @@ class VoiceControllerTest {
                 .voiceSeq(seq)
                 .name("test-voice-name"+seq)
                 .age(seq.intValue()+10)
-                .server("test-voice-server"+seq)
+                .server(ServerCode.GOOGLE_CLOUD)
                 .enabled(enabled)
                 .language(language)
                 .style(style)
+                .isRecommend('N')
+                .useCnt(seq.intValue())
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
+import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import org.junit.jupiter.api.DisplayName;
@@ -142,7 +143,7 @@ public class VoiceRepositoryFindTest {
         return Voice.builder()
                 .name("test-voice-name"+i)
                 .age(i+10)
-                .server("test-voice-server"+i)
+                .server(ServerCode.GOOGLE_CLOUD)
                 .enabled(enabled)
                 .language(language)
                 .style(style)
@@ -166,7 +167,6 @@ public class VoiceRepositoryFindTest {
                 .mood("test-style-mood"+i)
                 .description("test-style-dest"+i)
                 .contents("test-style-contents"+i)
-                .isRecommend('n')
                 .build();
     }
 

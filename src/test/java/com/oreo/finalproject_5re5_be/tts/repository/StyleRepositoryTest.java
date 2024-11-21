@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
+import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -103,8 +104,6 @@ public class StyleRepositoryTest {
                 .mood("styleMood")
                 .contents("styleContents")
                 .description("styleDescription")
-                .useCnt(0)
-                .isRecommend('N')
                 .build();
 
         // when, then
@@ -173,8 +172,8 @@ public class StyleRepositoryTest {
         String updateMood = "updateStyleMood";
         String updateContents = "updateStyleContents";
         String updateDescription = "updateStyleDescription";
-        int updateUseCnt = 3;
-        char updateIsRecommend = 'N';
+        ServerCode updateServer = ServerCode.GOOGLE_CLOUD;
+        char updateEnabled = 'n';
 
         // 1. Style Entity 객체 생성
         Style createStyle = createStyleEntity();
@@ -192,8 +191,8 @@ public class StyleRepositoryTest {
                 .mood(updateMood)
                 .contents(updateContents)
                 .description(updateDescription)
-                .useCnt(updateUseCnt)
-                .isRecommend(updateIsRecommend)
+                .server(updateServer)
+                .enabled(updateEnabled)
                 .build();
 
         // 5. 수정된 Style Entity 객체 저장
@@ -257,8 +256,6 @@ public class StyleRepositoryTest {
         String updateMood = "updateStyleMood";
         String updateContents = "updateStyleContents";
         String updateDescription = "updateStyleDescription";
-        int updateUseCnt = 3;
-        char updateIsRecommend = 'N';
 
         // 1. Style Entity 객체 생성
         Style createStyle = createStyleEntity();
@@ -276,8 +273,6 @@ public class StyleRepositoryTest {
                 .mood(updateMood)
                 .contents(updateContents)
                 .description(updateDescription)
-                .useCnt(updateUseCnt)
-                .isRecommend(updateIsRecommend)
                 .build();
 
         // 4. 수정된 Style Entity 객체 저장
@@ -354,8 +349,8 @@ public class StyleRepositoryTest {
                 .mood("styleMood")
                 .contents("styleContents")
                 .description("styleDescription")
-                .useCnt(0)
-                .isRecommend('N')
+                .server(ServerCode.NAVER_CLOVA)
+                .enabled('y')
                 .build();
     }
 
@@ -365,8 +360,8 @@ public class StyleRepositoryTest {
                 .mood("styleMood" + cnt)
                 .contents("styleContents" + cnt)
                 .description("styleDescription" + cnt)
-                .useCnt(cnt)
-                .isRecommend('N')
+                .server(ServerCode.GOOGLE_CLOUD)
+                .enabled('y')
                 .build();
     }
 }
