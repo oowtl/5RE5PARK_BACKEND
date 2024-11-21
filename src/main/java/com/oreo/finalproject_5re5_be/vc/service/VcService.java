@@ -53,7 +53,7 @@ public interface VcService {
 
     VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
     VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
-
+    List<VcRowResponse> updateRowOrder(@Valid @NotNull List<VcRowRequest> row);
     VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
     List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs);
 
