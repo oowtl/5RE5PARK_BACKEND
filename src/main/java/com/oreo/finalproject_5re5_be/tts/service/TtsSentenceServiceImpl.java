@@ -266,4 +266,21 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 3. 결과 반환
         return true;
     }
+
+    @Override
+    public TtsSentenceDto patchSentenceOrder(Long projectSeq, Long tsSeq, Integer order) {
+        // 1. TtsSentence 엔티티 조회
+        TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
+                .orElseThrow(EntityNotFoundException::new);
+
+        // 2. TtsSentence 엔티티 수정
+        TtsSentence updatedTtsSentence = ttsSentence.toBuilder()
+                .sortOrder(order)
+                .build();
+
+        // 3. TtsSentence 저장
+        TtsSentence savedTtsSentence = ttsSentenceRepository.save(updatedTtsSentence);
+
+        return TtsSentenceDto.of(savedTtsSentence);
+    }
 }
