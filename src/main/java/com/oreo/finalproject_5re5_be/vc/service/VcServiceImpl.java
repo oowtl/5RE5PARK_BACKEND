@@ -59,13 +59,14 @@ public class VcServiceImpl implements VcService{
         //프로젝트 조회, 객체 생성후 저장
         List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vcSrcRequest.getSeq());
         VcSrcFile src;
+        //VC 찾기
         Vc vc = vcRepository.findById(proSeq)
                 .orElseThrow(() -> new IllegalArgumentException("not found"));
-                ;
+        //SRC를 찾아서 있다면 1로 없다면 사이즈만큼에서 +1해서 저장
         if (vcSrcFileRepository.existsById(vcSrcRequest.getSeq())){
              src = VcSrcFile.builder()
                     .vc(vc)
-                    .rowOrder(vcSrcRequest.getRowOrder())
+                    .rowOrder(1)
                     .fileName(vcSrcRequest.getName())
                     .fileUrl(vcSrcRequest.getFileUrl())
                     .fileLength(vcSrcRequest.getLength())
@@ -413,11 +414,18 @@ public class VcServiceImpl implements VcService{
                 .build();
     }
 
+    /**
+     * 행 순서 변경 리스트로
+     * @param row
+     * @return
+     */
     @Override
     public List<VcRowResponse> updateRowOrder(List<VcRowRequest> row) {
         List<VcRowResponse> vcRowResponseList = new ArrayList<>();
         for (int i = 0; i < row.size(); i++) {
+            //SRC seq 로 SRC 값 조회 검증
             VcSrcFile vcSrcFile = vcSrcFileFind(row.get(i).getSeq());
+            //변경할 행순서 값과 SRC seq 값 변경 객체 생성
             VcSrcFile updateSrcFile = vcSrcFile.toBuilder()
                     .srcSeq(row.get(i).getSeq())
                     .rowOrder(row.get(i).getRowOrder())
