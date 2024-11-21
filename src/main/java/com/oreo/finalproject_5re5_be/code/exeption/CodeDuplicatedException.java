@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.member.exception;
+package com.oreo.finalproject_5re5_be.code.exeption;
 
 import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 

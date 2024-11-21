@@ -1,10 +1,9 @@
-package com.oreo.finalproject_5re5_be.member.dto.response;
+package com.oreo.finalproject_5re5_be.code.dto.response;
 
-import com.oreo.finalproject_5re5_be.member.entity.Code;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 

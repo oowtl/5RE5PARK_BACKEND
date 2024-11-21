@@ -4,14 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
-import com.oreo.finalproject_5re5_be.member.entity.Code;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
-import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
+import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;

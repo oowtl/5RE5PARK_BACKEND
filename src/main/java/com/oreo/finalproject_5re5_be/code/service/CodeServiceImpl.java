@@ -1,14 +1,14 @@
-package com.oreo.finalproject_5re5_be.member.service;
+package com.oreo.finalproject_5re5_be.code.service;
 
 
-import com.oreo.finalproject_5re5_be.member.dto.request.CodeRequest;
-import com.oreo.finalproject_5re5_be.member.dto.request.CodeUpdateRequest;
-import com.oreo.finalproject_5re5_be.member.dto.response.CodeResponse;
-import com.oreo.finalproject_5re5_be.member.dto.response.CodeResponses;
-import com.oreo.finalproject_5re5_be.member.entity.Code;
-import com.oreo.finalproject_5re5_be.member.exception.CodeDuplicatedException;
-import com.oreo.finalproject_5re5_be.member.exception.CodeNotFoundException;
-import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
+import com.oreo.finalproject_5re5_be.code.dto.request.CodeRequest;
+import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
+import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponse;
+import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponses;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
+import com.oreo.finalproject_5re5_be.code.exeption.CodeDuplicatedException;
+import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
+import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

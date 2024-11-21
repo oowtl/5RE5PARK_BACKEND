@@ -1,6 +1,6 @@
-package com.oreo.finalproject_5re5_be.member.repository;
+package com.oreo.finalproject_5re5_be.code.repository;
 
-import com.oreo.finalproject_5re5_be.member.entity.Code;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

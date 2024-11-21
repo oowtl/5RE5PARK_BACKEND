@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.member.dto.request;
+package com.oreo.finalproject_5re5_be.code.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;
