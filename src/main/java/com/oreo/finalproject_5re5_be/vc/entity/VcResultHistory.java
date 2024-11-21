@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.entity.Code;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,31 +9,28 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vc_errorlog")
+@Table(name = "vc_result_history")
 @Getter
 @ToString
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
-public class VcErrorLog extends BaseEntity {
+public class VcResultHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ver_seq")
-    private Long verSeq;
+    @Column(name = "vrl_seq")
+    private Long vrlSeq;
 
-    @Column(nullable = false, name = "message")
-    private String message;
-    @Column(nullable = false, name = "code")
-    private String code;
-    @Column(nullable = false, name = "vc_reg_date")
+    @Column(nullable = false, name = "vrl_reg_date")
     @CreatedDate
     private LocalDateTime date;
-    @Column(nullable = false, name = "stack")
-    private String stack;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code")
+    private Code ccSeq;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Vc vc;
 
