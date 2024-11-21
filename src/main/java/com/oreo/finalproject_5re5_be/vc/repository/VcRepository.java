@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VcRepository extends JpaRepository<Vc, Long> {
+    boolean existsById(Long id);
 }
