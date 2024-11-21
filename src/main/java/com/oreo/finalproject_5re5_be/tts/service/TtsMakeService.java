@@ -2,7 +2,6 @@ package com.oreo.finalproject_5re5_be.tts.service;
 
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
-import com.oreo.finalproject_5re5_be.global.component.audio.AudioDurationUtil;
 import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.tts.client.AudioConfigGenerator;
@@ -14,7 +13,10 @@ import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProcessHistory;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
-import com.oreo.finalproject_5re5_be.tts.repository.*;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsAudioFileRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsProcessHistoryRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,7 +117,7 @@ public class TtsMakeService {
                 .audioName(audioFileInfo.getName())
                 .audioExtension(audioFileInfo.getExtension())
                 .audioPath(url)
-                .audioTime(AudioDurationUtil.getAudioDurationInMilliseconds(ttsFile))
+                .audioTime(audioFileInfo.getLength())
                 .audioSize(audioFileInfo.getSize())
                 .audioPlayYn('y')
                 .downloadYn('y')
