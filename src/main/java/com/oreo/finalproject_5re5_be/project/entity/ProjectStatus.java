@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.project.entity;
 
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.entity.Code;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,8 +33,14 @@ public class ProjectStatus extends BaseEntity {
     private Project project;
 
     /** 추후에 통합 코드 엔티티와 연관관계 맺기 **/
-    private Long ccSeq;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code")
+    private Code ccSeq;
 
-    private LocalDateTime applDate;
-    private LocalDateTime endDate;
+    private LocalDateTime applDate;//적용 시점일
+    private LocalDateTime endDate;//적용 종료일
+
+    public void prePersist() {
+        applDate = LocalDateTime.now();
+    }
 }
