@@ -15,8 +15,6 @@ public class StyleDto {
     private String mood;
     private String contents;
     private String desc;
-    private Integer useCnt;
-    private char recm;
 
     public static StyleDto of(Style style) {
         return StyleDto.builder()
@@ -24,8 +22,6 @@ public class StyleDto {
                 .mood(style.getMood())
                 .contents(style.getContents())
                 .desc(style.getDescription())
-                .useCnt(style.getUseCnt())
-                .recm(style.getIsRecommend())
                 .build();
     }
 }
