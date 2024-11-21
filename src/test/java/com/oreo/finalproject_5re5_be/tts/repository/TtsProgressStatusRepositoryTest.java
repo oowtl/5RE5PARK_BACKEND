@@ -179,7 +179,7 @@ class TtsProgressStatusRepositoryTest {
                 .age(30)
                 .description("Sample Description")
                 .enabled('Y')
-                .server("Test Server")
+                .server(ServerCode.GOOGLE_CLOUD)
                 .build();
     }
 

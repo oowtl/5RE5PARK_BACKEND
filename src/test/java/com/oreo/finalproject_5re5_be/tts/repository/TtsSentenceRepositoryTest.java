@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
+import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
@@ -397,7 +398,7 @@ public class TtsSentenceRepositoryTest {
                 .age(30)
                 .description("Sample Description")
                 .enabled('Y')
-                .server("Test Server")
+                .server(ServerCode.GOOGLE_CLOUD)
                 .build();
     }
 
