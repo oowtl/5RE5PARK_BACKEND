@@ -21,6 +21,9 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         handleSession(request, authentication);
         // 세션 처리
         handleCookie(request, response, authentication);
+
+        // 로그인 성공시 "/" url로 리다이렉션 처리
+        response.sendRedirect("/");
     }
 
     // 세션 등록
@@ -58,8 +61,6 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             response.addCookie(cookie);
         }
 
-        // 로그인 성공시 "/" url로 리다이렉션 처리
-        response.sendRedirect("/");
     }
 
 }
