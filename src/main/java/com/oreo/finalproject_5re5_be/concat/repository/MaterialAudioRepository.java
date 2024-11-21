@@ -22,5 +22,8 @@ public interface MaterialAudioRepository extends JpaRepository<MaterialAudio, Lo
     @Modifying(clearAutomatically = true) // 변경 후 자동으로 영속성 컨텍스트를 초기화
     @Query("DELETE FROM material_audio ma WHERE ma.concatResult.concatResultSequence = :concatResultSeq")
     void deleteByConcatResultSeq(Long concatResultSeq);
+    
+    @Query("SELECT ma FROM material_audio ma WHERE ma.concatResult.concatResultSequence = :concatResultSeq")
+    List<MaterialAudio> findByConcatResultSeq(Long concatResultSeq);
 
 }

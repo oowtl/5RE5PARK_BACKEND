@@ -159,9 +159,11 @@ public class AudioFileService {
             }
             audioFileRepository.deleteById(seq);
         }
-
-
     }
 
+    // AudioFile seq 리스트를 받아서 매칭되는 ConcatRow seq 리스트 반환
+    public List<Long> findConcatRowSeqsByAudioFileSeqs(List<Long> audioFileSeqs) {
+        return audioFileRepository.findConcatRowSeqsByAudioFileSeqs(audioFileSeqs);
+    }
 }
 
