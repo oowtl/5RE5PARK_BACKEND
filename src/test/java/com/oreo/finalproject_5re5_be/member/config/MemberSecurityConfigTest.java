@@ -118,7 +118,7 @@ class MemberSecurityConfigTest {
                         .user(memberRegisterRequest.getId())
                         .password("wrong password"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/api/member/login")); // 이 부분 추후에 프론트랑 얘기하기
+                .andExpect(redirectedUrl("/fail")); // 이 부분 추후에 프론트랑 얘기하기
     }
 
     // 인증되지 않은 비회원이 보호된 페이지에 접근하면 401 Unauthorized 응답 반환된다.
