@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.member.controller.advice;
+package com.oreo.finalproject_5re5_be.code.controller.advice;
 
 import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.CODE_INVALID_INPUT_VALUE_ERROR;
 import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.INTERNAL_SERVER_ERROR;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j

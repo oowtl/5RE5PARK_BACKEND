@@ -1,14 +1,13 @@
-package com.oreo.finalproject_5re5_be.member.entity;
+package com.oreo.finalproject_5re5_be.code.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import com.oreo.finalproject_5re5_be.member.dto.request.CodeUpdateRequest;
+import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
