@@ -95,5 +95,12 @@ public class MaterialAudioService {
         materialAudioRepository.deleteByConcatResultSeq(concatResultSeq);
     }
 
+    // concatResult의 seq로 매칭되는 audioFile seq들을 조회
+    public List<Long> findAudioFileSeqsByConcatResultSeq(Long concatResultSeq) {
+        return materialAudioRepository.findByConcatResultSeq(concatResultSeq)
+                .stream()
+                .map(materialAudio -> materialAudio.getAudioFile().getAudioFileSeq()) // AudioFile의 seq를 추출
+                .collect(Collectors.toList());
+    }
 
 }
