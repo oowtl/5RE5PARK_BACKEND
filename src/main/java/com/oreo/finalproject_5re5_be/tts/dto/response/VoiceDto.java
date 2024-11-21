@@ -15,6 +15,8 @@ public class VoiceDto {
     private String name;
     private String gender;
     private Integer age;
+    private Integer useCnt;
+    private char isRecommend;
 
     public static VoiceDto of(Voice voice) {
         return VoiceDto.builder()
@@ -22,6 +24,8 @@ public class VoiceDto {
                 .name(voice.getName())
                 .gender(voice.getGender())
                 .age(voice.getAge())
+                .useCnt(voice.getUseCnt())
+                .isRecommend(voice.getIsRecommend())
                 .build();
     }
 }
