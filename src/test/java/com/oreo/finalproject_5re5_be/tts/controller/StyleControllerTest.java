@@ -93,9 +93,7 @@ class StyleControllerTest {
                 .name("style-name"+n)
                 .mood("style-mood"+n)
                 .description("style-desc"+n)
-                .isRecommend('n')
                 .contents("contents-test"+n)
-                .useCnt(n)
                 .build();
     }
 }

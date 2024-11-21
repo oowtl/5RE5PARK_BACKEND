@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
 import com.oreo.finalproject_5re5_be.tts.entity.SampleAudio;
+import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -289,7 +290,7 @@ public class SampleAudioRepositoryTest {
                 .age(30)
                 .description("Sample Voice Description")
                 .enabled('Y')
-                .server("Test Server")
+                .server(ServerCode.GOOGLE_CLOUD)
                 .build();
     }
 

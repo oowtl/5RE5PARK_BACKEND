@@ -32,9 +32,10 @@ public class Style extends BaseEntity {
     @Column(name = "dscp")
     private String description;
 
-    @Column(name = "use_cnt")
-    private Integer useCnt;
+    @Enumerated(EnumType.STRING)
+    @Column(name="server")
+    private ServerCode server;
 
-    @Column(name = "recm")
-    private char isRecommend;
+    @Column(name = "enabled")
+    private char enabled;
 }

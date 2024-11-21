@@ -297,7 +297,7 @@ class TtsProcessHistoryRepositoryTest {
                 .age(30)
                 .description("Sample Description")
                 .enabled('Y')
-                .server("Test Server")
+                .server(ServerCode.NAVER_CLOVA)
                 .build();
     }
 

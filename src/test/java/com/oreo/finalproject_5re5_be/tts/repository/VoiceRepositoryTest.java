@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
+import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,7 +109,7 @@ public class VoiceRepositoryTest {
         // 3. Voice 객체 생성 및 저장 (연관 관계 매핑 포함)
         Voice createVoice = Voice.builder()
                 .name("TEST_NAME") // name 을 제외한 나머지 비 필수 값 제외
-                .server("googleCloudTTS") // 필수 값
+                .server(ServerCode.GOOGLE_CLOUD) // 필수 값
                 .language(language)
                 .style(style)
                 .build();
@@ -334,7 +335,9 @@ public class VoiceRepositoryTest {
         Integer updateAge = 60;
         String updateDescription = "UPDATED_DESCRIPTION";
         char updateEnabled = 'N';
-        String updateServer = "clovaTTS";
+        ServerCode updateServer = ServerCode.NAVER_CLOVA;
+        Integer updateUseCnt = 100;
+        char updateRecommend = 'Y';
 
         // 1. Language 객체 생성 및 저장
         Language createLanguage = languageCreate();
@@ -375,6 +378,8 @@ public class VoiceRepositoryTest {
                 .server(updateServer)
                 .language(savedNewLanguage)
                 .style(savedNewStyle)
+                .useCnt(updateUseCnt)
+                .isRecommend(updateRecommend)
                 .build();
 
         // when
@@ -477,7 +482,7 @@ public class VoiceRepositoryTest {
         Integer savedAge = savedVoice.getAge();
         String savedDescription = savedVoice.getDescription();
         char savedEnabled = savedVoice.getEnabled();
-        String savedServer = savedVoice.getServer();
+        ServerCode savedServer = savedVoice.getServer();
 
         Voice updateVoice = Voice.builder()
                 .voiceSeq(savedVoiceSeq)
@@ -530,7 +535,7 @@ public class VoiceRepositoryTest {
         Integer savedAge = savedVoice.getAge();
         String savedDescription = savedVoice.getDescription();
         char savedEnabled = savedVoice.getEnabled();
-        String savedServer = savedVoice.getServer();
+        ServerCode savedServer = savedVoice.getServer();
 
         Voice updateVoice = Voice.builder()
                 .voiceSeq(savedVoiceSeq)
@@ -629,8 +634,6 @@ public class VoiceRepositoryTest {
                 .mood("styleMood")
                 .contents("styleContents")
                 .description("styleDescription")
-                .useCnt(0)
-                .isRecommend('N')
                 .build();
     }
 
@@ -642,7 +645,9 @@ public class VoiceRepositoryTest {
                 .age(25)
                 .description("TEST description")
                 .enabled('Y')
-                .server("googleCloudTTS")
+                .server(ServerCode.GOOGLE_CLOUD)
+                .useCnt(0)
+                .isRecommend('N')
                 .build();
     }
 
@@ -653,7 +658,9 @@ public class VoiceRepositoryTest {
                 .age(25)
                 .description("TEST description" + cnt)
                 .enabled('Y')
-                .server("googleCloudTTS")
+                .server(ServerCode.GOOGLE_CLOUD)
+                .useCnt(0)
+                .isRecommend('N')
                 .build();
     }
 }

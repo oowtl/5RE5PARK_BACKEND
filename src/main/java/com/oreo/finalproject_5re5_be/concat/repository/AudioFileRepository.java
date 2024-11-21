@@ -27,7 +27,9 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     //페이징 처리해서 데이터를 한번에 모두 가져오지 않고 필요한 만큼만 나눠서 처리
     Page<AudioFile> findByExtension(String extension, Pageable pageable);
 
-
     void deleteById(Long seq);
+
+    @Query("SELECT af.concatRow.concatRowSeq FROM audio_file af WHERE af.audioFileSeq IN :audioFileSeqs")
+    List<Long> findConcatRowSeqsByAudioFileSeqs(List<Long> audioFileSeqs);
 
 }
