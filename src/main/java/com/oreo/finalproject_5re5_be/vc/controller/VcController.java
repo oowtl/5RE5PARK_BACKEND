@@ -57,7 +57,7 @@ public class VcController {
         List<String> upload = s3Service.upload(file, "vc/src");//파일 업로드
         //저장을 위한 파일 정보로 객체 생성
         List<VcSrcRequest> vcSrcRequests = vcService.vcSrcRequestBuilder(audioFileInfos, upload, proSeq);
-        List<VcUrlResponse> vcUrlResponses = vcService.srcSave(vcSrcRequests);//객체 저장
+        List<VcUrlResponse> vcUrlResponses = vcService.srcSave(vcSrcRequests, proSeq);//객체 저장
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),mapCreate(vcUrlResponses,
                         "src 파일 저장 완료되었습니다.")));

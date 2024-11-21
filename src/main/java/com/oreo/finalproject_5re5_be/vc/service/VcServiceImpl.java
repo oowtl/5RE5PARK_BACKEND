@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -53,12 +54,15 @@ public class VcServiceImpl implements VcService{
      */
     @Override
     @Transactional
-    public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest) {
+    public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq) {
+
         //프로젝트 조회, 객체 생성후 저장
+        List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vcSrcRequest.getSeq());
         VcSrcFile src;
-        Vc vc = projectFind(vcSrcRequest.getSeq());
-        List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vc.getProjectSeq());
-        if (vcRepository.existsById(vc.getProjectSeq())){
+        Vc vc = vcRepository.findById(proSeq)
+                .orElseThrow(() -> new IllegalArgumentException("not found"));
+                ;
+        if (vcSrcFileRepository.existsById(vcSrcRequest.getSeq())){
              src = VcSrcFile.builder()
                     .vc(vc)
                     .rowOrder(vcSrcRequest.getRowOrder())
@@ -90,12 +94,12 @@ public class VcServiceImpl implements VcService{
     }
     @Override
     @Transactional
-    public List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequests) {
+    public List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequests, Long proSeq) {
         List<VcUrlResponse> srcUrl = new ArrayList<>();
         for (VcSrcRequest vcSrcRequest : vcSrcRequests) {
             VcSrcFile src;
             //프로젝트 조회, 객체 생성후 저장
-            Vc vc = projectFind(vcSrcRequest.getSeq());
+            Vc vc = projectFind(proSeq);
             List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vc.getProjectSeq());
             if (vcRepository.existsById(vc.getProjectSeq())){
                 src = VcSrcFile.builder()
