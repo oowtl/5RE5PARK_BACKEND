@@ -1,43 +1,50 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
-import com.oreo.finalproject_5re5_be.member.entity.Member;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
+import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Service
+@AllArgsConstructor
 public class ConcatTabService {
     private ConcatTabRepository concatTabRepository;
     private ProjectRepository projectRepository;
+    private MemberServiceImpl memberService;
     private ConcatTabHelper concatTabHelper;
 
     /**
-     * @param projectSeq
+     * @param concatCreateRequestDto
      * @return boolean
      */
     @Transactional
-    public boolean createConcatTab(long projectSeq) {
-        Optional<Project> projectOpt = projectRepository.findById(projectSeq);
-        if (concatTabRepository.existsById(projectSeq) || projectOpt.isEmpty()) {
+    public boolean createConcatTab(ConcatCreateRequestDto concatCreateRequestDto) {
+        Optional<Project> projectOpt = projectRepository.findById(concatCreateRequestDto.getProjectSequence());
+        if (concatTabRepository.existsById(concatCreateRequestDto.getProjectSequence()) || projectOpt.isEmpty()) {
             return false;
         }
         Project project = projectOpt.get();
-        ConcatTab concatTab = new ConcatTab(project.getProSeq(), project, null, 'Y', 0.0f);
+        System.out.println("project.getProSeq() = " + project.getProSeq());
+        ConcatTab concatTab = ConcatTab.builder()
+                .project(project) // Hibernate가 projectId를 자동으로 동기화
+                .option(null)
+                .status('Y')
+                .frontSilence(0.0f)
+                .build();
+
         concatTabRepository.save(concatTab);
         return true;
     }
@@ -55,7 +62,7 @@ public class ConcatTabService {
 
     //projectSeq가 사용자가 소유한 프로젝트의 id가 맞는지 확인 해야함
     @Transactional
-    public ConcatTabResponseDto readConcatTab(long projectSeq, String memberSeq) {
+    public ConcatTabResponseDto readConcatTab(long projectSeq, Long memberSeq) {
         // ConcatTab, Project 조회
         Optional<ConcatTab> concatOpt = concatTabRepository.findById(projectSeq);
         Optional<Project> projectOpt = projectRepository.findById(projectSeq);
@@ -86,9 +93,10 @@ public class ConcatTabService {
 
     @Transactional
     public boolean updateConcatTab(ConcatUpdateRequestDto concatUpdateRequestDto) {
-        Member member = concatUpdateRequestDto.getMember();
+        MemberReadResponse member = memberService.read(concatUpdateRequestDto.getMemberId());
+
         if (member == null) {
-            return false;
+            throw new NoSuchElementException("회원 정보를 찾을 수 없습니다.");
         }
 
         // ConcatTab 및 Project 조회
@@ -99,16 +107,17 @@ public class ConcatTabService {
 
         // 조회 실패 처리
         if (concatTab == null || project == null) {
-            return false;
+            throw new NoSuchElementException("수정할 프로젝트가 없습니다.");
         }
 
         // 권한 확인
-        if (project.getMember().getId().equals(member.getId())) {
+        if (project.getMember().getId().equals(member.getMemberId())) {
             // 저장
             ConcatTab updatedTab = new ConcatTab(
                     concatUpdateRequestDto.getTabId(),
                     project,
-                    concatUpdateRequestDto.getConcatOption(),
+                    //concatUpdateRequestDto.getConcatOption(),
+                    null,
                     concatUpdateRequestDto.getStatus(),
                     concatUpdateRequestDto.getFrontSilence()
             );
@@ -116,6 +125,6 @@ public class ConcatTabService {
             concatTabRepository.save(updatedTab);
             return true;
         }
-        return false;
+        throw new IllegalArgumentException("알 수 없는 오류가 발생했습니다.");
     }
 }
