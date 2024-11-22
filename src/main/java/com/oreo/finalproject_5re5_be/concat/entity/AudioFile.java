@@ -16,17 +16,19 @@ import java.time.LocalDateTime;
 public class AudioFile extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "audio_file_seq_generator")
+    @SequenceGenerator(
+            name = "audio_file_seq_generator",
+            sequenceName = "audio_file_seq", // 실제 시퀀스 이름
+            allocationSize = 1              // ID를 하나씩 할당
+    )
     @Column(name = "audio_file_seq")
     private Long audioFileSeq;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "concat_row_seq")
     private ConcatRow concatRow;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "audio_format_seq")
-    private AudioFormat audioFormat;
 
 
     private String audioUrl;
