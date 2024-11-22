@@ -1,12 +1,18 @@
 package com.oreo.finalproject_5re5_be.member.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
+import com.oreo.finalproject_5re5_be.member.entity.Member;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +28,27 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         // 세션 처리
         handleCookie(request, response, authentication);
 
-        // 로그인 성공시 "/" url로 리다이렉션 처리
-        response.sendRedirect("/");
+        // 로그인 성공시 유저 정보 반환
+        // 사용자 정보 추출
+        Object principal = authentication.getPrincipal();
+        Map<String, Object> memberInfo = new HashMap<>();
+
+
+        if (principal instanceof CustomUserDetails) {
+            CustomUserDetails memberDetails = (CustomUserDetails) principal;
+            Member member = memberDetails.getMember();
+
+            memberInfo.put("seq", member.getSeq());
+            memberInfo.put("id", member.getId());
+            memberInfo.put("name", member.getName());
+            memberInfo.put("email", member.getEmail());
+        } else {
+            memberInfo.put("name", principal.toString());
+        }
+
+        // JSON으로 응답
+        response.setContentType("application/json;charset=UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), memberInfo);
     }
 
     // 세션 등록
