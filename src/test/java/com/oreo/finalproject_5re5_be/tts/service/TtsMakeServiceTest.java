@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ class TtsMakeServiceTest {
     private TtsAudioFileRepository ttsAudioFileRepository;
     @Autowired
     private TtsProcessHistoryRepository ttsProcessHistoryRepository;
+    @Autowired
+    private TtsProgressStatusRepository ttsProgressStatusRepository;
 
     /*
     * [ tts 생성 서비스 테스트 ]
@@ -42,11 +45,11 @@ class TtsMakeServiceTest {
     * */
 
 
-    // 테스트로 인한 TTS 생성 및 s3 업로드를 막기 위해 주석 처리 합니다.
+    // 테스트로 인한 TTS 생성 및 s3 업로드를 막기 위해 빌드 테스트에서 제외 합니다.
 //    @Test
 //    @DisplayName("tts 생성 테스트 - 행의 정보로 TTS 생성")
 //    public void ttsMakeServiceTest() throws Exception {
-//        // 1. Voice, Project, TtsSentence 정보 저장
+//        // 1. given: Voice, Project, TtsSentence 정보 저장
 //        Language savedLanguage = languageRepository.save(createLanguage());
 //        assertNotNull(savedLanguage);
 //        Voice savedVoice = voiceRepository.save(createVoice(savedLanguage));
@@ -56,34 +59,42 @@ class TtsMakeServiceTest {
 //        TtsSentence savedTtsSentence = ttsSentenceRepository.save(createTtsSentence(savedVoice, savedProject));
 //        assertNotNull(savedTtsSentence);
 //
-//        // 2. tts 생성 서비스 수행
+//        // 2. when: tts 생성 서비스 수행
 //        TtsSentenceDto ttsSentenceDto = ttsMakeService.makeTts(savedTtsSentence.getTsSeq());
 //        assertNotNull(ttsSentenceDto);
 //        assertNotNull(ttsSentenceDto.getSentence());
 //        SentenceInfo sentenceInfo = ttsSentenceDto.getSentence();
 //
-//        // 3. TTS 행의 오디오 파일 정보와 조회한 결과가 같은지 확인
+//        // 3. then: TTS 행의 오디오 파일 정보와 조회한 결과가 같은지 확인
 //        TtsAudioFile findTtsAudioFile =
 //                ttsAudioFileRepository.findById(sentenceInfo.getTtsAudioFileInfo().getTtsAudioSeq()).get();
 //        assertNotNull(findTtsAudioFile);
 //        assertEquals(sentenceInfo.getTtsAudioFileInfo().getAudioUrl(), findTtsAudioFile.getAudioPath());
 //
-//        // 4. TTS 처리 내역 리스트 조회 결과 갯수가 1인지 확인
+//        // 4. then: TTS 처리 내역 리스트 조회 결과 갯수가 1인지 확인
 //        List<TtsProcessHistory> list = ttsProcessHistoryRepository.findAll();
 //        assertTrue(list.size() == 1);
 //
+//        // 5. then: 해당 TTS 행의 처리 상태 조회 결과가 IN_PROGRESS, FINISH 상태를 가지고 있는지 확인
+//        List<TtsProgressStatus> statusList = ttsProgressStatusRepository.findAllByTtsSentence(savedTtsSentence);
+//        assertTrue(statusList.stream()
+//                .anyMatch(status -> TtsProgressStatusCode.IN_PROGRESS.equals(status.getProgressStatus()))
+//        );
+//        assertTrue(statusList.stream()
+//                .anyMatch(status -> TtsProgressStatusCode.FINISHED.equals(status.getProgressStatus()))
+//        );
 //    }
-//
-//    @Test
-//    @DisplayName("tts 생성 테스트 - 존재하지 않는 행의 정보로 TTS 생성")
-//    public void ttsMakeServiceTestFromNotExistTs() throws Exception {
-//        // 존재하지 않는 행 확인
-//        Long notExistedId = 2000L;
-//        assertFalse(ttsSentenceRepository.findById(notExistedId).isPresent());
-//
-//        assertThrows(EntityNotFoundException.class,()->ttsMakeService.makeTts(notExistedId) );
-//
-//    }
+
+    @Test
+    @DisplayName("tts 생성 테스트 - 존재하지 않는 행의 정보로 TTS 생성")
+    public void ttsMakeServiceTestFromNotExistTs() throws Exception {
+        // 존재하지 않는 행 확인
+        Long notExistedId = 2000L;
+        assertFalse(ttsSentenceRepository.findById(notExistedId).isPresent());
+
+        assertThrows(EntityNotFoundException.class,()->ttsMakeService.makeTts(notExistedId) );
+
+    }
 
 
     // Voice 엔티티 생성 메서드
