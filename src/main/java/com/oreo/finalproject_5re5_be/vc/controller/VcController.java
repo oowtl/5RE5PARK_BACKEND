@@ -6,6 +6,9 @@ import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
+import com.oreo.finalproject_5re5_be.vc.entity.Vc;
+import com.oreo.finalproject_5re5_be.vc.entity.VcSrcFile;
+import com.oreo.finalproject_5re5_be.vc.repository.VcSrcFileRepository;
 import com.oreo.finalproject_5re5_be.vc.service.VcApiService;
 import com.oreo.finalproject_5re5_be.vc.service.VcService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,11 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -30,6 +35,7 @@ import java.util.*;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/vc")
 public class VcController {
+    private VcSrcFileRepository vcSrcFileRepository;
     private VcService vcService;
     private AudioInfo audioInfo;
     private S3Service s3Service;
@@ -39,11 +45,13 @@ public class VcController {
     public VcController(VcService vcService,
                         AudioInfo audioInfo,
                         S3Service s3Service,
-                        VcApiService vcApiService) {
+                        VcApiService vcApiService,
+                        VcSrcFileRepository vcSrcFileRepository) {
         this.vcService = vcService;
         this.audioInfo = audioInfo;
         this.s3Service = s3Service;
         this.vcApiService = vcApiService;
+        this.vcSrcFileRepository = vcSrcFileRepository;
     }
 
     @Operation(
@@ -94,28 +102,59 @@ public class VcController {
     )
     @PostMapping(value = "/result",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<Map<String,Object>>> resultSave(
-            @Valid @RequestParam List<VcSrcUrlRequest> vcSrcUrlRequest,
-            @RequestParam("trg file") MultipartFile trgFile){
+    public ResponseEntity<ResponseDto<Map<String, Object>>> resultSave(
+            @RequestParam("vcSrcUrlRequest") @Valid List<Long> srcSeq,
+            @RequestParam("trgFile") MultipartFile trgFile) {
         Map<String, Object> map = new HashMap<>();//응답값 생성
-        String trgId = vcApiService.trgIdCreate(trgFile);//TRG ID 생성
-        List<MultipartFile> srcFile;
+//        String trgId = vcApiService.trgIdCreate(trgFile);//TRG ID 생성
+//        log.info("[vccontroller] /result trgId: {}", trgId);
+        List<MultipartFile> srcFile = new ArrayList<>();
+        //vcSrcSeq로 url 가지고 오기
+        List<VcSrcUrlRequest> vcSrcUrlRequest = vcService.vcSrcUrlRequests(srcSeq);
+        log.info("[vccontroller] /result vcSrcUrlRequest: {}", vcSrcUrlRequest);
         try {
-            srcFile = s3Service.downloadFile(vcSrcUrlRequest);//SRC 파일 다운로드(서버에 저장)
-            s3Service.deleteFolder(new File("file"));//SRC 파일 삭제(서버에서 삭제)
+
+            for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
+                //다시 불러올때 URL이 이상하면 바로 오류 뜨는데 SRC 저장할때 확인해봐야할듯
+                String url = "vc/src/"+vcSrcUrlRequest.get(i).getUrl().substring(
+                        vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
+                log.info("[vccontroller] /result url: {}", url);
+                File file = s3Service.downloadFile(url);
+                log.info("[vccontroller] /result file: {}", file);
+                MultipartFile multipartFile = convertFileToMultipartFile(file);
+                log.info("[vccontroller] /result multipartFile: {}", multipartFile);
+                srcFile.add(multipartFile);
+                log.info("[vccontroller] /result srcFile: {}", srcFile);
+            }
+
+                    
+            log.info("[vccontroller] /result srcFile: {}", srcFile);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         //결과 파일 생성(VC API)
-        List<MultipartFile> resultFile = vcApiService.resultFileCreate(srcFile, trgId);
+//        List<MultipartFile> resultFile = vcApiService.resultFileCreate(srcFile, "Yr8eh9CaB3tXeZD1ogAu");//trgId
+        List<MultipartFile> resultFile = new ArrayList<>();
+        for (int i = 0; i < srcSeq.size(); i++) {
+            resultFile.add(trgFile); //일단 그냥 SRC 파일로 출력 API 활용떄문에 꺼둠
+        }
+
+        log.info("[vccontroller] /result resultFile: {}", resultFile);
         //결과 s3 저장
         List<String> resultUrl = s3Service.upload(resultFile, "vc/result");
+        log.info("[vccontroller] /result resultUrl: {}", resultUrl);
         //결과 파일 정보 추출
         List<AudioFileInfo> info = audioInfo.extractAudioFileInfo(resultFile);
+        log.info("[vccontroller] /result info: {}", info);
         //결과 파일 정보들 가지고 객체 생성
         List<VcAudioRequest> requests = vcService.audioRequestBuilder(vcSrcUrlRequest, info, resultUrl);
+        log.info("[vccontroller] /result requests: {}", requests);
         //객체 저장
         List<VcUrlResponse> vcUrlResponses = vcService.resultSave(requests);
+        log.info("[vccontroller] /result vcUrlResponses: {}", vcUrlResponses);
+
+        s3Service.deleteFolder(new File("file"));//SRC 파일 삭제(spring 서버에서 삭제)
         map.put("result", vcUrlResponses);
         map.put("message", "result 파일 저장이 완료되었습니다.");//완료 메시지
         //응답 생성
@@ -133,8 +172,10 @@ public class VcController {
                                            @Valid @RequestBody List<String> text){
         //객체 생성
         List<VcTextRequest> vcTextRequests = vcService.vcTextResponses(srcSeq, text);
+        log.info("[VcController] /src/text vcTextRequest {} : ", vcTextRequests);
         //저장
         List<VcTextResponse> vcTextResponses = vcService.textSave(vcTextRequests);
+        log.info("[VcController] /src/text vcTextResponses {} : ", vcTextResponses);
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
                         mapCreate(vcTextResponses,
@@ -211,7 +252,7 @@ public class VcController {
     }
 
     @PatchMapping("/vc/row")
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(@Valid @RequestParam List<VcRowRequest> row){
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(@Valid @RequestBody List<VcRowRequest> row){
         List<VcRowResponse> vcRowResponses = vcService.updateRowOrder(row);
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), mapCreate(vcRowResponses,
@@ -225,5 +266,16 @@ public class VcController {
         map.put("data", Collections.singletonList(response));//응답 값
         map.put("message", Collections.singletonList(message));//응답 메시지
         return map;
+    }
+    //File을  MultipartFile로 변경
+    public MultipartFile convertFileToMultipartFile(File file) throws IOException {
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return new MockMultipartFile(
+                    "file",                          // 파라미터 이름
+                    file.getName(),                  // 파일 이름
+                    "application/octet-stream",      // MIME 타입
+                    inputStream                      // 파일 내용
+            );
+        }
     }
 }

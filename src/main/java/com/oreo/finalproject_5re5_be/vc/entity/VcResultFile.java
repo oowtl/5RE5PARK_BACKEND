@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -45,7 +44,7 @@ public class VcResultFile extends BaseEntity {
     @CreatedDate
     private LocalDateTime date;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
 

@@ -181,7 +181,7 @@ class VcServiceImplTest {
 
         when(projectRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(project));
         when(vcRepository.findById(vc.getProjectSeq())).thenReturn(Optional.of(vc));
-        when(vcSrcFileRepository.findByProjectId(project.getProSeq())).thenReturn(List.of(srcFile));//SrcFile 조회값 설정
+        when(vcSrcFileRepository.findByVcProjectSeq(project.getProSeq())).thenReturn(List.of(srcFile));//SrcFile 조회값 설정
         when(vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(srcFile.getSrcSeq())).thenReturn(vcResultFile);//result 조회값 설정
         when(vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(srcFile.getSrcSeq())).thenReturn(vcText);// text 조회값 설정
 

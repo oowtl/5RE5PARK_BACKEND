@@ -59,30 +59,20 @@ public class VcServiceImpl implements VcService{
         //프로젝트 조회, 객체 생성후 저장
         //vc안에 몇개의 vcSRC가 있는지 확인하여 행순서를 넣기 위한 쿼리메서드
         Integer count = vcSrcFileRepository.countByVc_ProjectSeq(vcSrcRequest.getSeq());
-        VcSrcFile src;
+        VcSrcFile src = null;
         //VC 찾기
         Vc vc = vcRepository.findById(proSeq)
                 .orElseThrow(() -> new IllegalArgumentException("not found"));
         //SRC를 찾아서 있다면 1로 없다면 사이즈만큼에서 +1해서 저장
-        if (vcSrcFileRepository.existsById(vcSrcRequest.getSeq())){
-             src = VcSrcFile.builder()
-                    .vc(vc)
-                    .rowOrder(1)
-                    .fileName(vcSrcRequest.getName())
-                    .fileUrl(vcSrcRequest.getFileUrl())
-                    .fileLength(vcSrcRequest.getLength())
-                    .fileSize(vcSrcRequest.getSize())
-                    .extension(vcSrcRequest.getExtension()).build();
-        }else {
-            src = VcSrcFile.builder()
-                    .vc(vc)
-                    .rowOrder(count + 1)
-                    .fileName(vcSrcRequest.getName())
-                    .fileUrl(vcSrcRequest.getFileUrl())
-                    .fileLength(vcSrcRequest.getLength())
-                    .fileSize(vcSrcRequest.getSize())
-                    .extension(vcSrcRequest.getExtension()).build();
-        }
+        src = VcSrcFile.builder()
+                .vc(vc)
+                .rowOrder(count+1)
+                .fileName(vcSrcRequest.getName())
+                .fileUrl(vcSrcRequest.getFileUrl())
+                .fileLength(vcSrcRequest.getLength())
+                .fileSize(vcSrcRequest.getSize())
+                .extension(vcSrcRequest.getExtension()).build();
+
         //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 SRC 객체 생성
 
         log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
@@ -99,30 +89,21 @@ public class VcServiceImpl implements VcService{
     public List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequests, Long proSeq) {
         List<VcUrlResponse> srcUrl = new ArrayList<>();
         for (VcSrcRequest vcSrcRequest : vcSrcRequests) {
-            VcSrcFile src;
+            VcSrcFile src = null;
             //프로젝트 조회, 객체 생성후 저장
             Vc vc = projectFind(proSeq);
             //vc안에 몇개의 vcSRC가 있는지 확인하여 행순서를 넣기 위한 쿼리메서드
             Integer count = vcSrcFileRepository.countByVc_ProjectSeq(vc.getProjectSeq());
-            if (vcRepository.existsById(vc.getProjectSeq())){
-                src = VcSrcFile.builder()
-                        .vc(vc)
-                        .rowOrder(1)
-                        .fileName(vcSrcRequest.getName())
-                        .fileUrl(vcSrcRequest.getFileUrl())
-                        .fileLength(vcSrcRequest.getLength())
-                        .fileSize(vcSrcRequest.getSize())
-                        .extension(vcSrcRequest.getExtension()).build();
-            }else {
-                src = VcSrcFile.builder()
-                        .vc(vc)
-                        .rowOrder(count+1)
-                        .fileName(vcSrcRequest.getName())
-                        .fileUrl(vcSrcRequest.getFileUrl())
-                        .fileLength(vcSrcRequest.getLength())
-                        .fileSize(vcSrcRequest.getSize())
-                        .extension(vcSrcRequest.getExtension()).build();
-            }
+            log.info("List<VcUrlResponse> srcSave : {}",count);
+            src = VcSrcFile.builder()
+                    .vc(vc)
+                    .rowOrder(count+1)
+                    .fileName(vcSrcRequest.getName())
+                    .fileUrl(vcSrcRequest.getFileUrl())
+                    .fileLength(vcSrcRequest.getLength())
+                    .fileSize(vcSrcRequest.getSize())
+                    .extension(vcSrcRequest.getExtension()).build();
+            
             log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
             VcSrcFile save = vcSrcFileRepository.save(src);// SRC 객체 저장
             log.info("[vcService] save 확인 : {} ", save);
@@ -207,6 +188,7 @@ public class VcServiceImpl implements VcService{
                     .extension(vcAudioRequest.getExtension()).build();
             log.info("[vcService] Save result 생성 : {}", result); // Result 객체 생성 확인
             VcResultFile save = vcResultFileRepository.save(result);// result 객체 저장
+
             resultFiles.add(VcUrlResponse.builder()//response 객체 생성
                     .seq(save.getResSeq())
                     .url(save.getFileUrl())
@@ -287,7 +269,7 @@ public class VcServiceImpl implements VcService{
     @Transactional
     public List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq) {
         //프로젝트 seq 조회한 값
-        List<VcSrcFile> vcSrcFileList = vcSrcFileRepository.findByProjectId(projectSeq);
+        List<VcSrcFile> vcSrcFileList = vcSrcFileRepository.findByVcProjectSeq(projectSeq);
         log.info("[vcService] GetVcResponse vcSrcFileList find : {} ", vcSrcFileList);
         //src, result, text 값 저장하기 위한 배열 생성
         List<VcResponse> vcResponseList = new ArrayList<>();
@@ -300,30 +282,36 @@ public class VcServiceImpl implements VcService{
                     .name(vcSrcFile.getFileName())
                     .fileUrl(vcSrcFile.getFileUrl())
                     .build();
+            log.info("[vcService] GetVcResponse srcAudio  : {} ", srcAudio);
             // SRC 로 제일 최근에 저장한 Result 조회 값이 없을 경우 null 출력
             VcResultFile vcResultFile = vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
-            if (vcResultFile == null) {
-                new IllegalArgumentException("VcResultFile not found");
-            }
-            //result 요청에 값 입력
-            VcResultsRequest resultAudio = VcResultsRequest.builder()
-                    .seq(vcResultFile.getResSeq())
-                    .name(vcResultFile.getFileName())
-                    .fileUrl(vcResultFile.getFileUrl())
-                    .build();
 
-            log.info("[vcService] GetVcResponse vcResultFile find : {} ", vcResultFile);
+            log.info("[vcService] GetVcResponse vcResultFile  : {} ", vcResultFile);
+            //result 요청에 값 입력
+            VcResultsRequest resultAudio = null;
+            if(vcResultFile != null) {
+                resultAudio = VcResultsRequest.builder()
+                        .seq(vcResultFile.getResSeq()) //여기서 오류
+                        .name(vcResultFile.getFileName())
+                        .fileUrl(vcResultFile.getFileUrl())
+                        .build();
+            }
+
+
+            log.info("[vcService] GetVcResponse resultAudio : {} ", resultAudio);
             //제일 최근에 저장한 텍스트 불러오기
             VcText vcText = vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
-            if (vcText == null) {
-                new IllegalArgumentException("vcText not found");
-            }
+            log.info("[vcService] GetVcText find vcText : {} ", vcText);
             //text 요청에 값 입력
-            VcTextRequest text = VcTextRequest.builder()
-                    .seq(vcText.getVtSeq())
-                    .text(vcText.getComment())
-                    .build();
-            log.info("[vcService] GetVcText find : {} ", vcText);
+            VcTextRequest text = null;
+            if(vcText != null) {
+                text = VcTextRequest.builder()
+                        .seq(vcText.getVtSeq())
+                        .text(vcText.getComment())
+                        .build();
+            }
+
+            log.info("[vcService] GetVcText text : {} ", text);
 
             // VcResponse 객체 생성 후 리스트에 추가
             VcResponse vcResponse = new VcResponse(srcAudio, resultAudio, text);
@@ -610,5 +598,20 @@ public class VcServiceImpl implements VcService{
             vcTextResponses.add(textRequest);
         }
         return vcTextResponses;
+    }
+
+    @Override
+    public List<VcSrcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq){
+        List<VcSrcUrlRequest> vcSrcUrlRequest = new ArrayList<>();
+        for (int i = 0; i < srcSeq.size(); i++) {
+            VcSrcFile vcSrcFile = vcSrcFileRepository.findById(srcSeq.get(i))
+                    .orElseThrow(() -> new IllegalArgumentException("srcSeq not found"));
+            VcSrcUrlRequest request = VcSrcUrlRequest.builder()
+                    .url(vcSrcFile.getFileUrl())
+                    .seq(vcSrcFile.getSrcSeq())
+                    .build();
+            vcSrcUrlRequest.add(request);
+        }
+        return vcSrcUrlRequest;
     }
 }

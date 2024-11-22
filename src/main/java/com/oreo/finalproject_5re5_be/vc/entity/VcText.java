@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,11 +28,11 @@ public class VcText extends BaseEntity {
     @Column(nullable = false, name = "length")
     private String length;
 
-    @Column(nullable = false, name = "vt_up_date")
+    @Column(name = "vt_up_date") //수정날짜
     @LastModifiedDate
     private LocalDateTime vtUpDate;
 
-    @Column(nullable = false, name = "vt_date", updatable = false)
+    @Column(name = "vt_date", updatable = false)//생성날짜
     @CreatedDate
     private LocalDateTime vtDate;
 
@@ -43,5 +42,9 @@ public class VcText extends BaseEntity {
 
     public void prePersist() {
         vtDate = LocalDateTime.now();
+        vtUpDate = LocalDateTime.now();
+    }
+    public void preUpdate() {
+        vtUpDate = LocalDateTime.now();
     }
 }
