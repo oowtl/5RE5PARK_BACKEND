@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
@@ -235,10 +236,9 @@ public class MemberServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("해당 아이디로 조회된 회원이 없습니다.");
         }
 
+        CustomUserDetails userDetails = new CustomUserDetails(foundMember);
         // 조회된 회원 정보를 바탕으로 UserDetails 반환
-        return User.withUsername(foundMember.getId())
-                .password(foundMember.getPassword())
-                .build();
+        return userDetails;
     }
 
     // 3. 비회원 이메일 인증번호 전송 : 회원 가입시에 이메일 인증번호 전송
