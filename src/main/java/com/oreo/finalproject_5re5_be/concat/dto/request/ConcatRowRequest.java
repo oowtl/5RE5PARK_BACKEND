@@ -13,7 +13,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConcatRowRequest { //화면을 저장하기 위해 SelectedConcatRowRequest와 달리 selected여부도 저장해야함
-    @NotNull(message = "seq 필드는 null 일 수 없습니다.")
     private Long seq;
 
     @NotNull(message = "originAudioRequest 필드는 null 일 수 없습니다.")
@@ -33,4 +32,6 @@ public class ConcatRowRequest { //화면을 저장하기 위해 SelectedConcatRo
     @Positive(message = "rowIndex 필드는 양수여야 합니다.")
     @NotNull(message = "rowIndex 필드는 null 일 수 없습니다.")
     private Integer rowIndex; //행 순서
+
+    private Character status;
 }
