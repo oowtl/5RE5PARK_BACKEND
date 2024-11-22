@@ -23,6 +23,5 @@ public class ConcatRowHelper {
             }
         }
         entityManager.flush();
-        entityManager.clear();
     }
 }
