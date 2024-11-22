@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberChangePasswordRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
@@ -16,6 +17,7 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedPasswordException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
@@ -568,6 +570,25 @@ public class MemberServiceImpl implements UserDetailsService {
             candidate.setCode(memberDeleteCode);
             candidate.setChkUse('Y');
         }
+    }
+
+    public void updatePassword(Long memberSeq, MemberChangePasswordRequest request) {
+        // 회원 조회
+        Member foundMember = memberRepository.findBySeq(memberSeq);
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        String originPassword = foundMember.getPassword();
+
+        if (encodedPassword.equals(originPassword)) {
+            throw new MemberDuplicatedPasswordException();
+        }
+
+        // 비밀번호 변경
+        foundMember.setPassword(encodedPassword);
     }
 
 }

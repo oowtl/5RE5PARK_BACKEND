@@ -17,9 +17,9 @@ public enum ErrorCode {
     MEMBER_INVALID_INPUT_VALUE_ERROR(400, "회원 정보 입력값이 올바르지 않습니다."),
     MEMBER_INVALID_TERM_INPUT_VALUE_ERROR(400, "회원 약관 입력값이 올바르지 않습니다."),
     MEMBER_INVALID_TERM_CONDITION_ERROR(400, "회원 약관 항목이 올바르지 않습니다."),
-    MEMBER_TERM_NOT_FOUND_ERROR(404, "회원 약관 항목을 찾을 수 없습니다."),
+    MEMBER_TERM_NOT_FOUND_ERROR(404, "회원 약관을 찾을 수 없습니다."),
     MEMBER_TERMS_CONDITION_NOT_FOUND_ERROR(404, "회원 약관 항목을 찾을 수 없습니다."),
-
+    MEMBER_DUPLICATED_PASSWORD_ERROR(409, "이전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다."),
 
     // 코드 예외 상태 코드 정의
     CODE_NOT_FOUND_ERROR(404, "해당 코드를 찾을 수 없습니다. 코드 정보를 다시 확인해 주세요."),
