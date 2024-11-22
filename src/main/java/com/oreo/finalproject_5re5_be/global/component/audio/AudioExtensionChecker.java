@@ -4,9 +4,10 @@ import java.io.*;
 
 /**
  * 이 클래스는 파일 또는 바이트 배열의 시그니처를 읽어 어떤 확장자 인지 확인합니다.
+ *
+ * @author K-KY
  * @apiNote 바이트 배열을 조작해 확장자의 시그니처와 일치 시키는 경우 True를 반환합니다.<br>
  * 바이트 배열이 실제 파일을 변환한 값인지, 확인하는 과정이 선행 되어야 할 수 있습니다.
- * @author K-KY
  */
 public class AudioExtensionChecker {
     private static final int WAV_SIGNATURE_BYTE = 4;
@@ -27,7 +28,7 @@ public class AudioExtensionChecker {
     }
 
     //mp3확장자 검사
-    public static boolean isMp3Extension(File file) throws IOException {
+    public static boolean isSupported(File file) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             byte[] buffer = new byte[MP3_SIGNATURE_BYTE]; // 4글자만 읽어야 하기떄문에 2바이트로 지정
             if (fileInputStream.read(buffer) != -1) {
@@ -44,7 +45,7 @@ public class AudioExtensionChecker {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);//InputStream으로 변환
 
         byte[] buffer = new byte[WAV_SIGNATURE_BYTE];
-        if(byteArrayInputStream.read(buffer) != -1) {//스트림에서 WAV_SIGNATURE_BYTE 만큼 읽기
+        if (byteArrayInputStream.read(buffer) != -1) {//스트림에서 WAV_SIGNATURE_BYTE 만큼 읽기
             String hexSignature = bytesToHex(buffer);//읽은 buffer을 String으로 변환
             byteArrayInputStream.close();//리소스 반환
             System.out.println("hexSignature = " + hexSignature);
@@ -54,18 +55,38 @@ public class AudioExtensionChecker {
     }
 
     //mp3확장자 검사
-    public static boolean isMp3Extension(byte[] byteArray) throws IOException {
+    public static boolean isSupported(byte[] byteArray) throws IOException {
+        return isSupportedWav(byteArray) || isSupportedMp3(byteArray);
+    }
+
+    //지원하는 확장자 검사
+    public static boolean isSupportedMp3(byte[] byteArray) throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
 
         byte[] buffer = new byte[MP3_SIGNATURE_BYTE];
-        if(byteArrayInputStream.read(buffer) != -1) {
-            String hexSignature = bytesToHex(buffer);
+        if (byteArrayInputStream.read(buffer) != -1) {
+            String mp3HexSignature = bytesToHex(buffer);
             byteArrayInputStream.close();
-            System.out.println("hexSignature = " + hexSignature);
-            return AudioExtensions.isMp3Extension(hexSignature);
+            System.out.println("hexSignature = " + mp3HexSignature);
+            return AudioExtensions.isSupported(mp3HexSignature);
         }
         return false;
     }
+
+    //지원하는 확장자 검사
+    public static boolean isSupportedWav(byte[] byteArray) throws IOException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+
+        byte[] buffer = new byte[WAV_SIGNATURE_BYTE];
+        if (byteArrayInputStream.read(buffer) != -1) {
+            String wavHexSignature = bytesToHex(buffer);
+            byteArrayInputStream.close();
+            System.out.println("hexSignature = " + wavHexSignature);
+            return AudioExtensions.isSupported(wavHexSignature);
+        }
+        return false;
+    }
+
 
     // 바이트 배열을 헥사 문자열로 변환
     private static String bytesToHex(byte[] bytes) {
