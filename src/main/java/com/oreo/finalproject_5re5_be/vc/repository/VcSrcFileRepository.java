@@ -12,6 +12,6 @@ import java.util.List;
 public interface VcSrcFileRepository extends JpaRepository<VcSrcFile, Long> {
     @Query("select v from VcSrcFile v where v.vc.proSeq = :projectId")
     List<VcSrcFile> findByProjectId(@Param("projectId")Long projectId);
-
+    Integer countByVc_ProjectSeq(Long projectSeq);
     boolean existsById(Long id);
 }

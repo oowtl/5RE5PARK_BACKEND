@@ -57,7 +57,8 @@ public class VcServiceImpl implements VcService{
     public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq) {
 
         //프로젝트 조회, 객체 생성후 저장
-        List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vcSrcRequest.getSeq());
+        //vc안에 몇개의 vcSRC가 있는지 확인하여 행순서를 넣기 위한 쿼리메서드
+        Integer count = vcSrcFileRepository.countByVc_ProjectSeq(vcSrcRequest.getSeq());
         VcSrcFile src;
         //VC 찾기
         Vc vc = vcRepository.findById(proSeq)
@@ -75,7 +76,7 @@ public class VcServiceImpl implements VcService{
         }else {
             src = VcSrcFile.builder()
                     .vc(vc)
-                    .rowOrder(byProjectId.size() + 1)
+                    .rowOrder(count + 1)
                     .fileName(vcSrcRequest.getName())
                     .fileUrl(vcSrcRequest.getFileUrl())
                     .fileLength(vcSrcRequest.getLength())
@@ -101,11 +102,12 @@ public class VcServiceImpl implements VcService{
             VcSrcFile src;
             //프로젝트 조회, 객체 생성후 저장
             Vc vc = projectFind(proSeq);
-            List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vc.getProjectSeq());
+            //vc안에 몇개의 vcSRC가 있는지 확인하여 행순서를 넣기 위한 쿼리메서드
+            Integer count = vcSrcFileRepository.countByVc_ProjectSeq(vc.getProjectSeq());
             if (vcRepository.existsById(vc.getProjectSeq())){
                 src = VcSrcFile.builder()
                         .vc(vc)
-                        .rowOrder(vcSrcRequest.getRowOrder())
+                        .rowOrder(1)
                         .fileName(vcSrcRequest.getName())
                         .fileUrl(vcSrcRequest.getFileUrl())
                         .fileLength(vcSrcRequest.getLength())
@@ -114,7 +116,7 @@ public class VcServiceImpl implements VcService{
             }else {
                 src = VcSrcFile.builder()
                         .vc(vc)
-                        .rowOrder(byProjectId.size() + 1)
+                        .rowOrder(count+1)
                         .fileName(vcSrcRequest.getName())
                         .fileUrl(vcSrcRequest.getFileUrl())
                         .fileLength(vcSrcRequest.getLength())
@@ -498,9 +500,14 @@ public class VcServiceImpl implements VcService{
         Project project = projectRepository.findById(seq)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
         log.info("[vcService] TextSave Project find : {} ", project);//프로젝트 확인
-        Vc vcSave = vcRepository.save(Vc.builder()
-                .proSeq(project)
-                .build());
+        //VC를 찾았는데 없으면 Save 시키고 값을 주고 있으면 그값을 가지고 오는
+        Vc vcSave = vcRepository.findById(project.getProSeq())
+                .orElseGet(() -> vcRepository.save(
+                        Vc.builder()
+                                .proSeq(project)
+                                .build()
+                ));
+        log.info("[vcService] TextSave Project find : {} ", vcSave);
         return vcSave;
     }
     //VcResultFile 찾는 메서드

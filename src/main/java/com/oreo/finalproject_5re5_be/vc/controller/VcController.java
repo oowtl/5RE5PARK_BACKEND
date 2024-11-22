@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,8 @@ public class VcController {
             summary = "SRC 저장",
             description = "프로젝트 seq와 파일을 받아 SRC 파일을 S3와 DB에 저장합니다."
     )
-    @PostMapping("/{proSeq}/src")
+    @PostMapping(value = "/{proSeq}/src",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> srcSave(@Valid @Parameter(description = "프로젝트 ID")
                                                                         @PathVariable Long proSeq,
                                                                    @Valid @RequestParam List<MultipartFile> file) {
@@ -69,10 +71,11 @@ public class VcController {
             summary = "TRG 저장",
             description = "프로젝트 seq 와 파일을 받아 TRG 파일을 S3와 DB에 저장합니다."
     )
-    @PostMapping("/{proSeq}/trg")
+    @PostMapping(value = "/{proSeq}/trg",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>>trgSave(@Valid @Parameter(description = "프로젝트 seq")
-                                                                         @PathVariable Long proSeq,
-                                          @Valid @RequestParam MultipartFile file){
+                                                                             @PathVariable Long proSeq,
+                                                                         @RequestParam MultipartFile file){
         //들어온 파일을 검사해서 확장자, 길이, 이름, 크기를 추출
         AudioFileInfo info = audioInfo.extractAudioFileInfo(file);
         //파일을 S3에 업로드
@@ -89,14 +92,12 @@ public class VcController {
             summary = "Result 파일 저장(VC 생성)",
             description = "src seq 와 파일을 받아 Result 파일을 S3와 DB에 저장합니다."
     )
-    @PostMapping("/result")
+    @PostMapping(value = "/result",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto<Map<String,Object>>> resultSave(
-//            @Valid @Parameter(description = "Src Seq") @PathVariable Long srcSeq,
-//                                             @RequestParam("src url")String url,
             @Valid @RequestParam List<VcSrcUrlRequest> vcSrcUrlRequest,
-                                             @Valid @RequestParam("trg file") MultipartFile trgFile)  {
+            @RequestParam("trg file") MultipartFile trgFile){
         Map<String, Object> map = new HashMap<>();//응답값 생성
-        List<MultipartFile> resultFiles = new ArrayList<>();//파일 저장 배열 생성
         String trgId = vcApiService.trgIdCreate(trgFile);//TRG ID 생성
         List<MultipartFile> srcFile;
         try {
@@ -108,7 +109,7 @@ public class VcController {
         //결과 파일 생성(VC API)
         List<MultipartFile> resultFile = vcApiService.resultFileCreate(srcFile, trgId);
         //결과 s3 저장
-        List<String> resultUrl = s3Service.upload(resultFiles, "vc/result");
+        List<String> resultUrl = s3Service.upload(resultFile, "vc/result");
         //결과 파일 정보 추출
         List<AudioFileInfo> info = audioInfo.extractAudioFileInfo(resultFile);
         //결과 파일 정보들 가지고 객체 생성
