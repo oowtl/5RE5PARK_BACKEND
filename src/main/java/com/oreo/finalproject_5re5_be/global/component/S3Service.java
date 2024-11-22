@@ -109,7 +109,6 @@ public class S3Service {
         GetObjectRequest getObjectRequest = new GetObjectRequest(buketName, key);
 
         S3ObjectInputStream inputStream = s3Client.getObject(getObjectRequest).getObjectContent();
-
         File file = new File(Paths.get("file", key).toString()); // 로컬에 저장할 경로
         file.getParentFile().mkdirs();// [file/폴더/파일명 이렇게 생성됨]
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -131,24 +130,16 @@ public class S3Service {
      * @return
      * @throws IOException
      */
-    public List<File> downloadFile(List<VcSrcUrlRequest> vcSrcUrlRequest) throws IOException {
-        List<File> files = new ArrayList<>();
+    public List<MultipartFile> downloadFile(List<VcSrcUrlRequest> vcSrcUrlRequest) throws IOException {
+        List<MultipartFile> files = new ArrayList<>();
 
         for (int i = 0; i < vcSrcUrlRequest.size(); i++){
-            String key = "vc/src/"+vcSrcUrlRequest.get(i).getUrl().substring(
+            String key = vcSrcUrlRequest.get(i).getUrl().substring(
                     vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
-
-            log.info("[S3Servce]  downloadFile - key : {}",key);
-
             GetObjectRequest getObjectRequest = new GetObjectRequest(buketName, key);
-            log.info("[S3Servce]  downloadFile - getObjectRequest : {}",getObjectRequest);
 
             S3ObjectInputStream inputStream = s3Client.getObject(getObjectRequest).getObjectContent();
-            log.info("[S3Servce]  downloadFile - inputStream : {}",inputStream);
-
             File file = new File(Paths.get("file", key).toString()); // 로컬에 저장할 경로
-            log.info("[S3Servce]  downloadFile - file : {}",file);
-
             file.getParentFile().mkdirs();// [file/폴더/파일명 이렇게 생성됨]
             try (FileOutputStream outputStream = new FileOutputStream(file)) {
                 byte[] buffer = new byte[1024];
@@ -160,7 +151,7 @@ public class S3Service {
                 e.printStackTrace();
                 throw new IOException("파일 다운로드 실패");
             }
-            files.add(file);
+            files.add((MultipartFile) file);
         }
         return files;
     }
@@ -181,16 +172,13 @@ public class S3Service {
                         deleteFolder(file);
                     } else {
                         // 파일 삭제
-                        if (!file.delete()) {
-                            throw new RuntimeException("파일 삭제 실패: " + file.getAbsolutePath());
-                        }
+                        // 폴더 자체 삭제
+                        folder.delete();
                     }
                 }
             }
-            // 폴더 삭제
-            if (!folder.delete()) {
-                throw new RuntimeException("폴더 삭제 실패: " + folder.getAbsolutePath());
-            }
+            // 폴더 자체 삭제
+            folder.delete();
         } else {
             throw new IllegalArgumentException("폴더가 존재하지 않음: " + folder.getAbsolutePath());
         }
