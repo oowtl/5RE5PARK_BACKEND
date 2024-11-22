@@ -9,14 +9,8 @@ import com.oreo.finalproject_5re5_be.tts.client.GoogleTTSService;
 import com.oreo.finalproject_5re5_be.tts.client.SynthesisInputGenerator;
 import com.oreo.finalproject_5re5_be.tts.client.VoiceParamsGenerator;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
-import com.oreo.finalproject_5re5_be.tts.entity.TtsProcessHistory;
-import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
-import com.oreo.finalproject_5re5_be.tts.entity.Voice;
-import com.oreo.finalproject_5re5_be.tts.repository.TtsAudioFileRepository;
-import com.oreo.finalproject_5re5_be.tts.repository.TtsProcessHistoryRepository;
-import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
-import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
+import com.oreo.finalproject_5re5_be.tts.entity.*;
+import com.oreo.finalproject_5re5_be.tts.repository.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class TtsMakeService {
 
-    private TtsAudioFileRepository ttsAudioFileRepository;
-    private TtsProcessHistoryRepository ttsProcessHistoryRepository;
-    private TtsSentenceRepository ttsSentenceRepository;
-    private GoogleTTSService googleTTSService;
-    private S3Service s3Service;
-    private AudioInfo audioInfo;
-    private VoiceRepository voiceRepository;
+    private final TtsProgressStatusRepository ttsProgressStatusRepository;
+    private final TtsAudioFileRepository ttsAudioFileRepository;
+    private final TtsProcessHistoryRepository ttsProcessHistoryRepository;
+    private final TtsSentenceRepository ttsSentenceRepository;
+    private final GoogleTTSService googleTTSService;
+    private final S3Service s3Service;
+    private final AudioInfo audioInfo;
+    private final VoiceRepository voiceRepository;
 
     public TtsMakeService(
             TtsAudioFileRepository ttsAudioFileRepository,
@@ -40,7 +35,8 @@ public class TtsMakeService {
             GoogleTTSService googleTTSService,
             S3Service s3Service,
             AudioInfo audioInfo,
-            VoiceRepository voiceRepository
+            VoiceRepository voiceRepository,
+            TtsProgressStatusRepository ttsProgressStatusRepository
     ) {
         this.ttsAudioFileRepository = ttsAudioFileRepository;
         this.ttsProcessHistoryRepository = ttsProcessHistoryRepository;
@@ -49,6 +45,7 @@ public class TtsMakeService {
         this.s3Service = s3Service;
         this.audioInfo = audioInfo;
         this.voiceRepository = voiceRepository;
+        this.ttsProgressStatusRepository = ttsProgressStatusRepository;
     }
 
     // TTS 생성 서비스
@@ -58,11 +55,14 @@ public class TtsMakeService {
         TtsSentence ttsSentence = ttsSentenceRepository.findById(sentenceSeq)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 TTS 행입니다. id:"+sentenceSeq));
 
+        // TTS 문장 '진행중' 상태 저장
+        saveTtsSentenceProcessStatus(ttsSentence, TtsProgressStatusCode.IN_PROGRESS);
+
         // 1. TTS 생성
         MultipartFile ttsFile = makeTtsAudioFile(ttsSentence);
 
         // 2. TTS 결과 파일 AWS S3에 업로드
-        String uploadedUrl = s3Service.upload(ttsFile, "tts");
+        String uploadedUrl = s3Service.upload(ttsFile, "tts123");
 
         // 3. 오디오 파일 메타데이터 DB 저장
         TtsAudioFile savedTtsAudioFile = saveTtsAudioFile(ttsFile, uploadedUrl);
@@ -73,7 +73,19 @@ public class TtsMakeService {
         // 5. TTS 처리 내역 저장
         saveTtsProcessHistory(ttsSentence, savedTtsAudioFile);
 
+        // TTS 문장 '완료' 상태 저장
+        saveTtsSentenceProcessStatus(ttsSentence, TtsProgressStatusCode.FINISHED);
+
         return TtsSentenceDto.of(updatedSentence);
+    }
+
+    // TTS 문장 상태 정보 저장 메서드
+    private void saveTtsSentenceProcessStatus(TtsSentence ttsSentence, TtsProgressStatusCode inProgress) {
+        TtsProgressStatus ttsProgressInProgressStatus = TtsProgressStatus.builder()
+                .ttsSentence(ttsSentence)
+                .progressStatus(inProgress)
+                .build();
+        ttsProgressStatusRepository.save(ttsProgressInProgressStatus);
     }
 
     // TTS 생성
