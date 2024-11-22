@@ -1,13 +1,17 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
+import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
@@ -18,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +37,9 @@ class ConcatTabServiceTest {
     @Mock
     private ConcatTabHelper concatTabHelper;
 
+    @Mock
+    private MemberServiceImpl memberService;
+
     @InjectMocks
     private ConcatTabService concatTabService;
 
@@ -45,7 +53,8 @@ class ConcatTabServiceTest {
         when(concatTabRepository.existsById(project.getProSeq())).thenReturn(false);
 
         // when : 컨캣탭 생성
-        boolean result = concatTabService.createConcatTab(project.getProSeq());
+        boolean result = concatTabService
+                .createConcatTab(new ConcatCreateRequestDto(project.getProSeq(), 1L));
 
         // then : 생성  성공
         assertThat(result).isTrue();
@@ -62,7 +71,7 @@ class ConcatTabServiceTest {
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.empty());
 
         // when : 프로젝트를 찾지 못하면
-        boolean result = concatTabService.createConcatTab(projectSeq);
+        boolean result = concatTabService.createConcatTab(new ConcatCreateRequestDto(projectSeq, 1L));
 
         // then : 실패
         assertThat(result).isFalse();
@@ -79,7 +88,8 @@ class ConcatTabServiceTest {
         when(concatTabRepository.existsById(project.getProSeq())).thenReturn(true);
 
         // when : ConcatTab이 이미 존재
-        boolean result = concatTabService.createConcatTab(project.getProSeq());
+        boolean result = concatTabService
+                .createConcatTab(new ConcatCreateRequestDto(project.getProSeq(), 1L));
 
         // then : 실패
         assertThat(result).isFalse();
@@ -90,13 +100,16 @@ class ConcatTabServiceTest {
     void readConcatTab_Success() {
         //given : 프로젝트와 ConcatTab이 존재
         Project project = Project.builder().proSeq(1L).build();
-        String memberSeq = "memberSeq";
+        Long memberSeq = 1L;
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
         when(concatTabHelper.prepareConcatTab(concatTab, memberSeq)).thenReturn(new ConcatTabResponseDto(
-                concatTab.getProjectId(), concatTab.getOption(), concatTab.getFrontSilence(), concatTab.getStatus()
+                concatTab.getProjectId(),
+                null,
+                concatTab.getFrontSilence(),
+                concatTab.getStatus()
         ));
 
         //when : ConcatTab 조회
@@ -113,14 +126,17 @@ class ConcatTabServiceTest {
         //given : 프로젝트가 존재하지만 ConcatTab이 존재하지 않음
         Project project = Project.builder().proSeq(1L).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        String memberSeq = "memberSeq";
+        Long memberSeq = 1L;
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq()))
                 .thenReturn(Optional.empty())//첫 번째 리턴
                 .thenReturn(Optional.of(concatTab));// 두 번쨰 리턴
         when(concatTabHelper.prepareConcatTab(concatTab, memberSeq)).thenReturn(new ConcatTabResponseDto(
-                concatTab.getProjectId(), concatTab.getOption(), concatTab.getFrontSilence(), concatTab.getStatus()
+                concatTab.getProjectId()
+                , null,
+                concatTab.getFrontSilence(),
+                concatTab.getStatus()
         ));
         when(concatTabRepository.existsById(project.getProSeq())).thenReturn(false);
 
@@ -136,18 +152,20 @@ class ConcatTabServiceTest {
     @Test
     void updateConcatTab_Success() {
         //given : member, project, concatTab, concatUpdateRequestDto
-        Member member = Member.builder().id("memberSeq").build();
-        Project project = Project.builder().proSeq(1L).member(member).build();
+        Member member = Member.builder().id("memberSeq").seq(1L).build();
+        Project project = Project.builder().member(member).proSeq(1L).member(member).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member,
+        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
                 project.getProSeq(),
-                concatTab.getOption(),
+                null,
                 0.0f,
                 'Y'
                 );
         //when : 업데이트
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
+        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member.getId(),
+                null, null, null, null));
 
         boolean b = concatTabService.updateConcatTab(updateDto);
         //then : 성공한다.
@@ -160,12 +178,12 @@ class ConcatTabServiceTest {
     @Test
     void UpdateConcatTab_Fail_ProjectNotFound() {
         //given : 프로젝트가 주어지지 않음
-        Member member = Member.builder().id("memberSeq").build();
+        Member member = Member.builder().id("memberSeq").seq(1L).build();
         Project project = Project.builder().proSeq(1L).member(member).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member,
+        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
                 project.getProSeq(),
-                concatTab.getOption(),
+                null,
                 0.0f,
                 'Y'
         );
@@ -173,12 +191,11 @@ class ConcatTabServiceTest {
         //when : 업데이트시 프로젝트를 찾을 수 없으면
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.empty());
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
+        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member.getId(),
+                null, null, null, null));
+
         //then : 실패한다.
-
-
-        boolean b = concatTabService.updateConcatTab(updateDto);
-
-        assertThat(b).isFalse();
+        assertThatThrownBy(() -> concatTabService.updateConcatTab(updateDto)).isInstanceOf(NoSuchElementException.class);
 
         verify(concatTabRepository, times(1)).findById(project.getProSeq());
         verify(projectRepository, times(1)).findById(project.getProSeq());
@@ -188,24 +205,24 @@ class ConcatTabServiceTest {
     void updateConcatTab_Fail_MissingProjectOrConcatTab() {
         // Given
         long tabId = 1L;
-        Member member = Member.builder().id("memberSeq").build();
+        Member member = Member.builder().id("memberSeq").seq(1L).build();
         Project project = Project.builder().proSeq(1L).member(member).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member,
+        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
                 project.getProSeq(),
-                concatTab.getOption(),
+                null,
                 0.0f,
                 'Y'
         );
 
+        // When
         when(projectRepository.findById(tabId)).thenReturn(Optional.empty());
         when(concatTabRepository.findById(tabId)).thenReturn(Optional.empty());
-
-        // When
-        boolean result = concatTabService.updateConcatTab(updateDto);
+        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member.getId(),
+                null, null, null, null));
 
         // Then
-        assertThat(result).isFalse();
+        assertThatThrownBy(() -> concatTabService.updateConcatTab(updateDto)).isInstanceOf(NoSuchElementException.class);
         verify(concatTabRepository, never()).save(any(ConcatTab.class));//호출되지 않음
     }
 
