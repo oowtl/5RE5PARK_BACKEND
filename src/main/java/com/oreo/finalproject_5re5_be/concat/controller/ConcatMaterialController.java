@@ -4,6 +4,9 @@ import com.oreo.finalproject_5re5_be.concat.dto.ConcatRowListDto;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
 @RequestMapping("/api/concat/audio/materials")
 public class ConcatMaterialController {
@@ -25,6 +29,8 @@ public class ConcatMaterialController {
     }
 
     // 재료 오디오 목록의 행 정보 불러오기
+    @Operation(summary = "concat 결과에 연관된 행 정보 불러오기")
+    @Parameter(name="concatresultseq", description = "concat 결과 seq(식별번호)")
     @GetMapping("/rows")
     ResponseEntity<ResponseDto<ConcatRowListDto>> getMaterialRowListByResultSeq(
             @NotNull @RequestParam("concatresultseq") Long concatResultSeq
