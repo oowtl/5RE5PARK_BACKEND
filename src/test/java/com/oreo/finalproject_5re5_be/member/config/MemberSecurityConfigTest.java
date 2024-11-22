@@ -85,8 +85,7 @@ class MemberSecurityConfigTest {
         mockMvc.perform(formLogin("/api/member/login")
                         .user(memberRegisterRequest.getId())
                         .password(memberRegisterRequest.getPassword()))  // 실제 인코딩 전 비밀번호 전달
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
+                .andExpect(status().isOk());
 
     }
 

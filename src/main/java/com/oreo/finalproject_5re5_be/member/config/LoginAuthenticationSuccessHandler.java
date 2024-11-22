@@ -42,8 +42,10 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             memberInfo.put("id", member.getId());
             memberInfo.put("name", member.getName());
             memberInfo.put("email", member.getEmail());
-        } else {
-            memberInfo.put("name", principal.toString());
+        } else if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+
+            memberInfo.put("username", userDetails.getUsername());
         }
 
         // JSON으로 응답
