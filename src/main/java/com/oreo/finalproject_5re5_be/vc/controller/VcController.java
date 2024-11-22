@@ -1,14 +1,13 @@
 package com.oreo.finalproject_5re5_be.vc.controller;
 
-import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
-import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioFileTypeConverter;
+import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
+import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
-import com.oreo.finalproject_5re5_be.vc.entity.Vc;
-import com.oreo.finalproject_5re5_be.vc.entity.VcSrcFile;
-import com.oreo.finalproject_5re5_be.vc.repository.VcSrcFileRepository;
 import com.oreo.finalproject_5re5_be.vc.service.VcApiService;
 import com.oreo.finalproject_5re5_be.vc.service.VcService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,13 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -35,7 +32,6 @@ import java.util.*;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/vc")
 public class VcController {
-    private VcSrcFileRepository vcSrcFileRepository;
     private VcService vcService;
     private AudioInfo audioInfo;
     private S3Service s3Service;
@@ -45,13 +41,11 @@ public class VcController {
     public VcController(VcService vcService,
                         AudioInfo audioInfo,
                         S3Service s3Service,
-                        VcApiService vcApiService,
-                        VcSrcFileRepository vcSrcFileRepository) {
+                        VcApiService vcApiService) {
         this.vcService = vcService;
         this.audioInfo = audioInfo;
         this.s3Service = s3Service;
         this.vcApiService = vcApiService;
-        this.vcSrcFileRepository = vcSrcFileRepository;
     }
 
     @Operation(
@@ -106,12 +100,14 @@ public class VcController {
             @RequestParam("vcSrcUrlRequest") @Valid List<Long> srcSeq,
             @RequestParam("trgFile") MultipartFile trgFile) {
         Map<String, Object> map = new HashMap<>();//응답값 생성
-//        String trgId = vcApiService.trgIdCreate(trgFile);//TRG ID 생성
-//        log.info("[vccontroller] /result trgId: {}", trgId);
         List<MultipartFile> srcFile = new ArrayList<>();
+        String trgId = vcApiService.trgIdCreate(trgFile);//TRG ID 생성
+        log.info("[vccontroller] /result trgId: {}", trgId);
+
         //vcSrcSeq로 url 가지고 오기
         List<VcSrcUrlRequest> vcSrcUrlRequest = vcService.vcSrcUrlRequests(srcSeq);
         log.info("[vccontroller] /result vcSrcUrlRequest: {}", vcSrcUrlRequest);
+
         try {
 
             for (int i = 0; i < vcSrcUrlRequest.size(); i++) {
@@ -119,37 +115,39 @@ public class VcController {
                 String url = "vc/src/"+vcSrcUrlRequest.get(i).getUrl().substring(
                         vcSrcUrlRequest.get(i).getUrl().lastIndexOf("/")+1);
                 log.info("[vccontroller] /result url: {}", url);
+
                 File file = s3Service.downloadFile(url);
                 log.info("[vccontroller] /result file: {}", file);
-                MultipartFile multipartFile = convertFileToMultipartFile(file);
+
+                MultipartFile multipartFile = AudioFileTypeConverter.convertFileToMultipartFile(file);
                 log.info("[vccontroller] /result multipartFile: {}", multipartFile);
+
                 srcFile.add(multipartFile);
                 log.info("[vccontroller] /result srcFile: {}", srcFile);
             }
-
-                    
-            log.info("[vccontroller] /result srcFile: {}", srcFile);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         //결과 파일 생성(VC API)
-//        List<MultipartFile> resultFile = vcApiService.resultFileCreate(srcFile, "Yr8eh9CaB3tXeZD1ogAu");//trgId
-        List<MultipartFile> resultFile = new ArrayList<>();
-        for (int i = 0; i < srcSeq.size(); i++) {
-            resultFile.add(trgFile); //일단 그냥 SRC 파일로 출력 API 활용떄문에 꺼둠
-        }
-
+        List<MultipartFile> resultFile = vcApiService.resultFileCreate(srcFile, trgId);//trgId
+//        List<MultipartFile> resultFile = new ArrayList<>();
+//        for (int i = 0; i < srcSeq.size(); i++) {
+//            resultFile.add(trgFile); //일단 그냥 SRC 파일로 출력 API 활용떄문에 꺼둠
+//        }
         log.info("[vccontroller] /result resultFile: {}", resultFile);
+
         //결과 s3 저장
         List<String> resultUrl = s3Service.upload(resultFile, "vc/result");
         log.info("[vccontroller] /result resultUrl: {}", resultUrl);
+
         //결과 파일 정보 추출
         List<AudioFileInfo> info = audioInfo.extractAudioFileInfo(resultFile);
         log.info("[vccontroller] /result info: {}", info);
+
         //결과 파일 정보들 가지고 객체 생성
         List<VcAudioRequest> requests = vcService.audioRequestBuilder(vcSrcUrlRequest, info, resultUrl);
         log.info("[vccontroller] /result requests: {}", requests);
+
         //객체 저장
         List<VcUrlResponse> vcUrlResponses = vcService.resultSave(requests);
         log.info("[vccontroller] /result vcUrlResponses: {}", vcUrlResponses);
@@ -266,16 +264,5 @@ public class VcController {
         map.put("data", Collections.singletonList(response));//응답 값
         map.put("message", Collections.singletonList(message));//응답 메시지
         return map;
-    }
-    //File을  MultipartFile로 변경
-    public MultipartFile convertFileToMultipartFile(File file) throws IOException {
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            return new MockMultipartFile(
-                    "file",                          // 파라미터 이름
-                    file.getName(),                  // 파일 이름
-                    "application/octet-stream",      // MIME 타입
-                    inputStream                      // 파일 내용
-            );
-        }
     }
 }
