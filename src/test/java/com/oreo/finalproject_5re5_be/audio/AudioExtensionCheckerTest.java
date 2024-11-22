@@ -31,13 +31,13 @@ class AudioExtensionCheckerTest {
     @Test
     @DisplayName("mp3 확장자 검사 Parameter : File")
     void checkAudioExtensionIsMP3() throws IOException {
-        assertThat(AudioExtensionChecker.isMp3Extension(mp3)).isTrue();
+        assertThat(AudioExtensionChecker.isSupported(mp3)).isTrue();
     }
 
     @Test
     @DisplayName("mp3 확장자 검사 실패 Parameter : File")
     void checkAudioExtensionIsMP3False() throws IOException {
-        assertThat(AudioExtensionChecker.isMp3Extension(wav)).isFalse();
+        assertThat(AudioExtensionChecker.isSupported(wav)).isFalse();
     }
 
     @Test
@@ -47,17 +47,17 @@ class AudioExtensionCheckerTest {
         try (FileInputStream fileInputStream = new FileInputStream(mp3)) {
             bytes = fileInputStream.readAllBytes();//바이트 배열 검사를 하기위해 File을 바이트 배열로 변환
         }
-        assertThat(AudioExtensionChecker.isMp3Extension(bytes)).isTrue();
+        assertThat(AudioExtensionChecker.isSupported(bytes)).isTrue();
     }
 
     @Test
     @DisplayName("mp3 확장자 검사 실패 Parameter : ByteArray")
     void checkAudioExtensionIsMP3ForByteArrayFalse() throws IOException {
         byte[] bytes;
-        try (FileInputStream fileInputStream = new FileInputStream(wav)) {
+        try (FileInputStream fileInputStream = new FileInputStream(new File("build.gradle"))) {
             bytes = fileInputStream.readAllBytes();//바이트 배열 검사를 하기위해 File을 바이트 배열로 변환
         }
-        assertThat(AudioExtensionChecker.isMp3Extension(bytes)).isFalse();
+        assertThat(AudioExtensionChecker.isSupported(bytes)).isFalse();
     }
 
     @Test
