@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -27,9 +28,13 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     //페이징 처리해서 데이터를 한번에 모두 가져오지 않고 필요한 만큼만 나눠서 처리
     Page<AudioFile> findByExtension(String extension, Pageable pageable);
 
+    @Query(value = "SELECT * FROM audio_file" +
+            " WHERE concat_row_seq IN (:concatRowSeq)", nativeQuery = true)
+    List<AudioFile> findAllByConcatRowSeq(@Param("concatRowSeq") List<Long> concatRowSeq);
+
+
     void deleteById(Long seq);
 
     @Query("SELECT af.concatRow.concatRowSeq FROM audio_file af WHERE af.audioFileSeq IN :audioFileSeqs")
     List<Long> findConcatRowSeqsByAudioFileSeqs(List<Long> audioFileSeqs);
-
 }
