@@ -112,7 +112,7 @@ public class VcApiServiceImpl implements VcApiService{
                 //응답 오디오 inputStream
                 InputStream inputStream = response.getEntity().getContent();
 
-                String filename = "response.wav";
+                String filename = "response.mp3";
                 log.info("input stream : {} ", inputStream);
                 multipartFile = convertInputStreamToMultipartFile(inputStream,
                         filename,
