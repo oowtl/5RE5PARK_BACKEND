@@ -600,18 +600,27 @@ public class VcServiceImpl implements VcService{
         return vcTextResponses;
     }
 
+    /**
+     * Srcseq로 url을 찾는 메서드
+     * @param srcSeq
+     * @return
+     */
     @Override
     public List<VcSrcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq){
         List<VcSrcUrlRequest> vcSrcUrlRequest = new ArrayList<>();
         for (int i = 0; i < srcSeq.size(); i++) {
+            //Seq로 VcSrcFile을 찾는다.
             VcSrcFile vcSrcFile = vcSrcFileRepository.findById(srcSeq.get(i))
                     .orElseThrow(() -> new IllegalArgumentException("srcSeq not found"));
+            //Url 과 Seq를 넣는다.
             VcSrcUrlRequest request = VcSrcUrlRequest.builder()
                     .url(vcSrcFile.getFileUrl())
                     .seq(vcSrcFile.getSrcSeq())
                     .build();
+            //배열에 넣는다.
             vcSrcUrlRequest.add(request);
         }
+        //배열로 반환한다.
         return vcSrcUrlRequest;
     }
 }
