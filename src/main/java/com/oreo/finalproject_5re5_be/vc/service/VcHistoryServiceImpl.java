@@ -1,7 +1,7 @@
 package com.oreo.finalproject_5re5_be.vc.service;
 
-import com.oreo.finalproject_5re5_be.member.entity.Code;
-import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
+import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcRequestHistoryRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcResultHistoryRequest;
 import com.oreo.finalproject_5re5_be.vc.entity.*;

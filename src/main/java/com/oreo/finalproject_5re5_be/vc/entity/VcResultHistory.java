@@ -1,7 +1,7 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import com.oreo.finalproject_5re5_be.member.entity.Code;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
