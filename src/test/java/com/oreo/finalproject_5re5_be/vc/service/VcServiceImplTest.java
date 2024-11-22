@@ -61,25 +61,30 @@ class VcServiceImplTest {
     void srcSave() {
         Project project = createProjectBuild();
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
+        log.info("project: {}", project);
         Vc vc = createVcBuild(project);
+        log.info("vc: {}", vc);
         when(vcRepository.findById(anyLong())).thenReturn(Optional.of(vc));
 
         VcSrcRequest request = createSrcFileBuildInProject(vc);
-
+        log.info("request: {}", request);
         log.info("[VcServiceTest] srcSave request: {}", request);
+
+        Vc vc1 = vcRepository.findById(request.getSeq())
+                .orElseThrow(() -> new IllegalArgumentException("not found"));
+        log.info("vc1: {}", vc1);
         VcSrcFile srcfile = VcSrcFile.builder()
-                .vc(vc)
-                .rowOrder(1)
-                .fileName("test")
-                .fileUrl("testurl")
-                .fileLength(100)
-                .fileSize("1000")
-                .extension("mp3")
+                .vc(vc1)
+                .fileName(request.getFileUrl())
+                .fileUrl(request.getFileUrl())
+                .fileLength(request.getLength())
+                .fileSize(request.getSize())
+                .extension(request.getExtension())
                 .build();
 
         when(vcSrcFileRepository.save(any(VcSrcFile.class))).thenReturn(srcfile);
 
-        VcUrlResponse response = vcService.srcSave(request);
+        VcUrlResponse response = vcService.srcSave(request, project.getProSeq());
 
         verify(vcSrcFileRepository, times(1)).save(any(VcSrcFile.class));
         assertNotNull(response);
@@ -176,7 +181,7 @@ class VcServiceImplTest {
 
         when(projectRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(project));
         when(vcRepository.findById(vc.getProjectSeq())).thenReturn(Optional.of(vc));
-        when(vcSrcFileRepository.findByProjectId(project.getProSeq())).thenReturn(List.of(srcFile));//SrcFile 조회값 설정
+        when(vcSrcFileRepository.findByVcProjectSeq(project.getProSeq())).thenReturn(List.of(srcFile));//SrcFile 조회값 설정
         when(vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(srcFile.getSrcSeq())).thenReturn(vcResultFile);//result 조회값 설정
         when(vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(srcFile.getSrcSeq())).thenReturn(vcText);// text 조회값 설정
 
@@ -289,9 +294,7 @@ class VcServiceImplTest {
 
     private static VcSrcRequest createSrcFileBuildInProject(Vc vc) {
         return VcSrcRequest.builder()//Src 입력
-                .seq(1L)
                 .seq(vc.getProjectSeq())
-                .rowOrder(1)
                 .name("src_file")
                 .fileUrl("file_url")
                 .length(100)

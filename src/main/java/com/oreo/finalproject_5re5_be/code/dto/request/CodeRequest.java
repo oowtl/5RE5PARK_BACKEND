@@ -1,10 +1,9 @@
-package com.oreo.finalproject_5re5_be.member.dto.request;
+package com.oreo.finalproject_5re5_be.code.dto.request;
 
-import com.oreo.finalproject_5re5_be.member.entity.Code;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

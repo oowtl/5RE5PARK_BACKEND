@@ -22,7 +22,7 @@ public class GoogleTTSService {
         SynthesizeSpeechResponse response = ttsClient.synthesizeSpeech(input, voice, audioConfig);
 
         // 응답으로부터 오디오 컨텐츠 얻기
-        ByteString audioContents = response .getAudioContent();
+        ByteString audioContents = response.getAudioContent();
 
         return audioContents.toByteArray();
 

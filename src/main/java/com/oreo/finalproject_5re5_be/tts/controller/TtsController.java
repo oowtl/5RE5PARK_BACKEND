@@ -197,9 +197,10 @@ public class TtsController {
             .body(new ResponseDto<>(HttpStatus.OK.value(), response));
     }
 
+    @Operation(summary = "TTS 생성 요청", description = "TTS 문장을 저장한 후 수행해주세요!")
     @GetMapping("/sentence/{tsSeq}/maketts")
     public ResponseEntity<ResponseDto<TtsSentenceDto>> makeTts(
-            @Min(value = 1L) @PathVariable Long tsSeq) {
+            @Parameter(description = "TTS Sentence ID (문장 식별 번호)")@Min(value = 1L) @PathVariable Long tsSeq) {
 
         // tts 생성
         TtsSentenceDto ttsSentenceDto = ttsMakeService.makeTts(tsSeq);

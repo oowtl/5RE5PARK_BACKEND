@@ -1,4 +1,4 @@
-package com.oreo.finalproject_5re5_be.member.dto.response;
+package com.oreo.finalproject_5re5_be.code.dto.response;
 
 
 import java.util.List;

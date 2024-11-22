@@ -6,6 +6,9 @@ import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.dto.response.VoiceListDto;
 import com.oreo.finalproject_5re5_be.tts.service.VoiceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Tag(name = "TTS-Voice", description = "Voice 관련 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/voice")
@@ -66,10 +70,11 @@ public class VoiceController {
     }
 
     // 보이스 조건 조회 컨트롤러
+    @Operation(summary = "언어코드, 스타일명으로 목소리 조회", description = "DB에 저장된 언어 코드, 스타일 명을 쿼리스트링으로 반드시 전달해야합니다.")
     @GetMapping("")
     public ResponseEntity<ResponseDto<VoiceListDto>> getVoiceList(
-            @RequestParam("languagecode") @NotNull String langCode,
-            @RequestParam("stylename") @NotNull String styleName
+            @Parameter(description = "언어 코드(언어 식별 번호가 아닙니다)") @RequestParam("languagecode") @NotNull String langCode,
+            @Parameter(description = "스타일명(스타일 식별 번호가 아닙니다)") @RequestParam("stylename") @NotNull String styleName
     ) {
         // 보이스 조회 결과 가져오기
         VoiceListDto voiceListDto = voiceService.getVoiceList(langCode, styleName);

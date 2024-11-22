@@ -1,10 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
-import com.oreo.finalproject_5re5_be.member.entity.Code;
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberConnectionHistory;
@@ -12,7 +13,7 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberDelete;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
-import com.oreo.finalproject_5re5_be.member.exception.CodeNotFoundException;
+import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
@@ -20,7 +21,7 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
-import com.oreo.finalproject_5re5_be.member.repository.CodeRepository;
+import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
@@ -235,10 +236,9 @@ public class MemberServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("해당 아이디로 조회된 회원이 없습니다.");
         }
 
+        CustomUserDetails userDetails = new CustomUserDetails(foundMember);
         // 조회된 회원 정보를 바탕으로 UserDetails 반환
-        return User.withUsername(foundMember.getId())
-                .password(foundMember.getPassword())
-                .build();
+        return userDetails;
     }
 
     // 3. 비회원 이메일 인증번호 전송 : 회원 가입시에 이메일 인증번호 전송

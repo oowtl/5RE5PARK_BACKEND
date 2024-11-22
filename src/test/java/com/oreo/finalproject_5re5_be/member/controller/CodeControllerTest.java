@@ -13,11 +13,11 @@
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 //
 //import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.oreo.finalproject_5re5_be.member.dto.request.CodeRequest;
-//import com.oreo.finalproject_5re5_be.member.dto.request.CodeUpdateRequest;
-//import com.oreo.finalproject_5re5_be.member.dto.response.CodeResponse;
-//import com.oreo.finalproject_5re5_be.member.dto.response.CodeResponses;
-//import com.oreo.finalproject_5re5_be.member.service.CodeServiceImpl;
+//import com.oreo.finalproject_5re5_be.code.dto.request.CodeRequest;
+//import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
+//import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponse;
+//import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponses;
+//import com.oreo.finalproject_5re5_be.code.service.CodeServiceImpl;
 //import java.util.ArrayList;
 //import java.util.List;
 //import org.junit.jupiter.api.BeforeEach;
