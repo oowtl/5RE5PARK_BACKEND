@@ -1,91 +1,38 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileRequestDto;
+import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
+import com.oreo.finalproject_5re5_be.concat.repository.AudioFormatRepository;
+import com.oreo.finalproject_5re5_be.concat.service.helper.AudioFileHelper;
+import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
+import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.sound.sampled.*;
+import java.io.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
 @Service
+@Log4j2
 public class AudioFileService {
 
     private final AudioFileRepository audioFileRepository;
-
-
-//    //AudioFile 정보를 받아 저장 (1개)
-//    public ConcatUrlResponse saveAudioFile(OriginAudioRequest request) {
-//        //해당하는 AudioRowSeq를 조회
-////        ConcatRow rowSeq = rowFind(request.getSeq()); //audioFile의 seq를 써서 어떤 row와 매칭되는지 가져오기
-//        //seq번호를 받아서 어떤 concatRow 객체와 매칭되는지
-//
-//        //해당하는 AudioFormatSeq를 조회
-////        AudioFormat formatSeq = formatFind(request.getSeq()); //audioFile의 seq를 써서 어떤 format과 매칭되는지 가져오기
-//
-//        //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 AudioFile 객체 생성
-//        AudioFile audioFile = AudioFile.builder()
-////                .concatRow(rowSeq) //어떤 concatRow에 대응되는지 넣기
-////                .audioFormat(formatSeq) //어떤 audioFormat에 대응되는지 넣기
-//                .audioUrl(request.getAudioUrl())
-//                .extension(request.getExtension())
-//                .fileSize(request.getFileSize())
-//                .fileLength(request.getFileLength())
-//                .fileName(request.getFileName())
-//                .createdDate(request.getCreatedDate())
-//                .build();
-//
-//        AudioFile save = audioFileRepository.save(audioFile); //audioFile 객체 저장
-//
-//        return ConcatUrlResponse.builder() //response 객체 생성
-//                .seq(save.getAudioFileSeq())
-//                .url(save.getAudioUrl())
-//                .build();
-//    }
-
-
-//    // AudioFile 정보를 받아 저장 (N개)
-//    public List<ConcatUrlResponse> batchSaveAudioFiles(List<OriginAudioRequest> requestList) {
-//        // 요청 리스트를 반복 처리하여 AudioFile 객체 생성
-//        List<AudioFile> audioFileList = requestList.stream().map(request -> {
-//            // 해당하는 AudioRowSeq를 조회
-////            ConcatRow rowSeq = rowFind(request.getSeq()); // audioFile의 seq를 써서 어떤 row와 매칭되는지 가져오기
-//
-//            // 해당하는 AudioFormatSeq를 조회
-////            AudioFormat formatSeq = formatFind(request.getSeq()); // audioFile의 seq를 써서 어떤 format과 매칭되는지 가져오기
-//
-//            // AudioFile 객체 생성
-//            return AudioFile.builder()
-////                    .concatRow(rowSeq) // 어떤 concatRow에 대응되는지 넣기
-////                    .audioFormat(formatSeq) // 어떤 audioFormat에 대응되는지 넣기
-//                    .audioUrl(request.getAudioUrl())
-//                    .extension(request.getExtension())
-//                    .fileSize(request.getFileSize())
-//                    .fileLength(request.getFileLength())
-//                    .fileName(request.getFileName())
-//                    .createdDate(request.getCreatedDate())
-//                    .build();
-//        }).collect(Collectors.toList());
-//
-//        // AudioFile 리스트 저장 (Batch 처리)
-//        List<AudioFile> savedFiles = audioFileRepository.saveAll(audioFileList);
-//
-//        // 저장된 파일 정보로 응답 리스트 생성
-//        return savedFiles.stream().map(savedFile ->
-//                ConcatUrlResponse.builder()
-//                        .seq(savedFile.getAudioFileSeq())
-//                        .url(savedFile.getAudioUrl())
-//                        .build()
-//        ).collect(Collectors.toList());
-//    }
-
+    private final S3Service s3Service;
+    private final AudioFileHelper audioFileHelper;
 
     // audioFile seq로 audioFile 정보 조회 (1개)
     public AudioFile getAudioFile(Long audioFileSeq) {
@@ -140,6 +87,10 @@ public class AudioFileService {
                 .collect(Collectors.toList());
     }
 
+    public List<AudioFile> findByConcatRowSeq(List<Long> concatRowSeq) {
+        return audioFileRepository.findAllByConcatRowSeq(concatRowSeq);
+    }
+
 
     // AudioFile seq로 삭제 (1개)
     public void deleteAudioFileBySeq(Long audioFileSeq) {
@@ -165,5 +116,104 @@ public class AudioFileService {
     public List<Long> findConcatRowSeqsByAudioFileSeqs(List<Long> audioFileSeqs) {
         return audioFileRepository.findConcatRowSeqsByAudioFileSeqs(audioFileSeqs);
     }
-}
 
+    public List<AudioFileRequestDto> checkExtension(List<AudioFileRequestDto> audioDto) throws IOException {
+
+        List<AudioFileRequestDto> notSupported = new ArrayList<>();
+
+        for (AudioFileRequestDto audioFileRequestDto : audioDto) {
+            byte[] bytes = audioFileRequestDto.getAudioFile().getBytes();
+            if (isAudioFile(bytes)) {
+                log.info("[{}]", "AUDIO_FILE_CHECK_SUCCESS");
+                continue;
+            }
+
+            notSupported.add(new AudioFileRequestDto(audioFileRequestDto.getAudioFile().getOriginalFilename()));
+            log.info("[{}]", "AUDIO_FILE_CHECK_FAIL");
+        }
+        return notSupported;
+    }
+
+    //s3 업로드
+    public List<OriginAudioRequest> saveAudioFile(List<AudioFileRequestDto> audioDto) throws IOException {
+        if (audioDto.isEmpty()) {
+            throw new IllegalArgumentException("[AudioFileService.saveAudioFile] 오디오 파일이 비어있습니다.");
+        }
+        if (checkExtension(audioDto).isEmpty()) {
+            return audioDto.stream().map(dto -> {
+                // S3 업로드
+                String audioUrl = s3Service.upload(dto.getAudioFile(), "concat/audio");
+
+                // AudioFile 엔티티 생성
+                try {
+                    return prepareDto(dto, audioUrl);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+        }
+        throw new DataNotFoundException("파일 형식이 올바르지 않습니다.");
+    }
+
+
+    public void saveAudioFiles(List<AudioFile> audioFiles) {
+        audioFileHelper.batchInsert(audioFiles);
+    }
+
+    private OriginAudioRequest prepareDto(AudioFileRequestDto dto, String audioUrl) {
+        try {
+            return OriginAudioRequest.builder()
+                    .audioUrl(audioUrl) // S3에 저장된 파일 URL
+                    .extension(getFileExtension(dto.getAudioFile().getOriginalFilename())) // 파일 확장자 추출
+                    .fileSize(dto.getAudioFile().getSize()) // 파일 크기
+                    .fileLength(getFileLength(dto.getAudioFile().getInputStream())) // 파일 길이 계산
+                    .fileName(dto.getAudioFile().getOriginalFilename()) // 원본 파일명
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    public static String getFileExtension(String fileName) {
+        if (fileName == null || fileName.lastIndexOf(".") == -1) {
+            throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
+        }
+        return fileName.substring(fileName.lastIndexOf(".") + 1).toUpperCase();
+    }
+
+    public static long getFileLength(InputStream inputStream) throws Exception {
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream)) {
+            AudioFormat format = audioInputStream.getFormat();
+            long frames = audioInputStream.getFrameLength();
+            return (long) (frames / format.getFrameRate()); // 초 단위 길이 반환
+        }
+    }
+
+
+    public static boolean isAudioFile(File file) {
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file)) {
+            return true; // 파일이 오디오 형식으로 처리 가능
+        } catch (UnsupportedAudioFileException | IOException e) {
+            return false; // 오디오 파일이 아니거나 지원하지 않는 형식
+        }
+    }
+
+    public static boolean isAudioFile(InputStream stream) {
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(stream)) {
+            return true; // 파일이 오디오 형식으로 처리 가능
+        } catch (UnsupportedAudioFileException | IOException e) {
+            return false; // 오디오 파일이 아니거나 지원하지 않는 형식
+        }
+    }
+
+    public static boolean isAudioFile(byte[] stream) {
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(stream))) {
+            return true; // 파일이 오디오 형식으로 처리 가능
+        } catch (UnsupportedAudioFileException | IOException e) {
+            return false; // 오디오 파일이 아니거나 지원하지 않는 형식
+        }
+    }
+
+}
