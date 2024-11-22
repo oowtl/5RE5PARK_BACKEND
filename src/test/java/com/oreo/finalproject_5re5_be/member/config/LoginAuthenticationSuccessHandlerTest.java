@@ -3,6 +3,8 @@ package com.oreo.finalproject_5re5_be.member.config;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
+import com.oreo.finalproject_5re5_be.member.entity.Member;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
@@ -42,9 +44,20 @@ class LoginAuthenticationSuccessHandlerTest {
 
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
+        Member member = Member.builder()
+                                .seq(1L)
+                                .id("qwefghnm1212")
+                                .email("qwedr123@gmail.com")
+                                .password("dqwesf1212@!")
+                                .name("홍길동")
+                                .normAddr("서울시 강남구")
+                                .detailAddr("서초대로 59-32")
+                                .build();
+        CustomUserDetails userDetails = new CustomUserDetails(member);
 
         User user = new User("qwefghnm1212", "dqwesf1212@!", Collections.emptyList());
         when(authentication.getName()).thenReturn(user.getUsername());
+        when(authentication.getPrincipal()).thenReturn(userDetails);
     }
 
 

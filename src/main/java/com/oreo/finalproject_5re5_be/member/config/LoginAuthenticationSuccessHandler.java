@@ -23,16 +23,14 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
-        // 쿠키 처리
-        handleSession(request, authentication);
-        // 세션 처리
-        handleCookie(request, response, authentication);
-
         // 로그인 성공시 유저 정보 반환
         // 사용자 정보 추출
         Object principal = authentication.getPrincipal();
         Map<String, Object> memberInfo = new HashMap<>();
 
+
+        String memberId = "";
+        Long memberSeq = 0L;
 
         if (principal instanceof CustomUserDetails) {
             CustomUserDetails memberDetails = (CustomUserDetails) principal;
@@ -42,25 +40,36 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             memberInfo.put("id", member.getId());
             memberInfo.put("name", member.getName());
             memberInfo.put("email", member.getEmail());
+
+            memberId = member.getId();
+            memberSeq = member.getSeq();
+
         } else if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;
 
             memberInfo.put("username", userDetails.getUsername());
+
+            memberId = userDetails.getUsername();
+            memberSeq = 0L;
         }
 
-        // JSON으로 응답
-        response.setContentType("application/json;charset=UTF-8");
-        new ObjectMapper().writeValue(response.getWriter(), memberInfo);
-    }
+        System.out.println("memberSeq = " + memberSeq);
+        System.out.println("memberId = " + memberId);
 
-    // 세션 등록
-    private void handleSession(HttpServletRequest request, Authentication authentication) {
-        // Authentication에서 회원 아이디 조회
-        String memberId = authentication.getName();
         // 세션 조회
         HttpSession session = request.getSession();
         // 세션에 아이디 등록
         session.setAttribute("memberId", memberId);
+        session.setAttribute("memberSeq", memberSeq);
+
+
+
+        // 세션 처리
+        handleCookie(request, response, authentication);
+
+        // JSON으로 응답
+        response.setContentType("application/json;charset=UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), memberInfo);
     }
 
     // 쿠키 등록
