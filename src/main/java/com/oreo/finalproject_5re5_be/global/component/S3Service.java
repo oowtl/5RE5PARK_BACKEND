@@ -12,9 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,4 +199,25 @@ public class S3Service {
             throw new IllegalArgumentException("폴더가 존재하지 않음: " + folder.getAbsolutePath());
         }
     }
+
+    public static AudioInputStream load(String s3Url) throws MalformedURLException {
+        URL url = new URL(s3Url);
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url)) {
+            return audioInputStream;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static AudioInputStream load(URL s3Url) throws MalformedURLException {
+
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(s3Url)) {
+            return audioInputStream;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
