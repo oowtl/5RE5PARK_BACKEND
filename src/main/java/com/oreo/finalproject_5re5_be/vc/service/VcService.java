@@ -36,13 +36,13 @@ public interface VcService {
         삭제 (수정)
         12. SRC 파일 활성화상태 N로 변경
      */
-    VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest);
+    VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq);
     VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
     VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
     VcTextResponse textSave(@Valid @NotNull VcTextRequest vcTextRequest);
 
     //리스트로 뽑기 위해 오버로딩하여 추가 작성
-    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest);
+    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest, Long proSeq);
     List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequest);
     List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests);
 
@@ -53,7 +53,7 @@ public interface VcService {
 
     VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
     VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
-
+    List<VcRowResponse> updateRowOrder(@Valid @NotNull List<VcRowRequest> row);
     VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
     List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs);
 

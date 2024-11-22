@@ -1,20 +1,14 @@
 package com.oreo.finalproject_5re5_be.project.entity;
 
 
+import com.oreo.finalproject_5re5_be.code.entity.Code;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "project_status")
@@ -32,8 +26,14 @@ public class ProjectStatus extends BaseEntity {
     private Project project;
 
     /** 추후에 통합 코드 엔티티와 연관관계 맺기 **/
-    private Long ccSeq;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "code")
+    private Code ccSeq;
 
-    private LocalDateTime applDate;
-    private LocalDateTime endDate;
+    private LocalDateTime applDate;//적용 시점일
+    private LocalDateTime endDate;//적용 종료일
+
+    public void prePersist() {
+        applDate = LocalDateTime.now();
+    }
 }

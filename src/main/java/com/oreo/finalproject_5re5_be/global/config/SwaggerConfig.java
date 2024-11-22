@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -36,37 +37,25 @@ public class SwaggerConfig {
         paths.addPathItem("/api/member/login", new PathItem()
                 .post(new Operation()
                         .summary("회원 로그인")
-                        .description("스프링 시큐리티 기본 로그인 처리 - 로그인 성공 시 메인 페이지로 리다이렉션")
-                        .addParametersItem(new Parameter()
-                                .name("username")
-                                .description("사용자 아이디")
+                        .description("스프링 시큐리티 기본 로그인 처리")
+                        .requestBody(new RequestBody()
                                 .required(true)
-                                .in("query")
-                                .schema(new Schema<>().type("string"))
-                        )
-                        .addParametersItem(new Parameter()
-                                .name("password")
-                                .description("사용자 비밀번호")
-                                .required(true)
-                                .in("query")
-                                .schema(new Schema<>().type("string"))
+                                .content(new Content()
+                                        .addMediaType("application/x-www-form-urlencoded", new MediaType()
+                                                .schema(new Schema<>()
+                                                        .addProperty("username", new StringSchema())
+                                                        .addProperty("password", new StringSchema())
+                                                )
+                                        )
+                                )
                         )
                         .responses(new ApiResponses()
-                                .addApiResponse("200", new ApiResponse()
-                                        .description("로그인 성공")
-                                        .content(new Content()
-                                                .addMediaType("application/json", new MediaType()
-                                                        .schema(new Schema<>().type("string"))))
-                                )
-                                .addApiResponse("302", new ApiResponse()
-                                        .description("로그인 성공 후 메인 페이지로 리다이렉션")
-                                )
-                                .addApiResponse("401", new ApiResponse()
-                                        .description("로그인 실패 - 잘못된 자격 증명")
-                                )
+                                .addApiResponse("200", new ApiResponse().description("로그인 성공"))
+                                .addApiResponse("401", new ApiResponse().description("로그인 실패"))
                         )
                 )
         );
+
 
         // 로그아웃 API 경로 추가
         paths.addPathItem("/api/member/logout", new io.swagger.v3.oas.models.PathItem()

@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -53,19 +54,36 @@ public class VcServiceImpl implements VcService{
      */
     @Override
     @Transactional
-    public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest) {
-        //프로젝트 조회, 객체 생성후 저장
-        Vc vc = projectFind(vcSrcRequest.getSeq());
+    public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq) {
 
+        //프로젝트 조회, 객체 생성후 저장
+        List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vcSrcRequest.getSeq());
+        VcSrcFile src;
+        //VC 찾기
+        Vc vc = vcRepository.findById(proSeq)
+                .orElseThrow(() -> new IllegalArgumentException("not found"));
+        //SRC를 찾아서 있다면 1로 없다면 사이즈만큼에서 +1해서 저장
+        if (vcSrcFileRepository.existsById(vcSrcRequest.getSeq())){
+             src = VcSrcFile.builder()
+                    .vc(vc)
+                    .rowOrder(1)
+                    .fileName(vcSrcRequest.getName())
+                    .fileUrl(vcSrcRequest.getFileUrl())
+                    .fileLength(vcSrcRequest.getLength())
+                    .fileSize(vcSrcRequest.getSize())
+                    .extension(vcSrcRequest.getExtension()).build();
+        }else {
+            src = VcSrcFile.builder()
+                    .vc(vc)
+                    .rowOrder(byProjectId.size() + 1)
+                    .fileName(vcSrcRequest.getName())
+                    .fileUrl(vcSrcRequest.getFileUrl())
+                    .fileLength(vcSrcRequest.getLength())
+                    .fileSize(vcSrcRequest.getSize())
+                    .extension(vcSrcRequest.getExtension()).build();
+        }
         //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 SRC 객체 생성
-        VcSrcFile src = VcSrcFile.builder()
-                .vc(vc)
-                .rowOrder(vcSrcRequest.getRowOrder())
-                .fileName(vcSrcRequest.getName())
-                .fileUrl(vcSrcRequest.getFileUrl())
-                .fileLength(vcSrcRequest.getLength())
-                .fileSize(vcSrcRequest.getSize())
-                .extension(vcSrcRequest.getExtension()).build();
+
         log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
         VcSrcFile save = vcSrcFileRepository.save(src);// SRC 객체 저장
         log.info("[vcService] save 확인 : {} ", save);
@@ -77,21 +95,32 @@ public class VcServiceImpl implements VcService{
     }
     @Override
     @Transactional
-    public List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequests) {
+    public List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequests, Long proSeq) {
         List<VcUrlResponse> srcUrl = new ArrayList<>();
         for (VcSrcRequest vcSrcRequest : vcSrcRequests) {
+            VcSrcFile src;
             //프로젝트 조회, 객체 생성후 저장
-            Vc vc = projectFind(vcSrcRequest.getSeq());
-
-            //프로젝트 조회한 값과 입력한 값 저장을 하기 위한 SRC 객체 생성
-            VcSrcFile src = VcSrcFile.builder()
-                    .vc(vc)
-                    .rowOrder(vcSrcRequest.getRowOrder())
-                    .fileName(vcSrcRequest.getName())
-                    .fileUrl(vcSrcRequest.getFileUrl())
-                    .fileLength(vcSrcRequest.getLength())
-                    .fileSize(vcSrcRequest.getSize())
-                    .extension(vcSrcRequest.getExtension()).build();
+            Vc vc = projectFind(proSeq);
+            List<VcSrcFile> byProjectId = vcSrcFileRepository.findByProjectId(vc.getProjectSeq());
+            if (vcRepository.existsById(vc.getProjectSeq())){
+                src = VcSrcFile.builder()
+                        .vc(vc)
+                        .rowOrder(vcSrcRequest.getRowOrder())
+                        .fileName(vcSrcRequest.getName())
+                        .fileUrl(vcSrcRequest.getFileUrl())
+                        .fileLength(vcSrcRequest.getLength())
+                        .fileSize(vcSrcRequest.getSize())
+                        .extension(vcSrcRequest.getExtension()).build();
+            }else {
+                src = VcSrcFile.builder()
+                        .vc(vc)
+                        .rowOrder(byProjectId.size() + 1)
+                        .fileName(vcSrcRequest.getName())
+                        .fileUrl(vcSrcRequest.getFileUrl())
+                        .fileLength(vcSrcRequest.getLength())
+                        .fileSize(vcSrcRequest.getSize())
+                        .extension(vcSrcRequest.getExtension()).build();
+            }
             log.info("[vcService] Save src 객체 생성  : {}", src); //SRC 객체 생성 확인
             VcSrcFile save = vcSrcFileRepository.save(src);// SRC 객체 저장
             log.info("[vcService] save 확인 : {} ", save);
@@ -386,6 +415,31 @@ public class VcServiceImpl implements VcService{
     }
 
     /**
+     * 행 순서 변경 리스트로
+     * @param row
+     * @return
+     */
+    @Override
+    public List<VcRowResponse> updateRowOrder(List<VcRowRequest> row) {
+        List<VcRowResponse> vcRowResponseList = new ArrayList<>();
+        for (int i = 0; i < row.size(); i++) {
+            //SRC seq 로 SRC 값 조회 검증
+            VcSrcFile vcSrcFile = vcSrcFileFind(row.get(i).getSeq());
+            //변경할 행순서 값과 SRC seq 값 변경 객체 생성
+            VcSrcFile updateSrcFile = vcSrcFile.toBuilder()
+                    .srcSeq(row.get(i).getSeq())
+                    .rowOrder(row.get(i).getRowOrder())
+                    .build();
+            VcSrcFile save = vcSrcFileRepository.save(updateSrcFile);//행순서 변경
+            vcRowResponseList.add(VcRowResponse.builder()
+                    .seq(save.getSrcSeq())
+                    .rowOrder(save.getRowOrder())
+                    .build());
+        }
+        return vcRowResponseList;
+    }
+
+    /**
      * SRC 행 삭제 하는 기능(수정)
      * @param seq
      */
@@ -550,6 +604,4 @@ public class VcServiceImpl implements VcService{
         }
         return vcTextResponses;
     }
-
-
 }
