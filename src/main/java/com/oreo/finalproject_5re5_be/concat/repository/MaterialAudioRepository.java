@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.concat.repository;
 
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
+import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import com.oreo.finalproject_5re5_be.concat.entity.MaterialAudio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -25,5 +26,8 @@ public interface MaterialAudioRepository extends JpaRepository<MaterialAudio, Lo
     
     @Query("SELECT ma FROM material_audio ma WHERE ma.concatResult.concatResultSequence = :concatResultSeq")
     List<MaterialAudio> findByConcatResultSeq(Long concatResultSeq);
+
+    @Query("SELECT ma.audioFile.concatRow FROM material_audio ma WHERE ma.concatResult.concatResultSequence = :concatResultSeq")
+    List<ConcatRow> findConcatRowListByConcatResultSeq(Long concatResultSeq);
 
 }
