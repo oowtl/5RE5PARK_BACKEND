@@ -590,6 +590,9 @@ public class MemberServiceImpl implements UserDetailsService {
         // 비밀번호 변경
         foundMember.setPassword(encodedPassword);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8c6599e ([feat] 이력 기록 추가)
 
         // 변경 이력 기록
         Code passwordFiledCode = codeRepository.findCodeByCode("MF003"); // 회원 비밀번호 필드 코드
@@ -617,7 +620,11 @@ public class MemberServiceImpl implements UserDetailsService {
                 .applDate(formattedNow)
                 .endDate(formattedEnd)
                 .build();
+<<<<<<< HEAD
 =======
+=======
+
+>>>>>>> 8c6599e ([feat] 이력 기록 추가)
     }
 >>>>>>> 30f022f ([feat] 회원 비밀번호 변경 구현)
 
