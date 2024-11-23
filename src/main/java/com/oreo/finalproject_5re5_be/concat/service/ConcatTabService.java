@@ -111,7 +111,7 @@ public class ConcatTabService {
         }
 
         // 권한 확인
-        if (project.getMember().getId().equals(member.getMemberId())) {
+        if (project.getMember().getId().equals(member.getId())) {
             // 저장
             ConcatTab updatedTab = new ConcatTab(
                     concatUpdateRequestDto.getTabId(),
