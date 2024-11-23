@@ -617,6 +617,15 @@ public class MemberServiceImpl implements UserDetailsService {
                 .endDate(formattedEnd)
                 .build();
 
+    public String findId(String email) {
+        // 이메일로 회원 조회
+        Member foundMember = memberRepository.findByEmail(email);
+        // 조회된 회원이 없으면 예외 발생
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+        // 조회된 회원의 아이디 반환
+        return foundMember.getId();
     }
 
 }

@@ -100,6 +100,15 @@ public class MemberController {
         // 응답 반환
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
-    }
 
+    @Operation(summary = "회원 아이디 찾기 처리")
+    @GetMapping("/find-id/{email}")
+    public ResponseEntity<String> findId(@Parameter(description = "이메일") @PathVariable("email") String email) {
+        // 아이디 찾기 처리
+        String id = memberService.findId(email);
+        // 응답 반환
+        return ResponseEntity.ok()
+                             .body(id);
+
+    }
 }
