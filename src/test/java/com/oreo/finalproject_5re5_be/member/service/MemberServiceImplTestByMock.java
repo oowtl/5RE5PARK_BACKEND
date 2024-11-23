@@ -516,7 +516,7 @@ class MemberServiceImplTestByMock {
         verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
         verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
         verify(memberChangeHistoryRepository, times(1)).deleteAll(anyList());
-        verify(codeRepository, times(1)).findCodeByCode("MBS999");
+        verify(codeRepository, times(1)).findCodeByCode("MBS003");
     }
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
