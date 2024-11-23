@@ -609,13 +609,16 @@ public class MemberServiceImpl implements UserDetailsService {
                 .ifPresent(history -> history.setEndDate(formattedNow));
 
         MemberChangeHistory passwordChangeHistory = MemberChangeHistory.builder()
-                .member(foundMember)
-                .chngFieldCode(passwordFiledCode)
-                .befVal(foundMember.getPassword())
-                .aftVal(encodedPassword)
-                .applDate(formattedNow)
-                .endDate(formattedEnd)
-                .build();
+                                                                        .member(foundMember)
+                                                                        .chngFieldCode(passwordFiledCode)
+                                                                        .befVal(foundMember.getPassword())
+                                                                        .aftVal(encodedPassword)
+                                                                        .applDate(formattedNow)
+                                                                        .endDate(formattedEnd)
+                                                                        .build();
+
+        // 변경 이력 저장
+        memberChangeHistoryRepository.save(passwordChangeHistory);
     }
 
 
