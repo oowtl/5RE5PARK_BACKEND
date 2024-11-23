@@ -7,6 +7,7 @@ import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 public interface TtsSentenceService {
     TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceRequest createRequest);
