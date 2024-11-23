@@ -21,7 +21,7 @@ public class BgmProcessor {
             AudioResample resampler = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B32); // 고정된 목표 포맷
 
             // 1. 파일 포맷 검사
-            if (AudioExtensionChecker.isMp3Extension(bgmFile)) {
+            if (AudioExtensionChecker.isSupported(bgmFile)) {
                 System.out.println("BGM 파일이 MP3 형식입니다. WAV로 변환 중...");
                 byte[] wavBytes = AudioExtensionConverter.mp3ToWav(bgmFile);
                 AudioInputStream wavStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavBytes));
