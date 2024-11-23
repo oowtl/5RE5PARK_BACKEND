@@ -121,7 +121,7 @@ class MemberServiceImplTest {
         System.out.println("savedMember = " + savedMember);
 
         // 회원 상태 조회
-        memberStateRepository.findByMemberSeq(savedMember.getSeq()).forEach(e -> {
+        memberStateRepository.findAllByMemberSeq(savedMember.getSeq()).forEach(e -> {
             System.out.println("memberState = " + e);
         });
 

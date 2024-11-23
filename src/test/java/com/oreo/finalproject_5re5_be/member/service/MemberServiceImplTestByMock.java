@@ -226,9 +226,7 @@ class MemberServiceImplTestByMock {
         when(memberRepository.findById("qwerfde2312")).thenReturn(foundMember);
 
         // 회원 응답 객체 생성
-        MemberReadResponse response = MemberReadResponse.of(foundMember.getId(), foundMember.getEmail(),
-                                                            foundMember.getName(), foundMember.getNormAddr(),
-                                                            foundMember.getDetailAddr());
+        MemberReadResponse response = MemberReadResponse.of(foundMember);
 
         // 서비스 호출
         MemberReadResponse actualResponse = memberService.read("qwerfde2312");
@@ -516,7 +514,7 @@ class MemberServiceImplTestByMock {
         verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
         verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
         verify(memberChangeHistoryRepository, times(1)).deleteAll(anyList());
-        verify(codeRepository, times(1)).findCodeByCode("MBS999");
+        verify(codeRepository, times(1)).findCodeByCode("MBS004");
     }
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {

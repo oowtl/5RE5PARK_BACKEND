@@ -20,6 +20,9 @@ public enum ErrorCode {
     MEMBER_TERM_NOT_FOUND_ERROR(404, "회원 약관을 찾을 수 없습니다."),
     MEMBER_TERMS_CONDITION_NOT_FOUND_ERROR(404, "회원 약관 항목을 찾을 수 없습니다."),
     MEMBER_DUPLICATED_PASSWORD_ERROR(409, "이전 비밀번호와 동일한 비밀번호는 사용할 수 없습니다."),
+    HUMAN_MEMBER_ERROR(401, "이메일 인증 또는 본인 확인 절차를 통해 계정을 활성화해야합니다."),
+    RESTRICTED_MEMBER_ERROR(403, "해당 계정은 제한된 상태입니다. 관리자에게 문의하세요."),
+    DELETED_MEMBER_ERROR(410, "해당 계정은 삭제된 상태입니다."),
 
     // 코드 예외 상태 코드 정의
     CODE_NOT_FOUND_ERROR(404, "해당 코드를 찾을 수 없습니다. 코드 정보를 다시 확인해 주세요."),
