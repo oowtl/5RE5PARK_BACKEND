@@ -566,7 +566,7 @@ public class MemberServiceImpl implements UserDetailsService {
             memberChangeHistoryRepository.deleteAll(foundMemberChangeHistories);
 
             // 회원 삭제 데이터 업데이트
-            Code memberDeleteCode = codeRepository.findCodeByCode("MBS999");
+            Code memberDeleteCode = codeRepository.findCodeByCode("MBS003"); // 휴먼 회원 등록
             candidate.setCode(memberDeleteCode);
             candidate.setChkUse('Y');
         }
