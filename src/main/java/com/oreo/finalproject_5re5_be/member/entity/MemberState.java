@@ -28,7 +28,7 @@ public class MemberState extends BaseEntity {
     @Id
     @Column(name = "state_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long StateSeq;
+    private Long stateSeq;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_seq")
