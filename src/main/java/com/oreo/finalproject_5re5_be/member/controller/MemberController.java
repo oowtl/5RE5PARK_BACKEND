@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +33,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "MEMBER", description = "MEMBER 관련 API")
 @Validated
 @RestController
-@AllArgsConstructor
+//@AllArgsConstructor
 @RequestMapping("/api/member")
 public class MemberController {
 
     private final MemberServiceImpl memberService;
+
+    public MemberController(MemberServiceImpl memberService) {
+        this.memberService = memberService;
+    }
 
     @Operation(summary = "회원가입 처리")
     @PostMapping("/register")

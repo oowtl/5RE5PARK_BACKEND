@@ -569,7 +569,7 @@ public class MemberServiceImpl implements UserDetailsService {
             memberRepository.delete(foundMember);
 
             // - 회원의 상태를 삭제한다
-            List<MemberState> foundMemberStates = memberStateRepository.findByMemberSeq(candidate.getMemberSeq());
+            List<MemberState> foundMemberStates = memberStateRepository.findAllByMemberSeq(candidate.getMemberSeq());
             memberStateRepository.deleteAll(foundMemberStates);
 
 
