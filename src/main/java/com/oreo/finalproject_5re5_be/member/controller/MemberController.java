@@ -33,15 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "MEMBER", description = "MEMBER 관련 API")
 @Validated
 @RestController
-//@AllArgsConstructor
+@AllArgsConstructor
 @RequestMapping("/api/member")
 public class MemberController {
 
     private final MemberServiceImpl memberService;
-
-    public MemberController(MemberServiceImpl memberService) {
-        this.memberService = memberService;
-    }
 
     @Operation(summary = "회원가입 처리")
     @PostMapping("/register")
