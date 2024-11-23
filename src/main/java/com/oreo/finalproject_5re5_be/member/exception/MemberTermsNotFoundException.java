@@ -10,7 +10,7 @@ import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 public class MemberTermsNotFoundException extends BusinessException {
 
     public MemberTermsNotFoundException() {
-        this(MEMBER_NOT_FOUND_ERROR.getMessage());
+        this(MEMBER_TERM_NOT_FOUND_ERROR.getMessage());
     }
 
     public MemberTermsNotFoundException(String message) {

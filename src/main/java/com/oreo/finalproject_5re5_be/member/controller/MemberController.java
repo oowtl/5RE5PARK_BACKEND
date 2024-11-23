@@ -1,10 +1,12 @@
 package com.oreo.finalproject_5re5_be.member.controller;
 
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberChangePasswordRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberRegisterResponse;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberResponse;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -73,7 +75,6 @@ public class MemberController {
     @PutMapping("/{memberSeq}")
     public ResponseEntity<Void> update(@Parameter(description = "Member 시퀀스") @Min(value = 1L, message = "회원의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("memberSeq") Long memberSeq, @Valid @RequestBody
             MemberUpdateRequest request) {
-        System.out.println("request = " + request);
         // 수정 처리
         memberService.update(memberSeq, request);
         // 응답 반환
@@ -91,6 +92,17 @@ public class MemberController {
                              .build();
     }
 
+    @Operation(summary = "비밀번호 변경 처리")
+    @PutMapping("/change-password/{memberSeq}")
+    public ResponseEntity<Void> changePassword(@Parameter(description = "Member 시퀀스") @Min(value = 1L, message = "회원의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("memberSeq") Long memberSeq, @Valid @RequestBody MemberChangePasswordRequest request) {
+        // 비밀번호 변경 처리
+        memberService.updatePassword(memberSeq, request);
+        // 응답 반환
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
+
     @Operation(summary = "회원 아이디 찾기 처리")
     @GetMapping("/find-id/{email}")
     public ResponseEntity<String> findId(@Parameter(description = "이메일") @PathVariable("email") String email) {
@@ -99,6 +111,6 @@ public class MemberController {
         // 응답 반환
         return ResponseEntity.ok()
                              .body(id);
-    }
 
+    }
 }

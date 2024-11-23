@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberChangePasswordRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
@@ -16,6 +17,7 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedPasswordException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
@@ -569,6 +571,53 @@ public class MemberServiceImpl implements UserDetailsService {
             candidate.setChkUse('Y');
         }
     }
+
+    public void updatePassword(Long memberSeq, MemberChangePasswordRequest request) {
+        // 회원 조회
+        Member foundMember = memberRepository.findBySeq(memberSeq);
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        String originPassword = foundMember.getPassword();
+
+        if (encodedPassword.equals(originPassword)) {
+            throw new MemberDuplicatedPasswordException();
+        }
+
+        // 비밀번호 변경
+        foundMember.setPassword(encodedPassword);
+
+        // 변경 이력 기록
+        Code passwordFiledCode = codeRepository.findCodeByCode("MF003"); // 회원 비밀번호 필드 코드
+
+        // 현재 시간과 최대 시간 세팅
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.MAX;
+
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedNow = now.format(formatter);
+        String formattedEnd = end.format(formatter);
+
+        // 가장 최근 이력 시간 업데이트
+        memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, passwordFiledCode.getCode())
+                .ifPresent(history -> history.setEndDate(formattedNow));
+
+        MemberChangeHistory passwordChangeHistory = MemberChangeHistory.builder()
+                .member(foundMember)
+                .chngFieldCode(passwordFiledCode)
+                .befVal(foundMember.getPassword())
+                .aftVal(encodedPassword)
+                .applDate(formattedNow)
+                .endDate(formattedEnd)
+                .build();
+    }
+
 
     public String findId(String email) {
         // 이메일로 회원 조회

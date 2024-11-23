@@ -12,15 +12,15 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class MemberReadResponse {
 
-    private String memberId;
+    private String id;
     private String email;
     private String name;
     private String normAddr;
     private String detailAddr;
 
-    public static MemberReadResponse of(String memberId, String email, String name, String normAddr, String detailAddr) {
+    public static MemberReadResponse of(String id, String email, String name, String normAddr, String detailAddr) {
         return MemberReadResponse.builder()
-                .memberId(memberId)
+                .id(id)
                 .email(email)
                 .name(name)
                 .normAddr(normAddr)
