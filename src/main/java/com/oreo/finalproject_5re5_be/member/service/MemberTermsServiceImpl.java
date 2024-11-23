@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermsDetailResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
@@ -201,4 +202,58 @@ public class MemberTermsServiceImpl {
         return foundMemberTermCondition;
     }
 
+
+    // 특정 코드로 호원 약관 상세 조회
+    public MemberTermsDetailResponse readByTermCode(String termCode) {
+        // 특정 회원 약관 코드로 조회
+        MemberTerms foundMemberTerms = memberTermsRepository.findMemberTermsByTermCode(termCode);
+        if (foundMemberTerms == null) {
+            throw new MemberTermsNotFoundException();
+        }
+
+        // 각 약관 정보 조회해서 응답 데이터에 넣어주기
+        List<MemberTermConditionResponse> memberTermConditionResponseList = new ArrayList<>();
+        MemberTermsCondition termCond1 = foundMemberTerms.getTermCond1();
+        if (termCond1 == null) {
+            throw new MemberTermsConditionNotFoundException();
+        }
+
+        MemberTermsCondition termCond2 = foundMemberTerms.getTermCond2();
+        if (termCond2 == null) {
+            throw new MemberTermsConditionNotFoundException();
+        }
+
+        MemberTermsCondition termCond3 = foundMemberTerms.getTermCond3();
+        if (termCond3 == null) {
+            throw new MemberTermsConditionNotFoundException();
+        }
+
+        MemberTermsCondition termCond4 = foundMemberTerms.getTermCond4();
+        if (termCond4 == null) {
+            throw new MemberTermsConditionNotFoundException();
+        }
+
+        MemberTermsCondition termCond5 = foundMemberTerms.getTermCond5();
+        if (termCond5 == null) {
+            throw new MemberTermsConditionNotFoundException();
+        }
+
+        // 응답 데이터로 전환
+        MemberTermConditionResponse memberTermConditionResponse1 = MemberTermConditionResponse.of(termCond1);
+        MemberTermConditionResponse memberTermConditionResponse2 = MemberTermConditionResponse.of(termCond2);
+        MemberTermConditionResponse memberTermConditionResponse3 = MemberTermConditionResponse.of(termCond3);
+        MemberTermConditionResponse memberTermConditionResponse4 = MemberTermConditionResponse.of(termCond4);
+        MemberTermConditionResponse memberTermConditionResponse5 = MemberTermConditionResponse.of(termCond5);
+
+        // 리스트에 추가
+        memberTermConditionResponseList.add(memberTermConditionResponse1);
+        memberTermConditionResponseList.add(memberTermConditionResponse2);
+        memberTermConditionResponseList.add(memberTermConditionResponse3);
+        memberTermConditionResponseList.add(memberTermConditionResponse4);
+        memberTermConditionResponseList.add(memberTermConditionResponse5);
+
+        // 응답 데이터 반환
+        return MemberTermsDetailResponse.of(foundMemberTerms, memberTermConditionResponseList);
+
+    }
 }
