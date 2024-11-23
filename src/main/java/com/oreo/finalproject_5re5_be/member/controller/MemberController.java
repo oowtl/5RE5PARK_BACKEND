@@ -100,10 +100,8 @@ public class MemberController {
         // 응답 반환
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
-<<<<<<< HEAD
-=======
     }
->>>>>>> 30f022f ([feat] 회원 비밀번호 변경 구현)
+
 
     @Operation(summary = "회원 아이디 찾기 처리")
     @GetMapping("/find-id/{email}")
