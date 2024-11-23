@@ -95,12 +95,12 @@ class ConcatMaterialControllerTest {
     // concatRow 엔티티 생성 메서드
     private ConcatRow createConcatRowEntity(int i) {
         return ConcatRow.builder()
-                .concatRowSeq((long)i)
-                .rowText("test-concat-row-text"+i)
-                .rowIndex(i)
-                .silence((float)(i+0.22))
-                .status('y')
-                .selected('n')
-                .build();
+                        .concatRowSeq((long)i)
+                        .rowText("test-concat-row-text"+i)
+                        .rowIndex(i)
+                        .silence((float)(i+0.22))
+                        .status('y')
+                        .selected('n')
+                        .build();
     }
 }
