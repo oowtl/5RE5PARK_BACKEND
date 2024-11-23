@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,9 +70,10 @@ public class MemberController {
     }
 
     @Operation(summary = "회원 수정 처리")
-    @PatchMapping("/{memberSeq}")
+    @PutMapping("/{memberSeq}")
     public ResponseEntity<Void> update(@Parameter(description = "Member 시퀀스") @Min(value = 1L, message = "회원의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("memberSeq") Long memberSeq, @Valid @RequestBody
             MemberUpdateRequest request) {
+        System.out.println("request = " + request);
         // 수정 처리
         memberService.update(memberSeq, request);
         // 응답 반환

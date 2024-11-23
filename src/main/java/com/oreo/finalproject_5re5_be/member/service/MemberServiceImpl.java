@@ -42,7 +42,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -139,9 +138,9 @@ public class MemberServiceImpl implements UserDetailsService {
         encodePassword(request);
         // 회원 엔티티 저장
         Member savedMember = saveMember(request);
-//        // 회원 약관 이력 엔티티 저장
+        // 회원 약관 이력 엔티티 저장
         saveMemberTermsHistory(request, savedMember);
-//        // 회원 초기 상태 엔티티 저장
+        // 회원 초기 상태 엔티티 저장
         saveMemberState(savedMember, "MBS001"); // 초기 상태 코드 : MBS001 - 신규 등록
         return savedMember;
     }
@@ -401,7 +400,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                         .befVal(foundMember.getId())
                                                                         .aftVal(request.getId())
                                                                         .applDate(formattedNow)
-                                                                        .applDate(formattedEnd)
+                                                                        .endDate(formattedEnd)
                                                                         .build();
             changeHistories.add(memberIdChangeHistory);
         }
@@ -414,7 +413,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                         .befVal(foundMember.getEmail())
                                                                         .aftVal(request.getEmail())
                                                                         .applDate(formattedNow)
-                                                                        .applDate(formattedEnd)
+                                                                        .endDate(formattedEnd)
                                                                         .build();
             // 가장 최근 이력 시간 업데이트
             memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, emailFiledCode.getCode())
@@ -437,7 +436,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                             .befVal(foundMember.getPassword())
                                                                             .aftVal(encodedPassword)
                                                                             .applDate(formattedNow)
-                                                                            .applDate(formattedEnd)
+                                                                            .endDate(formattedEnd)
                                                                             .build();
             changeHistories.add(passwordChangeHistory);
         }
@@ -450,7 +449,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                         .befVal(foundMember.getName())
                                                                         .aftVal(request.getName())
                                                                         .applDate(formattedNow)
-                                                                        .applDate(formattedEnd)
+                                                                        .endDate(formattedEnd)
                                                                         .build();
 
             // 가장 최근 이력 시간 업데이트
@@ -468,7 +467,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                             .befVal(foundMember.getNormAddr())
                                                                             .aftVal(request.getNormAddr())
                                                                             .applDate(formattedNow)
-                                                                            .applDate(formattedEnd)
+                                                                            .endDate(formattedEnd)
                                                                             .build();
 
             // 가장 최근 이력 시간 업데이트
