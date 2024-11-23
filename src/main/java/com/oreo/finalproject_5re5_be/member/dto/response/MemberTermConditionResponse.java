@@ -14,7 +14,9 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class MemberTermConditionResponse {
     private String condCode;
     private String shortCont;
@@ -34,5 +36,18 @@ public class MemberTermConditionResponse {
         this.law1 = memberTermsCondition.getLaw1();
         this.law2 = memberTermsCondition.getLaw2();
         this.law3 = memberTermsCondition.getLaw3();
+    }
+
+    public static MemberTermConditionResponse of(MemberTermsCondition memberTermsCondition) {
+        return MemberTermConditionResponse.builder()
+                                          .condCode(memberTermsCondition.getCondCode())
+                                          .shortCont(memberTermsCondition.getShortCont())
+                                          .longCont(memberTermsCondition.getLongCont())
+                                          .chkUse(memberTermsCondition.getChkUse())
+                                          .ord(memberTermsCondition.getOrd())
+                                          .law1(memberTermsCondition.getLaw1())
+                                          .law2(memberTermsCondition.getLaw2())
+                                          .law3(memberTermsCondition.getLaw3())
+                                          .build();
     }
 }

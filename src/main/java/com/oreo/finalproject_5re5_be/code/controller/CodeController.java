@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
 import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponse;
 import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponses;
 import com.oreo.finalproject_5re5_be.code.service.CodeServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,8 +72,8 @@ public class CodeController {
                              .body(response);
     }
 
-//    @Operation(summary = "각 파트(cateNum)으로 사용 가능한 코드 조회")
-//    @GetMapping("/{cateNum}/available")
+    @Operation(summary = "각 파트(cateNum)으로 사용 가능한 코드 조회 - 회원 삭제 유형 카테고리 조회시 cateNum에 MD 코드를 입력해주세요")
+    @GetMapping("/{cateNum}/available")
     public ResponseEntity<CodeResponses> readAvailable(@Parameter(description = "Code의 파트별 번호") @PathVariable("cateNum") String cateNum) {
         // 서비스를 호출하여 각 파트별 사용 가능한 코드를 조회한다
         CodeResponses responses = codeService.readAvailableCodeByCateNum(cateNum);
