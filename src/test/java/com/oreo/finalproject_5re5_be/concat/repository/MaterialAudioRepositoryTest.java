@@ -4,6 +4,7 @@ import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import com.oreo.finalproject_5re5_be.concat.entity.MaterialAudio;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ class MaterialAudioRepositoryTest {
     @Autowired
     private MaterialAudioRepository materialAudioRepository;
 
+
     /**
     *  [ result seq로 concat row 리스트 읽기 테스트 ]
     *   1. 재료 2개로 만든 resultSeq로 조회 - 성공
@@ -35,6 +37,7 @@ class MaterialAudioRepositoryTest {
 
     // result seq로 concat row 리스트 읽기 테스트 -  1. 재료 2개로 만든 resultSeq로 조회 - 성공
     @Test
+    @Transactional
     @DisplayName("resultSeq로 concatRow 리스트 읽기 테스트 - 재료 2개 넣고 제대로 읽히는 지 확인")
     public void findConcatRowListByResultSeqTest() {
         // 1. given: concatRow, audioFile, materialAudio, ConcatResult 생성
