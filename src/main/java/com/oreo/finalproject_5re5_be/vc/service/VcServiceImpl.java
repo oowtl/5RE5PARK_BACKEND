@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -185,55 +186,43 @@ public class VcServiceImpl implements VcService{
     @Override
     @Transactional
     public List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq) {
-        //프로젝트 seq 조회한 값
+        // 프로젝트 seq 조회한 값
         List<VcSrcFile> vcSrcFileList = vcSrcFileRepository.findByVcProjectSeq(projectSeq);
-        log.info("[vcService] GetVcResponse vcSrcFileList find : {} ", vcSrcFileList);
-        //src, result, text 값 저장하기 위한 배열 생성
-        List<VcResponse> vcResponseList = new ArrayList<>();
 
-        for (VcSrcFile vcSrcFile : vcSrcFileList) {
-            //src요청 값 입력
-            VcSrcsRequest srcAudio = VcSrcsRequest.builder()
-                    .seq(vcSrcFile.getSrcSeq())
-                    .rowOrder(vcSrcFile.getRowOrder())
-                    .name(vcSrcFile.getFileName())
-                    .fileUrl(vcSrcFile.getFileUrl())
-                    .build();
-            log.info("[vcService] GetVcResponse srcAudio  : {} ", srcAudio);
-            // SRC 로 제일 최근에 저장한 Result 조회 값이 없을 경우 null 출력
-            VcResultFile vcResultFile =
-                    vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+        // 데이터가 많을수 있으므로 병렬 처리로 변경
+        return vcSrcFileList.parallelStream()
+                .sorted(Comparator.comparing(VcSrcFile::getRowOrder)) //
+                .map(vcSrcFile -> {
+                    // src 요청 값 입력
+                    VcSrcsRequest srcAudio = VcSrcsRequest.builder()
+                            .seq(vcSrcFile.getSrcSeq())
+                            .rowOrder(vcSrcFile.getRowOrder())
+                            .name(vcSrcFile.getFileName())
+                            .fileUrl(vcSrcFile.getFileUrl())
+                            .build();
 
-            log.info("[vcService] GetVcResponse vcResultFile  : {} ", vcResultFile);
-            //result 요청에 값 입력
-            VcResultsRequest resultAudio = null;
-            if(vcResultFile != null) {
-                resultAudio = VcResultsRequest.builder()
-                        .seq(vcResultFile.getResSeq()) //여기서 오류
-                        .name(vcResultFile.getFileName())
-                        .fileUrl(vcResultFile.getFileUrl())
-                        .build();
-            }
+                    // SRC 로 제일 최근에 저장한 Result 조회, 값이 없을 경우 null 처리
+                    VcResultFile vcResultFile =
+                            vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+                    VcResultsRequest resultAudio = Optional.ofNullable(vcResultFile)
+                            .map(file -> VcResultsRequest.builder()
+                                    .seq(file.getResSeq())
+                                    .name(file.getFileName())
+                                    .fileUrl(file.getFileUrl())
+                                    .build())
+                            .orElse(null);
 
+                    // 제일 최근에 저장한 텍스트 조회, 값이 없을 경우 null 처리
+                    VcText vcText =
+                            vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+                    VcTextRequest text = Optional.ofNullable(vcText)
+                            .map(t -> VcTextRequest.of(t.getVtSeq(), t.getComment()))
+                            .orElse(null);
 
-            log.info("[vcService] GetVcResponse resultAudio : {} ", resultAudio);
-            //제일 최근에 저장한 텍스트 불러오기
-            VcText vcText = vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
-            log.info("[vcService] GetVcText find vcText : {} ", vcText);
-            //text 요청에 값 입력
-            VcTextRequest text = null;
-            if(vcText != null) {
-                text = VcTextRequest.of(vcText.getVtSeq(), vcText.getComment());
-            }
-
-            log.info("[vcService] GetVcText text : {} ", text);
-
-            // VcResponse 객체 생성 후 리스트에 추가
-            VcResponse vcResponse = new VcResponse(vcSrcFile.getActivate(),srcAudio, resultAudio, text);
-            vcResponseList.add(vcResponse);
-        }
-        log.info("[vcService] GetVcResponseList find : {} ", vcResponseList);
-        return vcResponseList;
+                    // VcResponse 객체 생성 후 반환
+                    return new VcResponse(vcSrcFile.getActivate(), srcAudio, resultAudio, text);
+                })
+                .collect(Collectors.toList());
     }
 
     /**
