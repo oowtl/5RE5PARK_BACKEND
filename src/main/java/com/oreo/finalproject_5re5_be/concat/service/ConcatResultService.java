@@ -38,7 +38,6 @@ public class ConcatResultService {
                 .extension(request.getResultExtension())
                 .fileLength(request.getResultFileLength())
                 .fileName(request.getResultFileName())
-                .audioFormat(null) //audioFormat 객체 필요. 일단 null 고정
                 .build();
 
         ConcatResult result = concatResultRepository.save(concatResult);
