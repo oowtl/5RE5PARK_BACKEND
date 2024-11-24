@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.service.ttsSentenceService;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -100,6 +101,29 @@ class TestBatchSave {
     - BatchRequest의 sentenceList가 빈 리스트로 제공됨.
     - 기대 결과:
     - 빈 TtsSentenceDto 리스트 반환.
+
+    정렬 테스트
+
+    7. 정렬 테스트
+    - 조건:
+    - sentenceList 내 sentenceInfo의 order가 정렬되어 있지 않음.
+    - 기대 결과:
+    - TtsSentenceListDto 반환.
+
+    8. 정렬 테스트 - order 중복
+    - 조건:
+    - sentenceList 내 sentenceInfo의 order가 중복된 것이 있음
+    - 기대 결과:
+    - TsSeq 기준 정렬 후 TtsSentenceListDto 반환.
+    - TsSeq 기준 정렬 불가 시, 임의로 정렬 후 TtsSentenceListDto 반환.
+
+    9. 정렬 테스트 - order 미설정
+    - 조건:
+    - sentenceList 내 sentenceInfo의 order가 설정되지 않음.
+    - 기대 결과:
+    - TsSeq 기준 정렬 후 TtsSentenceListDto 반환.
+    - TsSeq 기준 정렬 불가 시, 임의로 정렬 후 TtsSentenceListDto 반환.
+
     */
 
     // 1. 성공 케이스 테스트
@@ -181,7 +205,8 @@ class TestBatchSave {
         TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of(batchInfo));
 
         // when, then: 예외 발생 검증
-        assertThrows(TtsSentenceInValidInput.class,
+//        assertThrows(TtsSentenceInValidInput.class,
+        assertThrows(ConstraintViolationException.class,
             () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
     }
 
@@ -225,6 +250,83 @@ class TestBatchSave {
         // when, then: batchSaveSentence 메서드 호출
         assertThrows(ConstraintViolationException.class,
             () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
+    }
+
+    // 7. 정렬 테스트
+    @Test
+    @DisplayName("batchSaveSentence - 정렬 테스트")
+    void batchSaveSentence_SortOrder() {
+        // given: 정렬되지 않은 sentenceList가 포함된 batchRequest 생성
+
+        // 정렬되지 않은 sentenceList 생성
+        TtsSentenceBatchRequest request = new TtsSentenceBatchRequest(List.of(
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 3),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 4)
+        ));
+
+        // when
+        // 정렬된 sentenceList 생성
+        List<TtsSentenceBatchInfo> sortedList = request.getSortedSentenceList();
+
+        // then: 반환된 결과 검증
+        assertEquals(0, sortedList.get(0).getSentence().getOrder());
+        assertEquals(1, sortedList.get(1).getSentence().getOrder());
+        assertEquals(2, sortedList.get(2).getSentence().getOrder());
+        assertEquals(3, sortedList.get(3).getSentence().getOrder());
+        assertEquals(4, sortedList.get(4).getSentence().getOrder());
+    }
+
+    // 8. 정렬 테스트 - order 중복
+    @Test
+    @DisplayName("batchSaveSentence - 정렬 테스트 - order 중복")
+    void batchSaveSentence_SortOrder_Duplicate() {
+        // given: 중복된 order가 포함된 sentenceList가 포함된 batchRequest 생성
+        TtsSentenceBatchRequest request = new TtsSentenceBatchRequest(List.of(
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 3),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 2),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 3)
+        ));
+
+        // when
+        // 정렬된 sentenceList 생성
+        List<TtsSentenceBatchInfo> sortedList = request.getSortedSentenceList();
+
+        // then: 반환된 결과 검증
+        assertEquals(0, sortedList.get(0).getSentence().getOrder());
+        assertEquals(1, sortedList.get(1).getSentence().getOrder());
+        assertEquals(2, sortedList.get(2).getSentence().getOrder());
+        assertEquals(3, sortedList.get(3).getSentence().getOrder());
+        assertEquals(4, sortedList.get(4).getSentence().getOrder());
+    }
+
+    // 9. 정렬 테스트 - order 미설정
+    @Test
+    @DisplayName("batchSaveSentence - 정렬 테스트 - order 미설정")
+    void batchSaveSentence_SortOrder_NotSet() {
+        // given: order가 설정되지 않은 sentenceList가 포함된 batchRequest 생성
+        TtsSentenceBatchRequest request = new TtsSentenceBatchRequest(List.of(
+            createBatchInfoWithOrder(BatchProcessType.CREATE, null),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, null),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 4)
+        ));
+
+        // when
+        // 정렬된 sentenceList 생성
+        List<TtsSentenceBatchInfo> sortedList = request.getSortedSentenceList();
+
+        // then: 반환된 결과 검증
+        assertEquals(0, sortedList.get(0).getSentence().getOrder());
+        assertEquals(1, sortedList.get(1).getSentence().getOrder());
+        assertEquals(2, sortedList.get(2).getSentence().getOrder());
+        assertEquals(3, sortedList.get(3).getSentence().getOrder());
+        assertEquals(4, sortedList.get(4).getSentence().getOrder());
     }
 
     /*
@@ -277,6 +379,18 @@ class TestBatchSave {
         TtsSentenceBatchInfo batchInfo4 = new TtsSentenceBatchInfo(BatchProcessType.CREATE,
             createSentenceInfo4);
         return new TtsSentenceBatchRequest(List.of(batchInfo1, batchInfo2, batchInfo3, batchInfo4));
+    }
+
+    private TtsSentenceBatchInfo createBatchInfoWithOrder(BatchProcessType batchProcessType,
+        Integer orderIndex) {
+        SentenceInfo sentenceInfo = SentenceInfo.builder()
+            .voiceSeq(1L)
+            .styleSeq(1L)
+            .order(orderIndex)
+            .text("Test text")
+            .ttsAttributeInfo(createAttribute())
+            .build();
+        return new TtsSentenceBatchInfo(batchProcessType, sentenceInfo);
     }
 
     private TtsAttributeInfo createAttribute() {

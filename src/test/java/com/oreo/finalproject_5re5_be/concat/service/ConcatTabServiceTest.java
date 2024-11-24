@@ -164,8 +164,7 @@ class ConcatTabServiceTest {
         //when : 업데이트
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
-        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member.getId(),
-                null, null, null, null));
+        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member));
 
         boolean b = concatTabService.updateConcatTab(updateDto);
         //then : 성공한다.
@@ -191,8 +190,7 @@ class ConcatTabServiceTest {
         //when : 업데이트시 프로젝트를 찾을 수 없으면
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.empty());
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
-        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member.getId(),
-                null, null, null, null));
+        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member));
 
         //then : 실패한다.
         assertThatThrownBy(() -> concatTabService.updateConcatTab(updateDto)).isInstanceOf(NoSuchElementException.class);
@@ -218,8 +216,7 @@ class ConcatTabServiceTest {
         // When
         when(projectRepository.findById(tabId)).thenReturn(Optional.empty());
         when(concatTabRepository.findById(tabId)).thenReturn(Optional.empty());
-        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member.getId(),
-                null, null, null, null));
+        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member));
 
         // Then
         assertThatThrownBy(() -> concatTabService.updateConcatTab(updateDto)).isInstanceOf(NoSuchElementException.class);

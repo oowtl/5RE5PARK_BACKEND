@@ -51,4 +51,19 @@ public class VcResultFile extends BaseEntity {
     public void prePersist() {
         date = LocalDateTime.now();
     }
+    public static VcResultFile create(VcSrcFile srcFile,
+                                      String fileName,
+                                      String fileUrl,
+                                      Integer fileLength,
+                                      String fileSize,
+                                      String extension){
+        return VcResultFile.builder()
+                .srcSeq(srcFile)
+                .fileName(fileName)
+                .fileUrl(fileUrl)
+                .fileLength(fileLength)
+                .fileSize(fileSize)
+                .extension(extension)
+                .build();
+    }
 }
