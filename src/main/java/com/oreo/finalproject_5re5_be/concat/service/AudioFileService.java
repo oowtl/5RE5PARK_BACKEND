@@ -5,10 +5,8 @@ import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
-import com.oreo.finalproject_5re5_be.concat.repository.AudioFormatRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.AudioFileHelper;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
-import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,8 +15,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.sound.sampled.*;
-import java.io.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +51,12 @@ public class AudioFileService {
                 .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioUrl));
     }
 
+    // audioFile Url로 audioFileSeq 정보 조회 (N개)
+    public List<Long> getAudioFileSeqsByUrls(List<String> audioUrls) {
+        return audioUrls.stream()
+                .map(url -> getAudioFileByUrl(url).getAudioFileSeq()) // URL로 AudioFile 조회 후 Seq 추출
+                .toList();
+    }
 
     // audioFile Name으로 audioFile 정보 조회 (1개)
     public AudioFile getAudioFileByName(String fileName) {
@@ -173,7 +183,6 @@ public class AudioFileService {
             throw new RuntimeException(e);
         }
     }
-
 
 
     public static String getFileExtension(String fileName) {
