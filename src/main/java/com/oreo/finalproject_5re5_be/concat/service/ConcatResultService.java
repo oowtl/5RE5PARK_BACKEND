@@ -6,7 +6,6 @@ import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatResultDetailsResp
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
-import com.oreo.finalproject_5re5_be.concat.repository.AudioFormatRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatOptionRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
@@ -20,8 +19,6 @@ public class ConcatResultService {
     private final ConcatResultRepository concatResultRepository;
     private final ConcatTabRepository concatTabRepository;
     private final ConcatOptionRepository concatOptionRepository;
-    private final AudioFormatRepository audioFormatRepository;
-
 
     // ConcatResult 정보를 받아서 저장 (1개)
     public ConcatUrlResponse saveConcatResult(ConcatResultRequest request) {
@@ -32,10 +29,6 @@ public class ConcatResultService {
 //        // 2. ConcatOption 조회
 //        ConcatOption concatOption = concatOptionRepository.findById(request.getOptionSeq())
 //                .orElseThrow(() -> new IllegalArgumentException("Invalid Option ID: " + request.getOptionSeq()));
-
-//        // 3. AudioFormat 조회
-//        AudioFormat audioFormat = audioFormatRepository.findById(request.getAudioFormatSeq())
-//                .orElseThrow(() -> new IllegalArgumentException("Invalid AudioFormat ID: " + request.getAudioFormatSeq()));
 
         //조회한 값과 입력한 값 저장을 하기 위한 ConcatResult 객체 생성
         ConcatResult concatResult = ConcatResult.builder()
@@ -72,13 +65,6 @@ public class ConcatResultService {
                 .extension(concatResult.getExtension())
                 .fileLength(concatResult.getFileLength())
                 .fileName(concatResult.getFileName())
-
-                .encoding(concatResult.getAudioFormat().getEncoding())
-                .sampleRate(concatResult.getAudioFormat().getSampleRate())
-                .channel(concatResult.getAudioFormat().getChannel())
-                .frameSize(concatResult.getAudioFormat().getFrameSize())
-                .frameRate(concatResult.getAudioFormat().getFrameRate())
-                .isBigEndian(concatResult.getAudioFormat().getIsBigEndian())
                 .build();
 
     }
