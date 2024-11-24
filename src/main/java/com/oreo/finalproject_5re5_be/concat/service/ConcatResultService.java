@@ -4,7 +4,6 @@ package com.oreo.finalproject_5re5_be.concat.service;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatResultRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatResultDetailsResponse;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFormat;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFormatRepository;
@@ -34,9 +33,9 @@ public class ConcatResultService {
 //        ConcatOption concatOption = concatOptionRepository.findById(request.getOptionSeq())
 //                .orElseThrow(() -> new IllegalArgumentException("Invalid Option ID: " + request.getOptionSeq()));
 
-        // 3. AudioFormat 조회
-        AudioFormat audioFormat = audioFormatRepository.findById(request.getAudioFormatSeq())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid AudioFormat ID: " + request.getAudioFormatSeq()));
+//        // 3. AudioFormat 조회
+//        AudioFormat audioFormat = audioFormatRepository.findById(request.getAudioFormatSeq())
+//                .orElseThrow(() -> new IllegalArgumentException("Invalid AudioFormat ID: " + request.getAudioFormatSeq()));
 
         //조회한 값과 입력한 값 저장을 하기 위한 ConcatResult 객체 생성
         ConcatResult concatResult = ConcatResult.builder()
@@ -46,7 +45,7 @@ public class ConcatResultService {
                 .extension(request.getResultExtension())
                 .fileLength(request.getResultFileLength())
                 .fileName(request.getResultFileName())
-                .audioFormat(audioFormat) //audioFormat 객체 필요
+                .audioFormat(null) //audioFormat 객체 필요. 일단 null 고정
                 .build();
 
         ConcatResult result = concatResultRepository.save(concatResult);
