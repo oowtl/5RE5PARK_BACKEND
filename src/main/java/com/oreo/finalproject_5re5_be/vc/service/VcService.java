@@ -65,8 +65,9 @@ public interface VcService {
                                                    Long proSeq);
 
     VcAudioRequest audioRequestBuilder(Long proSeq, AudioFileInfo info, String url);
-    List<VcAudioRequest> audioRequestBuilder(List<VcSrcUrlRequest> vcSrcUrlRequest, List<AudioFileInfo> info, List<String> url);
+    List<VcAudioRequest> audioRequestBuilder(List<VcUrlRequest> vcUrlRequest, List<AudioFileInfo> info, List<String> url);
 
     List<VcTextRequest> vcTextResponses(List<Long> srcSeq, List<String> text);
-    List<VcSrcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq);
+    List<VcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq);
+    VcUrlRequest vcTrgUrlRequest(Long trgSeq);
 }

@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.vc.service;
 
 import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -202,26 +200,11 @@ public class VcServiceImpl implements VcService{
                             .fileUrl(vcSrcFile.getFileUrl())
                             .build();
                     log.info("[vcService] getVcResponse srcAudio 확인 : {} ", srcAudio);
-
                     // SRC 로 제일 최근에 저장한 Result 조회, 값이 없을 경우 null 처리
-                    VcResultFile vcResultFile =
-                            vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
-                    log.info("[vcService] getVcResponse vcResultFile 확인 : {} ", vcResultFile);
-                    VcResultsRequest resultAudio = Optional.ofNullable(vcResultFile)
-                            .map(file -> VcResultsRequest.builder()
-                                    .seq(file.getResSeq())
-                                    .name(file.getFileName())
-                                    .fileUrl(file.getFileUrl())
-                                    .build())
-                            .orElse(null);
+                    VcResultsRequest resultAudio = vcSrcFileCreate(vcSrcFile);
                     log.info("[vcService] getVcResponse resultAudio 확인 : {} ", resultAudio);
                     // 제일 최근에 저장한 텍스트 조회, 값이 없을 경우 null 처리
-                    VcText vcText =
-                            vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
-                    log.info("[vcService] getVcResponse vcText 확인 : {} ", vcText);
-                    VcTextRequest text = Optional.ofNullable(vcText)
-                            .map(t -> VcTextRequest.of(t.getVtSeq(), t.getComment()))
-                            .orElse(null);
+                    VcTextRequest text = textCreate(vcSrcFile);
                     log.info("[vcService] getVcResponse text 확인 : {} ", text);
                     // VcResponse 객체 생성 후 반환
                     return new VcResponse(vcSrcFile.getActivate(), srcAudio, resultAudio, text);
@@ -394,18 +377,18 @@ public class VcServiceImpl implements VcService{
 
     /**
      * VCAudioRequest 객체 생성
-     * @param vcSrcUrlRequest
+     * @param vcUrlRequest
      * @param info
      * @param url
      * @return
      */
     @Override
-    public List<VcAudioRequest> audioRequestBuilder(List<VcSrcUrlRequest> vcSrcUrlRequest,
+    public List<VcAudioRequest> audioRequestBuilder(List<VcUrlRequest> vcUrlRequest,
                                                     List<AudioFileInfo> info,
                                                     List<String> url) {
         //vcSrcUrlRequest 사이즈 만큼 반복 하여 생성자 리턴
-        return IntStream.range(0, vcSrcUrlRequest.size())
-                .mapToObj(i -> VcAudioRequest.of(vcSrcUrlRequest.get(i).getSeq(),
+        return IntStream.range(0, vcUrlRequest.size())
+                .mapToObj(i -> VcAudioRequest.of(vcUrlRequest.get(i).getSeq(),
                         info.get(i).getName(),
                         url.get(i),
                         info.get(i).getLength(),
@@ -431,23 +414,30 @@ public class VcServiceImpl implements VcService{
     /**
      * Srcseq로 url을 찾는 메서드
      * @param srcSeq
-     * @return
+     * @return List<VcUrlRequest>
      */
     @Override
-    public List<VcSrcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq){
+    public List<VcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq){
         //srcSeq를 가지고 vcSrcFile 찾고 없으면 예외던지고 있다면 생성자로 리턴
         return srcSeq.stream()
                 .map(seq -> {
                     VcSrcFile vcSrcFile = vcSrcFileRepository.findById(seq)
-                            .orElseThrow(() -> new IllegalArgumentException("srcSeq not found"));
-                    return VcSrcUrlRequest.builder()
-                            .url(vcSrcFile.getFileUrl())
-                            .seq(vcSrcFile.getSrcSeq())
-                            .build();
+                            .orElseThrow(() -> new IllegalArgumentException("vcSrcFile not found"));
+                    return VcUrlRequest.of(vcSrcFile.getSrcSeq(), vcSrcFile.getFileUrl());
                 })
                 .collect(Collectors.toList());
     }
-
+    /**
+     * trgSeq url을 찾는 메서드
+     * @param trgSeq
+     * @return VcUrlRequest
+     */
+    @Override
+    public VcUrlRequest vcTrgUrlRequest(Long trgSeq) {
+        VcTrgFile trgFile = vcTrgFileRepository.findById(trgSeq)
+                .orElseThrow(() -> new IllegalArgumentException("trgFile not found"));
+        return VcUrlRequest.of(trgFile.getTrgSeq(), trgFile.getFileUrl());
+    }
 
 
     //VcSrcFile 찾는 메서드
@@ -473,5 +463,27 @@ public class VcServiceImpl implements VcService{
     private VcText vcTextFind(Long seq){
         return vcTextRepository.findById(seq)
                 .orElseThrow(() -> new IllegalArgumentException("Text not found"));
+    }
+    private VcResultsRequest vcSrcFileCreate(VcSrcFile vcSrcFile){
+        // SRC 로 제일 최근에 저장한 Result 조회, 값이 없을 경우 null 처리
+        VcResultFile vcResultFile =
+                vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+        log.info("[vcService] getVcResponse vcResultFile 확인 : {} ", vcResultFile);
+        return Optional.ofNullable(vcResultFile)
+                .map(file -> VcResultsRequest.builder()
+                        .seq(file.getResSeq())
+                        .name(file.getFileName())
+                        .fileUrl(file.getFileUrl())
+                        .build())
+                .orElse(null);
+    }
+    private VcTextRequest textCreate(VcSrcFile vcSrcFile){
+        // 제일 최근에 저장한 텍스트 조회, 값이 없을 경우 null 처리
+        VcText vcText =
+                vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+        log.info("[vcService] getVcResponse vcText 확인 : {} ", vcText);
+        return Optional.ofNullable(vcText)
+                .map(t -> VcTextRequest.of(t.getVtSeq(), t.getComment()))
+                .orElse(null);
     }
 }

@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.oreo.finalproject_5re5_be.vc.dto.request.VcSrcUrlRequest;
+import com.oreo.finalproject_5re5_be.vc.dto.request.VcUrlRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,14 +50,14 @@ public class S3Service {
     }
     /**
      * 파일명을 배열로 받아서 생성
-     * @param vcSrcUrlRequest
+     * @param vcUrlRequest
      * @return List of downloaded files
      * @throws IOException
      */
-    public List<File> downloadFile(List<VcSrcUrlRequest> vcSrcUrlRequest) throws IOException {
+    public List<File> downloadFile(List<VcUrlRequest> vcUrlRequest) throws IOException {
         List<File> files = new ArrayList<>();
 
-        for (VcSrcUrlRequest request : vcSrcUrlRequest) {
+        for (VcUrlRequest request : vcUrlRequest) {
             String key = extractFileKeyFromUrl(request.getUrl());
             log.info("[S3Service] downloadFile - key: {}", key);
             files.add(downloadSingleFile(key));
