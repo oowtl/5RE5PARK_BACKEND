@@ -60,7 +60,7 @@ class ProjectServiceImplTest {
         when(projectRepository.findByMemberSeq(memberSeq)).thenReturn(List.of(mockProject));//project 값 세팅
 
         // when
-        List<ProjectResponse> responses = projectService.projectFindAll(memberSeq);//memberSeq 로 project 확인
+        List<ProjectResponse> responses = projectService.projectFindAll();//memberSeq 로 project 확인
 
         // then
         assertThat(responses).hasSize(1);
@@ -76,7 +76,7 @@ class ProjectServiceImplTest {
         when(projectRepository.save(any(Project.class))).thenReturn(mockProject);//project 값 세팅
 
         // when
-        Long projectSeq = projectService.projectSave(memberSeq);//1L
+        Long projectSeq = projectService.projectSave();//1L
 
         // then
         assertThat(projectSeq).isEqualTo(1L);//결과 비교
@@ -146,6 +146,6 @@ class ProjectServiceImplTest {
 
         // when // then
         assertThrows(IllegalArgumentException.class,
-                () -> projectService.projectSave(1L));
+                () -> projectService.projectSave());
     }
 }
