@@ -155,7 +155,7 @@ public class TtsController {
             .body(new ResponseDto<>(HttpStatus.OK.value(), response));
     }
 
-    @Operation(summary = "TTS 현재 상태 저장 (저장 및 수정)")
+    @Operation(summary = "TTS 현재 상태 저장 (저장 및 수정)", description="TTS 문장 저장 시 정렬을 합니다. 순서 정보가 null 인 경우는 전부 뒤로 보낼 것이며, null 인 객체간의 순서는 보장되지 않습니다.")
     @PostMapping("/batch")
     public ResponseEntity<ResponseDto<TtsSentenceListDto>> batchSave(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
