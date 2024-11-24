@@ -188,6 +188,7 @@ public class VcServiceImpl implements VcService{
     public List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq) {
         // 프로젝트 seq 조회한 값
         List<VcSrcFile> vcSrcFileList = vcSrcFileRepository.findByVcProjectSeq(projectSeq);
+        log.info("[vcService] getVcResponse vcSrcFileList 확인 : {} ", vcSrcFileList);
 
         // 데이터가 많을수 있으므로 병렬 처리로 변경
         return vcSrcFileList.parallelStream()
@@ -200,10 +201,12 @@ public class VcServiceImpl implements VcService{
                             .name(vcSrcFile.getFileName())
                             .fileUrl(vcSrcFile.getFileUrl())
                             .build();
+                    log.info("[vcService] getVcResponse srcAudio 확인 : {} ", srcAudio);
 
                     // SRC 로 제일 최근에 저장한 Result 조회, 값이 없을 경우 null 처리
                     VcResultFile vcResultFile =
                             vcResultFileRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+                    log.info("[vcService] getVcResponse vcResultFile 확인 : {} ", vcResultFile);
                     VcResultsRequest resultAudio = Optional.ofNullable(vcResultFile)
                             .map(file -> VcResultsRequest.builder()
                                     .seq(file.getResSeq())
@@ -211,14 +214,15 @@ public class VcServiceImpl implements VcService{
                                     .fileUrl(file.getFileUrl())
                                     .build())
                             .orElse(null);
-
+                    log.info("[vcService] getVcResponse resultAudio 확인 : {} ", resultAudio);
                     // 제일 최근에 저장한 텍스트 조회, 값이 없을 경우 null 처리
                     VcText vcText =
                             vcTextRepository.findFirstBySrcSeq_SrcSeqOrderBySrcSeqDesc(vcSrcFile.getSrcSeq());
+                    log.info("[vcService] getVcResponse vcText 확인 : {} ", vcText);
                     VcTextRequest text = Optional.ofNullable(vcText)
                             .map(t -> VcTextRequest.of(t.getVtSeq(), t.getComment()))
                             .orElse(null);
-
+                    log.info("[vcService] getVcResponse text 확인 : {} ", text);
                     // VcResponse 객체 생성 후 반환
                     return new VcResponse(vcSrcFile.getActivate(), srcAudio, resultAudio, text);
                 })
