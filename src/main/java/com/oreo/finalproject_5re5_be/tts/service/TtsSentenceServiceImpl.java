@@ -82,7 +82,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                 .audioFormat(attribute.getAudioFormat())
                 .project(project)
                 .voice(voice)
-                .style(style)
                 .build();
 
         // 5. TtsSentence 저장
@@ -137,7 +136,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         TtsSentence updateSentence = sentence.toBuilder()
                 .text(updateRequest.getText())
                 .voice(voice)
-                .style(style)
                 .sortOrder(updateRequest.getOrder())
                 .volume(updateRequest.getAttribute().getVolume())
                 .speed(updateRequest.getAttribute().getSpeed())
