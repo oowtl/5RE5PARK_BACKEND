@@ -62,7 +62,7 @@ public class TtsSentence extends BaseEntity {
     @JoinColumn(name = "tts_aud_seq")
     private TtsAudioFile ttsAudiofile;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "voice_seq", nullable = false)
     private Voice voice;
 
