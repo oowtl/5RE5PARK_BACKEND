@@ -6,7 +6,9 @@ import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface VcService {
@@ -49,8 +51,8 @@ public interface VcService {
 
     List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq);
 
-    VcUrlResponse getSrcFile(@Valid @NotNull Long seq);
-    VcUrlResponse getResultFile(@Valid @NotNull Long seq);
+    VcUrlResponse getSrcUrl(@Valid @NotNull Long seq);
+    VcUrlResponse getResultUrl(@Valid @NotNull Long seq);
 
     VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
 
@@ -70,4 +72,7 @@ public interface VcService {
     List<VcTextRequest> vcTextResponses(List<Long> srcSeq, List<String> text);
     List<VcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq);
     VcUrlRequest vcTrgUrlRequest(Long trgSeq);
+
+    MultipartFile getTrgFile(Long trgSeq) throws IOException;
+    List<MultipartFile> getSrcFile(List<Long> srcSeq);
 }

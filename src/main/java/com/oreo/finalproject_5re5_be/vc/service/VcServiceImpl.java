@@ -1,5 +1,7 @@
 package com.oreo.finalproject_5re5_be.vc.service;
 
+import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioFileTypeConverter;
 import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
@@ -14,7 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -33,19 +39,22 @@ public class VcServiceImpl implements VcService{
     private VcResultFileRepository vcResultFileRepository;
     private VcTextRepository vcTextRepository;
     private ProjectRepository projectRepository;
+    private S3Service s3Service;
     @Autowired
     public VcServiceImpl(VcRepository vcRepository,
                          VcSrcFileRepository vcSrcFileRepository,
                          VcTrgFileRepository vcTrgFileRepository,
                          VcResultFileRepository vcResultFileRepository,
                          VcTextRepository vcTextRepository,
-                         ProjectRepository projectRepository) {
+                         ProjectRepository projectRepository,
+                         S3Service s3Service) {
         this.vcRepository = vcRepository;
         this.vcSrcFileRepository = vcSrcFileRepository;
         this.vcTrgFileRepository = vcTrgFileRepository;
         this.vcResultFileRepository = vcResultFileRepository;
         this.vcTextRepository = vcTextRepository;
         this.projectRepository = projectRepository;
+        this.s3Service = s3Service;
     }
 
     /**
@@ -219,7 +228,7 @@ public class VcServiceImpl implements VcService{
      */
 
     @Override
-    public VcUrlResponse getSrcFile(@Valid @NotNull Long seq) {
+    public VcUrlResponse getSrcUrl(@Valid @NotNull Long seq) {
         //SRC seq 로 SRC 값 조회
         VcSrcFile srcFile = vcSrcFileFind(seq);
         log.info("[vcService] getSrcFile srcFile 확인 : {} ", srcFile);
@@ -233,7 +242,7 @@ public class VcServiceImpl implements VcService{
      * @return VcUrlResponse
      */
     @Override
-    public VcUrlResponse getResultFile(@Valid @NotNull Long seq) {
+    public VcUrlResponse getResultUrl(@Valid @NotNull Long seq) {
         //TRG seq 로 TRG 값 조회
         VcResultFile resultFile = vcResultFind(seq);
         log.info("[vcService] getResultFile resultFile 확인 : {} ", resultFile);
@@ -436,7 +445,43 @@ public class VcServiceImpl implements VcService{
     public VcUrlRequest vcTrgUrlRequest(Long trgSeq) {
         VcTrgFile trgFile = vcTrgFileRepository.findById(trgSeq)
                 .orElseThrow(() -> new IllegalArgumentException("trgFile not found"));
+        log.info("[vcService] vcTrgUrlRequest trgFile 확인 : {} ", trgFile);
         return VcUrlRequest.of(trgFile.getTrgSeq(), trgFile.getFileUrl());
+    }
+
+    @Override
+    public MultipartFile getTrgFile(Long trgSeq) throws IOException {
+        try{
+            MultipartFile multipartFile = AudioFileTypeConverter
+                    .convertFileToMultipartFile(
+                            s3Service.downloadFile(
+                                    "vc/trg/" + extractFileName(
+                                            vcTrgUrlRequest(trgSeq).getUrl())));
+            log.info("[vcService] getTrgFile multipartFile 확인 : {} ", multipartFile);
+            return multipartFile ;
+        }catch (Exception e) {
+            throw new IOException("TRG File 오류");
+        }
+    }
+
+    @Override
+    public List<MultipartFile> getSrcFile(List<Long> srcSeq) {
+        List<VcUrlRequest> vcSrcUrlRequests = vcSrcUrlRequests(srcSeq);
+        log.info("[vcService] getSrcUrl vcSrcUrlRequests 확인 : {} ", vcSrcUrlRequests);
+        List<MultipartFile> collect = vcSrcUrlRequests.stream()
+                .map(vcSrcUrlRequest -> {
+                    String srcFileName = extractFileName(vcSrcUrlRequest.getUrl());
+                    File srcFile = null;
+                    try {
+                        srcFile = s3Service.downloadFile("vc/src/" + srcFileName);
+                        return AudioFileTypeConverter.convertFileToMultipartFile(srcFile);
+                    } catch (IOException e) {
+                        throw new RuntimeException("SRC File 오류");
+                    }
+                })
+                .collect(Collectors.toList());
+        log.info("[vcService] getSrcUrl collect 확인 : {} ", collect);
+        return collect;
     }
 
 
@@ -485,5 +530,8 @@ public class VcServiceImpl implements VcService{
         return Optional.ofNullable(vcText)
                 .map(t -> VcTextRequest.of(t.getVtSeq(), t.getComment()))
                 .orElse(null);
+    }
+    private static String extractFileName(String url) {
+        return url.substring(url.lastIndexOf("/") + 1);
     }
 }
