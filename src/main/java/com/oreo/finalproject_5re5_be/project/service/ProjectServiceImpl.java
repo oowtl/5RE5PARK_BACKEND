@@ -6,6 +6,7 @@ import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.exception.InvalidProjectNameException;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +43,8 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public List<ProjectResponse> projectFindAll(Long memberSeq) {
-        Member member = memberFind(memberSeq);
+    public List<ProjectResponse> projectFindAll() {
+        Member member = memberFind(1L);
         //회원 정보로 전체 조회
         List<Project> project = projectRepository
                 .findByMemberSeq(member.getSeq());
@@ -69,9 +70,9 @@ public class ProjectServiceImpl implements ProjectService {
      * @return Long
      */
     @Override
-    public Long projectSave(Long memberSeq) {
+    public Long projectSave() {
         //회원정보 추출
-        Member member = memberFind(memberSeq);
+        Member member = memberFind(1L);
         //회원정보로 프로젝트 객체 생성
         Project project = Project.builder()
                 .member(member)
@@ -89,7 +90,8 @@ public class ProjectServiceImpl implements ProjectService {
      * @param projectName
      */
     @Override
-    public void projectUpdate(@NotNull Long projectSeq,@NotNull String projectName) {
+    public void projectUpdate(@Valid @NotNull Long projectSeq,
+                              @Valid @NotNull String projectName){
         //프로젝트 길이 제한
         validateProjectName(projectName);
         // 프로젝트 번호로 프로젝트 찾기
@@ -109,7 +111,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public void projectDelete(List<Long> projectSeq) {
+    public void projectDelete(@Valid @NotNull List<Long> projectSeq) {
         //리스트로 받은 프로젝트 번호를 조회
         for (int i = 0; i < projectSeq.size(); i++) {
             Project projectFind = projectFind(projectSeq.get(i));
@@ -124,7 +126,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     // 길이 제한 메서드
-    private void validateProjectName(@NotNull String projectName) {
+    private void validateProjectName(@Valid @NotNull String projectName) {
         if (projectName == null || projectName.length() < 3 || projectName.length() > 50) {
             throw new InvalidProjectNameException("프로젝트 이름은 3자 이상, 50자 이하여야 합니다.");
         }
