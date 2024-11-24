@@ -115,9 +115,11 @@ public class VcController {
             @RequestParam("srcSeq") @Valid List<Long> srcSeq,
             @RequestParam("trgSeq") @Valid Long trgSeq) throws IOException {
         //결과 파일 생성(VC API)
-        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
-                vcService.getSrcFile(srcSeq),//srcFile
-                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
+//        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
+//                vcService.getSrcFile(srcSeq),//srcFile
+//                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
+        List<MultipartFile> resultFile = new ArrayList<>();
+        resultFile.add((MultipartFile) new File("test.wav"));//API가 사용되지 않게 test로 반환
         log.info("[VcController] resultSave  resultFile: {} ", resultFile);
 
         //SRC 파일 삭제(spring 서버에서 삭제)
