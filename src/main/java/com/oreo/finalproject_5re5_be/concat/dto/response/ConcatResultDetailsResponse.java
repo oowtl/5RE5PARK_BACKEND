@@ -13,16 +13,16 @@ public class ConcatResultDetailsResponse {
     private Long concatOptionSeq; //객체가 아닌 seq를 반환
     private String audioUrl;
     private String extension;
-    private Long fileLength;
+    private Float fileLength;
     private String fileName;
 
     //format 관련 필드
     private String encoding;
-    private Integer sampleRate;
-    private Short sampleSizeBit;
-    private Short channel;
+    private Float sampleRate;
+    private Integer sampleSizeBit;
+    private Integer channel;
     private Integer frameSize;
-    private Short frameRate;
+    private Float frameRate;
     private Character isBigEndian;
 
 
