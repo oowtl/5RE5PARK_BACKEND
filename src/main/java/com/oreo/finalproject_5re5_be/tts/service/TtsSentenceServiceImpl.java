@@ -80,21 +80,20 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 4. TtsSentenceRequest -> TtsSentence 변환
         TtsAttributeInfo attribute = createRequest.getAttribute();
         TtsSentence ttsSentence = TtsSentence.builder()
-            .text(createRequest.getText())
-            .sortOrder(createRequest.getOrder())
-            .volume(attribute.getVolume())
-            .speed(attribute.getSpeed())
-            .startPitch(attribute.getStPitch())
-            .emotion(attribute.getEmotion())
-            .emotionStrength(attribute.getEmotionStrength())
-            .sampleRate(attribute.getSampleRate())
-            .alpha(attribute.getAlpha())
-            .endPitch(attribute.getEndPitch())
-            .audioFormat(attribute.getAudioFormat())
-            .project(project)
-            .voice(voice)
-            .style(style)
-            .build();
+                .text(createRequest.getText())
+                .sortOrder(createRequest.getOrder())
+                .volume(attribute.getVolume())
+                .speed(attribute.getSpeed())
+                .startPitch(attribute.getStPitch())
+                .emotion(attribute.getEmotion())
+                .emotionStrength(attribute.getEmotionStrength())
+                .sampleRate(attribute.getSampleRate())
+                .alpha(attribute.getAlpha())
+                .endPitch(attribute.getEndPitch())
+                .audioFormat(attribute.getAudioFormat())
+                .project(project)
+                .voice(voice)
+                .build();
 
         // 5. TtsSentence 저장
         TtsSentence createdTtsSentence = ttsSentenceRepository.save(ttsSentence);
@@ -151,21 +150,20 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 3.2 TtsSentence 엔티티 수정
         TtsSentence updateSentence = sentence.toBuilder()
-            .text(updateRequest.getText())
-            .voice(voice)
-            .style(style)
-            .sortOrder(updateRequest.getOrder())
-            .volume(updateRequest.getAttribute().getVolume())
-            .speed(updateRequest.getAttribute().getSpeed())
-            .startPitch(updateRequest.getAttribute().getStPitch())
-            .emotion(updateRequest.getAttribute().getEmotion())
-            .emotionStrength(updateRequest.getAttribute().getEmotionStrength())
-            .sampleRate(updateRequest.getAttribute().getSampleRate())
-            .alpha(updateRequest.getAttribute().getAlpha())
-            .endPitch(updateRequest.getAttribute().getEndPitch())
-            .audioFormat(updateRequest.getAttribute().getAudioFormat())
-            .ttsAudiofile(null) // 3.3 TtsSentence 에 연관된 ttsAudioFile 연결 끊기
-            .build();
+                .text(updateRequest.getText())
+                .voice(voice)
+                .sortOrder(updateRequest.getOrder())
+                .volume(updateRequest.getAttribute().getVolume())
+                .speed(updateRequest.getAttribute().getSpeed())
+                .startPitch(updateRequest.getAttribute().getStPitch())
+                .emotion(updateRequest.getAttribute().getEmotion())
+                .emotionStrength(updateRequest.getAttribute().getEmotionStrength())
+                .sampleRate(updateRequest.getAttribute().getSampleRate())
+                .alpha(updateRequest.getAttribute().getAlpha())
+                .endPitch(updateRequest.getAttribute().getEndPitch())
+                .audioFormat(updateRequest.getAttribute().getAudioFormat())
+                .ttsAudiofile(null) // 3.3 TtsSentence 에 연관된 ttsAudioFile 연결 끊기
+                .build();
 
         // 4. TtsSentence 저장
         TtsSentence updatedSentence = ttsSentenceRepository.save(updateSentence);

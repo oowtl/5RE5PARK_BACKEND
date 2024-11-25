@@ -154,7 +154,6 @@ class TestBatchSave {
             .audioFormat("wav")
             .project(mock(Project.class))
             .voice(mock(Voice.class))
-            .style(mock(Style.class))
             .build();
 
         TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()

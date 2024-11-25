@@ -245,7 +245,6 @@ class TestUpdateSentence {
             .tsSeq(tsSeq)
             .text("Original text")
             .voice(voice)
-            .style(style)
             .sortOrder(1)
             .build();
 
@@ -254,7 +253,6 @@ class TestUpdateSentence {
             .tsSeq(tsSeq)
             .text(updatedText)
             .voice(voice)
-            .style(style)
             .sortOrder(updatedOrder)
             .volume(attribute.getVolume())
             .speed(attribute.getSpeed())
@@ -282,7 +280,6 @@ class TestUpdateSentence {
         assertNotNull(updateResult);
         assertEquals(updateRequest.getText(), updateResult.getSentence().getText());
         assertEquals(updateRequest.getVoiceSeq(), updateResult.getSentence().getVoiceSeq());
-        assertEquals(updateRequest.getStyleSeq(), updateResult.getSentence().getStyleSeq());
         assertEquals(updateRequest.getAttribute().getVolume(),
             updateResult.getSentence().getTtsAttributeInfo().getVolume());
         assertEquals(updateRequest.getAttribute().getSpeed(),
