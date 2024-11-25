@@ -48,6 +48,7 @@ public class VcResultFile extends BaseEntity {
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
 
+    @PrePersist
     public void prePersist() {
         date = LocalDateTime.now();
     }

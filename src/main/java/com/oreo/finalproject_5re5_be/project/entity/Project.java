@@ -47,10 +47,12 @@ public class Project extends BaseEntity {
     @Column(nullable = false, name = "activate")
     private Character proActivate = 'Y';
 
+    @PrePersist
     public void prePersist() {
         proUpDate = LocalDateTime.now();
     }
 
+    @PreUpdate
     public void preUpdate() {
         proUpDate = LocalDateTime.now();
     }

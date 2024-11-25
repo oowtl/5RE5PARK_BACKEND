@@ -1,9 +1,7 @@
 package com.oreo.finalproject_5re5_be.global.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -13,10 +11,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@ToString
-@MappedSuperclass
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
 public class BaseEntity {
 
     @CreatedDate
@@ -24,7 +22,7 @@ public class BaseEntity {
     private LocalDateTime regDate;
 
     @LastModifiedDate
-    @Column(insertable = false, name = "up_date")
+    @Column(name = "up_date")
     private LocalDateTime upDate;
 
     @CreatedBy
@@ -32,17 +30,6 @@ public class BaseEntity {
     private Long regSeq;
 
     @LastModifiedBy
-    @Column(insertable = false, name = "up_seq")
+    @Column(name = "up_seq")
     private Long upSeq;
-
-    @PrePersist
-    public void prePersist() {
-        regDate = LocalDateTime.now();
-        upDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        upDate = LocalDateTime.now();
-    }
 }
