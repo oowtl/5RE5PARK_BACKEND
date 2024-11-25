@@ -15,10 +15,11 @@ public interface ProjectService {
      * 3. 프로젝트 이름 변경
      * 4. 프로젝트 삭제
      */
-    List<ProjectResponse> projectFindAll();
-    Long projectSave();
-//    List<ProjectResponse> projectFindAll(Long memberSeq);
-//    Long projectSave(Long memberSeq);
+
+    List<ProjectResponse> projectFindAll(Long memberSeq);
+    Long projectSave(Long memberSeq);
     void projectUpdate(@Valid @NotNull Long projectSeq,@Valid @NotNull String projectName);
     void projectDelete(@Valid @NotNull List<Long> projectSeq);
+    boolean projectCheck(Long memberSeq, Long projectSeq);
+    boolean projectCheck(Long memberSeq, List<Long> projectSeq);
 }

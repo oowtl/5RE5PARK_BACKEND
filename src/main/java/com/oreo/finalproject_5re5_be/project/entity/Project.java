@@ -28,7 +28,7 @@ public class Project extends BaseEntity {
     private Long proSeq;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
+    @JoinColumn(name = "member_seq")
     private Member member;
 
     @Builder.Default
@@ -44,7 +44,7 @@ public class Project extends BaseEntity {
     private LocalDateTime proUpDate;
 
     @Builder.Default
-    @Column(nullable = false, name = "asctivate")
+    @Column(nullable = false, name = "activate")
     private Character proActivate = 'Y';
 
     public void prePersist() {
