@@ -2,8 +2,10 @@ package com.oreo.finalproject_5re5_be.vc.controller;
 
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioFileTypeConverter;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
-import com.oreo.finalproject_5re5_be.vc.dto.request.*;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
+import com.oreo.finalproject_5re5_be.vc.dto.request.VcRowRequest;
 import com.oreo.finalproject_5re5_be.vc.service.VcApiService;
 import com.oreo.finalproject_5re5_be.vc.service.VcHistoryService;
 import com.oreo.finalproject_5re5_be.vc.service.VcService;
@@ -34,18 +36,21 @@ public class VcController {
     private S3Service s3Service;
     private VcApiService vcApiService;
     private VcHistoryService vcHistoryService;
+    private ProjectService projectService;
 
     @Autowired
     public VcController(VcService vcService,
                         AudioInfo audioInfo,
                         S3Service s3Service,
                         VcApiService vcApiService,
-                        VcHistoryService vcHistoryService) {
+                        VcHistoryService vcHistoryService,
+                        ProjectService projectService) {
         this.vcService = vcService;
         this.audioInfo = audioInfo;
         this.s3Service = s3Service;
         this.vcApiService = vcApiService;
         this.vcHistoryService = vcHistoryService;
+        this.projectService = projectService;
     }
 
     @Operation(
@@ -54,9 +59,13 @@ public class VcController {
     )
     @PostMapping(value = "/{proSeq}/src",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> srcSave(@Valid @Parameter(description = "프로젝트 ID")
-                                                                        @PathVariable Long proSeq,
-                                                                   @Valid @RequestParam List<MultipartFile> file) {
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> srcSave(
+            @Valid @Parameter(description = "프로젝트 ID")
+            @PathVariable Long proSeq,
+            @Valid @RequestParam List<MultipartFile> file,
+            @SessionAttribute(value = "memberSeq") Long memberSeq) {
+        //회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
         try{
             //저장을 위한 파일 정보로 객체 생성
             return ResponseEntity.ok()
@@ -83,9 +92,13 @@ public class VcController {
     )
     @PostMapping(value = "/{proSeq}/trg",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>>trgSave(@Valid @Parameter(description = "프로젝트 seq")
-                                                                             @PathVariable Long proSeq,
-                                                                         @RequestParam MultipartFile file){
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>>trgSave(
+            @Valid @Parameter(description = "프로젝트 seq")
+            @PathVariable Long proSeq,
+            @RequestParam MultipartFile file,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
         try{
             //들어온 파일을 검사해서 확장자, 길이, 이름, 크기를 추출 + 파일을 S3에 업로드
             //DB에 저장할 객체 생성 + 저장
@@ -113,13 +126,18 @@ public class VcController {
     @PostMapping(value = "/result")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> resultSave(
             @RequestParam("srcSeq") @Valid List<Long> srcSeq,
-            @RequestParam("trgSeq") @Valid Long trgSeq) throws IOException {
+            @RequestParam("trgSeq") @Valid Long trgSeq,
+            @SessionAttribute(value = "memberSeq") Long memberSeq) throws IOException {
+        //회원의 정보인지 확인
+        vcService.srcCheck(memberSeq, srcSeq);
         //결과 파일 생성(VC API)
 //        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
 //                vcService.getSrcFile(srcSeq),//srcFile
 //                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
         List<MultipartFile> resultFile = new ArrayList<>();
-        resultFile.add((MultipartFile) new File("test.wav"));//API가 사용되지 않게 test로 반환
+        MultipartFile file = AudioFileTypeConverter.convertFileToMultipartFile(new File("ttsoutput.mp3"));
+
+        resultFile.add(file);//API가 사용되지 않게 test로 반환
         log.info("[VcController] resultSave  resultFile: {} ", resultFile);
 
         //SRC 파일 삭제(spring 서버에서 삭제)
@@ -139,9 +157,13 @@ public class VcController {
             description = "src Seq 와 Text 를 받아 DB에 저장 합니다."
     )
     @PostMapping("/src/text")
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> textSave(@Valid @Parameter(description = "Src Seq")
-                                                                               @RequestParam  List<Long> srcSeq,
-                                                                           @Valid @RequestBody List<String> text){
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> textSave(
+            @Valid @Parameter(description = "Src Seq")
+            @RequestParam  List<Long> srcSeq,
+            @Valid @RequestBody List<String> text,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        vcService.srcCheck(memberSeq, srcSeq);
         try{
             //객체 생성 + 저장
             return ResponseEntity.ok()
@@ -160,7 +182,11 @@ public class VcController {
             description = "src Seq 로 파일 url을 가지고 옵니다."
     )
     @GetMapping("/src/url/{srcSeq}")
-    public ResponseEntity<ResponseDto<Map<String, Object>>> srcURL(@Valid @PathVariable Long srcSeq){
+    public ResponseEntity<ResponseDto<Map<String, Object>>> srcURL(
+            @Valid @PathVariable Long srcSeq,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        vcService.srcCheck(memberSeq, srcSeq);
         try{
             //SRCFile URL 호출
             return ResponseEntity.ok()
@@ -178,7 +204,11 @@ public class VcController {
             description = "Result Seq 로 파일 url을 가지고 옵니다."
     )
     @GetMapping("/result/url/{resSeq}")
-    public ResponseEntity<ResponseDto<Map<String, Object>>> resultURL(@Valid @PathVariable Long resSeq){
+    public ResponseEntity<ResponseDto<Map<String, Object>>> resultURL(
+            @Valid @PathVariable Long resSeq,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        vcService.resCheck(memberSeq, resSeq);
         //Result Seq 로 URL 정보 추출
         try{
             return ResponseEntity.ok()
@@ -197,7 +227,11 @@ public class VcController {
             description = "Result Seq 로 VC 전체 행을 가지고 옵니다."
     )
     @GetMapping("/{proSeq}")
-    public ResponseEntity<ResponseDto<Map<String, Object>>> vc(@Valid @PathVariable Long proSeq){
+    public ResponseEntity<ResponseDto<Map<String, Object>>> vc(
+            @Valid @PathVariable Long proSeq,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
         //Project 의 src, result, text 정보 추출
         try{
             return ResponseEntity.ok()
@@ -216,7 +250,11 @@ public class VcController {
             description = "SRC 행을 비활성화 상태로 변경합니다. active = 'N' "
     )
     @DeleteMapping("/src")
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(@Valid @RequestBody List<Long> srcSeq){
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(
+            @Valid @RequestBody List<Long> srcSeq,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        vcService.srcCheck(memberSeq, srcSeq);
         //삭제 호출
         try{
             return ResponseEntity.ok()
@@ -236,8 +274,12 @@ public class VcController {
             description = "text seq 로 text 내용을 변경합니다."
     )
     @PutMapping("/src/{textSeq}")
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateText(@Valid @PathVariable Long textSeq,
-                                                          @Valid @RequestParam("text") String text){
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateText(
+            @Valid @PathVariable Long textSeq,
+            @Valid @RequestParam("text") String text,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        vcService.textCheck(memberSeq, textSeq);
         //textseq 로 text 값 변경
         try{
             return ResponseEntity.ok()
@@ -248,18 +290,23 @@ public class VcController {
                     .body(new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                             mapCreate(Collections.emptyList(), "Text 수정 중 오류가 발생했습니다.")));
         }
-
     }
     @Operation(
             summary = "행 수정",
             description = "Seq와 행순서를 가지고 변경합니다."
     )
     @PatchMapping("/row")
-    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(@Valid @RequestBody List<VcRowRequest> row){
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(
+            @Valid @RequestBody List<VcRowRequest> rows,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        //회원의 정보인지 확인
+        for (VcRowRequest row : rows) {
+            vcService.srcCheck(memberSeq, row.getSeq());
+        }
         //VC 행 순서 수정
         try{
             return ResponseEntity.ok()
-                    .body(new ResponseDto<>(HttpStatus.OK.value(), mapCreate(vcService.updateRowOrder(row),
+                    .body(new ResponseDto<>(HttpStatus.OK.value(), mapCreate(vcService.updateRowOrder(rows),
                             "행 수정 완료되었습니다.")));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

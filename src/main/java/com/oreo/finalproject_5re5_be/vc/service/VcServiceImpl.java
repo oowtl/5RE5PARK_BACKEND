@@ -3,10 +3,13 @@ package com.oreo.finalproject_5re5_be.vc.service;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFileTypeConverter;
 import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
 import com.oreo.finalproject_5re5_be.vc.entity.*;
+import com.oreo.finalproject_5re5_be.vc.exception.VcNotMemberException;
 import com.oreo.finalproject_5re5_be.vc.repository.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,8 @@ public class VcServiceImpl implements VcService{
     private VcTextRepository vcTextRepository;
     private ProjectRepository projectRepository;
     private S3Service s3Service;
+    private ProjectService projectService;
+
     @Autowired
     public VcServiceImpl(VcRepository vcRepository,
                          VcSrcFileRepository vcSrcFileRepository,
@@ -47,7 +51,8 @@ public class VcServiceImpl implements VcService{
                          VcResultFileRepository vcResultFileRepository,
                          VcTextRepository vcTextRepository,
                          ProjectRepository projectRepository,
-                         S3Service s3Service) {
+                         S3Service s3Service,
+                         ProjectService projectService) {
         this.vcRepository = vcRepository;
         this.vcSrcFileRepository = vcSrcFileRepository;
         this.vcTrgFileRepository = vcTrgFileRepository;
@@ -55,6 +60,7 @@ public class VcServiceImpl implements VcService{
         this.vcTextRepository = vcTextRepository;
         this.projectRepository = projectRepository;
         this.s3Service = s3Service;
+        this.projectService = projectService;
     }
 
     /**
@@ -484,6 +490,78 @@ public class VcServiceImpl implements VcService{
         return collect;
     }
 
+    /**
+     * SrcSeq 로 회원 확인 (단일)
+     * @param memberSeq
+     * @param srcSeq
+     * @return
+     */
+    @Override
+    public boolean srcCheck(Long memberSeq, Long srcSeq){
+        //행 찾기
+        VcSrcFile vcSrcFile = vcSrcFileFind(srcSeq);
+        //행에서 프로젝트 찾기
+        Project proSeq = vcSrcFile.getVc().getProSeq();
+        //프로젝트에서 회원정보로 회원확인
+        if(projectService.projectCheck(memberSeq, proSeq.getProSeq())){
+            return true;
+        }
+        throw new VcNotMemberException();
+    }
+
+    /**
+     * SrcSeq 로 회원 확인 (여러개)
+     * @param memberSeq
+     * @param srcSeq
+     * @return
+     */
+    @Override
+    public boolean srcCheck(Long memberSeq, List<Long> srcSeq){
+        //위에 단일을 반복
+        for (Long src : srcSeq) {
+            srcCheck(memberSeq, src);
+        }
+        return true;
+    }
+
+    /**
+     * resultSeq를 가지고 회원확인
+     * @param memberSeq
+     * @param resSeq
+     * @return
+     */
+
+    @Override
+    public boolean resCheck(Long memberSeq, Long resSeq) {
+        //결과물찾기
+        VcResultFile resultFile = vcResultFind(resSeq);
+        //결과물로 src찾기
+        VcSrcFile srcSeq = resultFile.getSrcSeq();
+        //위에 src 단일로 회원 비교
+        if(srcCheck(memberSeq, srcSeq.getSrcSeq())){
+            return true;
+        }
+        throw new VcNotMemberException();
+    }
+
+    /**
+     * textSeq를 가지고 회원확인
+     * @param memberSeq
+     * @param textSeq
+     * @return
+     */
+    @Override
+    public boolean textCheck(Long memberSeq, Long textSeq) {
+        //Text 찾기
+        VcText vcText = vcTextFind(textSeq);
+        //SRC 찾기
+        VcSrcFile srcSeq = vcText.getSrcSeq();
+        //위에 단일메서드 호출
+        if(srcCheck(memberSeq, srcSeq.getSrcSeq())){
+            return true;
+        }
+        throw new VcNotMemberException();
+    }
 
     //VcSrcFile 찾는 메서드
     private VcSrcFile vcSrcFileFind(Long seq){

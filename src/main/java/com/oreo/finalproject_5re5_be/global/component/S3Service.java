@@ -198,7 +198,7 @@ public class S3Service {
                 throw new RuntimeException("폴더 삭제 실패: " + folder.getAbsolutePath());
             }
         } else {
-            throw new IllegalArgumentException("폴더가 존재하지 않음: " + folder.getAbsolutePath());
+            log.error("폴더가 존재하지 않음: {} " , folder.getAbsolutePath());
         }
     }
 

@@ -75,4 +75,9 @@ public interface VcService {
 
     MultipartFile getTrgFile(Long trgSeq) throws IOException;
     List<MultipartFile> getSrcFile(List<Long> srcSeq);
+
+    boolean srcCheck(Long memberSeq, Long srcSeq);
+    boolean srcCheck(Long memberSeq, List<Long> srcSeq);
+    boolean resCheck(Long memberSeq, Long resSeq);
+    boolean textCheck(Long memberSeq, Long textSeq);
 }
