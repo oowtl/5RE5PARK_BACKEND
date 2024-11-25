@@ -5,11 +5,13 @@ import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatTabService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/concat/tab")
