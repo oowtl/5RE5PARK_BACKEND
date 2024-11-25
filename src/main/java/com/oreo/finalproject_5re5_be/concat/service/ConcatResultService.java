@@ -1,24 +1,24 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 
+import com.oreo.finalproject_5re5_be.concat.dto.ConcatResultDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatResultRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatResultDetailsResponse;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
-import com.oreo.finalproject_5re5_be.concat.repository.ConcatOptionRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class ConcatResultService {
 
     private final ConcatResultRepository concatResultRepository;
     private final ConcatTabRepository concatTabRepository;
-    private final ConcatOptionRepository concatOptionRepository;
 
     // ConcatResult 정보를 받아서 저장 (1개)
     public ConcatUrlResponse saveConcatResult(ConcatResultRequest request) {
@@ -49,6 +49,10 @@ public class ConcatResultService {
 
     }
 
+    public ConcatResult saveConcatResult(ConcatResult request) {
+        return concatResultRepository.save(request);
+    }
+
 
     // ConcatResult Seq를 받아서 ConcatResult의 세부 정보 조회 (1개)
     public ConcatResultDetailsResponse getConcatResultDetails(Long concatResultSeq) {
@@ -68,7 +72,6 @@ public class ConcatResultService {
 
     }
 
-
     // ConcatResult Seq를 받아서 해당 ConcatResult를 삭제 (1개)
     public void deleteConcatResultBySeq(Long concatResultSeq) {
         // ConcatResult 존재 여부 확인
@@ -80,5 +83,15 @@ public class ConcatResultService {
 
     }
 
-
+    public List<ConcatResultDto> findByConcatTabSequence(Long projectSeq) {
+        List<ConcatResult> byProjectSeq = concatResultRepository.findByConcatTabSequence(projectSeq);
+        return byProjectSeq.stream().map(cr -> ConcatResultDto.builder()
+                .concatResultSequence(cr.getConcatResultSequence())
+                .fileName(cr.getFileName())
+                .extension(cr.getExtension())
+                .fileSize(cr.getFileSize())
+                .audioUrl(cr.getAudioUrl())
+                .fileLength(cr.getFileLength())
+                .build()).toList();
+    }
 }
