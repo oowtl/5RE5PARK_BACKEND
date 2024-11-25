@@ -109,4 +109,13 @@ public class MaterialAudioService {
         return  materialAudioRepository.findConcatRowListByConcatResultSeq(concatResultSeq);
     }
 
+    public boolean saveMaterialAudio(List<MaterialAudio> materialAudios) {
+        try {
+            materialAudioRepository.saveAll(materialAudios);
+            return true;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("재료 오디오 저장 실패");
+        }
+
+    }
 }
