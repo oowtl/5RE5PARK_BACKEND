@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
 @RequestMapping("/api/concat")
 @RequiredArgsConstructor
@@ -125,7 +127,7 @@ public class ConcatWithBgmController {
                     .ResultUrl(audioUrl)
                     .ResultFileName("mixed_with_bgm.wav")
                     .ResultExtension("wav")
-                    .ResultFileLength(mixedAudioStream.getFrameLength())
+                    .ResultFileLength(mixedAudioStream.getFrameLength() / mixedAudioStream.getFormat().getFrameRate())
                     .build();
             ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatResultRequest);
 
@@ -157,7 +159,7 @@ public class ConcatWithBgmController {
         }
     }
 
-    private List<AudioProperties> loadAudioFiles(SelectedConcatRowRequest selectedRows) throws IOException, UnsupportedAudioFileException {
+    private List<AudioProperties> loadAudioFiles(SelectedConcatRowRequest selectedRows) {
         List<AudioProperties> audioPropertiesList = new ArrayList<>();
         for (SelectedConcatRowRequest.Row row : selectedRows.getRows()) {
             // S3에서 오디오 파일 다운로드
