@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.tts.dto.request;
 
 import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -10,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 public class TtsSentenceBatchInfo {
     BatchProcessType batchProcessType;
+    @NotNull
     SentenceInfo sentence;
 
     public static TtsSentenceBatchInfo of(BatchProcessType batchProcessType, SentenceInfo sentenceInfo) {

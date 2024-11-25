@@ -20,9 +20,17 @@ public class VcHistoryServiceImpl implements VcHistoryService {
 
     @Autowired
     public VcHistoryServiceImpl(VcRequestHistoryRepository vcRequestHistoryRepository,
-                                VcResultHistoryRepository vcResultHistoryRepository){
+                                VcResultHistoryRepository vcResultHistoryRepository,
+                                VcSrcFileRepository vcSrcFileRepository,
+                                VcTrgFileRepository vcTrgFileRepository,
+                                VcRepository vcRepository,
+                                CodeRepository codeRepository){
         this.vcRequestHistoryRepository = vcRequestHistoryRepository;
         this.vcResultHistoryRepository = vcResultHistoryRepository;
+        this.vcSrcFileRepository = vcSrcFileRepository;
+        this.vcTrgFileRepository = vcTrgFileRepository;
+        this.vcRepository = vcRepository;
+        this.codeRepository = codeRepository;
     }
 
 

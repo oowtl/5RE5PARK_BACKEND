@@ -11,16 +11,23 @@ import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
-import com.oreo.finalproject_5re5_be.tts.entity.*;
+import com.oreo.finalproject_5re5_be.tts.entity.Style;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
+import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
-import com.oreo.finalproject_5re5_be.tts.repository.*;
+import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsAudioFileRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsProgressStatusRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 
 @Slf4j
@@ -35,7 +42,10 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     private final StyleRepository styleRepository;
     private final TtsProgressStatusRepository ttsProgressStatusRepository;
 
-    public TtsSentenceServiceImpl(TtsSentenceRepository ttsSentenceRepository, ProjectRepository projectRepository, TtsAudioFileRepository ttsAudioFileRepository, VoiceRepository voiceRepository, StyleRepository styleRepository, TtsProgressStatusRepository ttsProgressStatusRepository) {
+    public TtsSentenceServiceImpl(TtsSentenceRepository ttsSentenceRepository,
+        ProjectRepository projectRepository, TtsAudioFileRepository ttsAudioFileRepository,
+        VoiceRepository voiceRepository, StyleRepository styleRepository,
+        TtsProgressStatusRepository ttsProgressStatusRepository) {
         this.ttsSentenceRepository = ttsSentenceRepository;
         this.projectRepository = projectRepository;
         this.ttsAudioFileRepository = ttsAudioFileRepository;
@@ -45,25 +55,26 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     }
 
     @Override
-    public TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceRequest createRequest) {
+    public TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq,
+        @Valid TtsSentenceRequest createRequest) {
         // 1. TtsSentenceRequest 유효성 검증 : Text (not blank) => @NotBlank
 
         // 2.1 projectSeq 유효성 검증 : not null => @NotNull
         // 2.2. projectSeq : 조회 가능한 projectSeq (존재 여부) 검증 및 할당
         Project project = projectRepository.findById(projectSeq)
-                .orElseThrow(() -> new IllegalArgumentException("projectSeq is invalid"));
+            .orElseThrow(() -> new IllegalArgumentException("projectSeq is invalid"));
 
         // 3.1 TtsSentenceRequest.voiceSeq 유효성 검증 : not null => @NotNull
         // 3.2 voiceSeq : 조회 가능한 voiceSeq (존재 여부) 검증 및 할당
         Voice voice = voiceRepository.findById(createRequest.getVoiceSeq())
-                .orElseThrow(() -> new IllegalArgumentException("voiceSeq is invalid"));
+            .orElseThrow(() -> new IllegalArgumentException("voiceSeq is invalid"));
 
         // 3. TtsSentenceRequest 유효성 검증 : StyleSeq
         // 3.1. styleSeq : not null 일 때 styleSeq 유효성 검증 및 할당
         Style style = null;
         if (createRequest.getStyleSeq() != null) {
             style = styleRepository.findById(createRequest.getStyleSeq())
-                    .orElseThrow(() -> new IllegalArgumentException("styleSeq is invalid"));
+                .orElseThrow(() -> new IllegalArgumentException("styleSeq is invalid"));
         }
 
         // 4. TtsSentenceRequest -> TtsSentence 변환
@@ -90,9 +101,9 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 6. TtsProgressStatus 저장
         TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()
-                .ttsSentence(createdTtsSentence)
-                .progressStatus(TtsProgressStatusCode.CREATED)
-                .build();
+            .ttsSentence(createdTtsSentence)
+            .progressStatus(TtsProgressStatusCode.CREATED)
+            .build();
         TtsProgressStatus createdTtsProgress = ttsProgressStatusRepository.save(ttsProgressStatus);
         log.info("[ttsProgressStatus] save : {}", createdTtsProgress);
 
@@ -108,7 +119,8 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
      * @apiNote TtsSentence 엔티티 수정
      */
     @Override
-    public TtsSentenceDto updateSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq, @Valid TtsSentenceRequest updateRequest) {
+    public TtsSentenceDto updateSentence(@Valid @NotNull Long projectSeq,
+        @Valid @NotNull Long tsSeq, @Valid TtsSentenceRequest updateRequest) {
         // 1. TtsSentenceRequest 유효성 검증
         if (updateRequest == null) {
             throw new IllegalArgumentException("Update request cannot be null");
@@ -117,20 +129,24 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 2. DB 유효성 검증
         // 2.1 projectSeq 조회 가능한 projectSeq (존재 여부) 검증 및 할당
         Project project = projectRepository.findById(projectSeq)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectSeq));
+            .orElseThrow(
+                () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
 
         // 2.2 voiceSeq 조회 가능한 voiceSeq (존재 여부) 검증 및 할당
         Voice voice = voiceRepository.findById(updateRequest.getVoiceSeq())
-                .orElseThrow(() -> new EntityNotFoundException("Voice not found with id: " + updateRequest.getVoiceSeq()));
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Voice not found with id: " + updateRequest.getVoiceSeq()));
 
         // 2.3 styleSeq 조회 가능한 styleSeq (존재 여부) 검증 및 할당
         Style style = styleRepository.findById(updateRequest.getStyleSeq())
-                .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + updateRequest.getStyleSeq()));
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Style not found with id: " + updateRequest.getStyleSeq()));
 
         // 3. TtsSentenceRequest -> TtsSentence 변환
         // 3.1 TtsSentence 엔티티 조회
         TtsSentence sentence = ttsSentenceRepository.findById(tsSeq)
-                .orElseThrow(() -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+            .orElseThrow(
+                () -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
 
         // 3.2 TtsSentence 엔티티 수정
         TtsSentence updateSentence = sentence.toBuilder()
@@ -149,7 +165,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                 .ttsAudiofile(null) // 3.3 TtsSentence 에 연관된 ttsAudioFile 연결 끊기
                 .build();
 
-
         // 4. TtsSentence 저장
         TtsSentence updatedSentence = ttsSentenceRepository.save(updateSentence);
 
@@ -158,20 +173,19 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     }
 
     /**
-     * @param projectSeq
-     * @param batchRequest
-     * @return
      * @apiNote TtsSentence 엔티티 Batch 저장
      */
     @Override
-    public TtsSentenceListDto batchSaveSentence(@Valid @NotNull Long projectSeq, @Valid TtsSentenceBatchRequest batchRequest) {
+    public TtsSentenceListDto batchSaveSentence(@Valid @NotNull Long projectSeq,
+        @Valid TtsSentenceBatchRequest batchRequest) {
         // 1. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
-        List<TtsSentenceBatchInfo> batchList = batchRequest.getSentenceList();
+        // 2. 정렬 및 정렬 순서 수정
+        List<TtsSentenceBatchInfo> batchList = batchRequest.getSortedSentenceList();
 
-        // 2. TtsSentenceDto List 변환
+        // 3. TtsSentenceDto List 변환
         List<TtsSentenceDto> batchedList = batchList.stream()
-                .map(batchInfo -> toSentenceDto(projectSeq, batchInfo))
-                .toList();
+            .map(batchInfo -> toSentenceDto(projectSeq, batchInfo))
+            .toList();
 
         return new TtsSentenceListDto(batchedList);
     }
@@ -187,12 +201,12 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 2. sentenceInfo -> TtsSentenceRequest 변환
         TtsSentenceRequest sentenceRequest = TtsSentenceRequest.builder()
-                .text(sentenceInfo.getText())
-                .voiceSeq(sentenceInfo.getVoiceSeq())
-                .styleSeq(sentenceInfo.getStyleSeq())
-                .order(sentenceInfo.getOrder())
-                .attribute(sentenceInfo.getTtsAttributeInfo())
-                .build();
+            .text(sentenceInfo.getText())
+            .voiceSeq(sentenceInfo.getVoiceSeq())
+            .styleSeq(sentenceInfo.getStyleSeq())
+            .order(sentenceInfo.getOrder())
+            .attribute(sentenceInfo.getTtsAttributeInfo())
+            .build();
 
         // 3. BatchProcessType 에 따른 분기처리
         // 3.1 CREATE : addSentence
@@ -212,19 +226,20 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     // 유효한 프로젝트인지 확인
     private Project getValidProject(Long projectSeq) {
         return projectRepository.findById(projectSeq)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectSeq));
+            .orElseThrow(
+                () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
     }
 
     // 유효한 음성인지 확인
     private Voice getValidVoice(Long voiceSeq) {
         return voiceRepository.findById(voiceSeq)
-                .orElseThrow(() -> new EntityNotFoundException("Voice not found with id: " + voiceSeq));
+            .orElseThrow(() -> new EntityNotFoundException("Voice not found with id: " + voiceSeq));
     }
 
     // 유효한 스타일인지 확인
     private Style getValidStyle(Long styleSeq) {
         return styleRepository.findById(styleSeq)
-                .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + styleSeq));
+            .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + styleSeq));
     }
 
 
@@ -233,7 +248,8 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 1. TtsSentence 엔티티 조회
         TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
-                .orElseThrow(() -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+            .orElseThrow(
+                () -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
 
         return TtsSentenceDto.of(ttsSentence);
     }
@@ -243,7 +259,8 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 1. Project 엔티티 조회
         Project project = projectRepository.findById(projectSeq)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + projectSeq));
+            .orElseThrow(
+                () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
 
         // 2. Project 에 연관된 TtsSentence 리스트 조회
         List<TtsSentence> ttsSentenceList = ttsSentenceRepository.findAllByProject(project);
@@ -256,12 +273,29 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     public boolean deleteSentence(Long projectSeq, Long tsSeq) {
         // 1. TtsSentence 엔티티 조회
         TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
-                .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(EntityNotFoundException::new);
 
         // 2. TtsSentence 삭제 (TtsSentence 만 삭제)
         ttsSentenceRepository.delete(ttsSentence);
 
         // 3. 결과 반환
         return true;
+    }
+
+    @Override
+    public TtsSentenceDto patchSentenceOrder(Long projectSeq, Long tsSeq, Integer order) {
+        // 1. TtsSentence 엔티티 조회
+        TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
+            .orElseThrow(EntityNotFoundException::new);
+
+        // 2. TtsSentence 엔티티 수정
+        TtsSentence updatedTtsSentence = ttsSentence.toBuilder()
+            .sortOrder(order)
+            .build();
+
+        // 3. TtsSentence 저장
+        TtsSentence savedTtsSentence = ttsSentenceRepository.save(updatedTtsSentence);
+
+        return TtsSentenceDto.of(savedTtsSentence);
     }
 }

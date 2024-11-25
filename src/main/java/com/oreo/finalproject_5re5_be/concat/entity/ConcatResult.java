@@ -35,8 +35,4 @@ public class ConcatResult extends BaseEntity {
     @Column(name = "file_name")
     private String fileName;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "audio_format_seq")
-    private AudioFormat audioFormat;
-
 }

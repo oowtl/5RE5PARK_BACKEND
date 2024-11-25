@@ -47,4 +47,12 @@ public class VcText extends BaseEntity {
     public void preUpdate() {
         vtUpDate = LocalDateTime.now();
     }
+
+    public static VcText create(VcSrcFile srcFile, String comment, String length){
+        return VcText.builder()
+                .srcSeq(srcFile)
+                .comment(comment)
+                .length(length)
+                .build();
+    }
 }

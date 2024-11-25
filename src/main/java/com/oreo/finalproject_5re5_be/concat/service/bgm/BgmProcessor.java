@@ -8,7 +8,6 @@ import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -91,28 +90,19 @@ public class BgmProcessor {
         );
     }
 
-    public static long calculateTargetFrames(File sourceFile) throws IOException, UnsupportedAudioFileException {
-        AudioInputStream sourceAudio = AudioSystem.getAudioInputStream(sourceFile);
-        AudioFormat sourceFormat = sourceAudio.getFormat();
-
-        // 샘플링 레이트와 길이를 기반으로 프레임 계산
-        long sourceDurationInFrames = sourceAudio.getFrameLength();
-        if (sourceDurationInFrames > 0) {
-            return sourceDurationInFrames;
-        }
-
-        // 데이터 기반으로 길이를 계산 (프레임 길이가 음수일 경우)
-        int frameSize = sourceFormat.getFrameSize();
+    public static long calculateTargetFrames(AudioInputStream audioStream) throws IOException {
+        AudioFormat format = audioStream.getFormat();
+        int frameSize = format.getFrameSize();
         byte[] buffer = new byte[4096];
         long totalBytes = 0;
         int bytesRead;
 
-        while ((bytesRead = sourceAudio.read(buffer)) != -1) {
+        while ((bytesRead = audioStream.read(buffer)) != -1) {
             totalBytes += bytesRead;
         }
 
         long calculatedFrames = totalBytes / frameSize;
-        System.out.println("Calculated Source Frames: " + calculatedFrames);
+        System.out.println("Calculated Frames: " + calculatedFrames);
         return calculatedFrames;
     }
 

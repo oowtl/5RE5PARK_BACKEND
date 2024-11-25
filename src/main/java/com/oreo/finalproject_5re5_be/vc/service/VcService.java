@@ -37,14 +37,15 @@ public interface VcService {
         12. SRC 파일 활성화상태 N로 변경
      */
     VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq);
+    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest, Long proSeq);
     VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+
+    List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequest);
     VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+
+    List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests);
     VcTextResponse textSave(@Valid @NotNull VcTextRequest vcTextRequest);
 
-    //리스트로 뽑기 위해 오버로딩하여 추가 작성
-    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest, Long proSeq);
-    List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequest);
-    List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests);
 
     List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq);
 
@@ -52,8 +53,10 @@ public interface VcService {
     VcUrlResponse getResultFile(@Valid @NotNull Long seq);
 
     VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
+
     VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
     List<VcRowResponse> updateRowOrder(@Valid @NotNull List<VcRowRequest> row);
+
     VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
     List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs);
 
