@@ -119,7 +119,7 @@ class MaterialAudioRepositoryTest {
                 .concatResultSequence((long)i)
                 .audioUrl("test/result-audio.test")
                 .extension(".result")
-                .fileLength((long)i*1000)
+                .fileLength(0.0f)
                 .fileName("test-result-audio-name")
                 .build();
     }
