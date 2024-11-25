@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcUrlRequest;
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -202,24 +202,58 @@ public class S3Service {
         }
     }
 
-    public static AudioInputStream load(String s3Url) throws MalformedURLException {
-        URL url = new URL(s3Url);
-        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url)) {
-            return audioInputStream;
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    public String upload(InputStream audioInputStream, String dirName, String fileName
+            , long fileSize, String contentType) {
+        if (audioInputStream == null) {
+            throw new IllegalArgumentException("AudioInputStream이 null입니다.");
         }
-        return null;
+
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
+        }
+
+        // 업로드할 객체의 메타데이터 정보 설정
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(contentType != null ? contentType : "audio/wav"); // 기본 MIME 타입 설정
+        objectMetadata.setContentLength(fileSize);
+
+        // S3 버킷 내 저장 경로(key) 설정
+        String key = dirName + "/" + UUID.randomUUID() + "_" + fileName;
+
+        // S3에 업로드 요청
+        try (InputStream inputStream = audioInputStream) {
+            PutObjectRequest request = new PutObjectRequest(
+                    buketName, // S3 버킷 이름
+                    key,       // 저장 경로(key)
+                    inputStream,
+                    objectMetadata
+            );
+
+            // S3 버킷에 객체 업로드
+            s3Client.putObject(request);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("AudioInputStream을 처리하는 중 문제가 발생했습니다. 업로드 실패!", e);
+        }
+
+        // 업로드된 파일의 S3 URL 반환
+        return s3Client.getUrl(buketName, key).toString();
     }
 
-    public static AudioInputStream load(URL s3Url) throws MalformedURLException {
 
-        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(s3Url)) {
-            return audioInputStream;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static AudioInputStream load(String s3Url)  {
+        try {
+            URL url = new URL(s3Url);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
+            byte[] bytes = AudioExtensionConverter.mp3ToWav(audioInputStream);
+
+            return AudioSystem.getAudioInputStream(new ByteArrayInputStream(bytes));
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("잘못된 URL입니다");
+        } catch (IOException e) {
+            throw new IllegalArgumentException("오디오 파일이 아닙니다.");
+        } catch (UnsupportedAudioFileException e) {
+            throw new IllegalArgumentException("지원하지 않는 오디오 형식입니다");
         }
-        return null;
     }
-
 }
