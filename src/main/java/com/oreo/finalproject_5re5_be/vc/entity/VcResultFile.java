@@ -8,7 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vc_resultaudiofile")
+@Table(name = "vc_resultfile")
 @Getter
 @ToString
 @Builder
