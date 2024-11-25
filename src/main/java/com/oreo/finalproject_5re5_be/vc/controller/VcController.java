@@ -254,7 +254,7 @@ public class VcController {
             summary = "행 수정",
             description = "Seq와 행순서를 가지고 변경합니다."
     )
-    @PatchMapping("/vc/row")
+    @PatchMapping("/row")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(@Valid @RequestBody List<VcRowRequest> row){
         //VC 행 순서 수정
         try{
