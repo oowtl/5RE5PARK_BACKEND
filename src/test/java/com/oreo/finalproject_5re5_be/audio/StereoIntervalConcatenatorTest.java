@@ -38,13 +38,13 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 10000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -67,13 +67,13 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B32);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -96,13 +96,13 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR240_B32);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -125,13 +125,13 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR240_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -155,13 +155,13 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //스테레오 병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 100f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         //테스트
         assertThatCode(() -> audioResample.resample(byteArrayOutputStream)).doesNotThrowAnyException();
@@ -183,13 +183,13 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //스테레오 병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 100f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         //테스트
         assertThatCode(() -> audioResample.resample(byteArrayOutputStream)).doesNotThrowAnyException();
@@ -210,15 +210,15 @@ class StereoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //스테레오 병합
         IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 100f);
 
         //테스트
-        assertThatThrownBy(() -> audioResample.resample(byteArrayOutputStream)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> intervalConcatenator.intervalConcatenate(audioInputStream, 1f))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

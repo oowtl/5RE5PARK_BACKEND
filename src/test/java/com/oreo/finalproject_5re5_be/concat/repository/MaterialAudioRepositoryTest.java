@@ -1,9 +1,10 @@
 package com.oreo.finalproject_5re5_be.concat.repository;
 
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
-import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
-import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
-import com.oreo.finalproject_5re5_be.concat.entity.MaterialAudio;
+import com.oreo.finalproject_5re5_be.concat.entity.*;
+import com.oreo.finalproject_5re5_be.member.entity.Member;
+import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,12 @@ class MaterialAudioRepositoryTest {
     private ConcatResultRepository concatResultRepository;
     @Autowired
     private MaterialAudioRepository materialAudioRepository;
+    @Autowired
+    private ConcatTabRepository concatTabRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
 
 
     /**
@@ -40,39 +47,55 @@ class MaterialAudioRepositoryTest {
     @Transactional
     @DisplayName("resultSeq로 concatRow 리스트 읽기 테스트 - 재료 2개 넣고 제대로 읽히는 지 확인")
     public void findConcatRowListByResultSeqTest() {
-        // 1. given: concatRow, audioFile, materialAudio, ConcatResult 생성
-        // 1-1. 재료가 될 concat row 2개 저장
+        // 1. Given: concatTab, concatResult, concatRow, audioFile, materialAudio 생성 및 저장
+
+        Member member = Member.builder().seq(1L).id("id").email("email").name("name").password("123")
+                .birthDate(LocalDateTime.now().toString()).chkValid('Y')
+                .detailAddr("").build();
+        Member save1 = memberRepository.save(member);
+        Project project = Project.builder().member(save1).proSeq(1L).build();
+        Project save = projectRepository.save(project);
+        // 1-1. ConcatTab 저장
+        ConcatTab concatTab = ConcatTab.builder().status('Y').frontSilence(0.0f).option(null).project(save).build();
+        ConcatTab savedConcatTab = concatTabRepository.save(concatTab);
+        assertNotNull(savedConcatTab);
+
+        // 1-2. ConcatResult 저장 (concatTab과 연결)
+        ConcatResult concatResult = ConcatResult.builder()
+                .concatTab(savedConcatTab) // 연관 관계 설정
+                .audioUrl("test/result-audio.test")
+                .extension(".result")
+                .fileLength(0.0f)
+                .fileName("test-result-audio-name")
+                .build();
+        ConcatResult savedConcatResult = concatResultRepository.save(concatResult);
+        assertNotNull(savedConcatResult);
+
+        // 1-3. ConcatRow와 AudioFile 저장
         ConcatRow concatRow1 = createConcatRowEntity(100);
         ConcatRow concatRow2 = createConcatRowEntity(200);
         List<ConcatRow> savedConcatRowList = concatRowRepository.saveAll(List.of(concatRow1, concatRow2));
         assertNotNull(savedConcatRowList);
 
-        // 1-2. 재료가 될 concat row의 각 오디오 정보 저장
         AudioFile afOfConcatRow1 = createAudioFileEntity(1000, concatRow1);
         AudioFile afOfConcatRow2 = createAudioFileEntity(1000, concatRow2);
         List<AudioFile> savedAudioFileList = audioFileRepository.saveAll(List.of(afOfConcatRow1, afOfConcatRow2));
         assertNotNull(savedAudioFileList);
 
-        // 1-3. concat 결과 저장
-        ConcatResult concatResult = createConcatResultEntity(50);
-        ConcatResult savedConcatResult = concatResultRepository.save(concatResult);
-        assertNotNull(savedConcatResult);
-
-        // 1-4. concat 결과에 대한 재료 오디오 정보 저장
-        MaterialAudio maOfConcatRow1af = createMaterialAudioEntity(concatResult, afOfConcatRow1);
-        MaterialAudio maOfConcatRow2af = createMaterialAudioEntity(concatResult, afOfConcatRow2);
+        // 1-4. MaterialAudio 저장 (concatResult와 audioFile 연결)
+        MaterialAudio maOfConcatRow1af = createMaterialAudioEntity(savedConcatResult, afOfConcatRow1);
+        MaterialAudio maOfConcatRow2af = createMaterialAudioEntity(savedConcatResult, afOfConcatRow2);
         List<MaterialAudio> savedMaterialAudioList = materialAudioRepository.saveAll(List.of(maOfConcatRow1af, maOfConcatRow2af));
         assertNotNull(savedMaterialAudioList);
 
-        // 2. when: 저장된 concat result seq로 row 리스트 읽어오기
+        // 2. When: 저장된 concatResultSeq로 row 리스트 읽기
         Long concatResultSeq = savedConcatResult.getConcatResultSequence();
         assertTrue(concatResultRepository.findById(concatResultSeq).isPresent());
         List<ConcatRow> findConcatRowListByResultSeq = materialAudioRepository.findConcatRowListByConcatResultSeq(concatResultSeq);
 
-        // 3. then: 조회한 concatRowList가 저장한 ConcatRowList와 일치하는지 확인
+        // 3. Then: 저장된 ConcatRow와 조회한 ConcatRow 비교
         assertEquals(findConcatRowListByResultSeq.size(), savedConcatRowList.size());
         assertTrue(savedConcatRowList.containsAll(findConcatRowListByResultSeq));
-
     }
 
     // result seq로 concat row 리스트 읽기 테스트 - 2. 존재하지 않는 resultSeq로 조회
