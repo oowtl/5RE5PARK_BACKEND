@@ -247,7 +247,14 @@ public class TtsController {
     @DeleteMapping("/sentence/{tsSeq}")
     public ResponseEntity<ResponseDto<String>> deleteSentence(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
-        @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq) {
+        @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq,
+        @SessionAttribute(value = "memberSeq") Long memberSeq) {
+
+        // 회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
+
+        // 회원이 소유한 tts 문장인지 확인
+        ttsSentenceService.checkSentenceWithMember(memberSeq, proSeq, tsSeq);
 
         // 문장 삭제
         boolean response = ttsSentenceService.deleteSentence(proSeq, tsSeq);
