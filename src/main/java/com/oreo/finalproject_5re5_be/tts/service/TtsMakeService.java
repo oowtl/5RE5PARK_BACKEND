@@ -11,7 +11,6 @@ import com.oreo.finalproject_5re5_be.tts.entity.*;
 import com.oreo.finalproject_5re5_be.tts.repository.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,26 +42,33 @@ public class TtsMakeService {
     }
 
     // TTS 생성 서비스
-    @Transactional(rollbackFor = RuntimeException.class)
     public TtsSentenceDto makeTts(@NotNull Long sentenceSeq) {
         // 0. sentenceSeq 로 행 정보 조회
         TtsSentence ttsSentence = ttsSentenceRepository.findById(sentenceSeq)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 TTS 행입니다. id:"+sentenceSeq));
 
         // TTS 문장 '진행중' 상태 저장
-        TtsProgressStatus ttsProgressInProgressStatus = TtsProgressStatus.builder()
-                .ttsSentence(ttsSentence)
-                .progressStatus( TtsProgressStatusCode.IN_PROGRESS)
-                .build();
-        ttsProgressStatusRepository.save(ttsProgressInProgressStatus);
+        saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.IN_PROGRESS);
 
-        // 1. TTS 생성
-        MultipartFile ttsFile = makeTtsAudioFile(ttsSentence);
+        try {
+            // 1. TTS 생성
+            MultipartFile ttsFile = makeTtsAudioFile(ttsSentence);
 
-        // 2. TTS 결과 파일 AWS S3에 업로드
-        String uploadedUrl = s3Service.upload(ttsFile, "tts");
+            // 2. TTS 결과 파일 AWS S3에 업로드
+            String uploadedUrl = s3Service.upload(ttsFile, "tts");
 
-        return saveTtsMakeResultService.saveTtsMakeResult(ttsFile, uploadedUrl, ttsSentence);
+            // 3. TTS 결과 정보 저장
+            TtsSentenceDto saveResult =  saveTtsMakeResultService.saveTtsMakeResult(ttsFile, uploadedUrl, ttsSentence);
+
+            // 4. TTS 문장 '성공' 상태 저장
+            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FINISHED);
+
+            return saveResult;
+        } catch (RuntimeException e) {
+            // 예외 발생 시 TTS 문장 '실패' 상태 저장
+            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
+            throw e;
+        }
     }
 
     // TTS 생성
@@ -92,8 +98,16 @@ public class TtsMakeService {
 
 
     // TTS 파일 이름 생성 메서드
-    private static String makeFilename(TtsSentence ttsSentence) {
+    private String makeFilename(TtsSentence ttsSentence) {
         return "project-" + ttsSentence.getProject().getProSeq() + "-tts-" + ttsSentence.getTsSeq();
     }
 
+    // TTS 문장 상태 저장 메서드
+    private TtsProgressStatus saveTtsProgressStatus(TtsSentence ttsSentence, TtsProgressStatusCode statusCode) {
+        TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()
+                .ttsSentence(ttsSentence)
+                .progressStatus(statusCode)
+                .build();
+        return ttsProgressStatusRepository.save(ttsProgressStatus);
+    }
 }
