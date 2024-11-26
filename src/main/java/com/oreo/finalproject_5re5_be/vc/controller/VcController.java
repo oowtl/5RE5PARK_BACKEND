@@ -70,12 +70,10 @@ public class VcController {
             //저장을 위한 파일 정보로 객체 생성
             return ResponseEntity.ok()
                     .body(new ResponseDto<>(HttpStatus.OK.value(),
-                            mapCreate(
-                                    vcService.srcSave(
-                                            vcService.vcSrcRequestBuilder(
-                                                    audioInfo.extractAudioFileInfo(file),
-                                    s3Service.upload(file, "vc/src"),
-                                    proSeq), proSeq),
+                            mapCreate(vcService.srcSave(vcService.vcSrcRequestBuilder(
+                                            audioInfo.extractAudioFileInfo(file),
+                                            s3Service.upload(file, "vc/src"),
+                                            proSeq), proSeq),
                             "src 파일 저장 완료되었습니다.")));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(

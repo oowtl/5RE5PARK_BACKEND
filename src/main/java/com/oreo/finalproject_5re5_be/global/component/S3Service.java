@@ -188,14 +188,14 @@ public class S3Service {
                     } else {
                         // 파일 삭제
                         if (!file.delete()) {
-                            throw new RuntimeException("파일 삭제 실패: " + file.getAbsolutePath());
+                            log.error("파일 삭제 실패: {}" ,file.getAbsolutePath());
                         }
                     }
                 }
             }
             // 폴더 삭제
             if (!folder.delete()) {
-                throw new RuntimeException("폴더 삭제 실패: " + folder.getAbsolutePath());
+                log.error("폴더 삭제 실패: {}" , folder.getAbsolutePath());
             }
         } else {
             log.error("폴더가 존재하지 않음: {} " , folder.getAbsolutePath());
