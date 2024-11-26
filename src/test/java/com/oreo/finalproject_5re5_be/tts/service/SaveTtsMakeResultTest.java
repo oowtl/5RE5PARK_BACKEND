@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class SaveTtsMakeResultTest {
 
     @Autowired
