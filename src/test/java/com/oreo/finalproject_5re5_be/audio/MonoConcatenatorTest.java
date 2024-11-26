@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MonoConcatenatorTest {
     public static final MonoConcatenator monoConcatenator = new MonoConcatenator();//기본 병합
@@ -151,9 +152,8 @@ class MonoConcatenatorTest {
         AudioInputStream inputAIS2 = AudioSystem.getAudioInputStream(byteArrayInputStream2);
 
         //병합
-        ByteArrayOutputStream concatenate = monoConcatenator
-                .concatenate(audioResample.resample(List.of(inputAIS, inputAIS2)));
-        //변환 한 오디오 포맷 확인
-        assertThat(concatenate).isNull();
+        assertThatThrownBy(() -> monoConcatenator
+                .concatenate(audioResample.resample(List.of(inputAIS, inputAIS2))))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

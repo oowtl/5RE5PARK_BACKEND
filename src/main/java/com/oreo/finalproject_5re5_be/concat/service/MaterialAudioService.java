@@ -4,6 +4,7 @@ package com.oreo.finalproject_5re5_be.concat.service;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
+import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import com.oreo.finalproject_5re5_be.concat.entity.MaterialAudio;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
@@ -103,4 +104,18 @@ public class MaterialAudioService {
                 .collect(Collectors.toList());
     }
 
+    // concatResult의 seq로 재료가 된 행 정보 리스트 조회
+    public List<ConcatRow> findConcatRowListByResultSeq(Long concatResultSeq) {
+        return  materialAudioRepository.findConcatRowListByConcatResultSeq(concatResultSeq);
+    }
+
+    public boolean saveMaterialAudio(List<MaterialAudio> materialAudios) {
+        try {
+            materialAudioRepository.saveAll(materialAudios);
+            return true;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("재료 오디오 저장 실패");
+        }
+
+    }
 }

@@ -32,7 +32,7 @@ public class MonoConcatenator implements Concatenator {
         if (mono) {
             return merge(audioStreams);//병합
         }
-        return null;
+        throw new IllegalArgumentException("잘못된 포맷 입니다.");
     }
 
     //오디오 파일 병합 메소드

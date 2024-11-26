@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.vc.service;
 
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioFileTypeConverter;
 import com.oreo.finalproject_5re5_be.vc.exception.VcAPIFilesIsEmptyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,176 +31,132 @@ public class VcApiServiceImpl implements VcApiService{
     @Value("${VC_APIKEY}")
     private String vcApiKey;//키 값
 
+    private static final String REMOVE_BACKGROUND_NOISE = "remove_background_noise"; // 백그라운드 노이즈 제거 설정 키
+    private static final String RESPONSE_FILENAME = "response.wav"; // 응답 파일 이름
+    private static final String RESPONSE_CONTENT_TYPE = "audio/wav"; // 응답 파일 MIME 타입
+
+    /**
+     * trgID 생성
+     * @param file
+     * @return String
+     */
     @Override
     public String trgIdCreate(MultipartFile file) {
-        String trgId = "";
+        String url = vcUrl + "/voices/add";
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            String url = vcUrl + "/voices/add";//API 주소
-            HttpPost post = new HttpPost(url);
-            post.setHeader("xi-api-key", vcApiKey);//키값 입력
+            HttpPost post = createHttpPost(url);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create()
+                    .addTextBody("name", "5re5PARKTRG", ContentType.TEXT_PLAIN) // 요청 이름 설정
+                    .addBinaryBody("files", file.getInputStream(), ContentType.create(file.getContentType()), file.getOriginalFilename()) // 파일 데이터 추가
+                    .addTextBody(REMOVE_BACKGROUND_NOISE, "true", ContentType.TEXT_PLAIN); // 노이즈 제거 옵션 설정
 
-            // Multipart 요청 작성
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addTextBody("name",
-                    "5re5PARKTRG",
-                    ContentType.TEXT_PLAIN);//이름 생성
-            builder.addBinaryBody(
-                    "files",                         // 필드 이름
-                    file.getInputStream(),           // 파일 데이터
-                    ContentType.create(file.getContentType()), // MIME 타입
-                    file.getOriginalFilename()       // 파일 이름
-            );//파일 입력
-            // remove_background_noise 추가
-            builder.addTextBody("remove_background_noise", "true", ContentType.TEXT_PLAIN);
             post.setEntity(builder.build());
-
-            // 요청 실행 및 응답 처리
-            try (CloseableHttpResponse response = httpClient.execute(post)) {
-                int statusCode = response.getStatusLine().getStatusCode(); // 상태 코드 확인
-                String responseBody = new String(response.getEntity().getContent().readAllBytes()); // 응답 본문 읽기
-                if (statusCode >= 400) { // 클라이언트 또는 서버 오류
-                    log.error("Error occurred: Status code {}, Response body: {}", statusCode, trgId);
-                    throw new IllegalArgumentException("Request failed with status code: " + statusCode);
-                }
-                trgId = extractValue(responseBody, "voice_id");
-                if (trgId == null){
-                    throw new IllegalArgumentException("voice_id is null");
-                }
-                log.info("trgId : {} ", trgId);
+            String responseBody = executeRequest(httpClient, post);// API 요청 실행
+            //trgID 추출
+            String trgId = extractValue(responseBody, "voice_id");
+            if (trgId == null) {
+                throw new IllegalArgumentException("voice_id is null");
             }
+            log.info("Generated trgId: {}", trgId);
+            return trgId;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error occurred while creating trgId: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to create trgId", e);
         }
-        log.info("trgIdResult : {} ", trgId);
-        return trgId;
     }
 
-
+    /**
+     * 단일 resultFile 생성
+     * @param file
+     * @param trgId
+     * @return MultipartFile
+     */
     @Override
     public MultipartFile resultFileCreate(MultipartFile file, String trgId) {
-        MultipartFile multipartFile = null;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            if(file.isEmpty()) {//파일이 없을경우 에러
-                throw new VcAPIFilesIsEmptyException("vc api empty file");
-            }
-            //api 주소 값 입력, 나오는 오디오 포켓은 mp3_44100_192 지정
-            String url = vcUrl + "/speech-to-speech/"+trgId+"?output_format=mp3_44100_192";
-            HttpPost post = new HttpPost(url);
-            //api 키 값 입력
-            post.setHeader("xi-api-key", vcApiKey);
-
-            // Multipart 요청 작성
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            //요청할 값
-            builder.addBinaryBody(
-                    "audio",                         // 필드 이름
-                    file.getInputStream(),           // 파일 데이터
-                    ContentType.create(file.getContentType()), // MIME 타입
-                    file.getOriginalFilename()       // 파일 이름
-            );//파일 값 입력
-
-            // remove_background_noise 추가
-            builder.addTextBody("remove_background_noise", "true", ContentType.TEXT_PLAIN);
-            //요청
-            post.setEntity(builder.build());
-            // 요청 실행 및 응답 처리
-            try (CloseableHttpResponse response = httpClient.execute(post)) {
-                int statusCode = response.getStatusLine().getStatusCode(); // 상태 코드 확인
-                if (statusCode >= 400) { // 클라이언트 또는 서버 오류
-                    log.error("Error occurred: Status code {}, Response body: {}", statusCode);
-                    throw new IllegalArgumentException("Request failed with status code: " + statusCode);
-                }
-                //응답 오디오 inputStream
-                InputStream inputStream = response.getEntity().getContent();
-
-                String filename = "response.mp3";
-                log.info("input stream : {} ", inputStream);
-                multipartFile = convertInputStreamToMultipartFile(inputStream,
-                        filename,
-                        "audio/wav");//multipartfile로 변경
-
-                // 서버가 반환한 파일 이름 (수동 설정)
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return multipartFile;
+        return createResultFile(file, trgId);
     }
 
+    /**
+     * resultFile 여러개 생성
+     * @param files
+     * @param trgId
+     * @return
+     */
     @Override
     public List<MultipartFile> resultFileCreate(List<MultipartFile> files, String trgId) {
-        List<MultipartFile> multipartFiles = new ArrayList<>();
+        List<MultipartFile> resultFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                throw new VcAPIFilesIsEmptyException("File is empty");
+            }
+            resultFiles.add(createResultFile(file, trgId));
+        }
+        return resultFiles;
+    }
+    //결과 파일 생성 api 요청
+    private MultipartFile createResultFile(MultipartFile file, String trgId) {
+        String url = vcUrl + "/speech-to-speech/" + trgId + "?output_format=mp3_44100_192";
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            for (MultipartFile file : files) {
-                if(file.isEmpty()) {//파일이 없을경우 에러
-                    throw new VcAPIFilesIsEmptyException("vc api empty file");
-                }
-                //api 주소 값 입력, 나오는 오디오 포켓은 mp3_44100_192 지정
-                String url = vcUrl + "/speech-to-speech/"+trgId+"?output_format=mp3_44100_192";
-                HttpPost post = new HttpPost(url);
-                //api 키 값 입력
-                post.setHeader("xi-api-key", vcApiKey);
+            HttpPost post = createHttpPost(url);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create()
+                    .addBinaryBody("audio", file.getInputStream(),
+                            ContentType.create(file.getContentType()),
+                            file.getOriginalFilename()) // 파일 데이터 추가
+                    .addTextBody(REMOVE_BACKGROUND_NOISE, "true", ContentType.TEXT_PLAIN); // 노이즈 제거 옵션 설정
 
-                // Multipart 요청 작성
-                MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                //요청할 값
-                builder.addBinaryBody(
-                        "audio",                         // 필드 이름
-                        file.getInputStream(),           // 파일 데이터
-                        ContentType.create(file.getContentType()), // MIME 타입
-                        file.getOriginalFilename()       // 파일 이름
-                );//파일 값 입력
-                //요청
-                post.setEntity(builder.build());
-                // 요청 실행 및 응답 처리
-                try (CloseableHttpResponse response = httpClient.execute(post)) {
-                    //응답 오디오 inputStream
-                    InputStream inputStream = response.getEntity().getContent();
-
-                    String filename = "response.wav";
-                    log.info("input stream : {} ", inputStream);
-                    MultipartFile multipartFile = convertInputStreamToMultipartFile(inputStream,
-                            filename,
-                            "audio/wav");//multipartfile로 변경
-                    multipartFiles.add(multipartFile);
-                    // 서버가 반환한 파일 이름 (수동 설정)
-                }
+            post.setEntity(builder.build());
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                InputStream inputStream = response.getEntity().getContent();// 응답 데이터
+                // InputStream을 MultipartFile로 변환
+                return convertInputStreamToMultipartFile(inputStream, RESPONSE_FILENAME, RESPONSE_CONTENT_TYPE);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error occurred while creating result file: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to create result file", e);
         }
-
-        return multipartFiles;
     }
-    // JSON에서 특정 키의 값을 추출하는 간단한 메서드
+
+    //HttpPost 객체 생성
+    private HttpPost createHttpPost(String url) {
+        HttpPost post = new HttpPost(url);
+        post.setHeader("xi-api-key", vcApiKey);
+        return post;
+    }
+    //API 요청 실행
+    private String executeRequest(CloseableHttpClient httpClient, HttpPost post) throws Exception {
+        try (CloseableHttpResponse response = httpClient.execute(post)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            String responseBody = new String(response.getEntity().getContent().readAllBytes()); // 응답
+            if (statusCode >= 400) {
+                log.error("Request failed with status code {}: {}", statusCode, responseBody);
+                throw new IllegalArgumentException("Request failed with status code: " + statusCode);
+            }
+            return responseBody;
+        }
+    }
+    //JSON 데이터에서 특정 키의 값을 추출
     private static String extractValue(String json, String key) {
         String keyPattern = "\"" + key + "\":\"";
         int startIndex = json.indexOf(keyPattern) + keyPattern.length();
         int endIndex = json.indexOf("\"", startIndex);
+        if (startIndex <= keyPattern.length() || endIndex <= 0) {
+            return null;
+        }
         return json.substring(startIndex, endIndex);
     }
-    //입력된 파일 MultipartFile로 변경
-    public static MultipartFile convertInputStreamToMultipartFile(InputStream inputStream, String filename, String contentType) {
-        try {
-            // InputStream 데이터를 바이트 배열로 변환
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+    // InputStream -> MultipartFile로 변환
+    private static MultipartFile convertInputStreamToMultipartFile(InputStream inputStream, String filename, String contentType) {
+        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
             byte[] data = new byte[1024];
             int bytesRead;
-            while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+            while ((bytesRead = inputStream.read(data)) != -1) {
                 buffer.write(data, 0, bytesRead);
             }
-
-            // MockMultipartFile 생성
-            return new MockMultipartFile(
-                    "file", // 필드 이름
-                    filename, // 원본 파일 이름
-                    contentType, // 파일 Content-Type
-                    buffer.toByteArray() // 파일 데이터
-            );
+            return new MockMultipartFile("file", filename, contentType, buffer.toByteArray());
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            log.error("Error occurred while converting InputStream to MultipartFile: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to convert InputStream to MultipartFile", e);
         }
     }
 }

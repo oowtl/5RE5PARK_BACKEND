@@ -17,6 +17,9 @@ public interface MemberTermsRepository extends JpaRepository<MemberTerms, Long> 
     MemberTerms findTopByChkUseOrderByTermRegDateDesc();
 
 
+    @Query( "SELECT mt " +
+            "FROM MemberTerms mt " +
+            "WHERE mt.termCode = :termCode")
     MemberTerms findMemberTermsByTermCode(String termCode);
 
     // 사용 가능한 약관 모두 조회

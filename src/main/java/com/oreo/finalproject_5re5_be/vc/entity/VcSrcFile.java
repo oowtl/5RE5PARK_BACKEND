@@ -45,4 +45,22 @@ public class VcSrcFile extends BaseEntity {
     @Builder.Default
     @Column(nullable = false, name = "dn_stat")
     private Character downloadStatus = 'Y';
+
+    public static VcSrcFile create(Vc vc,
+                                  int rowOrder,
+                                  String fileName,
+                                  String fileUrl,
+                                  Integer fileLength,
+                                  String fileSize,
+                                  String extension){
+        return VcSrcFile.builder()
+                .vc(vc)
+                .rowOrder(rowOrder)
+                .fileName(fileName)
+                .fileUrl(fileUrl)
+                .fileLength(fileLength)
+                .fileSize(fileSize)
+                .extension(extension)
+                .build();
+    }
 }

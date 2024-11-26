@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Entity(name = "concat_row")
 public class ConcatRow extends BaseEntity {
 

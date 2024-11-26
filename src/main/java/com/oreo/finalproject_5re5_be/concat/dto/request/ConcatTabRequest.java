@@ -6,7 +6,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 public class ConcatTabRequest {
-    @NotNull(message = "seq 필드는 null 일 수 없습니다.")
     private Long seq;
 
     @NotNull(message = "concatRows 필드는 null 일 수 없습니다.")

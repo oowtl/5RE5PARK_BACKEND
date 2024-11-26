@@ -1,10 +1,8 @@
 package com.oreo.finalproject_5re5_be.global.component.audio;
 
+
 import javax.sound.sampled.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class AudioExtensionConverter {
 
@@ -12,6 +10,32 @@ public class AudioExtensionConverter {
 
     public static byte[] mp3ToWav(File file) throws UnsupportedAudioFileException, IOException {
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);// 파일을 AudioInputStream으로 읽기
+
+        AudioFormat baseFormat = audioInputStream.getFormat();// WAV 포맷으로 변환할 대상 포맷 설정
+        AudioFormat decodedFormat = getDecodedFormat(baseFormat);
+        AudioInputStream finalStream = getAudioInputStream(decodedFormat, audioInputStream);
+
+        ByteArrayOutputStream wavOutputStream = new ByteArrayOutputStream();//메모리에 저장할 ByteArray
+        AudioSystem.write(finalStream, AudioFileFormat.Type.WAVE, wavOutputStream);// 메모리 내에서 WAV 형식으로 변환 및 저장
+
+        return wavOutputStream.toByteArray();// 바이트 배열 반환
+
+    }
+
+    public static byte[] mp3ToWav(AudioInputStream audioInputStream) throws IOException {
+        AudioFormat baseFormat = audioInputStream.getFormat();// WAV 포맷으로 변환할 대상 포맷 설정
+        AudioFormat decodedFormat = getDecodedFormat(baseFormat);
+        AudioInputStream finalStream = getAudioInputStream(decodedFormat, audioInputStream);
+
+        ByteArrayOutputStream wavOutputStream = new ByteArrayOutputStream();//메모리에 저장할 ByteArray
+        AudioSystem.write(finalStream, AudioFileFormat.Type.WAVE, wavOutputStream);// 메모리 내에서 WAV 형식으로 변환 및 저장
+
+        return wavOutputStream.toByteArray();// 바이트 배열 반환
+
+    }
+
+    public static byte[] mp3ToWav(InputStream inputStream) throws UnsupportedAudioFileException, IOException {
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);// 파일을 AudioInputStream으로 읽기
 
         AudioFormat baseFormat = audioInputStream.getFormat();// WAV 포맷으로 변환할 대상 포맷 설정
         AudioFormat decodedFormat = getDecodedFormat(baseFormat);

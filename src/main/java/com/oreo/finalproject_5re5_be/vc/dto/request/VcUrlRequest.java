@@ -9,9 +9,13 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class VcSrcUrlRequest {
+public class VcUrlRequest {
     @NotNull(message = "seq 필드는 null 일 수 없습니다.")
     private Long seq;
     @NotNull(message = "url 필드는 null 일 수 없습니다.")
     private String url;
+
+    public static VcUrlRequest of(Long seq, String url){
+        return new VcUrlRequest(seq, url);
+    }
 }

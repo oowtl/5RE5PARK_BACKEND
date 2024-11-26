@@ -6,7 +6,9 @@ import com.oreo.finalproject_5re5_be.vc.dto.request.*;
 import com.oreo.finalproject_5re5_be.vc.dto.response.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface VcService {
@@ -37,23 +39,26 @@ public interface VcService {
         12. SRC 파일 활성화상태 N로 변경
      */
     VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq);
+    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest, Long proSeq);
     VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+
+    List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequest);
     VcUrlResponse resultSave(@Valid @NotNull VcAudioRequest vcAudioRequest);
+
+    List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests);
     VcTextResponse textSave(@Valid @NotNull VcTextRequest vcTextRequest);
 
-    //리스트로 뽑기 위해 오버로딩하여 추가 작성
-    List<VcUrlResponse> srcSave(@Valid @NotNull List<VcSrcRequest> vcSrcRequest, Long proSeq);
-    List<VcTextResponse> textSave(@Valid @NotNull List<VcTextRequest> vcTextRequest);
-    List<VcUrlResponse> resultSave(@Valid @NotNull List<VcAudioRequest> vcAudioRequests);
 
     List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq);
 
-    VcUrlResponse getSrcFile(@Valid @NotNull Long seq);
-    VcUrlResponse getResultFile(@Valid @NotNull Long seq);
+    VcUrlResponse getSrcUrl(@Valid @NotNull Long seq);
+    VcUrlResponse getResultUrl(@Valid @NotNull Long seq);
 
     VcTextResponse updateText(@Valid @NotNull Long seq, @Valid @NotNull String text);
+
     VcRowResponse updateRowOrder(@Valid @NotNull Long seq, @Valid @NotNull int rowOrder);
     List<VcRowResponse> updateRowOrder(@Valid @NotNull List<VcRowRequest> row);
+
     VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
     List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs);
 
@@ -62,8 +67,17 @@ public interface VcService {
                                                    Long proSeq);
 
     VcAudioRequest audioRequestBuilder(Long proSeq, AudioFileInfo info, String url);
-    List<VcAudioRequest> audioRequestBuilder(List<VcSrcUrlRequest> vcSrcUrlRequest, List<AudioFileInfo> info, List<String> url);
+    List<VcAudioRequest> audioRequestBuilder(List<VcUrlRequest> vcUrlRequest, List<AudioFileInfo> info, List<String> url);
 
     List<VcTextRequest> vcTextResponses(List<Long> srcSeq, List<String> text);
-    List<VcSrcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq);
+    List<VcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq);
+    VcUrlRequest vcTrgUrlRequest(Long trgSeq);
+
+    MultipartFile getTrgFile(Long trgSeq) throws IOException;
+    List<MultipartFile> getSrcFile(List<Long> srcSeq);
+
+    boolean srcCheck(Long memberSeq, Long srcSeq);
+    boolean srcCheck(Long memberSeq, List<Long> srcSeq);
+    boolean resCheck(Long memberSeq, Long resSeq);
+    boolean textCheck(Long memberSeq, Long textSeq);
 }

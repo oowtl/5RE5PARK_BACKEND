@@ -1,28 +1,24 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 
+import com.oreo.finalproject_5re5_be.concat.dto.ConcatResultDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatResultRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatResultDetailsResponse;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFormat;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
-import com.oreo.finalproject_5re5_be.concat.repository.AudioFormatRepository;
-import com.oreo.finalproject_5re5_be.concat.repository.ConcatOptionRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class ConcatResultService {
 
     private final ConcatResultRepository concatResultRepository;
     private final ConcatTabRepository concatTabRepository;
-    private final ConcatOptionRepository concatOptionRepository;
-    private final AudioFormatRepository audioFormatRepository;
-
 
     // ConcatResult 정보를 받아서 저장 (1개)
     public ConcatUrlResponse saveConcatResult(ConcatResultRequest request) {
@@ -34,10 +30,6 @@ public class ConcatResultService {
 //        ConcatOption concatOption = concatOptionRepository.findById(request.getOptionSeq())
 //                .orElseThrow(() -> new IllegalArgumentException("Invalid Option ID: " + request.getOptionSeq()));
 
-        // 3. AudioFormat 조회
-        AudioFormat audioFormat = audioFormatRepository.findById(request.getAudioFormatSeq())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid AudioFormat ID: " + request.getAudioFormatSeq()));
-
         //조회한 값과 입력한 값 저장을 하기 위한 ConcatResult 객체 생성
         ConcatResult concatResult = ConcatResult.builder()
                 .concatTab(concatTab) //concatTab 객체 필요
@@ -46,7 +38,6 @@ public class ConcatResultService {
                 .extension(request.getResultExtension())
                 .fileLength(request.getResultFileLength())
                 .fileName(request.getResultFileName())
-                .audioFormat(audioFormat) //audioFormat 객체 필요
                 .build();
 
         ConcatResult result = concatResultRepository.save(concatResult);
@@ -56,6 +47,10 @@ public class ConcatResultService {
                 .url(result.getAudioUrl()) //저장된 객체의 url
                 .build();
 
+    }
+
+    public ConcatResult saveConcatResult(ConcatResult request) {
+        return concatResultRepository.save(request);
     }
 
 
@@ -73,17 +68,9 @@ public class ConcatResultService {
                 .extension(concatResult.getExtension())
                 .fileLength(concatResult.getFileLength())
                 .fileName(concatResult.getFileName())
-
-                .encoding(concatResult.getAudioFormat().getEncoding())
-                .sampleRate(concatResult.getAudioFormat().getSampleRate())
-                .channel(concatResult.getAudioFormat().getChannel())
-                .frameSize(concatResult.getAudioFormat().getFrameSize())
-                .frameRate(concatResult.getAudioFormat().getFrameRate())
-                .isBigEndian(concatResult.getAudioFormat().getIsBigEndian())
                 .build();
 
     }
-
 
     // ConcatResult Seq를 받아서 해당 ConcatResult를 삭제 (1개)
     public void deleteConcatResultBySeq(Long concatResultSeq) {
@@ -96,5 +83,15 @@ public class ConcatResultService {
 
     }
 
-
+    public List<ConcatResultDto> findByConcatTabSequence(Long projectSeq) {
+        List<ConcatResult> byProjectSeq = concatResultRepository.findByConcatTabSequence(projectSeq);
+        return byProjectSeq.stream().map(cr -> ConcatResultDto.builder()
+                .concatResultSequence(cr.getConcatResultSequence())
+                .fileName(cr.getFileName())
+                .extension(cr.getExtension())
+                .fileSize(cr.getFileSize())
+                .audioUrl(cr.getAudioUrl())
+                .fileLength(cr.getFileLength())
+                .build()).toList();
+    }
 }

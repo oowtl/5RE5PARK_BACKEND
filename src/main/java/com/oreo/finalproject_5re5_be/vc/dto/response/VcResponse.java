@@ -12,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VcResponse {
+    private Character activate;
     private VcSrcsRequest vcSrcFile;
     private VcResultsRequest vcResultFile;
     private VcTextRequest vcText;

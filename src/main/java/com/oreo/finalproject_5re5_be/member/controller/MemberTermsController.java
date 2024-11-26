@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.ErrorResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
+import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermsDetailResponse;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermInvalidException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
@@ -96,7 +97,7 @@ public class MemberTermsController {
     }
 
 //    @Operation(summary = "등록된 회원 약관 수정 처리")
-//    @PatchMapping("/{termSeq}")
+//    @PutMapping("/{termSeq}")
     public ResponseEntity<Void> update(@Parameter(description = "Member Term 시퀀스") @Min(value = 1L, message = "회원 약관의 시퀀스가 잘못됐습니다. 자동증분으로 관리되기 때문에 1부터 시작해야합니다.") @PathVariable("termSeq") Long termSeq, @Valid @RequestBody MemberTermUpdateRequest request) {
         // 수정 처리
         memberTermsService.update(termSeq, request);
@@ -113,6 +114,16 @@ public class MemberTermsController {
         // 삭제 성공시 응답 반환
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
+    }
+
+    @Operation(summary = "특정 회원 약관 코드로 조회 처리")
+    @GetMapping("/{termCode}")
+    public ResponseEntity<MemberTermsDetailResponse> readByTermCode(@Parameter(description = "Member Term 코드") @PathVariable("termCode") String termCode) {
+        // 특정 회원 약관 코드로 조회
+        MemberTermsDetailResponse response = memberTermsService.readByTermCode(termCode);
+        // 조회된 회원 약관 반환
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(response);
     }
 
 

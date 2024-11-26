@@ -203,7 +203,7 @@ class VcServiceImplTest {
         //src 파일 조회시 나오는 값 설정
         when(vcSrcFileRepository.findById(srcFile.getSrcSeq())).thenReturn(Optional.of(srcFile));
 
-        VcUrlResponse result = vcService.getSrcFile(srcFile.getSrcSeq());//조회
+        VcUrlResponse result = vcService.getSrcUrl(srcFile.getSrcSeq());//조회
 
         assertEquals(srcFile.getFileUrl(), result.getUrl());//값 확인
         assertEquals(srcFile.getSrcSeq(), result.getSeq());
@@ -221,7 +221,7 @@ class VcServiceImplTest {
 
         when(vcResultFileRepository.findById(resultFile.getResSeq())).thenReturn(Optional.of(resultFile));//trg조회 값 설정
 
-        VcUrlResponse result = vcService.getResultFile(resultFile.getResSeq());//조회
+        VcUrlResponse result = vcService.getResultUrl(resultFile.getResSeq());//조회
 
         assertEquals(resultFile.getFileUrl(), result.getUrl());//값 확인
         assertEquals(resultFile.getResSeq(), result.getSeq());

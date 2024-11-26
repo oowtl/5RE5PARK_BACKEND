@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
+import com.oreo.finalproject_5re5_be.member.dto.request.MemberChangePasswordRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
@@ -14,12 +15,16 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
 import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
+import com.oreo.finalproject_5re5_be.member.exception.DeletedMemberException;
+import com.oreo.finalproject_5re5_be.member.exception.HumanMemberException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
+import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedPasswordException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberMandatoryTermNotAgreedException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
+import com.oreo.finalproject_5re5_be.member.exception.RestrictedMemberException;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
@@ -42,7 +47,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -139,9 +143,9 @@ public class MemberServiceImpl implements UserDetailsService {
         encodePassword(request);
         // 회원 엔티티 저장
         Member savedMember = saveMember(request);
-//        // 회원 약관 이력 엔티티 저장
+        // 회원 약관 이력 엔티티 저장
         saveMemberTermsHistory(request, savedMember);
-//        // 회원 초기 상태 엔티티 저장
+        // 회원 초기 상태 엔티티 저장
         saveMemberState(savedMember, "MBS001"); // 초기 상태 코드 : MBS001 - 신규 등록
         return savedMember;
     }
@@ -304,9 +308,7 @@ public class MemberServiceImpl implements UserDetailsService {
             throw new MemberNotFoundException();
         }
         // 조회된 회원 정보를 바탕으로 응답 객체 생성
-        return MemberReadResponse.of(foundMember.getId(), foundMember.getEmail(),
-                                     foundMember.getName(), foundMember.getNormAddr(),
-                                     foundMember.getDetailAddr());
+        return MemberReadResponse.of(foundMember);
     }
 
     public MemberReadResponse read(Long memberSeq) {
@@ -317,10 +319,30 @@ public class MemberServiceImpl implements UserDetailsService {
             throw new MemberNotFoundException();
         }
 
+        // 조회된 회원의 상태를 확인함
+        // - 휴먼회원(MBS003), 제재회원(MBS007), 탈퇴회원(MBS004)일 경우 거르기
+        MemberState memberState = memberStateRepository.findLatestHistoryByMemberSeq(foundMember.getSeq());
+
+        // 휴먼 회원인지 확인
+        if ("MBS003".equals(memberState.getCode().getCode())) {
+            // 예외 발생
+            throw new HumanMemberException();
+        }
+
+        // 제재 회원인지 확인
+        if ("MBS007".equals(memberState.getCode().getCode())) {
+            // 예외 방생
+            throw new RestrictedMemberException();
+        }
+
+        // 탈퇴 회원인지 확인
+        if ("MBS004".equals(memberState.getCode().getCode())) {
+            // 예외 발생
+            throw new DeletedMemberException();
+        }
+
         // 조회된 회원 정보를 바탕으로 응답 객체 생성
-        return MemberReadResponse.of(foundMember.getId(), foundMember.getEmail(),
-                foundMember.getName(), foundMember.getNormAddr(),
-                foundMember.getDetailAddr());
+        return MemberReadResponse.of(foundMember);
     }
 
 
@@ -401,7 +423,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                         .befVal(foundMember.getId())
                                                                         .aftVal(request.getId())
                                                                         .applDate(formattedNow)
-                                                                        .applDate(formattedEnd)
+                                                                        .endDate(formattedEnd)
                                                                         .build();
             changeHistories.add(memberIdChangeHistory);
         }
@@ -414,7 +436,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                         .befVal(foundMember.getEmail())
                                                                         .aftVal(request.getEmail())
                                                                         .applDate(formattedNow)
-                                                                        .applDate(formattedEnd)
+                                                                        .endDate(formattedEnd)
                                                                         .build();
             // 가장 최근 이력 시간 업데이트
             memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, emailFiledCode.getCode())
@@ -437,7 +459,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                             .befVal(foundMember.getPassword())
                                                                             .aftVal(encodedPassword)
                                                                             .applDate(formattedNow)
-                                                                            .applDate(formattedEnd)
+                                                                            .endDate(formattedEnd)
                                                                             .build();
             changeHistories.add(passwordChangeHistory);
         }
@@ -450,7 +472,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                         .befVal(foundMember.getName())
                                                                         .aftVal(request.getName())
                                                                         .applDate(formattedNow)
-                                                                        .applDate(formattedEnd)
+                                                                        .endDate(formattedEnd)
                                                                         .build();
 
             // 가장 최근 이력 시간 업데이트
@@ -468,7 +490,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                                                             .befVal(foundMember.getNormAddr())
                                                                             .aftVal(request.getNormAddr())
                                                                             .applDate(formattedNow)
-                                                                            .applDate(formattedEnd)
+                                                                            .endDate(formattedEnd)
                                                                             .build();
 
             // 가장 최근 이력 시간 업데이트
@@ -502,7 +524,7 @@ public class MemberServiceImpl implements UserDetailsService {
                                              .orElseThrow(MemberNotFoundException::new);
 
         // - 해당 회원을 비활성 회원으로 업데이트한다
-        Code removeMemberCode = codeRepository.findCodeByCode("MBS003"); // 회원 비활성 코드
+        Code removeMemberCode = codeRepository.findCodeByCode("MBS003"); // 휴먼 회원으로 등록
         MemberState memberState = MemberState.of(foundMember, removeMemberCode);
         memberStateRepository.save(memberState);
 
@@ -547,7 +569,7 @@ public class MemberServiceImpl implements UserDetailsService {
             memberRepository.delete(foundMember);
 
             // - 회원의 상태를 삭제한다
-            List<MemberState> foundMemberStates = memberStateRepository.findByMemberSeq(candidate.getMemberSeq());
+            List<MemberState> foundMemberStates = memberStateRepository.findAllByMemberSeq(candidate.getMemberSeq());
             memberStateRepository.deleteAll(foundMemberStates);
 
 
@@ -565,10 +587,71 @@ public class MemberServiceImpl implements UserDetailsService {
             memberChangeHistoryRepository.deleteAll(foundMemberChangeHistories);
 
             // 회원 삭제 데이터 업데이트
-            Code memberDeleteCode = codeRepository.findCodeByCode("MBS999");
+            Code memberDeleteCode = codeRepository.findCodeByCode("MBS004"); // 탈퇴 회원으로 등록
             candidate.setCode(memberDeleteCode);
             candidate.setChkUse('Y');
         }
+    }
+
+    public void updatePassword(Long memberSeq, MemberChangePasswordRequest request) {
+        // 회원 조회
+        Member foundMember = memberRepository.findBySeq(memberSeq);
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        String originPassword = foundMember.getPassword();
+
+        if (encodedPassword.equals(originPassword)) {
+            throw new MemberDuplicatedPasswordException();
+        }
+
+        // 비밀번호 변경
+        foundMember.setPassword(encodedPassword);
+
+        // 변경 이력 기록
+        Code passwordFiledCode = codeRepository.findCodeByCode("MF003"); // 회원 비밀번호 필드 코드
+
+        // 현재 시간과 최대 시간 세팅
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.MAX;
+
+        // DATETIME 형식으로 변환하기 위한 포맷터 생성
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 포맷팅된 문자열로 변환
+        String formattedNow = now.format(formatter);
+        String formattedEnd = end.format(formatter);
+
+        // 가장 최근 이력 시간 업데이트
+        memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, passwordFiledCode.getCode())
+                .ifPresent(history -> history.setEndDate(formattedNow));
+
+        MemberChangeHistory passwordChangeHistory = MemberChangeHistory.builder()
+                                                                        .member(foundMember)
+                                                                        .chngFieldCode(passwordFiledCode)
+                                                                        .befVal(foundMember.getPassword())
+                                                                        .aftVal(encodedPassword)
+                                                                        .applDate(formattedNow)
+                                                                        .endDate(formattedEnd)
+                                                                        .build();
+
+        // 변경 이력 저장
+        memberChangeHistoryRepository.save(passwordChangeHistory);
+    }
+
+
+    public String findId(String email) {
+        // 이메일로 회원 조회
+        Member foundMember = memberRepository.findByEmail(email);
+        // 조회된 회원이 없으면 예외 발생
+        if (foundMember == null) {
+            throw new MemberNotFoundException();
+        }
+        // 조회된 회원의 아이디 반환
+        return foundMember.getId();
     }
 
 }

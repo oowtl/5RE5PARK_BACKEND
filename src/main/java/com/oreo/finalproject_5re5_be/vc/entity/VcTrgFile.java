@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "vc_target")
+@Table(name = "vc_trgfile")
 @Getter
 @ToString
 @Builder
@@ -32,4 +32,17 @@ public class VcTrgFile extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Vc vc;
+
+    public static VcTrgFile create(Vc vc, String fileName,
+                            String fileUrl, Integer fileLength,
+                            String fileSize, String extension){
+        return VcTrgFile.builder()
+                .vc(vc)
+                .fileName(fileName)
+                .fileUrl(fileUrl)
+                .fileLength(fileLength)
+                .fileSize(fileSize)
+                .extension(extension)
+                .build();
+    }
 }

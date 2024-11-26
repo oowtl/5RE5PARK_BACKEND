@@ -1,0 +1,40 @@
+name: Schedule Pull Request
+
+on:
+  schedule:
+    # 매일 아침 10시에 실행
+    - cron: '0 1 * * *'
+
+jobs:
+  create-pull-request:
+    name: RP 요청
+    runs-on: ubuntu-latest
+
+    steps:
+      # 래포 체크
+      - name: 체크아웃 래포
+        uses: actions/checkout@v3
+      # 깃 허브 명령
+      - name: 명령 셋팅
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # PR 생성
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_SCHEDULE }}
+        run: |
+          # Pull latest changes
+          git fetch origin
+
+          # Ensure develop branch is up to date
+          git checkout develop
+          git pull origin develop
+
+          # Create Pull Request using GitHub CLI
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "Daily PR: develop -> main" \
+            --body "10시 PR 입니다."

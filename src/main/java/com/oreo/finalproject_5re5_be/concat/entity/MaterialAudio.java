@@ -23,4 +23,7 @@ public class MaterialAudio extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "audio_file_seq")
     private AudioFile audioFile;
+
+    @Column(name ="method")
+    private String method;
 }

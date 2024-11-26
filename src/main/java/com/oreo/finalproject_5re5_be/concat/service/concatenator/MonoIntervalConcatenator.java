@@ -36,7 +36,7 @@ public class MonoIntervalConcatenator extends MonoConcatenator implements Interv
     @Override
     public ByteArrayOutputStream intervalConcatenate(List<AudioProperties> audioStreams, float start) throws IOException {
         List<AudioInputStream> list = prepareAudioStreams(audioStreams, AUDIO_FORMAT);
-        list.add(0, BeepMaker.makeSound(start, AUDIO_FORMAT));
+        list.add(0, BeepMaker.makeSound(start * 1000, AUDIO_FORMAT));
         return super.concatenate(list);
     }
 }

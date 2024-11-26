@@ -146,6 +146,8 @@ class ProjectServiceImplTest {
 
         // when // then
         assertThrows(IllegalArgumentException.class,
-                () -> projectService.projectSave(1L));
+                () -> projectService.projectSave(memberSeq));
     }
+
+
 }

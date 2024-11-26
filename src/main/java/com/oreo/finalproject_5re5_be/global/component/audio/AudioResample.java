@@ -14,10 +14,10 @@ import java.util.List;
 /**
  * @apiNote 병합 되거나 병합되기 이전의 오디오 형식을 일치 시키기 위한 클래스
  * @see Concatenator
- *
  */
 public class AudioResample {
     private final AudioFormat audioFormat;
+
     /**
      * <table class="striped">
      * <caption>오디오 리샘플링</caption>
@@ -62,9 +62,9 @@ public class AudioResample {
         audioFormat = new AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED,
                 44100, // 44.1kHz로 변환
-                16,    // 16비트
-                1,     // 모노
-                2,     // 2 bytes/frame
+                32,    // 32비트
+                2,     // 스테레오
+                8,     // 2 bytes/frame
                 44100, // frame rate와 샘플링 레이트 일치
                 false  // 리틀 엔디안
         );

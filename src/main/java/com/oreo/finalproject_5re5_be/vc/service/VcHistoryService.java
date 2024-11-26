@@ -10,5 +10,5 @@ public interface VcHistoryService {
      */
 
     void requestHistorySave(VcRequestHistoryRequest requestHistory);
-    void resultHistorySaver(VcResultHistoryRequest resultHistory);
+    void resultHistorySave(VcResultHistoryRequest resultHistory);
 }

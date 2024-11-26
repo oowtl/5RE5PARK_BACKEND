@@ -17,7 +17,7 @@ public class StereoConcatenator implements Concatenator {
         if (mono) {
             return merge(audioStreams);//병합
         }
-        return null;
+        throw new IllegalArgumentException("잘못된 포맷 입니다.");
     }
 
     @Override

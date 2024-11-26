@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.exception.InvalidProjectNameException;
+import com.oreo.finalproject_5re5_be.project.exception.projectNotMemberException;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
      * @param projectName
      */
     @Override
-    public void projectUpdate(@NotNull Long projectSeq,@NotNull String projectName) {
+    public void projectUpdate(Long projectSeq, String projectName) {
         //프로젝트 길이 제한
         validateProjectName(projectName);
         // 프로젝트 번호로 프로젝트 찾기
@@ -123,26 +124,41 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    /**
+     * 회원의 프로젝트인지 확인 단일
+     * @param memberSeq
+     * @param projectSeq
+     * @return
+     */
+    @Override
+    public boolean projectCheck(Long memberSeq, Long projectSeq) {
+        Project project = projectFind(projectSeq);
+        Long seq = project.getMember().getSeq();
+        if(seq.equals(memberSeq)){
+            return true;
+        }
+        throw new projectNotMemberException();
+    }
+
+    /**
+     * 회원의 프로젝트인지 확인 여러개
+     * @param memberSeq
+     * @param projectSeq
+     * @return
+     */
+    @Override
+    public boolean projectCheck(Long memberSeq, List<Long> projectSeq){
+        for (Long pro : projectSeq) {
+            projectCheck(memberSeq, pro);
+        }
+        return true;
+    }
+
     // 길이 제한 메서드
-    private void validateProjectName(@NotNull String projectName) {
+    private void validateProjectName(String projectName) {
         if (projectName == null || projectName.length() < 3 || projectName.length() > 50) {
             throw new InvalidProjectNameException("프로젝트 이름은 3자 이상, 50자 이하여야 합니다.");
         }
-    }
-
-    //회원 정보 추출
-    private Member getCurrentUser() {
-        //시큐리티 context 에서 회원 정보 추출
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //아이디 추출
-        String userId = authentication.getName();
-        //아이디로 회원정보 조회
-        Member member = memberRepository.findById(userId);
-        if(member==null){
-            throw new UsernameNotFoundException("Member not found");
-        }
-        //회원정보 리턴
-        return member;
     }
 
     private Project projectFind(Long seq){

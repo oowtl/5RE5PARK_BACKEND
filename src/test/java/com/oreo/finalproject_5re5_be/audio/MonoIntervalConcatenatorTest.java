@@ -36,13 +36,13 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 10000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -65,13 +65,13 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B32);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2f);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -94,13 +94,13 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR240_B32);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2f);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -123,13 +123,13 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR240_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 2f);
 
         AudioInputStream resample = audioResample.resample(byteArrayOutputStream);
         //테스트
@@ -152,13 +152,13 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
                 );
 
         //병합
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 10000f);
+        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         //테스트
         assertThatCode(() -> audioResample.resample(byteArrayOutputStream)).doesNotThrowAnyException();
@@ -180,8 +180,8 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
@@ -208,15 +208,16 @@ class MonoIntervalConcatenatorTest {
 
         //AudioProperties 타입으로 리스트에 넣기
         List<AudioProperties> audioInputStream = List.of(
-                new AudioProperties(audioResample.resample(t1), 3000f),
-                new AudioProperties(audioResample.resample(t2), 500f)
+                new AudioProperties(audioResample.resample(t1), 3f),
+                new AudioProperties(audioResample.resample(t2), 5f)
         );
 
         //병합
         IntervalConcatenator intervalConcatenator = new MonoIntervalConcatenator(AudioFormats.MONO_FORMAT_SR441_B16);
-        ByteArrayOutputStream byteArrayOutputStream = intervalConcatenator.intervalConcatenate(audioInputStream, 1f);
 
         //테스트
-        assertThatThrownBy(() -> audioResample.resample(byteArrayOutputStream)).isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> audioResample
+                .resample(intervalConcatenator.intervalConcatenate(audioInputStream, 1f)))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

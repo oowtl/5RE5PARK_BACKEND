@@ -32,4 +32,9 @@ public class VcAudioRequest {
     @Size(max = 5, message = "extension 필드는 최대 5자까지 허용됩니다.")
     @NotNull(message = "extension 필드는 null 일 수 없습니다.")
     private String extension;
+
+    public static VcAudioRequest of(Long seq, String name, String fileUrl, Integer length,
+                                    String size, String extension){
+        return new VcAudioRequest(seq, name, fileUrl, length, size, extension);
+    }
 }

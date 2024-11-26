@@ -40,11 +40,21 @@ public class VcText extends BaseEntity {
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
 
+    @PrePersist
     public void prePersist() {
         vtDate = LocalDateTime.now();
         vtUpDate = LocalDateTime.now();
     }
+    @PreUpdate
     public void preUpdate() {
         vtUpDate = LocalDateTime.now();
+    }
+
+    public static VcText create(VcSrcFile srcFile, String comment, String length){
+        return VcText.builder()
+                .srcSeq(srcFile)
+                .comment(comment)
+                .length(length)
+                .build();
     }
 }

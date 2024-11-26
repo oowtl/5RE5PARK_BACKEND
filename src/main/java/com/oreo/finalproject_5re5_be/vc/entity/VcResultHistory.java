@@ -34,6 +34,7 @@ public class VcResultHistory extends BaseEntity {
     @JoinColumn(name = "pro_seq")
     private Vc vc;
 
+    @PrePersist
     public void prePersist() {
         date = LocalDateTime.now();
     }
