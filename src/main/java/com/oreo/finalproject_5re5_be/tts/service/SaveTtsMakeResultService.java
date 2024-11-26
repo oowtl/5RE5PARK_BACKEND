@@ -65,32 +65,20 @@ public class SaveTtsMakeResultService {
         // 3. TTS 처리 내역 저장
         saveTtsProcessHistory(savedSentence, savedTtsAudioFile);
 
-        // 4. TTS 문장 '완료' 상태 저장
-        TtsProgressStatus ttsProgressInProgressStatus = TtsProgressStatus.builder()
-                .ttsSentence(ttsSentence).progressStatus(TtsProgressStatusCode.FINISHED).build();
-        ttsProgressStatusRepository.save(ttsProgressInProgressStatus);
-
-        // 5. 업데이트 된 문장 정보 반환
+        // 4. 업데이트 된 문장 정보 반환
         return TtsSentenceDto.of(updatedSentence);
     }
 
     // tts 생성 결과 저장 실패할 경우 처리
     @Recover
     public TtsSentenceDto recoverSaveTtsMakeResult(RuntimeException e, MultipartFile ttsFile, String uploadUrl, TtsSentence ttsSentence) {
+        // 1. 업로드 된 s3 파일 삭제
         if(!uploadUrl.isEmpty() && !uploadUrl.isBlank())  {
-            // 1. 업로드 된 s3 파일 삭제
             s3Service.deleteFile("tts", uploadUrl.split("/")[3]);
         }
 
-        // 2. 해당 TTS 문장 상태 실패 처리
-        TtsProgressStatus ttsProgressInProgressStatus = TtsProgressStatus.builder()
-                .ttsSentence(ttsSentence)
-                .progressStatus(TtsProgressStatusCode.FAILED)
-                .build();
-        ttsProgressStatusRepository.save(ttsProgressInProgressStatus);
-
-        // 3. 예외 발생 시키기
-        throw new SaveTtsMakeResultException("내부 문제로 TTS 생성 결과 저장 실패, 다시 시도 해 주세요.");
+        // 2. 예외 발생 시키기
+        throw new SaveTtsMakeResultException("TTS 생성 결과 저장 실패, 다시 시도 해 주세요.");
     }
 
     /// TTS 오디오 파일 메타데이터 저장
