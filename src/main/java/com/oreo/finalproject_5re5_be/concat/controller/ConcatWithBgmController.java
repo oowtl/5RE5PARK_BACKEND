@@ -28,7 +28,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -75,7 +78,8 @@ public class ConcatWithBgmController {
     public ResponseEntity<ResponseDto<ConcatResponseDto>> executeConcatWithBgm(
             @RequestBody SelectedConcatRowRequest selectedRows,
             @Parameter(description = "S3에 저장된 BGM 파일의 URL", required = true) @RequestParam String bgmFileUrl,
-            @RequestParam Long concatTabSeq) {
+            @Parameter(description = "결과물이 나온 concatTab", required = true) @RequestParam Long concatTabSeq,
+            @Parameter(description = "user가 설정한 결과물 파일 이름", required = true) @RequestParam String concatResultFileName) {
         try {
             // IntervalConcatenator 생성
             IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
@@ -125,7 +129,7 @@ public class ConcatWithBgmController {
                     .concatTabSeq(concatTabSeq)
                     .optionSeq(null)
                     .ResultUrl(audioUrl)
-                    .ResultFileName("mixed_with_bgm.wav")
+                    .ResultFileName(concatResultFileName + ".wav")
                     .ResultExtension("wav")
                     .ResultFileLength(mixedAudioStream.getFrameLength() / mixedAudioStream.getFormat().getFrameRate())
                     .build();
