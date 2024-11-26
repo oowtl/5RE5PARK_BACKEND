@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @Tag(name = "TTS", description = "TTS 관련 API")
 @Validated
 @RestController
-@RequestMapping("/api/project/{projectSeq}/tts")
+@RequestMapping("/api/project/{proSeq}/tts")
 public class TtsController {
 
     private final TtsSentenceService ttsSentenceService;
@@ -133,14 +133,14 @@ public class TtsController {
     @Operation(summary = "TTS 문장 생성 요청")
     @PostMapping("/sentence")
     public ResponseEntity<ResponseDto<TtsSentenceDto>> registerSentence(
-        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceRequest createRequest,
         @SessionAttribute(value = "memberSeq") Long memberSeq) {
         //회원의 정보인지 확인
-        projectService.projectCheck(memberSeq, projectSeq);
+        projectService.projectCheck(memberSeq, proSeq);
 
         // 문장 생성
-        TtsSentenceDto response = ttsSentenceService.addSentence(projectSeq, createRequest);
+        TtsSentenceDto response = ttsSentenceService.addSentence(proSeq, createRequest);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -150,12 +150,12 @@ public class TtsController {
     @Operation(summary = "TTS 문장 수정 요청")
     @PutMapping("/sentence/{tsSeq}")
     public ResponseEntity<ResponseDto<TtsSentenceDto>> updateSentence(
-        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq,
         @Parameter(description = "tts 문장 수정 요청 body") @Valid @RequestBody TtsSentenceRequest updateRequest) {
 
         // 문장 수정
-        TtsSentenceDto response = ttsSentenceService.updateSentence(projectSeq, tsSeq,
+        TtsSentenceDto response = ttsSentenceService.updateSentence(proSeq, tsSeq,
             updateRequest);
 
         return ResponseEntity
@@ -166,11 +166,11 @@ public class TtsController {
     @Operation(summary = "TTS 현재 상태 저장 (저장 및 수정)", description = "TTS 문장 저장 시 정렬을 합니다. 순서 정보가 null 인 경우는 전부 뒤로 보낼 것이며, null 인 객체간의 순서는 보장되지 않습니다.")
     @PostMapping("/batch")
     public ResponseEntity<ResponseDto<TtsSentenceListDto>> batchSave(
-        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceBatchRequest batchRequest) {
 
         // 문장 생성 및 수정
-        TtsSentenceListDto response = ttsSentenceService.batchSaveSentence(projectSeq,
+        TtsSentenceListDto response = ttsSentenceService.batchSaveSentence(proSeq,
             batchRequest);
 
         return ResponseEntity
@@ -181,11 +181,11 @@ public class TtsController {
     @Operation(summary = "TTS 문장 조회 요청")
     @GetMapping("/sentence/{tsSeq}")
     public ResponseEntity<ResponseDto<TtsSentenceDto>> getSentence(
-        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq) {
 
         // 문장 조회
-        TtsSentenceDto response = ttsSentenceService.getSentence(projectSeq, tsSeq);
+        TtsSentenceDto response = ttsSentenceService.getSentence(proSeq, tsSeq);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -195,10 +195,10 @@ public class TtsController {
     @Operation(summary = "프로젝트 TTS 조회")
     @GetMapping("")
     public ResponseEntity<ResponseDto<TtsSentenceListDto>> getSentenceList(
-        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq) {
+        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq) {
 
         // 프로젝트 TTS 조회
-        TtsSentenceListDto response = ttsSentenceService.getSentenceList(projectSeq);
+        TtsSentenceListDto response = ttsSentenceService.getSentenceList(proSeq);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -226,11 +226,11 @@ public class TtsController {
     @Operation(summary = "TTS 문장 삭제 요청")
     @DeleteMapping("/sentence/{tsSeq}")
     public ResponseEntity<ResponseDto<String>> deleteSentence(
-        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long projectSeq,
+        @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq) {
 
         // 문장 삭제
-        boolean response = ttsSentenceService.deleteSentence(projectSeq, tsSeq);
+        boolean response = ttsSentenceService.deleteSentence(proSeq, tsSeq);
 
         // 응답 메시지
         String message = response ? "삭제 성공" : "삭제 실패";
