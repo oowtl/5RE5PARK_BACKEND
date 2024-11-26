@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.concat.service;
 
 import com.oreo.finalproject_5re5_be.concat.dto.ConcatRowDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequest;
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
@@ -96,7 +97,32 @@ public class ConcatRowService {
 
         List<AudioFile> audioFiles = new ArrayList<>();
         // 2. ConcatRowRequest 처리
-        List<ConcatRow> concatRows = requestDto.getConcatRowRequests().stream()
+        List<ConcatRow> concatRows = getConcatRows(requestDto.getConcatRowRequests(), concatTab, audioFiles);
+
+        // 3. ConcatRow, 저장
+        concatRowHelper.batchInsert(concatRows);
+        audioFileService.saveAudioFiles(audioFiles);
+        return true;
+    }
+
+    @Transactional
+    public boolean saveConcatRows(ConcatRowRequestDto requestDto) {
+        // 1. ConcatTab 확인 및 조회
+        ConcatTab concatTab = concatTabRepository.findById(requestDto.getConcatTabId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid ConcatTab ID: " + requestDto.getConcatTabId()));
+
+        List<AudioFile> audioFiles = new ArrayList<>();
+        // 2. ConcatRowRequest 처리
+        List<ConcatRow> concatRows = getConcatRows(requestDto.getConcatRowRequests(), concatTab, audioFiles);
+
+        // 3. ConcatRow, 저장
+        concatRowHelper.batchInsert(concatRows);
+        audioFileService.saveAudioFiles(audioFiles);
+        return true;
+    }
+
+    private List<ConcatRow> getConcatRows(List<ConcatRowRequest> requestDto, ConcatTab concatTab, List<AudioFile> audioFiles) {
+        return requestDto.stream()
                 .filter(rowRequest -> rowRequest.getStatus() != 'N').map(rowRequest -> {
 
                     // 2.2 ConcatRow 생성
@@ -115,11 +141,6 @@ public class ConcatRowService {
 
                     return concatRow;
                 }).toList();
-
-        // 3. ConcatRow, 저장
-        concatRowHelper.batchInsert(concatRows);
-        audioFileService.saveAudioFiles(audioFiles);
-        return true;
     }
 
     private AudioFile mapToAudioFile(OriginAudioRequest originAudioRequest, ConcatRow concatRow) {

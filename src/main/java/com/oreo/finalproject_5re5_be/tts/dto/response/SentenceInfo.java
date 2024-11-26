@@ -30,7 +30,6 @@ public class SentenceInfo {
         return SentenceInfo.builder()
                 .tsSeq(ttsSentence.getTsSeq())
                 .voiceSeq(ttsSentence.getVoice() != null ? ttsSentence.getVoice().getVoiceSeq() : null)
-                .styleSeq(ttsSentence.getStyle() != null ? ttsSentence.getStyle().getStyleSeq() : null)
                 .text(ttsSentence.getText())
                 .order(ttsSentence.getSortOrder())
                 .ttsAttributeInfo(TtsAttributeInfo.of(ttsSentence))

@@ -8,7 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vc_resultaudiofile")
+@Table(name = "vc_resultfile")
 @Getter
 @ToString
 @Builder
@@ -48,6 +48,7 @@ public class VcResultFile extends BaseEntity {
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
 
+    @PrePersist
     public void prePersist() {
         date = LocalDateTime.now();
     }

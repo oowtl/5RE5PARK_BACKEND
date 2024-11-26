@@ -7,6 +7,7 @@ import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.util.List;
 
+@Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/concat/audio")
@@ -31,9 +33,7 @@ public class AudioFileController {
             @RequestParam("audio") List<MultipartFile> audioFiles) throws IOException {
         // MultipartFile -> AudioFileRequestDto 변환
         List<AudioFileRequestDto> audioDto = audioFiles.stream()
-                .map(file -> AudioFileRequestDto.builder()
-                        .audioFile(file)
-                        .build())
+                .map(file -> new AudioFileRequestDto(file, file.getOriginalFilename()))
                 .toList();
 
         List<AudioFileRequestDto> audioFileRequestDtos = audioFileService.checkExtension(audioDto);
@@ -51,20 +51,11 @@ public class AudioFileController {
             @RequestParam("audio") List<MultipartFile> audioFiles) throws IOException, UnsupportedAudioFileException {
         // MultipartFile -> AudioFileRequestDto 변환
         List<AudioFileRequestDto> audioDto = audioFiles.stream()
-                .map(file -> AudioFileRequestDto.builder()
-                        .audioFile(file)
-                        .build())
+                .map(file -> new AudioFileRequestDto(file, file.getOriginalFilename()))
                 .toList();
 
         List<OriginAudioRequest> originAudioRequests = audioFileService.saveAudioFile(audioDto);
         return new ResponseDto<>(HttpStatus.OK.value(), originAudioRequests).toResponseEntity();
-    }
-
-    // DataNotFoundException 처리
-    @ExceptionHandler(DataNotFoundException.class)
-    public ResponseEntity<ResponseDto<String>> handleDataNotFoundException(DataNotFoundException ex) {
-        String errorMessage = ex.getMessage();
-        return new ResponseDto<>(HttpStatus.NOT_FOUND.value(), errorMessage).toResponseEntity();
     }
 
     @PostMapping("read")
@@ -84,8 +75,10 @@ public class AudioFileController {
 
     }
 
-    @PostMapping("execute")
-    public void executeConcat() {
-
+    // DataNotFoundException 처리
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<ResponseDto<String>> handleDataNotFoundException(DataNotFoundException ex) {
+        String errorMessage = ex.getMessage();
+        return new ResponseDto<>(HttpStatus.NOT_FOUND.value(), errorMessage).toResponseEntity();
     }
 }

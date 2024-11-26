@@ -32,7 +32,7 @@ public class ConcatResultRequest {
     private Long ResultFileSize;
 
     @NotNull(message = "fileLength 필드는 null 일 수 없습니다.")
-    private Long ResultFileLength;
+    private Float ResultFileLength;
 
     @NotNull(message = "fileName 필드는 null 일 수 없습니다.")
     @Size(max = 255, message = "FileName 필드는 최대 255자까지 허용됩니다.")

@@ -13,6 +13,7 @@ import lombok.*;
 public class ConcatResult extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "concat_result")
     private Long concatResultSequence;
 
@@ -30,9 +31,12 @@ public class ConcatResult extends BaseEntity {
     private String extension;
 
     @Column(name = "file_length")
-    private Long fileLength;
+    private Float fileLength;
 
     @Column(name = "file_name")
     private String fileName;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 
 }

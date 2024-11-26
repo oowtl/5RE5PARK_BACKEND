@@ -64,7 +64,7 @@ public class VcHistoryServiceImpl implements VcHistoryService {
      * @param resultHistory
      */
     @Override
-    public void resultHistorySaver(VcResultHistoryRequest resultHistory) {
+    public void resultHistorySave(VcResultHistoryRequest resultHistory) {
         //Code 를 찾는다.
         Code code = codeRepository.findById(resultHistory.getCcSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Code not found"));

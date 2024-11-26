@@ -6,6 +6,7 @@ import com.oreo.finalproject_5re5_be.concat.service.ConcatResultService;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 
+@Tag(name = "Concat", description = "Concat 관련 API")
 @RestController("api/concat/audio/result")
 public class ConcatResultController {
 
     private final ConcatResultService concatResultService;
-    private S3Service s3Service;
+    private final S3Service s3Service;
 
     public ConcatResultController(ConcatResultService concatResultService,
                                   S3Service s3Service) {

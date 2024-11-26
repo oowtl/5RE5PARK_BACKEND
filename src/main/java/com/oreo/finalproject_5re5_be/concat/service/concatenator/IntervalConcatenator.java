@@ -22,7 +22,7 @@ public interface IntervalConcatenator extends Concatenator {
         List<AudioInputStream> result = new ArrayList<>();
         for (AudioProperties audioProperties : audioStreams) {
             result.add(audioProperties.audioInputStream());//오디오 파일 넣기
-            result.add(BeepMaker.makeSound(audioProperties.silence(), audioFormat));// 무음구간 오디오 만들어서 넣기
+            result.add(BeepMaker.makeSound(audioProperties.silence() * 1000, audioFormat));// 무음구간 오디오 만들어서 넣기
         }
         return result;
     }

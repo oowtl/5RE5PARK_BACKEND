@@ -38,6 +38,7 @@ public class VcRequestHistory extends BaseEntity {
     @JoinColumn(name = "trg_seq")
     private VcTrgFile trgSeq;
 
+    @PrePersist
     public void prePersist() {
         requestDate = LocalDateTime.now();
     }

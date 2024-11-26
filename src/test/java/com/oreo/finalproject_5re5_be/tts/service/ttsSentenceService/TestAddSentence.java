@@ -360,7 +360,6 @@ class TestAddSentence {
             .audioFormat(ttsAttributeInfo.getAudioFormat())
             .project(project)
             .voice(voice)
-            .style(style)
             .build();
         when(ttsSentenceRepository.save(ttsSentence)).thenReturn(ttsSentence);
 

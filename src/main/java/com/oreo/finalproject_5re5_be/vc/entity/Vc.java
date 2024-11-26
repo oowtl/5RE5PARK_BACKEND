@@ -32,12 +32,14 @@ public class Vc extends BaseEntity {
     @Column(nullable = false, name = "vc_up_date")
     private LocalDateTime upDateDate;
 
+    @PrePersist
     public void prePersist() {
         if (upDateDate == null) {
             upDateDate = LocalDateTime.now(); // INSERT 시점에 현재 시간 설정
         }
     }
 
+    @PreUpdate
     public void preUpdate() {
         upDateDate = LocalDateTime.now(); // UPDATE 시점에 현재 시간 설정
     }

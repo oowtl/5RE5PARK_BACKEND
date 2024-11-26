@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "vc_target")
+@Table(name = "vc_trgfile")
 @Getter
 @ToString
 @Builder
