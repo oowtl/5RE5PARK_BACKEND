@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.tts.controller.TtsController;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
@@ -36,6 +37,9 @@ class TestGetSentence {
 
     @MockBean
     private TtsMakeService ttsMakeService;
+
+    @MockBean
+    private ProjectService projectService;
 
     /*
     테스트 시나리오: 컨트롤러 메서드 `getSentence`
