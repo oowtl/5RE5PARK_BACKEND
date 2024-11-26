@@ -71,10 +71,8 @@ public class VcServiceImpl implements VcService{
     @Override
     @Transactional
     public VcUrlResponse srcSave(@Valid @NotNull VcSrcRequest vcSrcRequest, Long proSeq) {
-
         // VC 찾기
-        Vc vc = vcRepository.findById(proSeq)
-                .orElseThrow(() -> new IllegalArgumentException("not found"));
+        Vc vc = projectFind(proSeq);
         log.info("[vcService] srcSave vc 확인 : {} ", vc);
 
         // vcSrcFileRepository를 통해 rowOrder 값 결정
@@ -111,6 +109,7 @@ public class VcServiceImpl implements VcService{
      */
     @Override
     public VcUrlResponse trgSave(@Valid @NotNull VcAudioRequest vcAudioRequest) {
+
         //프로젝트 조회, 객체 생성후 저장
         Vc vc = projectFind(vcAudioRequest.getSeq());
         log.info("[vcService] trgSave vc 확인 : {} ", vc);

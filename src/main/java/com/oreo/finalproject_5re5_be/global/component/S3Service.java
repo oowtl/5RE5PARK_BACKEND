@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.global.component;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -188,14 +189,14 @@ public class S3Service {
                     } else {
                         // 파일 삭제
                         if (!file.delete()) {
-                            throw new RuntimeException("파일 삭제 실패: " + file.getAbsolutePath());
+                            log.error("파일 삭제 실패: {}" ,file.getAbsolutePath());
                         }
                     }
                 }
             }
             // 폴더 삭제
             if (!folder.delete()) {
-                throw new RuntimeException("폴더 삭제 실패: " + folder.getAbsolutePath());
+                log.error("폴더 삭제 실패: {}" , folder.getAbsolutePath());
             }
         } else {
             log.error("폴더가 존재하지 않음: {} " , folder.getAbsolutePath());
@@ -256,4 +257,15 @@ public class S3Service {
             throw new IllegalArgumentException("지원하지 않는 오디오 형식입니다");
         }
     }
+
+    // s3 파일 삭제 메서드
+    public void deleteFile(String buketName, String key) {
+        try {
+            s3Client.deleteObject(buketName, key);
+        } catch (SdkClientException e) {
+            throw new RuntimeException("S3 파일 삭제 요청 중 에러 발생, buketName:"+buketName+", key:"+key);
+        }
+
+    }
+
 }

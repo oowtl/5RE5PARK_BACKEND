@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.project.service;
 
+import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
@@ -7,13 +8,11 @@ import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.exception.InvalidProjectNameException;
 import com.oreo.finalproject_5re5_be.project.exception.projectNotMemberException;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
-import jakarta.validation.constraints.NotNull;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
+import com.oreo.finalproject_5re5_be.vc.repository.VcRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -29,11 +28,20 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
     private ProjectRepository projectRepository;
     private MemberRepository memberRepository;
+    private TtsSentenceRepository ttsSentenceRepository;
+    private VcRepository vcRepository;
+    private ConcatTabRepository concatTabRepository;
     @Autowired
     public ProjectServiceImpl(ProjectRepository projectRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository,
+                              TtsSentenceRepository ttsSentenceRepository,
+                              VcRepository vcRepository,
+                              ConcatTabRepository concatTabRepository) {
         this.projectRepository = projectRepository;
         this.memberRepository = memberRepository;
+        this.ttsSentenceRepository = ttsSentenceRepository;
+        this.vcRepository = vcRepository;
+        this.concatTabRepository = concatTabRepository;
     }
 
 
@@ -56,7 +64,11 @@ public class ProjectServiceImpl implements ProjectService {
                     .projectSeq(p.getProSeq())
                     .projectName(p.getProName())
                     .projectContent(p.getProName())
+                    .projectDate(p.getProDate())
                     .projectUpdateDate(p.getProUpDate())
+                    .tts(ttsSentenceRepository.existsByProject_ProSeq(p.getProSeq()))
+                    .vc(vcRepository.existsById(p.getProSeq()))
+                    .concat(concatTabRepository.existsById(p.getProSeq()))
                     .projectActivate(p.getProActivate())
                     .build();
             projectResponses.add(projectResponse);

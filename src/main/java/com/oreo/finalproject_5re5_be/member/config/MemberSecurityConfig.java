@@ -17,10 +17,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class MemberSecurityConfig {
 
     private final LoginAuthenticationSuccessHandler successHandler;
+    private final LoginAuthenticationFailureHandler failureHandler;
     private final CorsConfigurationSource corsConfigurationSource;
 
-    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler, CorsConfigurationSource corsConfigurationSource) {
+    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler, LoginAuthenticationFailureHandler failureHandler, CorsConfigurationSource corsConfigurationSource) {
         this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
         this.corsConfigurationSource = corsConfigurationSource;
     }
 
@@ -69,7 +71,7 @@ public class MemberSecurityConfig {
                 .formLogin(formLogin -> formLogin
                         .loginPage("/api/member/login") // 로그인 페이지 경로 설정
                         .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
-                        .failureUrl("/fail") // 로그인 실패 시 로그인 페이지로 이동
+                        .failureHandler(failureHandler) // 로그인 실패 시 로그인 페이지로 이동
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
