@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.global.component;
 
 import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -52,9 +53,10 @@ public class ByteArrayMultipartFile implements MultipartFile {
         return new ByteArrayInputStream(fileContent);
     }
 
-    // byte[]를 MultipartFile로 변환하는 용도기 때문에 File 객체로 변환하는 메서드 사용 불가
     @Override
     public void transferTo(java.io.File dest) throws IOException, IllegalStateException {
-        throw new UnsupportedOperationException("This method is not supported for ByteArrayMultipartFile.");
+        FileOutputStream fos = new FileOutputStream(dest);
+        fos.write(fileContent);
+        fos.close();
     }
 }
