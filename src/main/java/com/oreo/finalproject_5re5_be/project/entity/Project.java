@@ -1,15 +1,14 @@
 package com.oreo.finalproject_5re5_be.project.entity;
 
 
-import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
-
-import lombok.*;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "project")
@@ -37,6 +36,11 @@ public class Project extends BaseEntity {
 
     @Column(name = "pro_cmt")
     private String proCmt;
+
+    @Column(updatable = false, name = "pro_date")
+    @CreatedDate
+    @EqualsAndHashCode.Exclude
+    private LocalDateTime proDate;
 
     @Column(nullable = false, name = "pro_up_date")
     @LastModifiedDate
