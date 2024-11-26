@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.tts.controller.TtsController;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -42,6 +44,9 @@ class TestRegisterSentence {
 
     @MockBean
     private TtsMakeService ttsMakeService;
+
+    @MockBean
+    private ProjectService projectService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -111,9 +116,17 @@ class TestRegisterSentence {
         // TtsSentenceDto 객체 생성
         TtsSentenceDto response = TtsSentenceDto.of(ttsSentence);
 
-        // 3. TtsSentenceService의 addSentence 메서드에 대한 모의 동작 설정
+        // 3. 모의 동작 설정
+        // ttsSentenceService.addSentence 메서드가 호출되면 response 객체 반환
         when(ttsSentenceService.addSentence(eq(projectSeq),
             any(TtsSentenceRequest.class))).thenReturn(response); // 응답 객체 반환
+
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
 
         // when
         // 4. 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
@@ -121,6 +134,7 @@ class TestRegisterSentence {
                 .contentType(MediaType.APPLICATION_JSON)                // 요청 본문 타입 설정
                 .content(
                     objectMapper.writeValueAsString(requestBody))      // 요청 본문으로 JSON 데이터를 직렬화하여 전송
+                .session(mockHttpSession)                              // 세션 추가
                 .with(csrf()))                                          // CSRF 토큰 추가
             // Then - 예상 응답 상태와 JSON 구조 확인
             .andExpect(status().isCreated())                                   // HTTP 상태 201 확인
@@ -151,13 +165,22 @@ class TestRegisterSentence {
             .build();
 
         // when
-        // 2. 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
+        // 2. mock 객체 설정
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
+        // Then
+        // 3. 예상 응답 상태와 오류 메시지 확인
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq) // URL 설정
                 .contentType(MediaType.APPLICATION_JSON)              // 요청 본문 타입 설정
                 .content(objectMapper.writeValueAsString(requestBody)) // 요청 본문으로 JSON 데이터를 직렬화하여 전송
-                .with(csrf()))
-            // Then - 예상 응답 상태와 오류 메시지 확인
-            .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus())).andExpect(
+                .session(mockHttpSession)                              // 세션 추가
+                .with(csrf())).andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
+            .andExpect(
                 jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
@@ -180,13 +203,22 @@ class TestRegisterSentence {
             .attribute(attributeInfo) // 빈 속성 정보 설정
             .build();
 
-        // When - 컨트롤러의 addSentence 메서드에 요청을 전송하여 테스트 수행
+        // When
+        // 2. mock 객체 설정
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
+        // Then
+        // 3. 예상 응답 상태와 오류 메시지 확인
         mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq) // URL 설정
                 .contentType(MediaType.APPLICATION_JSON)              // 요청 본문 타입 설정
                 .content(objectMapper.writeValueAsString(requestBody)) // 요청 본문으로 JSON 데이터를 직렬화하여 전송
-                .with(csrf()))
-            // Then - 예상 응답 상태와 오류 메시지 확인
-            .andExpect(status().is(
+                .session(mockHttpSession)                              // 세션 추가
+                .with(csrf())).andExpect(status().is(
                 ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
             .andExpect(
                 jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
@@ -206,17 +238,24 @@ class TestRegisterSentence {
         // 문장 생성 요청 객체 생성
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
-        // When - 서비스에서 예외 발생을 설정
+        // When
+        // 2. mock 객체 설정
         when(ttsSentenceService.addSentence(eq(invalidProjectSeq),
             any(TtsSentenceRequest.class))).thenThrow(
             new IllegalArgumentException("projectSeq is invalid"));
+
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
 
         // Then - 요청 전송 및 응답 검증
         mockMvc.perform(
                 post("/api/project/{projectSeq}/tts/sentence", invalidProjectSeq).contentType(
                         MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
-                    .with(csrf()))
-            .andExpect(status().is(
+                    .session(mockHttpSession).with(csrf())).andExpect(status().is(
                 ErrorCode.INVALID_INPUT_VALUE.getStatus()))                            // HTTP 상태 400 확인
             .andExpect(
                 jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
@@ -237,13 +276,24 @@ class TestRegisterSentence {
         TtsSentenceRequest requestBody = TtsSentenceRequest.builder().voiceSeq(-1L)
             .text("Valid text").attribute(attributeInfo).build();
 
-        // When - 서비스에서 예외 발생을 설정
+        // When
+        // 2. mock 객체 설정
         when(ttsSentenceService.addSentence(eq(projectSeq),
             any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
 
-        // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
-                    MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
+        // Then
+        // 3. 요청 전송 및 응답 검증
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody))
+                .session(mockHttpSession)
                 .with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
             .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
     }
@@ -258,13 +308,24 @@ class TestRegisterSentence {
         TtsSentenceRequest request = TtsSentenceRequest.builder().voiceSeq(1L).styleSeq(-1L)
             .text("Valid text").build();
 
-        // When - 서비스에서 예외 발생을 설정
+        // When
+        // 2. mock 객체 설정
         when(ttsSentenceService.addSentence(eq(projectSeq),
             any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
 
-        // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
-                    MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
+        // Then
+        // 3. 요청 전송 및 응답 검증
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .session(mockHttpSession)
                 .with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
             .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
     }
@@ -293,10 +354,21 @@ class TestRegisterSentence {
             .text("Valid text").attribute(attributeInfo) // 유효 범위 초과 설정
             .build();
 
-        // When - 서비스에서 예외 발생을 설정
-        // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
-                    MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+        // When
+        // 2. mock 객체 설정
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
+        // Then
+        // 3. 요청 전송 및 응답 검증
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody))
+                .session(mockHttpSession)
                 .with(csrf())).andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
             .andExpect(
                 jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
@@ -316,13 +388,21 @@ class TestRegisterSentence {
         when(ttsSentenceService.addSentence(eq(projectSeq),
             any(TtsSentenceRequest.class))).thenThrow(new RuntimeException("Unexpected error"));
 
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
         // Then - 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq).contentType(
-                MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(requestBody))
+        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody))
+            .session(mockHttpSession)
             .with(csrf())).andExpect(status().isInternalServerError()).andExpect(
             jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
-
 
 
     private static TtsAttributeInfo createAttributeInfo() {
