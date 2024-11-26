@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.tts.controller.ttsController;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.tts.controller.TtsController;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
@@ -25,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +42,9 @@ class TestMakeTts {
 
     @MockBean
     private TtsMakeService ttsMakeService;
+
+    @MockBean
+    private ProjectService projectService;
 
     /*
      *  [ tts 생성 컨트롤러 테스트 ]
@@ -65,10 +71,19 @@ class TestMakeTts {
         // 3. TtsMakeService의 makeTts 메서드에 대한 모의 동작 설정
         Mockito.when(ttsMakeService.makeTts(eq(tsSeq))).thenReturn(response); // 응답 객체 반환
 
+        // 3.1 회원 조회에 관한 모의 동작 설정
+        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong()))
+            .thenReturn(true);
+
+        // 3.2 mock
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("memberSeq", 1L);
+
         // 4. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
         mockMvc.perform(
                 get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .session(session)
                     .with(csrf()))
             // 5. 응답 상태와 데이터 확인
             .andExpect(
@@ -92,10 +107,19 @@ class TestMakeTts {
         Mockito.when(ttsMakeService.makeTts(eq(tsSeq)))
             .thenThrow(new EntityNotFoundException(errorMassage));
 
+        // 3.1 회원 조회에 관한 모의 동작 설정
+        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong()))
+            .thenReturn(true);
+
+        // 3.2 mock session 설정
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("memberSeq", 1L);
+
         // 4. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
         mockMvc.perform(
                 get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .session(session)
                     .with(csrf()))
             // 5. 응답 상태와 데이터 확인
             .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
@@ -112,10 +136,21 @@ class TestMakeTts {
         Long tsSeq = -1L;
         Long projectSeq = 1L;
 
-        // 2. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
+        // 모의 동작 설정
+        // 2.1 회원 조회에 관한 모의 동작 설정
+        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong()))
+            .thenReturn(true);
+
+        // 2.2 mock session 설정
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("memberSeq", 1L);
+
+
+        // 3. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
         mockMvc.perform(
                 get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .session(session)
                     .with(csrf()))
             // 3. 응답 상태가 bad request여야 함
             .andExpect(status().isBadRequest())
