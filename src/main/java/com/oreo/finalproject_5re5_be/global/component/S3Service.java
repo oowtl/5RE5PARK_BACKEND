@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.global.component;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -220,6 +221,16 @@ public class S3Service {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // s3 파일 삭제 메서드
+    public void deleteFile(String buketName, String key) {
+        try {
+            s3Client.deleteObject(buketName, key);
+        } catch (SdkClientException e) {
+            throw new RuntimeException("S3 파일 삭제 요청 중 에러 발생, buketName:"+buketName+", key:"+key);
+        }
+
     }
 
 }
