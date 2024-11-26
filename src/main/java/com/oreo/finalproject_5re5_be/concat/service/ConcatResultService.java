@@ -12,7 +12,10 @@ import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.sound.sampled.AudioInputStream;
+import java.io.IOException;
 import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class ConcatResultService {
@@ -47,6 +50,26 @@ public class ConcatResultService {
                 .url(result.getAudioUrl()) //저장된 객체의 url
                 .build();
 
+    }
+
+    // AudioInputStream에서 ConcatResult 저장
+    public ConcatUrlResponse saveConcatResult(
+            Long concatTabSeq, String audioUrl, String fileName, AudioInputStream mixedAudioStream) throws IOException {
+        // 1. AudioInputStream을 사용하여 길이 계산
+        long fileLength = (long) (mixedAudioStream.getFrameLength() / mixedAudioStream.getFormat().getFrameRate());
+
+        // 2. ConcatResultRequest 생성
+        ConcatResultRequest request = ConcatResultRequest.builder()
+                .concatTabSeq(concatTabSeq)
+                .optionSeq(null) // 현재 옵션 없음
+                .ResultUrl(audioUrl)
+                .ResultFileName(fileName + ".wav")
+                .ResultExtension("wav")
+                .ResultFileLength((float) fileLength)
+                .build();
+
+        // 3. 기존 메서드를 호출하여 저장
+        return saveConcatResult(request);
     }
 
     public ConcatResult saveConcatResult(ConcatResult request) {
