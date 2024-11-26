@@ -106,6 +106,13 @@ public class BgmProcessor {
         return calculatedFrames;
     }
 
+    // BGM 길이 조정 로직 분리
+    public static AudioInputStream adjustBgmLength(AudioInputStream bgmStream, long targetFrames, long bgmFrames) throws IOException {
+        return bgmFrames > targetFrames
+                ? BgmProcessor.trimBgm(bgmStream, targetFrames)
+                : BgmProcessor.extendBgm(bgmStream, targetFrames);
+    }
+
 
     public static AudioInputStream mixAudio(AudioInputStream source, AudioInputStream bgm) throws IOException {
         AudioFormat format = source.getFormat();
