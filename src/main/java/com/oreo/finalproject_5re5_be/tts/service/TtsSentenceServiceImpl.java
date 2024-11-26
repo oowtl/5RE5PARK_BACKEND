@@ -322,4 +322,30 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 4. member 가 소유한 프로젝트인지 확인
         return projectService.projectCheck(memberSeq, projectSeq);
     }
+
+    @Override
+    public boolean checkSentenceWithMember(@Valid @NotNull Long memberSeq,
+        @Valid @NotNull Long projectSeq, @Valid List<TtsSentenceBatchInfo> sentenceList) {
+
+        // 순회하여 처리
+        for (TtsSentenceBatchInfo batchInfo : sentenceList) {
+            // 1. sentenceList 에서 create 제외
+            if (batchInfo.getBatchProcessType() == BatchProcessType.CREATE) {
+                continue;
+            }
+
+            // 1.1. checkSentenceWithMember 호출
+            // checkSentenceWithMember 에서 예외 발생시킴
+            boolean checkedSentenceWithMember = checkSentenceWithMember(memberSeq, projectSeq,
+                batchInfo.getSentence().getTsSeq());
+
+            // 1.2. 멤버가 소유하지 않은 프로젝트의 ttsSentence 가 있으면 false 반환
+            if (!checkedSentenceWithMember) {
+                return false;
+            }
+        }
+
+        // true 반환
+        return true;
+    }
 }

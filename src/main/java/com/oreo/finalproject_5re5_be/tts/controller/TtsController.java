@@ -173,7 +173,13 @@ public class TtsController {
     @PostMapping("/batch")
     public ResponseEntity<ResponseDto<TtsSentenceListDto>> batchSave(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
-        @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceBatchRequest batchRequest) {
+        @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceBatchRequest batchRequest,
+        @SessionAttribute(value = "memberSeq") Long memberSeq) {
+        // 회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
+
+        // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
+        ttsSentenceService.checkSentenceWithMember(memberSeq, proSeq, batchRequest.getSentenceList());
 
         // 문장 생성 및 수정
         TtsSentenceListDto response = ttsSentenceService.batchSaveSentence(proSeq,

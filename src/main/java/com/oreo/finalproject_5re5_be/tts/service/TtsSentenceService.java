@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.tts.service;
 
+import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
@@ -18,4 +19,5 @@ public interface TtsSentenceService {
     boolean deleteSentence(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq);
     TtsSentenceDto patchSentenceOrder(@Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq, @Valid @NotNull @Min(value = 0) Integer order);
     boolean checkSentenceWithMember(@Valid @NotNull Long memberSeq, @Valid @NotNull Long projectSeq, @Valid @NotNull Long tsSeq);
+    boolean checkSentenceWithMember(@Valid @NotNull Long memberSeq, @Valid @NotNull Long projectSeq, @Valid List<TtsSentenceBatchInfo> sentenceList);
 }
