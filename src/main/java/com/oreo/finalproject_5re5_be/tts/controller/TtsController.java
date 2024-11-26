@@ -152,7 +152,13 @@ public class TtsController {
     public ResponseEntity<ResponseDto<TtsSentenceDto>> updateSentence(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq,
-        @Parameter(description = "tts 문장 수정 요청 body") @Valid @RequestBody TtsSentenceRequest updateRequest) {
+        @Parameter(description = "tts 문장 수정 요청 body") @Valid @RequestBody TtsSentenceRequest updateRequest,
+        @SessionAttribute(value = "memberSeq") Long memberSeq) {
+        // 회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
+
+        // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
+        ttsSentenceService.checkSentenceWithMember(memberSeq, proSeq, tsSeq);
 
         // 문장 수정
         TtsSentenceDto response = ttsSentenceService.updateSentence(proSeq, tsSeq,

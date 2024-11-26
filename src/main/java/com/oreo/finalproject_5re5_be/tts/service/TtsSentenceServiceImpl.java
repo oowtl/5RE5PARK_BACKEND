@@ -4,6 +4,7 @@ import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
@@ -16,6 +17,7 @@ import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import com.oreo.finalproject_5re5_be.tts.exception.ProjectMismatchException;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
 import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsAudioFileRepository;
@@ -41,17 +43,19 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     private final VoiceRepository voiceRepository;
     private final StyleRepository styleRepository;
     private final TtsProgressStatusRepository ttsProgressStatusRepository;
+    private final ProjectService projectService;
 
     public TtsSentenceServiceImpl(TtsSentenceRepository ttsSentenceRepository,
         ProjectRepository projectRepository, TtsAudioFileRepository ttsAudioFileRepository,
         VoiceRepository voiceRepository, StyleRepository styleRepository,
-        TtsProgressStatusRepository ttsProgressStatusRepository) {
+        TtsProgressStatusRepository ttsProgressStatusRepository, ProjectService projectService) {
         this.ttsSentenceRepository = ttsSentenceRepository;
         this.projectRepository = projectRepository;
         this.ttsAudioFileRepository = ttsAudioFileRepository;
         this.voiceRepository = voiceRepository;
         this.styleRepository = styleRepository;
         this.ttsProgressStatusRepository = ttsProgressStatusRepository;
+        this.projectService = projectService;
     }
 
     @Override
@@ -80,20 +84,20 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 4. TtsSentenceRequest -> TtsSentence 변환
         TtsAttributeInfo attribute = createRequest.getAttribute();
         TtsSentence ttsSentence = TtsSentence.builder()
-                .text(createRequest.getText())
-                .sortOrder(createRequest.getOrder())
-                .volume(attribute.getVolume())
-                .speed(attribute.getSpeed())
-                .startPitch(attribute.getStPitch())
-                .emotion(attribute.getEmotion())
-                .emotionStrength(attribute.getEmotionStrength())
-                .sampleRate(attribute.getSampleRate())
-                .alpha(attribute.getAlpha())
-                .endPitch(attribute.getEndPitch())
-                .audioFormat(attribute.getAudioFormat())
-                .project(project)
-                .voice(voice)
-                .build();
+            .text(createRequest.getText())
+            .sortOrder(createRequest.getOrder())
+            .volume(attribute.getVolume())
+            .speed(attribute.getSpeed())
+            .startPitch(attribute.getStPitch())
+            .emotion(attribute.getEmotion())
+            .emotionStrength(attribute.getEmotionStrength())
+            .sampleRate(attribute.getSampleRate())
+            .alpha(attribute.getAlpha())
+            .endPitch(attribute.getEndPitch())
+            .audioFormat(attribute.getAudioFormat())
+            .project(project)
+            .voice(voice)
+            .build();
 
         // 5. TtsSentence 저장
         TtsSentence createdTtsSentence = ttsSentenceRepository.save(ttsSentence);
@@ -150,20 +154,20 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 3.2 TtsSentence 엔티티 수정
         TtsSentence updateSentence = sentence.toBuilder()
-                .text(updateRequest.getText())
-                .voice(voice)
-                .sortOrder(updateRequest.getOrder())
-                .volume(updateRequest.getAttribute().getVolume())
-                .speed(updateRequest.getAttribute().getSpeed())
-                .startPitch(updateRequest.getAttribute().getStPitch())
-                .emotion(updateRequest.getAttribute().getEmotion())
-                .emotionStrength(updateRequest.getAttribute().getEmotionStrength())
-                .sampleRate(updateRequest.getAttribute().getSampleRate())
-                .alpha(updateRequest.getAttribute().getAlpha())
-                .endPitch(updateRequest.getAttribute().getEndPitch())
-                .audioFormat(updateRequest.getAttribute().getAudioFormat())
-                .ttsAudiofile(null) // 3.3 TtsSentence 에 연관된 ttsAudioFile 연결 끊기
-                .build();
+            .text(updateRequest.getText())
+            .voice(voice)
+            .sortOrder(updateRequest.getOrder())
+            .volume(updateRequest.getAttribute().getVolume())
+            .speed(updateRequest.getAttribute().getSpeed())
+            .startPitch(updateRequest.getAttribute().getStPitch())
+            .emotion(updateRequest.getAttribute().getEmotion())
+            .emotionStrength(updateRequest.getAttribute().getEmotionStrength())
+            .sampleRate(updateRequest.getAttribute().getSampleRate())
+            .alpha(updateRequest.getAttribute().getAlpha())
+            .endPitch(updateRequest.getAttribute().getEndPitch())
+            .audioFormat(updateRequest.getAttribute().getAudioFormat())
+            .ttsAudiofile(null) // 3.3 TtsSentence 에 연관된 ttsAudioFile 연결 끊기
+            .build();
 
         // 4. TtsSentence 저장
         TtsSentence updatedSentence = ttsSentenceRepository.save(updateSentence);
@@ -297,5 +301,25 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         TtsSentence savedTtsSentence = ttsSentenceRepository.save(updatedTtsSentence);
 
         return TtsSentenceDto.of(savedTtsSentence);
+    }
+
+    @Override
+    public boolean checkSentenceWithMember(Long memberSeq, Long projectSeq, Long tsSeq) {
+        // 1. tsSeq 로 TtsSentence 조회
+        TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
+            .orElseThrow(EntityNotFoundException::new);
+
+        // 2. 조회한 TtsSentence 의 projectSeq 으로 멤버가 소유한 프로젝트인지 확인
+        Project sentenceProject = ttsSentence.getProject();
+        Long sentenceProjectProSeq = sentenceProject.getProSeq();
+
+        // 3. 검증
+        // 3.1 projectSeq 와 sentenceProjectProSeq 가 일치하지 않으면 예외 발생
+        if (!sentenceProjectProSeq.equals(projectSeq)) {
+            throw new ProjectMismatchException();
+        }
+
+        // 4. member 가 소유한 프로젝트인지 확인
+        return projectService.projectCheck(memberSeq, projectSeq);
     }
 }
