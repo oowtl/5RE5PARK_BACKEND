@@ -227,26 +227,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         throw new TtsSentenceInValidInput("BatchProcessType is invalid");
     }
 
-    // 유효한 프로젝트인지 확인
-    private Project getValidProject(Long projectSeq) {
-        return projectRepository.findById(projectSeq)
-            .orElseThrow(
-                () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
-    }
-
-    // 유효한 음성인지 확인
-    private Voice getValidVoice(Long voiceSeq) {
-        return voiceRepository.findById(voiceSeq)
-            .orElseThrow(() -> new EntityNotFoundException("Voice not found with id: " + voiceSeq));
-    }
-
-    // 유효한 스타일인지 확인
-    private Style getValidStyle(Long styleSeq) {
-        return styleRepository.findById(styleSeq)
-            .orElseThrow(() -> new EntityNotFoundException("Style not found with id: " + styleSeq));
-    }
-
-
     @Override
     public TtsSentenceDto getSentence(Long projectSeq, Long tsSeq) {
 
