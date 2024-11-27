@@ -83,34 +83,6 @@ jobs:
           script: |
             echo " - docker pull - "
             sudo docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
-
-#            echo " - docker stop - "
-#            sudo docker stop spring || true
-#
-#            echo " - docker rm - "
-#            sudo docker rm spring || true
-#
-#            echo " - docker run - "
-#            sudo docker run --name spring-green -d -p 8081:80 \
-#            -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
-#            -e MYSQL_PORT="${{ secrets.MYSQL_PORT }}" \
-#            -e MYSQL_USER="${{ secrets.MYSQL_USER }}" \
-#            -e MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD2 }}" \
-#            -e EMAIL_USERNAME="${{ secrets.EMAIL_USERNAME }}" \
-#            -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
-#            -e EMAIL_TITLE="${{ secrets.EMAIL_TITLE }}" \
-#            -e SERVICE_NAME="${{ secrets.SERVICE_NAME }}" \
-#            -e EMAIL_CONTENT_TEMPLATE="${{ secrets.EMAIL_CONTENT_TEMPLATE }}" \
-#            -e AWS_S3_ACCESSKEY="${{ secrets.AWS_S3_ACCESSKEY }}" \
-#            -e AWS_S3_SECRETKEY="${{ secrets.AWS_S3_SECRETKEY }}" \
-#            -e AWS_S3_BUKET_NAME="${{ secrets.AWS_S3_BUKET_NAME }}" \
-#            -e AWS_S3_REGION="${{ secrets.AWS_S3_REGION }}" \
-#            -e VC_URL="${{ secrets.VC_URL }}" \
-#            -e VC_APIKEY="${{ secrets.VC_APIKEY }}" \
-#            alswooy/5re5park_image:1.0
-#
-#            echo " - docker 불필요한 자원 삭제 - "
-#            sudo docker system prune -f -a
-#
-#            echo " - spring 컨테이너 밑에서부터 50줄 출력 - "
-#            sudo docker logs --tail 50 spring-green
+            
+            echo " - docker deploy 실행 - "
+            nohup ./docker_deploy.sh > deploy.log 2>&1 &
