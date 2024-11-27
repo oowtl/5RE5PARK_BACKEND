@@ -103,13 +103,13 @@ public class ConcatWithBgmController {
             // 6. 믹싱
             AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
 
-            // 7. S3 업로드
+            // 7. 결과파일 S3 업로드
             String audioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
 
-            // 8. ConcatResult 저장
+            // 8. DB ConcatResult테이블에 결과 저장
             ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatTabSeq, audioUrl, concatResultFileName, mixedAudioStream);
 
-            // 9. Material 데이터 저장
+            // 9. Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
             materialAudioService.saveMaterialsForSelectedRows(selectedRows, concatResultResponse);
 
             // 10. 성공 응답 생성
