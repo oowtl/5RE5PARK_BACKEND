@@ -68,48 +68,48 @@ jobs:
         docker build -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0 .
         docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
 
-#  CD:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: EC2 ssh 접속
-#        uses: appleboy/ssh-action@master # ssh 접속 오픈소스
-#        with:
-#          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
-#          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
-#          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
-#          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
-#          debug: true # 디버그 모드 활성화
-#          script: |
-#            echo " - docker pull - "
-#            sudo docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
-#
-#            echo " - docker stop - "
-#            sudo docker stop spring || true
-#
-#            echo " - docker rm - "
-#            sudo docker rm spring || true
-#
-#            echo " - docker run - "
-#            sudo docker run --name spring -d -p 8080:8080 \
-#            -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
-#            -e MYSQL_PORT=${{ secrets.MYSQL_PORT }} \
-#            -e MYSQL_USER="${{ secrets.MYSQL_USER }}" \
-#            -e MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' \
-#            -e EMAIL_USERNAME="${{ secrets.EMAIL_USERNAME }}" \
-#            -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
-#            -e EMAIL_TITLE="${{ secrets.EMAIL_TITLE }}" \
-#            -e SERVICE_NAME="${{ secrets.SERVICE_NAME }}" \
-#            -e EMAIL_CONTENT_TEMPLATE="${{ secrets.EMAIL_CONTENT_TEMPLATE }}" \
-#            -e AWS_S3_ACCESSKEY="${{ secrets.AWS_S3_ACCESSKEY }}" \
-#            -e AWS_S3_SECRETKEY="${{ secrets.AWS_S3_SECRETKEY }}" \
-#            -e AWS_S3_BUKET_NAME="${{ secrets.AWS_S3_BUKET_NAME }}" \
-#            -e AWS_S3_REGION="${{ secrets.AWS_S3_REGION }}" \
-#            -e VC_URL="${{ secrets.VC_URL }}" \
-#            -e VC_APIKEY="${{ secrets.VC_APIKEY }}" \
-#            ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
-#
-#            sudo docker system prune -f -a
-#
-#            echo " - spring 컨테이너 밑에서부터 50줄 출력 - "
-#            sudo docker logs --tail 50 spring
+  CD:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2 ssh 접속
+        uses: appleboy/ssh-action@master # ssh 접속 오픈소스
+        with:
+          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
+          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
+          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
+          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
+          debug: true # 디버그 모드 활성화
+          script: |
+            echo " - docker pull - "
+            sudo docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
+
+            echo " - docker stop - "
+            sudo docker stop spring || true
+
+            echo " - docker rm - "
+            sudo docker rm spring || true
+
+            echo " - docker run - "
+            sudo docker run --name spring -d -p 8080:8080 \
+            -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
+            -e MYSQL_PORT=${{ secrets.MYSQL_PORT }} \
+            -e MYSQL_USER="${{ secrets.MYSQL_USER }}" \
+            -e MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' \
+            -e EMAIL_USERNAME="${{ secrets.EMAIL_USERNAME }}" \
+            -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+            -e EMAIL_TITLE="${{ secrets.EMAIL_TITLE }}" \
+            -e SERVICE_NAME="${{ secrets.SERVICE_NAME }}" \
+            -e EMAIL_CONTENT_TEMPLATE="${{ secrets.EMAIL_CONTENT_TEMPLATE }}" \
+            -e AWS_S3_ACCESSKEY="${{ secrets.AWS_S3_ACCESSKEY }}" \
+            -e AWS_S3_SECRETKEY="${{ secrets.AWS_S3_SECRETKEY }}" \
+            -e AWS_S3_BUKET_NAME="${{ secrets.AWS_S3_BUKET_NAME }}" \
+            -e AWS_S3_REGION="${{ secrets.AWS_S3_REGION }}" \
+            -e VC_URL="${{ secrets.VC_URL }}" \
+            -e VC_APIKEY="${{ secrets.VC_APIKEY }}" \
+            ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
+
+            sudo docker system prune -f -a
+
+            echo " - spring 컨테이너 밑에서부터 50줄 출력 - "
+            sudo docker logs --tail 50 spring
