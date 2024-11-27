@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +35,25 @@ public class ProjectController {
             description = "회원 Seq로 프로젝트 정보를 가지고옵니다."
     )
     @GetMapping("")
-    public ResponseEntity<ResponseDto<Map<String, List<ProjectResponse>>>> projectGet(
+    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
             @SessionAttribute(value = "memberSeq") Long memberSeq){//session memberSeq값
-        //회원정보로 프로젝트 추출
+        try{
+            //회원정보로 프로젝트 추출
         List<ProjectResponse> projectResponses = projectService.projectFindAll(memberSeq);
-        Map<String, List<ProjectResponse>> map = new HashMap<>();//맵 생성
-        map.put("row", projectResponses);//row : [] 로 응답
-        return ResponseEntity.ok()
-                .body(new ResponseDto<>(HttpStatus.OK.value(), map));
+            Map<String, List<Object>> map = new HashMap<>();//맵 생성
+            map.put("row", Collections.singletonList(projectResponses));//row : [] 로 응답
+            return ResponseEntity.ok()
+                    .body(new ResponseDto<>(HttpStatus.OK.value(), map));
+        }catch (Exception e){
+            Map<String, List<Object>> map = new HashMap<>();//맵 생성
+            map.put("error", Collections.singletonList(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), map));
+        }
     }
     @Operation(
-            summary = "Project 저장",
-            description = "회원 Seq로 프로젝트를 저장(생성)합니다."
+            summary = "Project 생성",
+            description = "회원 Seq로 프로젝트를 생성 합니다."
     )
     @PostMapping("")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
@@ -58,29 +66,32 @@ public class ProjectController {
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),map));
     }
+
     @Operation(
-            summary = "Project 이름 수정",
+            summary = "Project 이름 수정(저장)",
             description = "프로젝트 Seq와 변경할 이름을 받아 수정합니다."
     )
-    @PutMapping("/{projectSeq}")
-    public ResponseEntity<ResponseDto<String>> projectUpdate(@SessionAttribute(value = "memberSeq") Long memberSeq,
-                                                             @Valid @PathVariable Long projectSeq,
-                                                             @Valid @RequestBody String text){
-        projectService.projectCheck(memberSeq, projectSeq); //회원의 프로젝트인지 확인
-        projectService.projectUpdate(projectSeq, text);//프로젝트 수정
+    @PutMapping("/{proSeq}")
+    public ResponseEntity<ResponseDto<String>> projectUpdate(
+            @SessionAttribute(value = "memberSeq") Long memberSeq,
+            @Valid @PathVariable Long proSeq,
+            @Valid @RequestBody String text){
+        projectService.projectCheck(memberSeq, proSeq); //회원의 프로젝트인지 확인
+        projectService.projectUpdate(proSeq, text);//프로젝트 수정
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
                         "Project 이름 변경 완료되었습니다.")); //응답 
     }
     @Operation(
             summary = "Project 삭제",
-            description = "프로젝트 Seq를 받아 activate상태를 'N'으로 변경합니다."
+            description = "프로젝트 Seq를 받아 activate 상태를 'N'으로 변경합니다."
     )
     @DeleteMapping("")
-    public ResponseEntity<ResponseDto<String>> projectDelete(@RequestParam List<Long> projectSeq,
-                                                             @SessionAttribute(value = "memberSeq") Long memberSeq){
-        projectService.projectCheck(memberSeq, projectSeq); //회원의 프로젝트인지 확인
-        projectService.projectDelete(projectSeq);//프로젝트 삭제 배열로 받음
+    public ResponseEntity<ResponseDto<String>> projectDelete(
+            @RequestParam List<Long> proSeq,
+            @SessionAttribute(value = "memberSeq") Long memberSeq){
+        projectService.projectCheck(memberSeq, proSeq); //회원의 프로젝트인지 확인
+        projectService.projectDelete(proSeq);//프로젝트 삭제 배열로 받음
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
                         "Project 삭제 완료되었습니다."));//모두 삭제

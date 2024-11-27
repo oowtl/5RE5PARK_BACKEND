@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.tts.controller.TtsController;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
@@ -29,6 +30,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -43,6 +45,9 @@ class TestUpdateSentence {
 
     @MockBean
     private TtsMakeService ttsMakeService;
+
+    @MockBean
+    private ProjectService projectService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -123,10 +128,18 @@ class TestUpdateSentence {
             any(TtsSentenceRequest.class)))
             .thenReturn(response);
 
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
         // when
         mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody))
+                .session(mockHttpSession)
                 .with(csrf()))
             // then
             .andExpect(status().isOk())
@@ -148,11 +161,19 @@ class TestUpdateSentence {
         TtsAttributeInfo attributeInfo = createAttributeInfo();
         TtsSentenceRequest requestBody = createSentenceRequest(attributeInfo);
 
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
         // when, then
         mockMvc.perform(
                 put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", invalidProjectSeq, invalidTsSeq)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(requestBody))
+                    .session(mockHttpSession)
                     .with(csrf()))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
@@ -195,11 +216,19 @@ class TestUpdateSentence {
             .thenThrow(
                 new EntityNotFoundException("Project not found with id: " + nonExistentProjectSeq));
 
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
         // when, then
         mockMvc.perform(
                 put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", nonExistentProjectSeq, tsSeq)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(requestBody))
+                    .session(mockHttpSession)
                     .with(csrf()))
             .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
             .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
@@ -224,10 +253,18 @@ class TestUpdateSentence {
             any(TtsSentenceRequest.class)))
             .thenThrow(new RuntimeException("Unexpected error"));
 
+        // projectService.projectCheck 메서드가 호출되면 true 반환
+        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
+
+        // mockHttpSession 생성
+        MockHttpSession mockHttpSession = new MockHttpSession();
+        mockHttpSession.setAttribute("memberSeq", 1L);
+
         // when, then
         mockMvc.perform(put("/api/project/{projectSeq}/tts/sentence/{tsSeq}", projectSeq, tsSeq)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody))
+                .session(mockHttpSession)
                 .with(csrf()))
             .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
             .andExpect(jsonPath("$.status", is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())))

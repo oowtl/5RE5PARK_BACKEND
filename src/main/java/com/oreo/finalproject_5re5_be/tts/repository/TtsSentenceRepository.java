@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface TtsSentenceRepository extends JpaRepository<TtsSentence, Long> {
     List<TtsSentence> findAllByProject(Project project);
+    Boolean existsByProject_ProSeq(Long proSeq);
 }
