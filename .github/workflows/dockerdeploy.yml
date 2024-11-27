@@ -1,0 +1,116 @@
+name: CD
+
+# 1. 이벤트 설정
+on:
+  # PR 요청이 들어올 때 빌드와 테스트 실행
+  push:
+    branches:
+      - CICDTEST
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    env:
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      EMAIL_TITLE: ${{ secrets.EMAIL_TITLE }}
+      EMAIL_CONTENT_TEMPLATE: ${{ secrets.EMAIL_CONTENT_TEMPLATE }}
+      SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+      AWS_S3_ACCESSKEY: ${{ secrets.AWS_S3_ACCESSKEY }}
+      AWS_S3_SECRETKEY: ${{ secrets.AWS_S3_SECRETKEY }}
+      AWS_S3_BUKET_NAME: ${{ secrets.AWS_S3_BUKET_NAME }}
+      AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+      VC_URL: ${{ secrets.VC_URL }}
+      VC_APIKEY: ${{ secrets.VC_APIKEY }}
+
+    steps: # 1. 코드 체크아웃
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    # 2. JDK 17 설치
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # 3. Gradle 의존성 캐시 설정
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    # 4. Gradle Wrapper 권한 부여
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+
+      # 5. JSON Config 파일 생성
+    - name: Create JSON Config File
+      env:
+        TTS_JSON_CONTENT: ${{ secrets.TTS_JSON }}
+      run: |
+        echo "${TTS_JSON_CONTENT}" > src/main/resources/tts.json
+
+      # 6. 빌드 및 테스트 실행
+    - name: Build and Test
+      run: ./gradlew build
+
+    - name: Docker Login
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    # push 까지만 하고 CD는 그냥 스크립트 실행해서 docker pull or run으로 파일을 받아서 실행할까? 무중단 배포는 그렇게 해야할듯?
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:1.0 .
+        docker tag ${{ secrets.DOCKER_IMAGE }}:1.0 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:1.0
+        docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:1.0
+
+#  CD:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: EC2 ssh 접속
+#        uses: appleboy/ssh-action@master # ssh 접속 오픈소스
+#        with:
+#          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
+#          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
+#          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
+#          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
+#          debug: true # 디버그 모드 활성화
+#          script: |
+#            echo " - docker pull - "
+#            sudo docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
+#
+#            echo " - docker stop - "
+#            sudo docker stop spring || true
+#
+#            echo " - docker rm - "
+#            sudo docker rm spring || true
+#
+#            echo " - docker run - "
+#            sudo docker run --name spring -d -p 8080:8080 \
+#            -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
+#            -e MYSQL_PORT=${{ secrets.MYSQL_PORT }} \
+#            -e MYSQL_USER="${{ secrets.MYSQL_USER }}" \
+#            -e MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' \
+#            -e EMAIL_USERNAME="${{ secrets.EMAIL_USERNAME }}" \
+#            -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+#            -e EMAIL_TITLE="${{ secrets.EMAIL_TITLE }}" \
+#            -e SERVICE_NAME="${{ secrets.SERVICE_NAME }}" \
+#            -e EMAIL_CONTENT_TEMPLATE="${{ secrets.EMAIL_CONTENT_TEMPLATE }}" \
+#            -e AWS_S3_ACCESSKEY="${{ secrets.AWS_S3_ACCESSKEY }}" \
+#            -e AWS_S3_SECRETKEY="${{ secrets.AWS_S3_SECRETKEY }}" \
+#            -e AWS_S3_BUKET_NAME="${{ secrets.AWS_S3_BUKET_NAME }}" \
+#            -e AWS_S3_REGION="${{ secrets.AWS_S3_REGION }}" \
+#            -e VC_URL="${{ secrets.VC_URL }}" \
+#            -e VC_APIKEY="${{ secrets.VC_APIKEY }}" \
+#            ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
+#
+#            sudo docker system prune -f -a
+#
+#            echo " - spring 컨테이너 밑에서부터 50줄 출력 - "
+#            sudo docker logs --tail 50 spring

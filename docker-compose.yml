@@ -1,0 +1,65 @@
+services:
+  nginx:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    networks:
+      - spring_network
+
+  green:
+    container_name: green
+    image: alswooy/spring-green:1.0
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_TITLE: ${EMAIL_TITLE}
+      SERVICE_NAME: ${SERVICE_NAME}
+      EMAIL_CONTENT_TEMPLATE: ${EMAIL_CONTENT_TEMPLATE}
+      AWS_S3_ACCESSKEY: ${AWS_S3_ACCESSKEY}
+      AWS_S3_SECRETKEY: ${AWS_S3_SECRETKEY}
+      AWS_S3_BUKET_NAME: ${AWS_S3_BUKET_NAME}
+      AWS_S3_REGION: ${AWS_S3_REGION}
+      VC_URL: ${VC_URL}
+      VC_APIKEY: ${VC_APIKEY}
+    ports:
+      - "8080:8080"
+    networks:
+      - spring_network
+
+
+  blue:
+    container_name: blue
+    image: alswooy/spring-blue:1.0
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_TITLE: ${EMAIL_TITLE}
+      SERVICE_NAME: ${SERVICE_NAME}
+      EMAIL_CONTENT_TEMPLATE: ${EMAIL_CONTENT_TEMPLATE}
+      AWS_S3_ACCESSKEY: ${AWS_S3_ACCESSKEY}
+      AWS_S3_SECRETKEY: ${AWS_S3_SECRETKEY}
+      AWS_S3_BUKET_NAME: ${AWS_S3_BUKET_NAME}
+      AWS_S3_REGION: ${AWS_S3_REGION}
+      VC_URL: ${VC_URL}
+      VC_APIKEY: ${VC_APIKEY}
+    ports:
+      - "8081:8081"
+    networks:
+      - spring_network
+
+
+networks:
+  spring_network:
+    external: true
+#  docker network create spring_network
