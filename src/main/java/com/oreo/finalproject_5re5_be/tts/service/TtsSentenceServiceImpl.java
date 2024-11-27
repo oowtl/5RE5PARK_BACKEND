@@ -184,7 +184,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         @Valid TtsSentenceBatchRequest batchRequest) {
         // 1. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
         // 2. 정렬 및 정렬 순서 수정
-        List<TtsSentenceBatchInfo> batchList = batchRequest.getSortedSentenceList();
+        List<TtsSentenceBatchInfo> batchList = batchRequest.sortSentenceList();
 
         // 3. TtsSentenceDto List 변환
         List<TtsSentenceDto> batchedList = batchList.stream()

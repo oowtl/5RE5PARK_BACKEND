@@ -23,7 +23,7 @@ public class TtsSentenceBatchRequest {
     @NotEmpty(message = "sentenceList is empty")
     private List<TtsSentenceBatchInfo> sentenceList;
 
-    public List<TtsSentenceBatchInfo> getSortedSentenceList() {
+    public List<TtsSentenceBatchInfo> sortSentenceList() {
         // 정렬
         List<TtsSentenceBatchInfo> sortedSentencelist = sentenceList.stream()
             .sorted(new TtsSentenceComparator()).collect(
