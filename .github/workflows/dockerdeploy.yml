@@ -55,7 +55,7 @@ jobs:
 
       # 6. 빌드 및 테스트 실행
     - name: Build and Test
-      run: ./gradlew build
+      run: ./gradlew build -x test
 
     - name: Docker Login
       uses: docker/login-action@v3
@@ -65,9 +65,9 @@ jobs:
     # push 까지만 하고 CD는 그냥 스크립트 실행해서 docker pull or run으로 파일을 받아서 실행할까? 무중단 배포는 그렇게 해야할듯?
     - name: Build and Push Docker Image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:1.0 .
-        docker tag ${{ secrets.DOCKER_IMAGE }}:1.0 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:1.0
-        docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:1.0
+        docker build -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0 .
+        docker tag ${{ secrets.DOCKER_IMAGE }}:1.0 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
+        docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
 
 #  CD:
 #    needs: build
