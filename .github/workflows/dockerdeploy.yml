@@ -107,7 +107,7 @@ jobs:
             -e AWS_S3_REGION="${{ secrets.AWS_S3_REGION }}" \
             -e VC_URL="${{ secrets.VC_URL }}" \
             -e VC_APIKEY="${{ secrets.VC_APIKEY }}" \
-            ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
+            alswooy/5re5park_image:1.0
 
             echo " - docker 불필요한 자원 삭제 - "
             sudo docker system prune -f -a
