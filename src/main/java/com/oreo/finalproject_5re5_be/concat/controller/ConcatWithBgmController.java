@@ -16,6 +16,7 @@ import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,6 +48,7 @@ public class ConcatWithBgmController {
     private final AudioStreamService audioStreamService; // 추가된 서비스
     private final AudioResample audioResample = new AudioResample(); // 리샘플링 유틸. Bean이 아니라 new로 생성
     private final AudioFormat defaultAudioFormat = AudioFormats.STEREO_FORMAT_SR441_B32; // 기본 포맷
+    private final ProjectService projectService;
 
     @Operation(
             summary = "Row 오디오와 BGM 파일 병합",
@@ -75,7 +77,9 @@ public class ConcatWithBgmController {
             @RequestBody SelectedConcatRowRequest selectedRows,
             @Parameter(description = "S3에 저장된 BGM 파일의 URL", required = true) @RequestParam String bgmFileUrl,
             @Parameter(description = "결과물이 나온 concatTab", required = true) @RequestParam Long concatTabSeq,
-            @Parameter(description = "user가 설정한 결과물 파일 이름", required = true) @RequestParam String concatResultFileName) {
+            @Parameter(description = "user가 설정한 결과물 파일 이름", required = true) @RequestParam String concatResultFileName,
+            @SessionAttribute Long memberSeq) {
+        projectService.projectCheck(memberSeq, concatTabSeq);
         try {
             IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
 
