@@ -69,7 +69,7 @@ jobs:
         docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
 
   CD:
-    needs: build
+    needs: CI
     runs-on: ubuntu-latest
     steps:
       - name: EC2 ssh 접속
