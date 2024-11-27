@@ -85,4 +85,4 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
             
             echo " - docker deploy 실행 - "
-            nohup ./docker_deploy.sh > deploy.log 2>&1 &
+            bash ./blue_docker_deploy.sh > deploy.log 2>&1 &
