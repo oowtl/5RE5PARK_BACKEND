@@ -84,5 +84,6 @@ jobs:
             echo " - docker pull - "
             sudo docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
             
-            echo " - docker deploy 실행 - "
+            echo "blue_docker_deploy.sh를 실행합니다."
             bash ./blue_docker_deploy.sh > deploy.log 2>&1 &
+            echo "새로운 blue_docker_deploy.sh가 실행 중입니다."
