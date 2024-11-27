@@ -6,7 +6,6 @@ import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
-import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,17 +30,11 @@ public class AudioFileController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto<List<AudioFileRequestDto>>> check(
             @RequestParam("audio") List<MultipartFile> audioFiles) throws IOException {
-        // MultipartFile -> AudioFileRequestDto 변환
-        List<AudioFileRequestDto> audioDto = audioFiles.stream()
-                .map(file -> new AudioFileRequestDto(file, file.getOriginalFilename()))
-                .toList();
-
+        List<AudioFileRequestDto> audioDto = convertToDto(audioFiles);
         List<AudioFileRequestDto> audioFileRequestDtos = audioFileService.checkExtension(audioDto);
-        if (audioFileRequestDtos.isEmpty()) {
-            return new ResponseDto<>(HttpStatus.OK.value(), audioFileService.checkExtension(audioDto)).toResponseEntity();
-        }
-        return new ResponseEntity<>(
-                new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), audioFileRequestDtos), HttpStatus.BAD_REQUEST);
+
+        HttpStatus status = audioFileRequestDtos.isEmpty() ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return buildResponse(status, audioFileRequestDtos);
     }
 
     @PostMapping(value = "save",
@@ -49,36 +42,38 @@ public class AudioFileController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto<List<OriginAudioRequest>>> save(
             @RequestParam("audio") List<MultipartFile> audioFiles) throws IOException, UnsupportedAudioFileException {
-        // MultipartFile -> AudioFileRequestDto 변환
-        List<AudioFileRequestDto> audioDto = audioFiles.stream()
-                .map(file -> new AudioFileRequestDto(file, file.getOriginalFilename()))
-                .toList();
-
+        List<AudioFileRequestDto> audioDto = convertToDto(audioFiles);
         List<OriginAudioRequest> originAudioRequests = audioFileService.saveAudioFile(audioDto);
-        return new ResponseDto<>(HttpStatus.OK.value(), originAudioRequests).toResponseEntity();
+        return buildResponse(HttpStatus.OK, originAudioRequests);
     }
 
     @PostMapping("read")
     public ResponseEntity<ResponseDto<List<AudioFileDto>>> read(@RequestParam List<Long> concatRowSeq) {
         concatRowSeq.sort(Long::compareTo);
-
         List<AudioFile> audioFile = audioFileService.findByConcatRowSeq(concatRowSeq);
-        List<AudioFileDto> list = audioFile.stream().map(af -> AudioFileDto.builder()
-                .audioFileSeq(af.getAudioFileSeq())
-                .audioUrl(af.getAudioUrl())
-                .fileLength(af.getFileLength())
-                .fileName(af.getFileName())
-                .fileSize(af.getFileSize())
-                .createdDate(af.getCreatedDate())
-                .extension(af.getExtension()).build()).toList();
-        return new ResponseDto<>(HttpStatus.OK.value(), list).toResponseEntity();
-
+        List<AudioFileDto> list = audioFile.stream().map(this::convertToDto).toList();
+        return buildResponse(HttpStatus.OK, list);
     }
 
-    // DataNotFoundException 처리
-    @ExceptionHandler(DataNotFoundException.class)
-    public ResponseEntity<ResponseDto<String>> handleDataNotFoundException(DataNotFoundException ex) {
-        String errorMessage = ex.getMessage();
-        return new ResponseDto<>(HttpStatus.NOT_FOUND.value(), errorMessage).toResponseEntity();
+    private List<AudioFileRequestDto> convertToDto(List<MultipartFile> audioFiles) {
+        return audioFiles.stream()
+                .map(file -> new AudioFileRequestDto(file, file.getOriginalFilename()))
+                .toList();
+    }
+
+    private <T> ResponseEntity<ResponseDto<T>> buildResponse(HttpStatus status, T data) {
+        return new ResponseEntity<>(new ResponseDto<>(status.value(), data), status);
+    }
+
+    private AudioFileDto convertToDto(AudioFile audioFile) {
+        return AudioFileDto.builder()
+                .audioFileSeq(audioFile.getAudioFileSeq())
+                .audioUrl(audioFile.getAudioUrl())
+                .fileLength(audioFile.getFileLength())
+                .fileName(audioFile.getFileName())
+                .fileSize(audioFile.getFileSize())
+                .createdDate(audioFile.getCreatedDate())
+                .extension(audioFile.getExtension())
+                .build();
     }
 }
