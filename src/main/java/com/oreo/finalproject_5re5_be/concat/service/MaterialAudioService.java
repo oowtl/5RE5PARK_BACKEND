@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.SelectedConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
@@ -106,7 +107,7 @@ public class MaterialAudioService {
 
     // concatResult의 seq로 재료가 된 행 정보 리스트 조회
     public List<ConcatRow> findConcatRowListByResultSeq(Long concatResultSeq) {
-        return  materialAudioRepository.findConcatRowListByConcatResultSeq(concatResultSeq);
+        return materialAudioRepository.findConcatRowListByConcatResultSeq(concatResultSeq);
     }
 
     public boolean saveMaterialAudio(List<MaterialAudio> materialAudios) {
@@ -116,6 +117,19 @@ public class MaterialAudioService {
         } catch (Exception e) {
             throw new IllegalArgumentException("재료 오디오 저장 실패");
         }
-
     }
+
+    // 기존 기능 외 추가 메서드: SelectedConcatRowRequest 처리
+    public void saveMaterialsForSelectedRows(SelectedConcatRowRequest selectedRows, ConcatUrlResponse concatResultResponse) {
+        List<Long> usedAudioFileSeqs = selectedRows.getRows().stream()
+                .map(SelectedConcatRowRequest.Row::getAudioUrl) // URL 추출
+                .map(audioFileRepository::findByAudioUrl) // URL로 AudioFile 조회
+                .map(audioFile -> audioFile.orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioFile.get().getAudioUrl())))
+                .map(AudioFile::getAudioFileSeq) // Seq 추출
+                .toList();
+
+        // 기존 saveMaterials 메서드를 호출하여 저장
+        saveMaterials(concatResultResponse.getSeq(), usedAudioFileSeqs);
+    }
+
 }

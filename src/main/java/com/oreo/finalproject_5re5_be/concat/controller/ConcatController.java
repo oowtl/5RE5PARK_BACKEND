@@ -8,6 +8,7 @@ import com.oreo.finalproject_5re5_be.concat.service.ConcatResultService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatTabService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,9 +27,13 @@ public class ConcatController {
     private final ConcatService concatService;
     private final ConcatTabService concatTabService;
     private final ConcatResultService concatResultService;
+    private final ProjectService projectService;
 
     @PostMapping("")
-    public ResponseEntity<ResponseDto<ConcatResultDto>> concat(@RequestBody ConcatRowRequestDto audioRequests, @RequestParam Long memberSeq) throws IOException {
+    public ResponseEntity<ResponseDto<ConcatResultDto>> concat(@RequestBody ConcatRowRequestDto audioRequests,
+                                                               @RequestParam Long memberSeq) throws IOException {
+        projectService.projectCheck(memberSeq, audioRequests.getConcatTabId());
+
         System.out.println("audioRequests.getFileName() = " + audioRequests.getFileName());
         ConcatTabResponseDto concatTabResponseDto
                 = concatTabService.readConcatTab(audioRequests.getConcatTabId(), memberSeq);
@@ -37,7 +42,10 @@ public class ConcatController {
     }
 
     @GetMapping("read/result")
-    public ResponseEntity<ResponseDto<List<ConcatResultDto>>> readConcatResult(@RequestParam Long projectSeq) {
+    public ResponseEntity<ResponseDto<List<ConcatResultDto>>> readConcatResult(@RequestParam Long projectSeq,
+                                                                               @SessionAttribute Long memberSeq) {
+        projectService.projectCheck(memberSeq, projectSeq);
+
         return new ResponseDto<>(HttpStatus.OK.value(), concatResultService.findByConcatTabSequence(projectSeq)).toResponseEntity();
     }
 

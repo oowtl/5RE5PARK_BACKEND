@@ -1,29 +1,29 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
+import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
-import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
-import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
+import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ConcatTabServiceTest {
@@ -156,11 +156,12 @@ class ConcatTabServiceTest {
         Project project = Project.builder().member(member).proSeq(1L).member(member).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
         ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
+                member.getSeq(),
                 project.getProSeq(),
                 null,
                 0.0f,
                 'Y'
-                );
+        );
         //when : 업데이트
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
@@ -181,6 +182,7 @@ class ConcatTabServiceTest {
         Project project = Project.builder().proSeq(1L).member(member).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
         ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
+                member.getSeq(),
                 project.getProSeq(),
                 null,
                 0.0f,
@@ -207,6 +209,7 @@ class ConcatTabServiceTest {
         Project project = Project.builder().proSeq(1L).member(member).build();
         ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
         ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
+                member.getSeq(),
                 project.getProSeq(),
                 null,
                 0.0f,

@@ -2,21 +2,21 @@ package com.oreo.finalproject_5re5_be.concat.controller;
 
 import com.oreo.finalproject_5re5_be.concat.dto.ConcatResponseDto;
 import com.oreo.finalproject_5re5_be.concat.dto.RowInfoDto;
-import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatResultRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.request.SelectedConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
+import com.oreo.finalproject_5re5_be.concat.service.AudioStreamService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatResultService;
 import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
 import com.oreo.finalproject_5re5_be.concat.service.bgm.BgmProcessor;
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.AudioProperties;
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.IntervalConcatenator;
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.StereoIntervalConcatenator;
-import com.oreo.finalproject_5re5_be.global.component.ByteArrayMultipartFile;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,10 +28,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sound.sampled.*;
-import java.io.ByteArrayInputStream;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +45,10 @@ public class ConcatWithBgmController {
     private final MaterialAudioService materialAudioService;
     private final ConcatResultService concatResultService;
     private final AudioFileService audioFileService;
+    private final AudioStreamService audioStreamService; // 추가된 서비스
     private final AudioResample audioResample = new AudioResample(); // 리샘플링 유틸. Bean이 아니라 new로 생성
     private final AudioFormat defaultAudioFormat = AudioFormats.STEREO_FORMAT_SR441_B32; // 기본 포맷
+    private final ProjectService projectService;
 
     @Operation(
             summary = "Row 오디오와 BGM 파일 병합",
@@ -75,119 +76,64 @@ public class ConcatWithBgmController {
     public ResponseEntity<ResponseDto<ConcatResponseDto>> executeConcatWithBgm(
             @RequestBody SelectedConcatRowRequest selectedRows,
             @Parameter(description = "S3에 저장된 BGM 파일의 URL", required = true) @RequestParam String bgmFileUrl,
-            @RequestParam Long concatTabSeq) {
+            @Parameter(description = "결과물이 나온 concatTab", required = true) @RequestParam Long concatTabSeq,
+            @Parameter(description = "user가 설정한 결과물 파일 이름", required = true) @RequestParam String concatResultFileName,
+            @SessionAttribute Long memberSeq) {
+        projectService.projectCheck(memberSeq, concatTabSeq);
         try {
-            // IntervalConcatenator 생성
             IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
 
-            // 1. Row 오디오 파일 로드 및 병합
-            List<AudioProperties> audioProperties = loadAudioFiles(selectedRows);
-            ByteArrayOutputStream concatenatedAudio = intervalConcatenator.intervalConcatenate(audioProperties, selectedRows.getInitialSilence());
+            // 1. Row 오디오 파일 로드 및 무음 처리
+            List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(selectedRows);
 
-            // 2. BGM 파일 로드 및 처리
-            AudioInputStream bgmStream = S3Service.load(bgmFileUrl);
+            // 2. 병합된 오디오 생성
+            ByteArrayOutputStream concatenatedAudioBuffer = intervalConcatenator.intervalConcatenate(audioProperties, selectedRows.getInitialSilence());
 
-            // 3. 병합된 Row 오디오와 BGM 믹싱
-            AudioInputStream concatenatedAudioStream = new AudioInputStream(
-                    new ByteArrayInputStream(concatenatedAudio.toByteArray()),
-                    defaultAudioFormat,
-                    concatenatedAudio.size() / defaultAudioFormat.getFrameSize()
-            );
+            // 3. 병합된 오디오를 AudioInputStream으로 변환
+            AudioInputStream concatenatedAudioStream = audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
 
-            // BGM 길이를 Row 오디오와 맞춤 (확장 또는 자르기)
-            long targetFrames = concatenatedAudioStream.getFrameLength();
+            // 4. BGM 스트림 로드 및 버퍼링
+            AudioInputStream bufferedBgmStream = s3Service.loadAsBufferedStream(bgmFileUrl);
 
-            // getFrameLength 값이 0 또는 음수인 경우 직접 계산
-            if (targetFrames <= 0) {
-                targetFrames = BgmProcessor.calculateTargetFrames(concatenatedAudioStream);
-            }
+            // 5. BGM 길이 조정
+            long targetFrames = audioStreamService.getValidFrameLength(concatenatedAudioStream);
+            long bgmFrames = audioStreamService.getValidFrameLength(bufferedBgmStream);
+            bufferedBgmStream = BgmProcessor.adjustBgmLength(bufferedBgmStream, targetFrames, bgmFrames);
 
-            long bgmFrames = bgmStream.getFrameLength();
-            if (bgmFrames <= 0) {
-                bgmFrames = BgmProcessor.calculateTargetFrames(bgmStream);
-            }
+            // 6. 믹싱
+            AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
 
-            // BGM 길이를 Row 오디오와 맞춤
-            if (bgmFrames > targetFrames) {
-                bgmStream = BgmProcessor.trimBgm(bgmStream, targetFrames);
-            } else {
-                bgmStream = BgmProcessor.extendBgm(bgmStream, targetFrames);
-            }
+            // 7. 결과파일 S3 업로드
+            String audioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
 
-            // 두 오디오 스트림을 믹싱
-            AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bgmStream);
+            // 8. DB ConcatResult테이블에 결과 저장
+            ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatTabSeq, audioUrl, concatResultFileName, mixedAudioStream);
 
-            // 4. S3에 업로드
-            String audioUrl = uploadToS3(mixedAudioStream);
+            // 9. Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
+            materialAudioService.saveMaterialsForSelectedRows(selectedRows, concatResultResponse);
 
-            // 5. ConcatResult 테이블 DB에 저장 결과물 저장
-            ConcatResultRequest concatResultRequest = ConcatResultRequest.builder()
-                    .concatTabSeq(concatTabSeq)
-                    .optionSeq(null)
-                    .ResultUrl(audioUrl)
-                    .ResultFileName("mixed_with_bgm.wav")
-                    .ResultExtension("wav")
-                    .ResultFileLength(mixedAudioStream.getFrameLength() / mixedAudioStream.getFormat().getFrameRate())
-                    .build();
-            ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatResultRequest);
-
-
-            // Material 테이블에 재료-결과물 관계 저장
-            List<Long> usedAudioFileSeqs = audioFileService.getAudioFileSeqsByUrls(
-                    selectedRows.getRows().stream()
-                            .map(SelectedConcatRowRequest.Row::getAudioUrl)
-                            .toList()
-            );
-            materialAudioService.saveMaterials(concatResultResponse.getSeq(), usedAudioFileSeqs);
-
-            // Response 데이터 생성
-            List<RowInfoDto> rows = selectedRows.getRows().stream()
-                    .map(row -> new RowInfoDto(row.getAudioUrl(), row.getSilenceInterval()))
-                    .toList();
-
-            ConcatResponseDto responseDto = ConcatResponseDto.builder()
-                    .audioUrl(audioUrl)
-                    .rows(rows)
-                    .build();
-
-            return new ResponseDto<>(HttpStatus.OK.value(), responseDto).toResponseEntity();
+            // 10. 성공 응답 생성
+            return createSuccessResponse(audioUrl, selectedRows);
         } catch (Exception e) {
-            // 에러 응답 생성
-            return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    ConcatResponseDto.builder().audioUrl(null).rows(new ArrayList<>()).build()
-            ).toResponseEntity();
+            // 11. 실패 응답 생성
+            return createErrorResponse();
         }
     }
 
-    private List<AudioProperties> loadAudioFiles(SelectedConcatRowRequest selectedRows) {
-        List<AudioProperties> audioPropertiesList = new ArrayList<>();
-        for (SelectedConcatRowRequest.Row row : selectedRows.getRows()) {
-            // S3에서 오디오 파일 다운로드
-            // 오디오 포맷 확인 및 변환
-            AudioInputStream audioStream = S3Service.load(row.getAudioUrl());
-            audioStream = audioResample.formatting(audioStream);
-
-            // AudioProperties 생성
-            audioPropertiesList.add(new AudioProperties(audioStream, row.getSilenceInterval()));
-        }
-        return audioPropertiesList;
+    private ResponseEntity<ResponseDto<ConcatResponseDto>> createSuccessResponse(String audioUrl, SelectedConcatRowRequest selectedRows) {
+        List<RowInfoDto> rows = selectedRows.getRows().stream()
+                .map(row -> new RowInfoDto(row.getAudioUrl(), row.getSilenceInterval()))
+                .toList();
+        ConcatResponseDto responseDto = ConcatResponseDto.builder()
+                .audioUrl(audioUrl)
+                .rows(rows)
+                .build();
+        return new ResponseDto<>(HttpStatus.OK.value(), responseDto).toResponseEntity();
     }
 
-    private String uploadToS3(AudioInputStream audioStream) throws IOException {
-        // AudioInputStream을 ByteArrayOutputStream으로 변환
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, outputStream);
-
-        // ByteArrayOutputStream을 MultipartFile로 변환
-        ByteArrayMultipartFile multipartFile = new ByteArrayMultipartFile(
-                outputStream.toByteArray(),
-                "mixed_with_bgm.wav",
-                "audio/wav"
-        );
-
-        // S3에 업로드
-        return s3Service.upload(multipartFile, "concat/result");
+    private ResponseEntity<ResponseDto<ConcatResponseDto>> createErrorResponse() {
+        return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ConcatResponseDto.builder().audioUrl(null).rows(new ArrayList<>()).build()
+        ).toResponseEntity();
     }
-
-
 }
