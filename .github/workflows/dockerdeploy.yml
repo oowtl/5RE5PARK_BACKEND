@@ -94,11 +94,11 @@ jobs:
             sudo docker system prune -f -a
             
             echo " - docker run - "
-            sudo docker run --name spring -d -p 8080:8080 \
+            sudo docker run --name spring -d -p 8081:8080 \
             -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
-            -e MYSQL_PORT=${{ secrets.MYSQL_PORT }} \
+            -e MYSQL_PORT="${{ secrets.MYSQL_PORT }}" \
             -e MYSQL_USER="${{ secrets.MYSQL_USER }}" \
-            -e MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}' \
+            -e MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}" \
             -e EMAIL_USERNAME="${{ secrets.EMAIL_USERNAME }}" \
             -e EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
             -e EMAIL_TITLE="${{ secrets.EMAIL_TITLE }}" \
