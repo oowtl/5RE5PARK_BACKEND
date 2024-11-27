@@ -87,9 +87,6 @@ jobs:
             # 스크립트 실행할 곳으로 이동
             cd /home/ubuntu/app
             
-            echo " 파일 확인 "
-            ls -l ./blue_docker_deploy.sh
-          
             echo "blue_docker_deploy.sh를 실행합니다."
             chmod +x ./blue_docker_deploy.sh
             bash blue_docker_deploy.sh > deploy.log 2>&1 &
