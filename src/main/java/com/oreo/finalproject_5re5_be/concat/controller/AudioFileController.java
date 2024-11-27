@@ -5,8 +5,11 @@ import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
+import com.oreo.finalproject_5re5_be.concat.service.ConcatRowService;
+import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
+import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,9 @@ import java.util.List;
 @RequestMapping("api/concat/audio")
 public class AudioFileController {
     private final AudioFileService audioFileService;
+    private final ProjectService projectService;
+    private final ConcatRowService concatRowService;
+    private final MaterialAudioService materialAudioService;
 
     @PostMapping(value = "extension/check",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -59,7 +65,13 @@ public class AudioFileController {
     }
 
     @PostMapping("read")
-    public ResponseEntity<ResponseDto<List<AudioFileDto>>> read(@RequestParam List<Long> concatRowSeq) {
+    public ResponseEntity<ResponseDto<List<AudioFileDto>>> read(@RequestParam List<Long> concatRowSeq,
+                                                                @SessionAttribute Long memberSeq) {
+        concatRowSeq.forEach(seq -> {
+            Long projectId = concatRowService.readConcatRow(seq).getConcatTab().getProjectId();
+            projectService.projectCheck(memberSeq, projectId);
+        });
+
         concatRowSeq.sort(Long::compareTo);
 
         List<AudioFile> audioFile = audioFileService.findByConcatRowSeq(concatRowSeq);
