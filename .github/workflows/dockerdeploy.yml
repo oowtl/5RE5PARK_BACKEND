@@ -89,7 +89,10 @@ jobs:
 
             echo " - docker rm - "
             sudo docker rm spring || true
-
+            
+            echo " - docker 불필요한 자원 삭제 - "
+            sudo docker system prune -f -a
+            
             echo " - docker run - "
             sudo docker run --name spring -d -p 8080:8080 \
             -e MYSQL_HOST="${{ secrets.MYSQL_HOST }}" \
@@ -109,7 +112,6 @@ jobs:
             -e VC_APIKEY="${{ secrets.VC_APIKEY }}" \
             ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE }}:1.0
 
-            sudo docker system prune -f -a
 
             echo " - spring 컨테이너 밑에서부터 50줄 출력 - "
             sudo docker logs --tail 50 spring
