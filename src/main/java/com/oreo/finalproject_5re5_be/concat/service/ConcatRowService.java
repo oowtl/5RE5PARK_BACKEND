@@ -155,4 +155,18 @@ public class ConcatRowService {
                 .build();
     }
 
+    public boolean uploadText(List<ConcatRowRequest> concatRowSaveRequestDto) {
+        boolean check = concatRowSaveRequestDto.stream()
+                .anyMatch(rowRequest -> rowRequest.getStatus() == 'N' || rowRequest.getSeq() == null);
+        if (check) {
+            return false;
+        }
+
+        List<ConcatRow> list = concatRowSaveRequestDto.stream().map(cr -> ConcatRow
+                .builder()
+                .concatRowSeq(cr.getSeq())
+                .rowText(cr.getRowText()).build()).toList();
+        concatRowHelper.batchInsert(list);
+        return true;
+    }
 }

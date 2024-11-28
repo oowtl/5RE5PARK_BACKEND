@@ -72,4 +72,14 @@ public class ConcatRowController {
         return new ResponseDto<>(HttpStatus.OK.value(), concatRowService.updateConcatRows(concatRowSaveRequestDto))
                 .toResponseEntity();
     }
+
+    @PostMapping("upload/text")
+    public ResponseEntity<ResponseDto<Boolean>> uploadText(
+            @RequestBody ConcatRowSaveRequestDto concatRowSaveRequestDto) {
+        boolean uploadText = concatRowService.uploadText(concatRowSaveRequestDto.getConcatRowRequests());
+        if (uploadText) {
+            return new ResponseDto<>(HttpStatus.OK.value(), uploadText).toResponseEntity();
+        }
+        return new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), uploadText).toResponseEntity();
+    }
 }
