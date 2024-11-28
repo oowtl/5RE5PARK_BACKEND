@@ -1,7 +1,10 @@
 package com.oreo.finalproject_5re5_be.concat.dto.request;
 
 import com.oreo.finalproject_5re5_be.concat.dto.ConcatOptionDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
 @ToString
 @AllArgsConstructor
@@ -9,6 +12,7 @@ import lombok.*;
 @Getter
 public class ConcatUpdateRequestDto {
     private final String memberId;
+    private final Long memberSeq;
     private final Long tabId;
     private final ConcatOptionDto concatOption;
     private final float frontSilence;

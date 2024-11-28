@@ -268,7 +268,7 @@ class TestBatchSave {
 
         // when
         // 정렬된 sentenceList 생성
-        List<TtsSentenceBatchInfo> sortedList = request.getSortedSentenceList();
+        List<TtsSentenceBatchInfo> sortedList = request.sortSentenceList();
 
         // then: 반환된 결과 검증
         assertEquals(0, sortedList.get(0).getSentence().getOrder());
@@ -293,7 +293,7 @@ class TestBatchSave {
 
         // when
         // 정렬된 sentenceList 생성
-        List<TtsSentenceBatchInfo> sortedList = request.getSortedSentenceList();
+        List<TtsSentenceBatchInfo> sortedList = request.sortSentenceList();
 
         // then: 반환된 결과 검증
         assertEquals(0, sortedList.get(0).getSentence().getOrder());
@@ -318,7 +318,7 @@ class TestBatchSave {
 
         // when
         // 정렬된 sentenceList 생성
-        List<TtsSentenceBatchInfo> sortedList = request.getSortedSentenceList();
+        List<TtsSentenceBatchInfo> sortedList = request.sortSentenceList();
 
         // then: 반환된 결과 검증
         assertEquals(0, sortedList.get(0).getSentence().getOrder());
