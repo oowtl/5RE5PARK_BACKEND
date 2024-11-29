@@ -16,5 +16,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .exposedHeaders("location")
                 .allowedHeaders("*")
                 .allowCredentials(true);
+        // Swagger를 위한 CORS 설정
+        registry.addMapping("/swagger-ui/**")
+                .allowedOrigins("https://client.5re5park.site", "https://5re5park.site", "https://www.5re5park.site")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }

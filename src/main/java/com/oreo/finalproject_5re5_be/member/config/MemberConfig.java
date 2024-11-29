@@ -62,37 +62,24 @@ public class MemberConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        //리소스를 허용할 URL 지정
-        ArrayList<String> allowedOriginPatterns = new ArrayList<>();
-        // 스프링 로컬 포트 번호 8080
-        allowedOriginPatterns.add("http://localhost:8080");
-        allowedOriginPatterns.add("http://127.0.0.1:8080");
-        allowedOriginPatterns.add("https://localhost:8080");
-        allowedOriginPatterns.add("https://127.0.0.1:8080");
+        // 허용된 Origin 설정
+        configuration.setAllowedOrigins(List.of(
+                "https://client.5re5park.site",
+                "https://5re5park.site",
+                "https://www.5re5park.site",
+                "https://localhost:8080",
+                "https://localhost:5173",
+                "http://127.0.0.1:8080",
+                "http://127.0.0.1:5173"
+        ));
 
-        // 스프링 로컬 포트 번호 443
-        allowedOriginPatterns.add("https://localhost:443");
-        allowedOriginPatterns.add("https://127.0.0.1:443");
+        // 허용된 HTTP 메서드 설정
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
 
-        // 리액트 로컬 포트 번호 5173
-        allowedOriginPatterns.add("http://localhost:5173");
-        allowedOriginPatterns.add("http://127.0.0.1:5173");
-        allowedOriginPatterns.add("https://localhost:5173");
-        allowedOriginPatterns.add("https://127.0.0.1:5173");
+        // 허용된 헤더 설정
+        configuration.setAllowedHeaders(List.of("*"));
 
-        configuration.setAllowedOrigins(allowedOriginPatterns);
-
-        //허용하는 HTTP METHOD 지정
-        ArrayList<String> allowedHttpMethods = new ArrayList<>();
-        allowedHttpMethods.add("GET");
-        allowedHttpMethods.add("POST");
-        allowedHttpMethods.add("PUT");
-        allowedHttpMethods.add("DELETE");
-        configuration.setAllowedMethods(allowedHttpMethods);
-
-        configuration.setAllowedHeaders(Collections.singletonList("*"));
-
-        //인증, 인가를 위한 credentials 를 TRUE로 설정
+        // 인증 정보 전송 허용
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -100,6 +87,7 @@ public class MemberConfig {
 
         return source;
     }
+
 }
 
 
