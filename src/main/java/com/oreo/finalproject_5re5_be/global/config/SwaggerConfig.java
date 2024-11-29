@@ -16,16 +16,26 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
+        //swagger servers 지정
+        List<Server> server = new ArrayList<>();
+        server.add(new Server().description("https Server").url("https://5re5park.site"));
+        server.add(new Server().description("localhost").url("http://localhost:8080"));
+
         OpenAPI info = new OpenAPI()
                 .components(new Components())
                 .paths(getPaths())
+                .servers(server)
                 .info(apiInfo());
         return info;
     }
