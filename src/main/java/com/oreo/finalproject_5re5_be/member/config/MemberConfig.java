@@ -69,8 +69,8 @@ public class MemberConfig {
                 "https://www.5re5park.site",
                 "https://localhost:8080",
                 "https://localhost:5173",
-                "http://127.0.0.1:8080",
-                "http://127.0.0.1:5173"
+                "https://127.0.0.1:8080",
+                "https://127.0.0.1:5173"
         ));
 
         // 허용된 HTTP 메서드 설정
