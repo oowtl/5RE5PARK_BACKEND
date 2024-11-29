@@ -70,7 +70,7 @@ public class MemberConfig {
         allowedOriginPatterns.add("https://localhost:8080");
         allowedOriginPatterns.add("https://127.0.0.1:8080");
 
-        // 스프링 로컬 포트 번호 8080
+        // 스프링 로컬 포트 번호 443
         allowedOriginPatterns.add("https://localhost:443");
         allowedOriginPatterns.add("https://127.0.0.1:443");
 
