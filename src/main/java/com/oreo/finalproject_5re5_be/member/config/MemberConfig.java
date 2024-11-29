@@ -87,7 +87,6 @@ public class MemberConfig {
 
         return source;
     }
-
 }
 
 
