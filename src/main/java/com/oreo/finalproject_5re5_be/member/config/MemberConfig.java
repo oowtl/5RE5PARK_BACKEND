@@ -67,10 +67,14 @@ public class MemberConfig {
         // 스프링 로컬 포트 번호 8080
         allowedOriginPatterns.add("http://localhost:8080");
         allowedOriginPatterns.add("http://127.0.0.1:8080");
+        allowedOriginPatterns.add("https://localhost:8080");
+        allowedOriginPatterns.add("https://127.0.0.1:8080");
 
         // 리액트 로컬 포트 번호 5173
         allowedOriginPatterns.add("http://localhost:5173");
         allowedOriginPatterns.add("http://127.0.0.1:5173");
+        allowedOriginPatterns.add("https://localhost:5173");
+        allowedOriginPatterns.add("https://127.0.0.1:5173");
 
         configuration.setAllowedOrigins(allowedOriginPatterns);
 
