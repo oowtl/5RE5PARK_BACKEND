@@ -13,6 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("https://5re5park.site")
                 .allowedOrigins("https://www.5re5park.site")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .exposedHeaders("location")
+                .allowedHeaders("*")
                 .allowCredentials(true);
     }
 }
