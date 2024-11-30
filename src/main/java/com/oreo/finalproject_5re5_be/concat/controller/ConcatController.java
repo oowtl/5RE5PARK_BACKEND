@@ -9,6 +9,7 @@ import com.oreo.finalproject_5re5_be.concat.service.ConcatService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatTabService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,18 +30,25 @@ public class ConcatController {
     private final ConcatResultService concatResultService;
     private final ProjectService projectService;
 
+    @Operation(
+            summary = "오디오 병합을 수행합니다.",
+            description = "병합이 성공 했다면 저장된 오디오 정보를 반환합니다."
+    )
     @PostMapping("")
     public ResponseEntity<ResponseDto<ConcatResultDto>> concat(@RequestBody ConcatRowRequestDto audioRequests,
                                                                @RequestParam Long memberSeq) throws IOException {
         projectService.projectCheck(memberSeq, audioRequests.getConcatTabId());
 
-        System.out.println("audioRequests.getFileName() = " + audioRequests.getFileName());
         ConcatTabResponseDto concatTabResponseDto
                 = concatTabService.readConcatTab(audioRequests.getConcatTabId(), memberSeq);
         ConcatResultDto concat = concatService.concat(concatTabResponseDto, audioRequests);
         return new ResponseDto<>(HttpStatus.OK.value(), concat).toResponseEntity();
     }
 
+    @Operation(
+            summary = "오디오 결과 목록 불러오기",
+            description = "프로젝트 번호에 해당하는 오디오 결과 목록을 반환합니다."
+    )
     @GetMapping("read/result")
     public ResponseEntity<ResponseDto<List<ConcatResultDto>>> readConcatResult(@RequestParam Long projectSeq,
                                                                                @SessionAttribute Long memberSeq) {

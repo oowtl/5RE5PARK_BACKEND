@@ -8,8 +8,8 @@ import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatRowService;
 import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
-import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,6 +32,11 @@ public class AudioFileController {
     private final ConcatRowService concatRowService;
     private final MaterialAudioService materialAudioService;
 
+
+    @Operation(
+            summary = "업로드 할 오디오 형식 검사",
+            description = "업로드 할 수 없는 오디오 목록을 반환합니다."
+    )
     @PostMapping(value = "extension/check",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -44,6 +49,10 @@ public class AudioFileController {
         return buildResponse(status, audioFileRequestDtos);
     }
 
+    @Operation(
+            summary = "오디오 업로드",
+            description = "업로드한 오디오의 정보를 반환합니다."
+    )
     @PostMapping(value = "save",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -54,6 +63,10 @@ public class AudioFileController {
         return buildResponse(HttpStatus.OK, originAudioRequests);
     }
 
+    @Operation(
+            summary = "행의 아이디에 저장된 오디오 불러오기",
+            description = "업로드 된 오디오의 정보를 반환합니다."
+    )
     @PostMapping("read")
     public ResponseEntity<ResponseDto<List<AudioFileDto>>> read(@RequestParam List<Long> concatRowSeq,
                                                                 @SessionAttribute Long memberSeq) {

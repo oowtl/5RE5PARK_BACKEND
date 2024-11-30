@@ -29,6 +29,10 @@ public class ConcatMaterialController {
         this.projectService = projectService;
     }
 
+    @Operation(
+            summary = "결과에 사용된 오디오 불러오기",
+            description = "결과에 사용된 오디오 URL을 반환 합니다."
+    )
     @GetMapping("")
     public ResponseDto<List<ConcatUrlResponse>> getMaterials(@RequestParam("concatresultseq") Long concatResultSeq,
                                                              @SessionAttribute Long memberSeq) {
@@ -45,8 +49,7 @@ public class ConcatMaterialController {
     @GetMapping("/rows")
     public ResponseEntity<ResponseDto<ConcatRowListDto>> getMaterialRowListByResultSeq(
             @NotNull @RequestParam("concatresultseq") Long concatResultSeq,
-            @SessionAttribute Long memberSeq
-    ) {
+            @SessionAttribute Long memberSeq) {
         projectService.projectCheck(memberSeq, concatResultSeq);
 
         // resultSeq로 재료가 된 concatRowList 얻어오기
