@@ -68,7 +68,7 @@ public class ConcatRowController {
 
     @Operation(
             summary = "행 조회",
-            description = "여러개의 행을 조회합니다. 이전에 비활성 된 행은 조회 할 수 없습니다."
+            description = "프로젝트의 활성 상태인 행을조회합니다. 이전에 비활성 된 행은 조회 할 수 없습니다."
     )
     @GetMapping("read/recent")
     public ResponseEntity<ResponseDto<List<ConcatRowDto>>> readRecent(
