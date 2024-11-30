@@ -87,7 +87,7 @@ public class ConcatService {
                 .option(null)
                 .audioUrl(uploadUrl)
                 .extension("WAV")
-                .fileSize((long) concat.readAllBytes().length)
+                .fileSize((long) audioData.length)
                 .fileLength(concat.getFrameLength() / concat.getFormat().getFrameRate())
                 .fileName(concatRowRequests.getFileName())
                 .build();
