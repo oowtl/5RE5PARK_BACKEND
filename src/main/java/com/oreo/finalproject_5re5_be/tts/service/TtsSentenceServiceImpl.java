@@ -27,6 +27,7 @@ import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -142,9 +143,12 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                 "Voice not found with id: " + updateRequest.getVoiceSeq()));
 
         // 2.3 styleSeq 조회 가능한 styleSeq (존재 여부) 검증 및 할당
-        Style style = styleRepository.findById(updateRequest.getStyleSeq())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "Style not found with id: " + updateRequest.getStyleSeq()));
+        Style style = null;
+        if (updateRequest.getStyleSeq() != null) {
+            style = styleRepository.findById(updateRequest.getStyleSeq())
+                .orElseThrow(() -> new EntityNotFoundException(
+                    "Style not found with id: " + updateRequest.getStyleSeq()));
+        }
 
         // 3. TtsSentenceRequest -> TtsSentence 변환
         // 3.1 TtsSentence 엔티티 조회
@@ -182,16 +186,34 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     @Override
     public TtsSentenceListDto batchSaveSentence(@Valid @NotNull Long projectSeq,
         @Valid TtsSentenceBatchRequest batchRequest) {
-        // 1. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
-        // 2. 정렬 및 정렬 순서 수정
-        List<TtsSentenceBatchInfo> batchList = batchRequest.sortSentenceList();
+        // 10개의 TTSSentence 가 있다고 가정했을 때 5개의 TTSSentence 를 수정하고 전체 정렬을 했을 때, 순서를 보장하기 위해서는?
 
-        // 3. TtsSentenceDto List 변환
-        List<TtsSentenceDto> batchedList = batchList.stream()
-            .map(batchInfo -> toSentenceDto(projectSeq, batchInfo))
+
+        // 1. DELETE 를 먼저 삭제한다. (삭제할 것들은 삭제 후에 정렬)
+        batchRequest.getSentenceList().stream()
+            .filter(sentence -> sentence.getBatchProcessType() == BatchProcessType.DELETE)
+            .forEach(sentence -> deleteSentence(projectSeq, sentence.getSentence().getTsSeq()));
+
+
+        List<TtsSentenceBatchInfo> alivedList = batchRequest.getSentenceList().stream()
+            .filter(sentence -> sentence.getBatchProcessType() != BatchProcessType.DELETE)
             .toList();
 
-        return new TtsSentenceListDto(batchedList);
+        // 살아남은 ttsSentenceList
+        TtsSentenceBatchRequest alivedRequest = TtsSentenceBatchRequest.builder()
+            .sentenceList(alivedList).build();
+
+        // 2. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
+        // 3. 정렬 및 정렬 순서 수정
+        List<TtsSentenceBatchInfo> batchList = alivedRequest.sortSentenceList();
+
+        // 4. TtsSentenceDto List 변환
+        List<TtsSentenceDto> batchedList = batchList.stream()
+            .map(batchInfo -> toSentenceDto(projectSeq, batchInfo))
+            .filter(Objects::nonNull) // not null
+            .toList();
+
+        return getSentenceList(projectSeq);
     }
 
     // batchInfo -> sentenceDto 변환
@@ -223,7 +245,17 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
             return updateSentence(projectSeq, sentenceInfo.getTsSeq(), sentenceRequest);
         }
 
-        // 3.3 해당하는 BatchProcessType 가 없으면 예외 발생
+        // 3.3 DELETE : updateSentence
+        if (batchInfo.getBatchProcessType() == BatchProcessType.DELETE) {
+            boolean deleteResult = deleteSentence(projectSeq, sentenceInfo.getTsSeq());
+
+            // deleteResult == false, 삭제 안됨
+            if (deleteResult) {
+                return null;
+            }
+        }
+
+        // 4 해당하는 BatchProcessType 가 없으면 예외 발생
         throw new TtsSentenceInValidInput("BatchProcessType is invalid");
     }
 
@@ -247,7 +279,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                 () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
 
         // 2. Project 에 연관된 TtsSentence 리스트 조회
-        List<TtsSentence> ttsSentenceList = ttsSentenceRepository.findAllByProject(project);
+        List<TtsSentence> ttsSentenceList = ttsSentenceRepository.findAllByProjectOrderBySortOrder(project);
 
         // 3. TtsSentenceDto 리스트 변환 및 반환
         return TtsSentenceListDto.of(ttsSentenceList);
@@ -259,7 +291,15 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
             .orElseThrow(EntityNotFoundException::new);
 
-        // 2. TtsSentence 삭제 (TtsSentence 만 삭제)
+        // 1.1 ttsSentence 에 연관된 ttsProgressStatusList 조회
+        List<TtsProgressStatus> ttsProgressStatusList = ttsProgressStatusRepository
+            .findAllByTtsSentence(ttsSentence);
+
+        // 2. 삭제
+        // 2.1 TtsProgressStatus 삭제
+        ttsProgressStatusList.forEach(ttsProgressStatusRepository::delete);
+
+        // 2.2 TtsSentence 삭제
         ttsSentenceRepository.delete(ttsSentence);
 
         // 3. 결과 반환

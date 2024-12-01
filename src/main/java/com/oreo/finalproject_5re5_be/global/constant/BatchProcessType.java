@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 public enum BatchProcessType {
     CREATE("CREATE"),
-    UPDATE("UPDATE");
+    UPDATE("UPDATE"),
+    DELETE("DELETE");
 
     private final String type;
 
@@ -15,7 +16,7 @@ public enum BatchProcessType {
     }
 
     @JsonCreator
-    public BatchProcessType from(String value) {
+    public static BatchProcessType from(String value) {
         return BatchProcessType.valueOf(value.toUpperCase());
     }
 }

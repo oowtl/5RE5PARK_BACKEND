@@ -21,7 +21,7 @@ public class TtsProgressStatus extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tpsSeq;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name="ts_seq", nullable = false)
     private TtsSentence ttsSentence;
 
