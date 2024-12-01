@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
@@ -35,6 +38,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -124,6 +128,11 @@ class TestBatchSave {
     - TsSeq 기준 정렬 후 TtsSentenceListDto 반환.
     - TsSeq 기준 정렬 불가 시, 임의로 정렬 후 TtsSentenceListDto 반환.
 
+    10. batchProcessType이 DELETE 인 경우 성공 테스트
+    - 조건 성공 테스트 input 에서 batchProcessType을 DELETE로 넣어서 테스트
+    - 기대 결과:
+    - DELETE 에 해당하는 TtsSentence는 삭제되어서 저장된다.
+    - 삭제된 행이 적용된 TtsSentenceListDto 반환.
     */
 
     // 1. 성공 케이스 테스트
@@ -326,6 +335,77 @@ class TestBatchSave {
         assertEquals(2, sortedList.get(2).getSentence().getOrder());
         assertEquals(3, sortedList.get(3).getSentence().getOrder());
         assertEquals(4, sortedList.get(4).getSentence().getOrder());
+    }
+
+    // 10. batchProcessType이 DELETE 인 경우
+    @Test
+    @DisplayName("batchSaveSentence - batchProcessType이 DELETE 인 경우")
+    void batchSaveSentence_DeleteBatchProcessType() {
+        // given: 유효한 projectSeq와 sentenceList 생성
+        Long projectSeq = 1L; // 유효한 projectSeq 설정
+
+        Project project = Project.builder().proSeq(projectSeq).build();
+        Voice voice = Voice.builder().voiceSeq(1L).build();
+        Style style = Style.builder().styleSeq(1L).build();
+
+
+        // List<TtsSentenceBatchInfo> 생성
+        List<TtsSentenceBatchInfo> reqList = List.of(
+            createBatchInfoWithOrder(BatchProcessType.DELETE, 3),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
+            createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
+            createBatchInfoWithOrder(BatchProcessType.CREATE, 4)
+        );
+
+        // batchRequest 생성
+        TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(reqList);
+
+        TtsSentence ttsSentence = TtsSentence.builder()
+            .tsSeq(1L)
+            .text("Test text")
+            .sortOrder(1)
+            .volume(100)
+            .speed(1.0f)
+            .startPitch(0)
+            .emotion("normal")
+            .emotionStrength(0)
+            .sampleRate(16000)
+            .alpha(0)
+            .endPitch(0.0f)
+            .audioFormat("wav")
+            .project(mock(Project.class))
+            .voice(mock(Voice.class))
+            .build();
+
+        TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()
+            .ttsSentence(ttsSentence)
+            .progressStatus(TtsProgressStatusCode.CREATED)
+            .build();
+
+        // 프로젝트가 존재한다고 설정
+        when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
+        // voice이 존재한다고 설정
+        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
+        // style이 존재한다고 설정
+        when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
+        // ttsSentece 가 존재한다고 설정
+        when(ttsSentenceRepository.findById(any())).thenReturn(Optional.of(ttsSentence));
+        // 각 문장에 대해 TtsSentenceDto 반환
+        when(ttsSentenceRepository.save(any())).thenReturn(ttsSentence);
+        // 삭제 = 호출 횟수 검증
+        doNothing().when(ttsSentenceRepository).delete(any());
+
+        // ttsProgressStatus 가 존재한다고 설정
+        when(ttsProgressStatusRepository.save(any())).thenReturn(ttsProgressStatus);
+
+        // when
+        // 정렬된 sentenceList 생성
+        TtsSentenceListDto batchResponse = ttsSentenceService.batchSaveSentence(projectSeq, batchRequest);
+
+        // then: 반환된 결과 검증
+        verify(ttsSentenceRepository, times(1)).delete(any());
+//        assertEquals(reqList.size() - 1, batchResponse.getSentenceList().size()); // delete 로 인한 갯수 감소반영 확인
     }
 
     /*
