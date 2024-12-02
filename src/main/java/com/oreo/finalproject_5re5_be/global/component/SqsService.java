@@ -30,15 +30,19 @@ public class SqsService {
     }
 
     public Message sendMessage(SqsRequestDto sqsRequestDto) throws TimeoutException {
-        // 변수
+        // 변수 설정
+        // 가상 대기열 사용
         String requestQueueUrl = sqsQueueUrl + virtualQueueName;
+
+        // 메세지 타입 설정
+        String messageType = sqsRequestDto.getMessageType().getType();
 
         // message attribute 설정
         Map<String, MessageAttributeValue>  messageAttributes = new HashMap<>();
 
-        // message attribute 추가 예시 코드
-        // messageAttributes.put("Name",
-        //    MessageAttributeValue.builder().dataType("String").stringValue("John").build());
+        // message attribute 추가
+        messageAttributes.put("messageType",
+            MessageAttributeValue.builder().dataType("String").stringValue(messageType).build());
 
         // messgae 생성
         String message = sqsRequestDto.getMessage();
