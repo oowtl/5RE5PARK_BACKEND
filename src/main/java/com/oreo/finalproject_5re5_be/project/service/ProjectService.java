@@ -20,6 +20,6 @@ public interface ProjectService {
     Long projectSave(Long memberSeq);
     void projectUpdate(@Valid @NotNull Long projectSeq,@Valid @NotNull String projectName);
     void projectDelete(@Valid @NotNull List<Long> projectSeq);
-    boolean projectCheck(Long memberSeq, Long projectSeq);
-    boolean projectCheck(Long memberSeq, List<Long> projectSeq);
+    boolean projectCheck(Long memberSeq, @Valid @NotNull Long projectSeq);
+    boolean projectCheck(Long memberSeq, @Valid @NotNull List<Long> projectSeq);
 }

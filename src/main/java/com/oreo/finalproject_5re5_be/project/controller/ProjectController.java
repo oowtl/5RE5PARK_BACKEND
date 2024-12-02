@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -74,8 +75,8 @@ public class ProjectController {
     @PutMapping("/{proSeq}")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
             @SessionAttribute(value = "memberSeq") Long memberSeq,
-            @Valid @PathVariable Long proSeq,
-            @Valid @RequestBody String text){
+            @Valid @NotNull @PathVariable Long proSeq,
+            @Valid @NotNull @RequestBody String text){
         projectService.projectCheck(memberSeq, proSeq); //회원의 프로젝트인지 확인
         projectService.projectUpdate(proSeq, text);//프로젝트 수정
         return ResponseEntity.ok()
@@ -88,7 +89,7 @@ public class ProjectController {
     )
     @DeleteMapping("")
     public ResponseEntity<ResponseDto<String>> projectDelete(
-            @RequestParam List<Long> proSeq,
+            @Valid @NotNull @RequestParam List<Long> proSeq,
             @SessionAttribute(value = "memberSeq") Long memberSeq){
         projectService.projectCheck(memberSeq, proSeq); //회원의 프로젝트인지 확인
         projectService.projectDelete(proSeq);//프로젝트 삭제 배열로 받음
