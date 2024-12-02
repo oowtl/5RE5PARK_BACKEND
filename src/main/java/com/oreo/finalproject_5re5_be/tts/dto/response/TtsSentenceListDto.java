@@ -13,15 +13,16 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class TtsSentenceListDto {
+
     private List<TtsSentenceDto> sentenceList;
 
     public static TtsSentenceListDto of(List<TtsSentence> ttsSentenceList) {
         List<TtsSentenceDto> sentenceList = ttsSentenceList.stream()
-                .map(TtsSentenceDto::of)
-                .toList();
+            .map(TtsSentenceDto::of)
+            .toList();
 
         return TtsSentenceListDto.builder()
-                .sentenceList(sentenceList)
-                .build();
+            .sentenceList(sentenceList)
+            .build();
     }
 }

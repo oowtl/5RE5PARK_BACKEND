@@ -30,6 +30,7 @@ public class SwaggerConfig {
         //swagger servers 지정
         List<Server> server = new ArrayList<>();
         server.add(new Server().description("https Server").url("https://5re5park.site"));
+        server.add(new Server().description("http Server").url("http://5re5park.site:8080"));
         server.add(new Server().description("localhost").url("http://localhost:8080"));
 
         OpenAPI info = new OpenAPI()

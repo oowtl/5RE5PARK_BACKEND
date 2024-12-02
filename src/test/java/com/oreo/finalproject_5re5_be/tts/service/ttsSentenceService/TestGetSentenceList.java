@@ -92,7 +92,7 @@ class TestGetSentenceList {
             .toList();
 
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(mockProject));
-        when(ttsSentenceRepository.findAllByProject(mockProject)).thenReturn(ttsSentenceList);
+        when(ttsSentenceRepository.findAllByProjectOrderBySortOrder(mockProject)).thenReturn(ttsSentenceList);
 
         // when
         TtsSentenceListDto result = ttsSentenceService.getSentenceList(projectSeq);
@@ -131,7 +131,7 @@ class TestGetSentenceList {
         Project mockProject = Project.builder().proSeq(projectSeq).build();
 
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(mockProject));
-        when(ttsSentenceRepository.findAllByProject(mockProject)).thenReturn(List.of()); // 빈 리스트 반환
+        when(ttsSentenceRepository.findAllByProjectOrderBySortOrder(mockProject)).thenReturn(List.of()); // 빈 리스트 반환
 
         // when
         TtsSentenceListDto result = ttsSentenceService.getSentenceList(projectSeq);

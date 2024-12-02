@@ -217,7 +217,7 @@ public class TtsSentenceRepositoryTest {
 
         // when
         // 4. Project로 조회
-        List<TtsSentence> sentences = ttsSentenceRepository.findAllByProject(project);
+        List<TtsSentence> sentences = ttsSentenceRepository.findAllByProjectOrderBySortOrder(project);
 
         // then
         // 5. 조회된 TtsSentence 검증
