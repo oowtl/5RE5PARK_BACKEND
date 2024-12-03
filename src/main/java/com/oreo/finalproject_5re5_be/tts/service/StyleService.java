@@ -15,9 +15,9 @@ public class StyleService {
     private final StyleRepository styleRepository;
     private final LanguageRepository languageRepository;
 
-    public StyleService(StyleRepository styleRepository, LanguageRepository languageRepository, LanguageRepository languageRepository1) {
+    public StyleService(StyleRepository styleRepository, LanguageRepository languageRepository) {
         this.styleRepository = styleRepository;
-        this.languageRepository = languageRepository1;
+        this.languageRepository = languageRepository;
     }
 
     public StyleListDto getStyleList() {
