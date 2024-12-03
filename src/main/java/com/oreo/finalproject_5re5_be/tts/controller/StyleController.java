@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "TTS-Voice", description = "Voice의 Style 관련 API")
@@ -28,6 +29,18 @@ public class StyleController {
 
         // 스타일 전체 조회 결과 가져오기
         StyleListDto styleListDto = styleService.getStyleList();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto<>(HttpStatus.OK.value(), styleListDto));
+    }
+
+    @GetMapping(params = "languagecode")
+    public ResponseEntity<ResponseDto<StyleListDto>> getStyleListByLang(
+            @RequestParam("languagecode") String langCode
+    ) {
+        // langCode로 목소리가 존재하는 스타일 조회 결과 가져오기
+        StyleListDto styleListDto = styleService.getStyleListByLang(langCode);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
