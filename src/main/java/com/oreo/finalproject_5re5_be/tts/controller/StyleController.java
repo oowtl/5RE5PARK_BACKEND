@@ -7,6 +7,7 @@ import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.tts.dto.response.StyleListDto;
 import com.oreo.finalproject_5re5_be.tts.service.StyleService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -81,6 +82,8 @@ public class StyleController {
                 .body(new ResponseDto<>(HttpStatus.OK.value(), styleListDto));
     }
 
+    @Operation(summary = "언어 코드로 voice가 있는 style만 조회")
+    @Parameter(name="languagecode", description = "언어 코드명을 작성해주세요")
     @GetMapping(params = "languagecode")
     public ResponseEntity<ResponseDto<StyleListDto>> getStyleListByLang(
             @RequestParam("languagecode") @NotNull String langCode
