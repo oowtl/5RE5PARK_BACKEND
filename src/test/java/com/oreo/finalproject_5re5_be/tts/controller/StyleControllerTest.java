@@ -93,7 +93,7 @@ class StyleControllerTest {
     // 언어 코드로 목소리가 있는 스타일 조회 테스트
     //  1. 존재하는 언어 코드로 조회 -> 응답 상태 200, response에 StyleListDto 반환
     @Test
-    @DisplayName("스타일 전체 조회 테스트 - 여러 개 데이터 조회")
+    @DisplayName("언어 코드로 조회 테스트 - 존재하는 언어 코드로 조회")
     public void getStyleListByLangTest() throws Exception {
         // given: 유효한 언어 코드 및 2개 데이터가 들어간 스타일 리스트 생성
         String existLangCode = "exist-lang-code";
@@ -105,7 +105,7 @@ class StyleControllerTest {
         when(styleService.getStyleListByLang(existLangCode)).thenReturn(styleListDto);
 
         // then: 유효한 언어 코드 값을 파라미터로 전달하면 getStyleListByLang 컨트롤러가 정상 수행되어야 함
-        mockMvc.perform(get("/api/style")
+        mockMvc.perform(get("/api/style/search")
                         .param("languagecode", existLangCode))
                 .andExpect(status().isOk()) // HTTP 상태 코드 검증
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())) // 응답 상태 코드 검증
@@ -116,7 +116,7 @@ class StyleControllerTest {
 
     //  2. 존재하지 않는 언어 코드로 조회 -> 응답 상태 400, ErrorResponse 반환
     @Test
-    @DisplayName("스타일 전체 조회 테스트 - 여러 개 데이터 조회")
+    @DisplayName("언어 코드로 조회 테스트 - 존재하지 않는 언어 코드로 조회")
     public void getStyleListByNotExistLangTest() throws Exception {
         // given: 존재하지 않는 언어 코드 초기화
         String notExistLangCode = "not-exist-lang-code";
@@ -126,7 +126,7 @@ class StyleControllerTest {
         when(styleService.getStyleListByLang(notExistLangCode)).thenThrow(throwException);
 
         // then: 존재하지 않는 언어 코드 값을 파라미터로 전달하면 BusinessException 핸들러가 수행되어야 함
-        mockMvc.perform(get("/api/style")
+        mockMvc.perform(get("/api/style/search")
                         .param("languagecode", notExistLangCode))
                 .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
                 .andExpect(jsonPath("$.status").value(throwException.getErrorCode().getStatus()))

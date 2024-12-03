@@ -84,7 +84,7 @@ public class StyleController {
 
     @Operation(summary = "언어 코드로 voice가 있는 style만 조회")
     @Parameter(name="languagecode", description = "언어 코드명을 작성해주세요")
-    @GetMapping(params = "languagecode")
+    @GetMapping("/search")
     public ResponseEntity<ResponseDto<StyleListDto>> getStyleListByLang(
             @RequestParam("languagecode") @NotNull String langCode
     ) {
