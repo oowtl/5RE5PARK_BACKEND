@@ -7,6 +7,7 @@ import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcRowRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcTextRequest;
+import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
 import com.oreo.finalproject_5re5_be.vc.service.VcApiService;
 import com.oreo.finalproject_5re5_be.vc.service.VcHistoryService;
 import com.oreo.finalproject_5re5_be.vc.service.VcService;
@@ -237,13 +238,17 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, Object>>> vc(
             @Valid @PathVariable Long proSeq,
             HttpSession session){
+        log.info("[VcController] vc 조회 - project : {} , ssession : {} ",
+                proSeq, (Long) session.getAttribute("memberSeq"));
         //회원의 정보인지 확인
-        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq);
+        boolean memberSeq = projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq);
+        log.info("[VcController] vc 조회 - memberSeq boolean : {} ",memberSeq);
         //Project 의 src, result, text 정보 추출
+        List<VcResponse> vcResponse = vcService.getVcResponse(proSeq);
+        log.info("[VcController] vc 조회 - memberSeq boolean : {} ",vcResponse.toString());
         try{
             return ResponseEntity.ok()
-                    .body(new ResponseDto<>(HttpStatus.OK.value(), createOneResultMap("row",
-                            vcService.getVcResponse(proSeq))));
+                    .body(new ResponseDto<>(HttpStatus.OK.value(), createOneResultMap("row",vcResponse)));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),

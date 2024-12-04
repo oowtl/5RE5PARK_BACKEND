@@ -43,10 +43,20 @@ public class ProjectController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
 //            @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpSession session){//session memberSeq값
+        Object memberSeq = session.getAttribute("memberSeq");
+        log.info("[ProjectController] memberSeq - memberSeq : {}", memberSeq != null ? memberSeq : "null");
+
+        Long memberSeqLong = (Long) memberSeq;
+        log.info("[ProjectController] memberSeq - memberSeqLong : {}", memberSeqLong);
+
+        log.info("[ProjectController] projectGet - session : {} ", session);
         try{
             //회원정보로 프로젝트 추출
-        List<ProjectResponse> projectResponses = projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
+            log.info("[ProjectController] projectGet - memberSeq : {} ", (Long) session.getAttribute("memberSeq"));
+            List<ProjectResponse> projectResponses = projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
 //        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
+            log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
+
             Map<String, List<Object>> map = new HashMap<>();//맵 생성
             map.put("row", Collections.singletonList(projectResponses));//row : [] 로 응답
             return ResponseEntity.ok()
