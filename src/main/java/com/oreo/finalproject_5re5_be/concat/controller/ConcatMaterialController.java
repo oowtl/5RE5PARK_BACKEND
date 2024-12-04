@@ -5,6 +5,7 @@ import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +37,8 @@ public class ConcatMaterialController {
     )
     @GetMapping("")
     public ResponseDto<List<ConcatUrlResponse>> getMaterials(@RequestParam("concatresultseq") Long concatResultSeq,
-                                                             @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatResultSeq);
+                                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        projectService.projectCheck(userDetails.getMember().getSeq(), concatResultSeq);
 
         List<ConcatUrlResponse> audioFilesByConcatResultSeq
                 = materialAudioService.findAudioFilesByConcatResultSeq(concatResultSeq);
@@ -49,8 +51,8 @@ public class ConcatMaterialController {
     @GetMapping("/rows")
     public ResponseEntity<ResponseDto<ConcatRowListDto>> getMaterialRowListByResultSeq(
             @NotNull @RequestParam("concatresultseq") Long concatResultSeq,
-            @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatResultSeq);
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        projectService.projectCheck(userDetails.getMember().getSeq(), concatResultSeq);
 
         // resultSeq로 재료가 된 concatRowList 얻어오기
         List<ConcatRow> materialConcatRowList = materialAudioService.findConcatRowListByResultSeq(concatResultSeq);

@@ -8,12 +8,14 @@ import com.oreo.finalproject_5re5_be.concat.service.ConcatResultService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatTabService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -51,8 +53,8 @@ public class ConcatController {
     )
     @GetMapping("read/result")
     public ResponseEntity<ResponseDto<List<ConcatResultDto>>> readConcatResult(@RequestParam Long projectSeq,
-                                                                               @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, projectSeq);
+                                                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
+        projectService.projectCheck(userDetails.getMember().getSeq(), projectSeq);
 
         return new ResponseDto<>(HttpStatus.OK.value(), concatResultService.findByConcatTabSequence(projectSeq)).toResponseEntity();
     }

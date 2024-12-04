@@ -11,12 +11,15 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 // 로그인 성공시 처리되는 핸들러
+@Slf4j
 @Component
 public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -52,17 +55,14 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             memberId = userDetails.getUsername();
             memberSeq = 0L;
         }
-
-        System.out.println("memberSeq = " + memberSeq);
-        System.out.println("memberId = " + memberId);
+        log.info("memberSeq = {}", memberSeq);
+        log.info("memberId = {}", memberId);
 
         // 세션 조회
         HttpSession session = request.getSession();
         // 세션에 아이디 등록
         session.setAttribute("memberId", memberId);
         session.setAttribute("memberSeq", memberSeq);
-
-
 
         // 세션 처리
         handleCookie(request, response, authentication);

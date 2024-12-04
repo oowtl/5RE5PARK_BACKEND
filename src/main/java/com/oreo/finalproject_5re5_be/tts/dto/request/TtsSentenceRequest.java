@@ -15,8 +15,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 public class TtsSentenceRequest {
-    @Schema(description = "스타일 ID", example = "1")
-    private Long styleSeq; // 스타일 id
 
     @Schema(description = "목소리 ID", example = "1")
     @NotNull(message = "voiceSeq is required")
@@ -33,9 +31,8 @@ public class TtsSentenceRequest {
     @Valid
     private TtsAttributeInfo attribute; // 옵션 정보
 
-    public static TtsSentenceRequest of(Long styleSeq, Long voiceSeq, String text, Integer order, TtsAttributeInfo attribute) {
+    public static TtsSentenceRequest of(Long voiceSeq, String text, Integer order, TtsAttributeInfo attribute) {
         return TtsSentenceRequest.builder()
-                .styleSeq(styleSeq)
                 .voiceSeq(voiceSeq)
                 .text(text)
                 .order(order)

@@ -88,10 +88,6 @@ class TestUpdateSentence {
     - updateRequest.getVoiceSeq()에 해당하는 Voice가 존재하지 않음.
     - 결과: 404 Not Found 반환, "Voice not found with id: <voiceSeq>" 에러 메시지.
 
-    3.4. 존재하지 않는 styleSeq
-    - updateRequest.getStyleSeq()에 해당하는 Style이 존재하지 않음.
-    - 결과: 404 Not Found 반환, "Style not found with id: <styleSeq>" 에러 메시지.
-
     4. 예외 처리
     - updateRequest가 null인 경우 IllegalArgumentException 발생.
     - DB 저장(save) 과정에서 예외 발생 (예: 데이터 무결성 위반).
@@ -273,7 +269,7 @@ class TestUpdateSentence {
     }
 
     private static TtsAttributeInfo createAttributeInfo() {
-        return TtsAttributeInfo.builder().volume(100) // 유효한 volume 설정
+        return TtsAttributeInfo.builder().volume(10) // 유효한 volume 설정
             .speed(1.0f) // 유효한 speed 설정
             .stPitch(0)  // 유효한 stPitch 설정
             .emotion("neutral") // 유효한 emotion 설정
@@ -287,7 +283,6 @@ class TestUpdateSentence {
 
     private static TtsSentenceRequest createSentenceRequest(TtsAttributeInfo attributeInfo) {
         return TtsSentenceRequest.builder().voiceSeq(1L) // 유효한 voiceSeq 설정
-            .styleSeq(1L) // 유효한 styleSeq 설정
             .text("Valid text") // 유효한 텍스트 설정
             .order(1) // 표시 순서 설정
             .attribute(attributeInfo) // 유효한 속성 정보 설정

@@ -1,14 +1,17 @@
 package com.oreo.finalproject_5re5_be.project.controller;
 
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Project", description = "Project 관련 API")
 @RestController
 @Slf4j
 @Validated
@@ -36,10 +40,11 @@ public class ProjectController {
     )
     @GetMapping("")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
-            @SessionAttribute(value = "memberSeq") Long memberSeq){//session memberSeq값
+            @AuthenticationPrincipal CustomUserDetails userDetails){//session memberSeq값
         try{
             //회원정보로 프로젝트 추출
-        List<ProjectResponse> projectResponses = projectService.projectFindAll(memberSeq);
+//        List<ProjectResponse> projectResponses = projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
+        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
             Map<String, List<Object>> map = new HashMap<>();//맵 생성
             map.put("row", Collections.singletonList(projectResponses));//row : [] 로 응답
             return ResponseEntity.ok()
@@ -57,9 +62,9 @@ public class ProjectController {
     )
     @PostMapping("")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
-            @SessionAttribute(value = "memberSeq") Long memberSeq){//session memberSeq값
+            @AuthenticationPrincipal CustomUserDetails userDetails){//session memberSeq값
         //project 생성
-        Long projectSeq = projectService.projectSave(memberSeq);
+        Long projectSeq = projectService.projectSave(userDetails.getMember().getSeq());
         Map<String, Object> map = new HashMap<>();
         map.put("projectSeq", projectSeq);//프로젝트seq 응답에 추가
         map.put("msg", "프로젝트 생성 완료되었습니다.");//메시지 추가
@@ -71,13 +76,13 @@ public class ProjectController {
             summary = "Project 이름 수정(저장)",
             description = "프로젝트 Seq와 변경할 이름을 받아 수정합니다."
     )
-    @PutMapping("/{proSeq}")
+    @PutMapping("")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
-            @SessionAttribute(value = "memberSeq") Long memberSeq,
-            @Valid @PathVariable Long proSeq,
-            @Valid @RequestBody String text){
-        projectService.projectCheck(memberSeq, proSeq); //회원의 프로젝트인지 확인
-        projectService.projectUpdate(proSeq, text);//프로젝트 수정
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody Long proSeq,
+            @Valid @RequestBody String projectName){
+        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq); //회원의 프로젝트인지 확인
+        projectService.projectUpdate(proSeq, projectName);//프로젝트 수정
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
                         "Project 이름 변경 완료되었습니다.")); //응답 
@@ -89,8 +94,8 @@ public class ProjectController {
     @DeleteMapping("")
     public ResponseEntity<ResponseDto<String>> projectDelete(
             @RequestParam List<Long> proSeq,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
-        projectService.projectCheck(memberSeq, proSeq); //회원의 프로젝트인지 확인
+            @AuthenticationPrincipal CustomUserDetails userDetails){
+        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq); //회원의 프로젝트인지 확인
         projectService.projectDelete(proSeq);//프로젝트 삭제 배열로 받음
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),

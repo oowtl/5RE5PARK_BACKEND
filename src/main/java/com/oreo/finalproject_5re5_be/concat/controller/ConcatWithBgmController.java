@@ -15,6 +15,7 @@ import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import com.oreo.finalproject_5re5_be.global.constant.MessageType;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.services.sqs.model.Message;
 
@@ -78,6 +80,7 @@ public class ConcatWithBgmController {
             @RequestBody BgmFunctionRequestDto bgmFunctionRequestDto,
             @SessionAttribute Long memberSeq) {
         projectService.projectCheck(memberSeq, concatTabSeq);
+
         try {
 
             //SQS로 메세지 보내기. 각각 messageBody와 messageAttribute로 들어갈 내용

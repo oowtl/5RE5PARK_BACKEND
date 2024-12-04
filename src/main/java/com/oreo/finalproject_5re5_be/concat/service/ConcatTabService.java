@@ -92,8 +92,8 @@ public class ConcatTabService {
 
 
     @Transactional
-    public boolean updateConcatTab(ConcatUpdateRequestDto concatUpdateRequestDto) {
-        MemberReadResponse member = memberService.read(concatUpdateRequestDto.getMemberId());
+    public boolean updateConcatTab(ConcatUpdateRequestDto concatUpdateRequestDto, Long memberSeq) {
+        MemberReadResponse member = memberService.read(memberSeq);
 
         if (member == null) {
             throw new NoSuchElementException("회원 정보를 찾을 수 없습니다.");
