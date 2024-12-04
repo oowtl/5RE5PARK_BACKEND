@@ -17,14 +17,14 @@ import lombok.*;
 @Builder
 public class TtsAttributeInfo {
 
-    @Schema(description = "음성 크기", example = "100")
+    @Schema(description = "음성 크기", example = "0")
     @NotNull(message = "volume 는 필수 입력값입니다.")
-    @Min(value = 0, message = "volume 는 0이상 부터 설정할 수 있습니다.")
-    @Max(value = 100, message = "volume 는 100이하 까지 설정할 수 있습니다.")
+    @Min(value = -10, message = "volume 는 -10이상 부터 설정할 수 있습니다.")
+    @Max(value = 10, message = "volume 는 10이하 까지 설정할 수 있습니다.")
     private Integer volume;            // 음성 크기
 
     @Schema(description = "음성 속도", example = "1.0")
-    @Positive(message = "speed 는 0이상 부터 설정할 수 있습니다.") // 양수 허용
+    @Positive(message = "speed 는 0.25이상 부터 설정할 수 있습니다.") // 양수 허용
     private Float speed;           // 음성 속도
 
     @Schema(description = "시작 음성 높낮이", example = "0")
