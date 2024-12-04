@@ -129,13 +129,12 @@ public class VcController {
         //회원의 정보인지 확인
         vcService.srcCheck(memberSeq, srcSeq);
         //결과 파일 생성(VC API)
-//        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
-//                vcService.getSrcFile(srcSeq),//srcFile
-//                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
-        List<MultipartFile> resultFile = new ArrayList<>();
-        MultipartFile file = AudioFileTypeConverter.convertFileToMultipartFile(new File("ttsoutput.mp3"));
-
-        resultFile.add(file);//API가 사용되지 않게 test로 반환
+        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
+                vcService.getSrcFile(srcSeq),//srcFile
+                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
+//        List<MultipartFile> resultFile = new ArrayList<>();
+//        MultipartFile file = AudioFileTypeConverter.convertFileToMultipartFile(new File("ttsoutput.mp3"));
+//        resultFile.add(file);//API가 사용되지 않게 test로 반환
         log.info("[VcController] resultSave  resultFile: {} ", resultFile);
 
         //SRC 파일 삭제(spring 서버에서 삭제)
