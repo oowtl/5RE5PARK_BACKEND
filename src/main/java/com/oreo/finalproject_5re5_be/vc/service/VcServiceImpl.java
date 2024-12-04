@@ -413,18 +413,17 @@ public class VcServiceImpl implements VcService{
 
     /**
      * VcTextRequest 객체 생성
-     * @param srcSeq
      * @param text
      * @return
      */
     @Override
-    public List<VcTextRequest> vcTextResponses(List<Long> srcSeq, List<String> text) {
+    public List<VcTextRequest> vcTextResponses(List<VcTextRequest> text) {
         //srcSeq 개수 가지고 생성자 리턴
-        return IntStream.range(0, srcSeq.size())
-                .mapToObj(i -> VcTextRequest.of(srcSeq.get(i), text.get(i)))
+
+        return IntStream.range(0, text.size())
+                .mapToObj(i -> VcTextRequest.of(text.get(i).getSeq(), text.get(i).getText()))
                 .collect(Collectors.toList());
     }
-
     /**
      * Srcseq로 url을 찾는 메서드
      * @param srcSeq

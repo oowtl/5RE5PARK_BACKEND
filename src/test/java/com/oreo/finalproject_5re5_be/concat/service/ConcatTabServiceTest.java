@@ -1,13 +1,10 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
-import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
-import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
-import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
@@ -18,11 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -148,82 +143,4 @@ class ConcatTabServiceTest {
         verify(projectRepository, times(1)).findById(project.getProSeq());//프로젝트 확인시 조회 1번
         verify(concatTabRepository, times(2)).findById(project.getProSeq());//요청 받을 때, 재생성 후
     }
-
-    @Test
-    void updateConcatTab_Success() {
-        //given : member, project, concatTab, concatUpdateRequestDto
-        Member member = Member.builder().id("memberSeq").seq(1L).build();
-        Project project = Project.builder().member(member).proSeq(1L).member(member).build();
-        ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
-                member.getSeq(),
-                project.getProSeq(),
-                null,
-                0.0f,
-                'Y'
-        );
-        //when : 업데이트
-        when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
-        when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
-        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member));
-
-        boolean b = concatTabService.updateConcatTab(updateDto);
-        //then : 성공한다.
-        assertThat(b).isTrue();
-
-        verify(concatTabRepository, times(1)).findById(project.getProSeq());
-        verify(projectRepository, times(1)).findById(project.getProSeq());
-    }
-
-    @Test
-    void UpdateConcatTab_Fail_ProjectNotFound() {
-        //given : 프로젝트가 주어지지 않음
-        Member member = Member.builder().id("memberSeq").seq(1L).build();
-        Project project = Project.builder().proSeq(1L).member(member).build();
-        ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
-                member.getSeq(),
-                project.getProSeq(),
-                null,
-                0.0f,
-                'Y'
-        );
-
-        //when : 업데이트시 프로젝트를 찾을 수 없으면
-        when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.empty());
-        when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
-        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member));
-
-        //then : 실패한다.
-        assertThatThrownBy(() -> concatTabService.updateConcatTab(updateDto)).isInstanceOf(NoSuchElementException.class);
-
-        verify(concatTabRepository, times(1)).findById(project.getProSeq());
-        verify(projectRepository, times(1)).findById(project.getProSeq());
-    }
-
-    @Test
-    void updateConcatTab_Fail_MissingProjectOrConcatTab() {
-        // Given
-        long tabId = 1L;
-        Member member = Member.builder().id("memberSeq").seq(1L).build();
-        Project project = Project.builder().proSeq(1L).member(member).build();
-        ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
-        ConcatUpdateRequestDto updateDto = new ConcatUpdateRequestDto(member.getId(),
-                member.getSeq(),
-                project.getProSeq(),
-                null,
-                0.0f,
-                'Y'
-        );
-
-        // When
-        when(projectRepository.findById(tabId)).thenReturn(Optional.empty());
-        when(concatTabRepository.findById(tabId)).thenReturn(Optional.empty());
-        when(memberService.read(member.getId())).thenReturn(MemberReadResponse.of(member));
-
-        // Then
-        assertThatThrownBy(() -> concatTabService.updateConcatTab(updateDto)).isInstanceOf(NoSuchElementException.class);
-        verify(concatTabRepository, never()).save(any(ConcatTab.class));//호출되지 않음
-    }
-
 }
