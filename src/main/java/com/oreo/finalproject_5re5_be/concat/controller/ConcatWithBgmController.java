@@ -16,6 +16,7 @@ import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sound.sampled.AudioFormat;
@@ -78,8 +80,8 @@ public class ConcatWithBgmController {
             @Parameter(description = "S3에 저장된 BGM 파일의 URL", required = true) @RequestParam String bgmFileUrl,
             @Parameter(description = "결과물이 나온 concatTab", required = true) @RequestParam Long concatTabSeq,
             @Parameter(description = "user가 설정한 결과물 파일 이름", required = true) @RequestParam String concatResultFileName,
-            @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatTabSeq);
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), concatTabSeq);
         try {
             IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
 

@@ -75,10 +75,10 @@ public class AudioFileController {
     )
     @PostMapping("read")
     public ResponseEntity<ResponseDto<List<AudioFileDto>>> read(@RequestParam List<Long> concatRowSeq,
-                                                                @SessionAttribute Long memberSeq) {
+                                                                @AuthenticationPrincipal CustomUserDetails userDetails) {
         concatRowSeq.forEach(seq -> {
             Long projectId = concatRowService.readConcatRow(seq).getConcatTab().getProjectId();
-            projectService.projectCheck(memberSeq, projectId);
+            projectService.projectCheck(userDetails.getMember().getSeq(), projectId);
         });
 
         concatRowSeq.sort(Long::compareTo);
@@ -110,9 +110,9 @@ public class AudioFileController {
             description = "숫자 배열을 반환합니다. 숫자는 0부터 시작합니다."
     )
     @GetMapping("read/my/audio/pages")
-    public ResponseEntity<ResponseDto<List<Integer>>> readMyAudioPages(@SessionAttribute Long memberSeq,
+    public ResponseEntity<ResponseDto<List<Integer>>> readMyAudioPages(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                        @RequestParam int size) {
-        return buildResponse(HttpStatus.OK, audioFileService.getAudioFilePages(memberSeq, size));
+        return buildResponse(HttpStatus.OK, audioFileService.getAudioFilePages(userDetails.getMember().getSeq(), size));
     }
 
     private List<AudioFileRequestDto> convertToDto(List<MultipartFile> audioFiles) {
