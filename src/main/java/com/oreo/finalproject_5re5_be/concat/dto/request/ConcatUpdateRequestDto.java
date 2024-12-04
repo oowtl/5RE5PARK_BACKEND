@@ -11,10 +11,9 @@ import lombok.ToString;
 @Builder
 @Getter
 public class ConcatUpdateRequestDto {
-    private final String memberId;
-    private final Long memberSeq;
     private final Long tabId;
     private final ConcatOptionDto concatOption;
     private final float frontSilence;
     private final Character status;
+
 }

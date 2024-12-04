@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @RequiredArgsConstructor
@@ -97,8 +99,9 @@ public class AudioFileService {
                 .collect(Collectors.toList());
     }
 
-    public List<AudioFile> findByConcatRowSeq(List<Long> concatRowSeq) {
-        return audioFileRepository.findAllByConcatRowSeq(concatRowSeq);
+    public List<AudioFileDto> findByConcatRowSeq(List<Long> concatRowSeq) {
+        List<AudioFile> audioFiles = audioFileRepository.findAllByConcatRowSeq(concatRowSeq);
+        return audioFiles.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
 
@@ -134,12 +137,12 @@ public class AudioFileService {
         for (AudioFileRequestDto audioFileRequestDto : audioDto) {
             byte[] bytes = audioFileRequestDto.getAudioFile().getBytes();
             if (isAudioFile(bytes)) {
-                log.info("[{}]", "AUDIO_FILE_CHECK_SUCCESS");
+                log.info("checkExtension : [{}]", "AUDIO_FILE_CHECK_SUCCESS");
                 continue;
             }
 
             notSupported.add(new AudioFileRequestDto(audioFileRequestDto.getAudioFile().getOriginalFilename()));
-            log.info("[{}]", "AUDIO_FILE_CHECK_FAIL");
+            log.info("checkExtension : [{}]", "AUDIO_FILE_CHECK_FAIL");
         }
         return notSupported;
     }
@@ -184,7 +187,6 @@ public class AudioFileService {
         }
     }
 
-
     public static String getFileExtension(String fileName) {
         if (fileName == null || fileName.lastIndexOf(".") == -1) {
             throw new IllegalArgumentException("파일 이름이 유효하지 않습니다.");
@@ -225,4 +227,38 @@ public class AudioFileService {
         }
     }
 
+    //사용자의 오디오 파일 전체 조회
+    public List<AudioFileDto> getMemberAudioFile(Long memberSeq, Pageable pageable) {
+        List<AudioFile> memberAudios = audioFileRepository.findAudioFileByMember(memberSeq, pageable);
+        if (memberAudios.isEmpty()) {//페이지 범위를 벗어나면 null을 반환 하므로 가장 뒤의 페이지를 반환
+            log.info("요청 가능한 페이지 번호 초과, PageNumber : [{}]", pageable.getPageNumber());
+            int maxPageNumber = getAudioFilePages(memberSeq, pageable.getPageSize()).size() - 1;
+            Pageable maxPageable = PageRequest.of(maxPageNumber, pageable.getPageSize(), pageable.getSort());
+            List<AudioFile> maxMemberAudios = audioFileRepository.findAudioFileByMember(memberSeq, maxPageable);
+            return maxMemberAudios.stream().map(this::convertToDto).toList();
+        }
+        return memberAudios.stream().map(this::convertToDto).toList();
+    }
+
+    //사용자 오디오 파일 페이지 배열 반환
+    public List<Integer> getAudioFilePages(Long memberSeq, int size) {
+        long totalCount = audioFileRepository.countByMemberSeq(memberSeq);
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        // Generate page numbers (0-based indexing)
+        return IntStream.range(0, totalPages).boxed().collect(Collectors.toList());
+    }
+
+    //AudioFileDto변환기
+    private AudioFileDto convertToDto(AudioFile audioFile) {
+        return AudioFileDto.builder()
+                .audioFileSeq(audioFile.getAudioFileSeq())
+                .audioUrl(audioFile.getAudioUrl())
+                .fileLength(audioFile.getFileLength())
+                .fileName(audioFile.getFileName())
+                .fileSize(audioFile.getFileSize())
+                .createdDate(audioFile.getCreatedDate())
+                .extension(audioFile.getExtension())
+                .build();
+    }
 }

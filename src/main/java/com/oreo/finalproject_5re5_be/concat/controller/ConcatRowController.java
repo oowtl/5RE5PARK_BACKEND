@@ -4,12 +4,14 @@ import com.oreo.finalproject_5re5_be.concat.dto.ConcatRowDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatRowService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -73,7 +75,7 @@ public class ConcatRowController {
     @GetMapping("read/recent")
     public ResponseEntity<ResponseDto<List<ConcatRowDto>>> readRecent(
             @RequestParam Long projectSequence,
-            @SessionAttribute Long memberSeq) {
+            @AuthenticationPrincipal Long memberSeq) {
         projectService.projectCheck(memberSeq, projectSequence);
 
         //사용자 예외 처리
@@ -87,8 +89,8 @@ public class ConcatRowController {
     )
     @PostMapping("update")
     public ResponseEntity<ResponseDto<Boolean>> update(@RequestBody ConcatRowSaveRequestDto concatRowSaveRequestDto,
-                                                       @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatRowSaveRequestDto.getConcatTabId());
+                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), concatRowSaveRequestDto.getConcatTabId());
 
         return new ResponseDto<>(HttpStatus.OK.value(), concatRowService.updateConcatRows(concatRowSaveRequestDto))
                 .toResponseEntity();
@@ -100,6 +102,7 @@ public class ConcatRowController {
     )
     @PostMapping("upload/text")
     public ResponseEntity<ResponseDto<Boolean>> uploadText(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody ConcatRowSaveRequestDto concatRowSaveRequestDto) {
         boolean uploadText = concatRowService.uploadText(concatRowSaveRequestDto.getConcatRowRequests());
         if (uploadText) {
