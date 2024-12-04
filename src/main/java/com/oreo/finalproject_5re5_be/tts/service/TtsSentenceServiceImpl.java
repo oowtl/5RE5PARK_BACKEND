@@ -40,21 +40,16 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
     private final TtsSentenceRepository ttsSentenceRepository;
     private final ProjectRepository projectRepository;
-    private final TtsAudioFileRepository ttsAudioFileRepository;
     private final VoiceRepository voiceRepository;
-    private final StyleRepository styleRepository;
     private final TtsProgressStatusRepository ttsProgressStatusRepository;
     private final ProjectService projectService;
 
     public TtsSentenceServiceImpl(TtsSentenceRepository ttsSentenceRepository,
-        ProjectRepository projectRepository, TtsAudioFileRepository ttsAudioFileRepository,
-        VoiceRepository voiceRepository, StyleRepository styleRepository,
+        ProjectRepository projectRepository, VoiceRepository voiceRepository,
         TtsProgressStatusRepository ttsProgressStatusRepository, ProjectService projectService) {
         this.ttsSentenceRepository = ttsSentenceRepository;
         this.projectRepository = projectRepository;
-        this.ttsAudioFileRepository = ttsAudioFileRepository;
         this.voiceRepository = voiceRepository;
-        this.styleRepository = styleRepository;
         this.ttsProgressStatusRepository = ttsProgressStatusRepository;
         this.projectService = projectService;
     }
@@ -74,13 +69,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         Voice voice = voiceRepository.findById(createRequest.getVoiceSeq())
             .orElseThrow(() -> new IllegalArgumentException("voiceSeq is invalid"));
 
-        // 3. TtsSentenceRequest 유효성 검증 : StyleSeq
-        // 3.1. styleSeq : not null 일 때 styleSeq 유효성 검증 및 할당
-        Style style = null;
-        if (createRequest.getStyleSeq() != null) {
-            style = styleRepository.findById(createRequest.getStyleSeq())
-                .orElseThrow(() -> new IllegalArgumentException("styleSeq is invalid"));
-        }
 
         // 4. TtsSentenceRequest -> TtsSentence 변환
         TtsAttributeInfo attribute = createRequest.getAttribute();
@@ -142,13 +130,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
             .orElseThrow(() -> new EntityNotFoundException(
                 "Voice not found with id: " + updateRequest.getVoiceSeq()));
 
-        // 2.3 styleSeq 조회 가능한 styleSeq (존재 여부) 검증 및 할당
-        Style style = null;
-        if (updateRequest.getStyleSeq() != null) {
-            style = styleRepository.findById(updateRequest.getStyleSeq())
-                .orElseThrow(() -> new EntityNotFoundException(
-                    "Style not found with id: " + updateRequest.getStyleSeq()));
-        }
 
         // 3. TtsSentenceRequest -> TtsSentence 변환
         // 3.1 TtsSentence 엔티티 조회
@@ -229,7 +210,6 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         TtsSentenceRequest sentenceRequest = TtsSentenceRequest.builder()
             .text(sentenceInfo.getText())
             .voiceSeq(sentenceInfo.getVoiceSeq())
-            .styleSeq(sentenceInfo.getStyleSeq())
             .order(sentenceInfo.getOrder())
             .attribute(sentenceInfo.getTtsAttributeInfo())
             .build();
