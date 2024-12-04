@@ -227,9 +227,10 @@ public class AudioFileService {
         }
     }
 
+    //사용자의 오디오 파일 전체 조회
     public List<AudioFileDto> getMemberAudioFile(Long memberSeq, Pageable pageable) {
         List<AudioFile> memberAudios = audioFileRepository.findAudioFileByMember(memberSeq, pageable);
-        if (memberAudios.isEmpty()) {
+        if (memberAudios.isEmpty()) {//페이지 범위를 벗어나면 null을 반환 하므로 가장 뒤의 페이지를 반환
             log.info("요청 가능한 페이지 번호 초과, PageNumber : [{}]", pageable.getPageNumber());
             int maxPageNumber = getAudioFilePages(memberSeq, pageable.getPageSize()).size() - 1;
             Pageable maxPageable = PageRequest.of(maxPageNumber, pageable.getPageSize(), pageable.getSort());
@@ -239,6 +240,7 @@ public class AudioFileService {
         return memberAudios.stream().map(this::convertToDto).toList();
     }
 
+    //사용자 오디오 파일 페이지 배열 반환
     public List<Integer> getAudioFilePages(Long memberSeq, int size) {
         long totalCount = audioFileRepository.countByMemberSeq(memberSeq);
         int totalPages = (int) Math.ceil((double) totalCount / size);
@@ -247,6 +249,7 @@ public class AudioFileService {
         return IntStream.range(0, totalPages).boxed().collect(Collectors.toList());
     }
 
+    //AudioFileDto변환기
     private AudioFileDto convertToDto(AudioFile audioFile) {
         return AudioFileDto.builder()
                 .audioFileSeq(audioFile.getAudioFileSeq())
