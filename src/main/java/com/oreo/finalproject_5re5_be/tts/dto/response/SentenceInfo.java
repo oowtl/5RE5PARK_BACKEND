@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class SentenceInfo {
     private Long tsSeq; // 행 id
     private Long voiceSeq;    // 목소리 id
-    private Long styleSeq;    // 스타일 id
     private String text;     // 텍스트 내용
 
     @Min(value = 0)
@@ -41,7 +40,6 @@ public class SentenceInfo {
         return SentenceInfo.builder()
                 .tsSeq(sentenceInfo.getTsSeq())
                 .voiceSeq(sentenceInfo.getVoiceSeq())
-                .styleSeq(sentenceInfo.getStyleSeq())
                 .text(sentenceInfo.getText())
                 .order(order)
                 .ttsAttributeInfo(sentenceInfo.getTtsAttributeInfo())
