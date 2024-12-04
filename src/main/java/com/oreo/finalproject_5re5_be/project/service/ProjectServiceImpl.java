@@ -52,10 +52,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public List<ProjectResponse> projectFindAll(Long memberSeq) {
+        log.info("[projectService] projectFindAll - memberSeq : {} ", memberSeq);
         Member member = memberFind(memberSeq);
+        log.info("[projectService] projectFindAll - member : {} ", member.toString());
         //회원 정보로 전체 조회
         List<Project> project = projectRepository
                 .findByMemberSeq(member.getSeq());
+        log.info("[projectService] projectFindAll - project : {} ", project.toString());
         //정보를 저장할 리스트 생성
         List<ProjectResponse> projectResponses = new ArrayList<>();
         //project 정보를 모두 넣고
@@ -73,6 +76,7 @@ public class ProjectServiceImpl implements ProjectService {
                     .build();
             projectResponses.add(projectResponse);
         }
+        log.info("[projectService] projectFindAll - projectResponses : {} ", projectResponses);
         //Response 로 추출
         return projectResponses;
     }
@@ -144,8 +148,11 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     public boolean projectCheck(Long memberSeq, Long projectSeq) {
+        log.info("[projectService] projectcheck - memberSeq,  projectSeq : {} | {}",memberSeq, projectSeq);
         Project project = projectFind(projectSeq);
+        log.info("[projectService] projectcheck - project : {} ",project.toString());
         Long seq = project.getMember().getSeq();
+        log.info("[projectService] projectcheck - seq : {} ",seq);
         if(seq.equals(memberSeq)){
             return true;
         }
@@ -160,8 +167,10 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     public boolean projectCheck(Long memberSeq, List<Long> projectSeq){
+        log.info("[projectService] projectCheck - memberSeq, projectSeq : {} , {} ", memberSeq, projectSeq.toString());
         for (Long pro : projectSeq) {
-            projectCheck(memberSeq, pro);
+            boolean b = projectCheck(memberSeq, pro);
+            log.info("[projectService] projectCheck - boolean : {} ",b);
         }
         return true;
     }
@@ -179,6 +188,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
     private Member memberFind(Long seq){
         return memberRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Member not found"));
     }
 }
