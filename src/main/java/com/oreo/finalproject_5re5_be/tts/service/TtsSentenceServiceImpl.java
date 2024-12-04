@@ -12,25 +12,23 @@ import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
-import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.exception.ProjectMismatchException;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
-import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
-import com.oreo.finalproject_5re5_be.tts.repository.TtsAudioFileRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsProgressStatusRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
