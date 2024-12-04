@@ -2,29 +2,37 @@ package com.oreo.finalproject_5re5_be.vc.controller;
 
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
-import com.oreo.finalproject_5re5_be.global.component.audio.AudioFileTypeConverter;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcRowRequest;
+import com.oreo.finalproject_5re5_be.vc.dto.request.VcTextRequest;
 import com.oreo.finalproject_5re5_be.vc.service.VcApiService;
 import com.oreo.finalproject_5re5_be.vc.service.VcHistoryService;
 import com.oreo.finalproject_5re5_be.vc.service.VcService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@Tag(name = "VC", description = "VC 관련 API")
 @RestController
 @Slf4j
 @Validated
@@ -63,9 +71,9 @@ public class VcController {
             @Valid @Parameter(description = "프로젝트 ID")
             @PathVariable Long proSeq,
             @Valid @RequestParam List<MultipartFile> file,
-            @SessionAttribute(value = "memberSeq") Long memberSeq) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         //회원의 정보인지 확인
-        projectService.projectCheck(memberSeq, proSeq);
+        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq);
         try{
             //저장을 위한 파일 정보로 객체 생성
             return ResponseEntity.ok()
@@ -94,9 +102,9 @@ public class VcController {
             @Valid @Parameter(description = "프로젝트 seq")
             @PathVariable Long proSeq,
             @RequestParam MultipartFile file,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        projectService.projectCheck(memberSeq, proSeq);
+        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq);
         try{
             //들어온 파일을 검사해서 확장자, 길이, 이름, 크기를 추출 + 파일을 S3에 업로드
             //DB에 저장할 객체 생성 + 저장
@@ -125,9 +133,9 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> resultSave(
             @RequestParam("srcSeq") @Valid List<Long> srcSeq,
             @RequestParam("trgSeq") @Valid Long trgSeq,
-            @SessionAttribute(value = "memberSeq") Long memberSeq) throws IOException {
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws IOException {
         //회원의 정보인지 확인
-        vcService.srcCheck(memberSeq, srcSeq);
+        vcService.srcCheck(userDetails.getMember().getSeq(), srcSeq);
         //결과 파일 생성(VC API)
         List<MultipartFile> resultFile = vcApiService.resultFileCreate(
                 vcService.getSrcFile(srcSeq),//srcFile
@@ -156,21 +164,23 @@ public class VcController {
     @PostMapping("/src/text")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> textSave(
             @Valid @Parameter(description = "Src Seq")
-            @RequestParam  List<Long> srcSeq,
-            @Valid @RequestBody List<String> text,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @RequestBody List<VcTextRequest> vcText,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        vcService.srcCheck(memberSeq, srcSeq);
+        for (VcTextRequest vc : vcText) {
+            vcService.srcCheck(userDetails.getMember().getSeq(), vc.getSeq());
+        }
+
         try{
             //객체 생성 + 저장
             return ResponseEntity.ok()
                     .body(new ResponseDto<>(HttpStatus.OK.value(),
-                            mapCreate(vcService.textSave(vcService.vcTextResponses(srcSeq, text)),
+                            mapCreate(vcService.textSave(vcService.vcTextResponses(vcText)),
                                     "text 저장 완료되었습니다.")));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    mapCreate(Collections.emptyList(), "text 저장 중 오류가 발생했습니다.")));
+                            mapCreate(Collections.emptyList(), "text 저장 중 오류가 발생했습니다.")));
         }
     }
 
@@ -181,9 +191,9 @@ public class VcController {
     @GetMapping("/src/url/{srcSeq}")
     public ResponseEntity<ResponseDto<Map<String, Object>>> srcURL(
             @Valid @PathVariable Long srcSeq,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        vcService.srcCheck(memberSeq, srcSeq);
+        vcService.srcCheck(userDetails.getMember().getSeq(), srcSeq);
         try{
             //SRCFile URL 호출
             return ResponseEntity.ok()
@@ -203,9 +213,9 @@ public class VcController {
     @GetMapping("/result/url/{resSeq}")
     public ResponseEntity<ResponseDto<Map<String, Object>>> resultURL(
             @Valid @PathVariable Long resSeq,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        vcService.resCheck(memberSeq, resSeq);
+        vcService.resCheck(userDetails.getMember().getSeq(), resSeq);
         //Result Seq 로 URL 정보 추출
         try{
             return ResponseEntity.ok()
@@ -226,9 +236,9 @@ public class VcController {
     @GetMapping("/{proSeq}")
     public ResponseEntity<ResponseDto<Map<String, Object>>> vc(
             @Valid @PathVariable Long proSeq,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        projectService.projectCheck(memberSeq, proSeq);
+        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq);
         //Project 의 src, result, text 정보 추출
         try{
             return ResponseEntity.ok()
@@ -249,9 +259,9 @@ public class VcController {
     @DeleteMapping("/src")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(
             @Valid @RequestBody List<Long> srcSeq,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        vcService.srcCheck(memberSeq, srcSeq);
+        vcService.srcCheck(userDetails.getMember().getSeq(), srcSeq);
         //삭제 호출
         try{
             return ResponseEntity.ok()
@@ -274,9 +284,9 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateText(
             @Valid @PathVariable Long textSeq,
             @Valid @RequestParam("text") String text,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
-        vcService.textCheck(memberSeq, textSeq);
+        vcService.textCheck(userDetails.getMember().getSeq(), textSeq);
         //textseq 로 text 값 변경
         try{
             return ResponseEntity.ok()
@@ -295,10 +305,10 @@ public class VcController {
     @PatchMapping("/row")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(
             @Valid @RequestBody List<VcRowRequest> rows,
-            @SessionAttribute(value = "memberSeq") Long memberSeq){
+            @AuthenticationPrincipal CustomUserDetails userDetails){
         //회원의 정보인지 확인
         for (VcRowRequest row : rows) {
-            vcService.srcCheck(memberSeq, row.getSeq());
+            vcService.srcCheck(userDetails.getMember().getSeq(), row.getSeq());
         }
         //VC 행 순서 수정
         try{
