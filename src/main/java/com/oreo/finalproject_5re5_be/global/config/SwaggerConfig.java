@@ -1,42 +1,24 @@
 package com.oreo.finalproject_5re5_be.global.config;
 
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.headers.Header;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
-
 import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
-        //swagger servers 지정
-        List<Server> server = new ArrayList<>();
-        server.add(new Server().description("https Server").url("https://5re5park.site"));
-        server.add(new Server().description("http Server").url("http://5re5park.site:8080"));
-        server.add(new Server().description("localhost").url("http://localhost:8080"));
-
         OpenAPI info = new OpenAPI()
                 .components(new Components())
                 .paths(getPaths())
-                .servers(server)
                 .info(apiInfo());
         return info;
     }
