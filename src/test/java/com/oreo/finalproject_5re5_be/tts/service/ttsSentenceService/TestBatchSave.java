@@ -1,16 +1,5 @@
 package com.oreo.finalproject_5re5_be.tts.service.ttsSentenceService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
@@ -20,29 +9,32 @@ import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceBatchRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.SentenceInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceListDto;
-import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
-import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsProgressStatusRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import jakarta.validation.ConstraintViolationException;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -60,9 +52,6 @@ class TestBatchSave {
 
     @MockBean
     private VoiceRepository voiceRepository;
-
-    @MockBean
-    private StyleRepository styleRepository;
 
     @MockBean
     private TtsProgressStatusRepository ttsProgressStatusRepository;
@@ -144,7 +133,6 @@ class TestBatchSave {
 
         Project project = Project.builder().proSeq(projectSeq).build();
         Voice voice = Voice.builder().voiceSeq(1L).build();
-        Style style = Style.builder().styleSeq(1L).build();
 
         TtsSentenceBatchRequest batchRequest = createBatchRequest(); // 유효한 batchRequest 생성
 
@@ -174,8 +162,6 @@ class TestBatchSave {
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
         // voice이 존재한다고 설정
         when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
-        // style이 존재한다고 설정
-        when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
         // ttsSentece 가 존재한다고 설정
         when(ttsSentenceRepository.findById(anyLong())).thenReturn(Optional.of(ttsSentence));
         // 각 문장에 대해 TtsSentenceDto 반환
@@ -346,7 +332,6 @@ class TestBatchSave {
 
         Project project = Project.builder().proSeq(projectSeq).build();
         Voice voice = Voice.builder().voiceSeq(1L).build();
-        Style style = Style.builder().styleSeq(1L).build();
 
 
         // List<TtsSentenceBatchInfo> 생성
@@ -387,8 +372,6 @@ class TestBatchSave {
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
         // voice이 존재한다고 설정
         when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
-        // style이 존재한다고 설정
-        when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
         // ttsSentece 가 존재한다고 설정
         when(ttsSentenceRepository.findById(any())).thenReturn(Optional.of(ttsSentence));
         // 각 문장에 대해 TtsSentenceDto 반환
@@ -418,7 +401,6 @@ class TestBatchSave {
         SentenceInfo updateSentenceInfo1 = SentenceInfo.builder()
             .tsSeq(1L)
             .voiceSeq(1L)
-            .styleSeq(1L)
             .order(1)
             .text("Test text")
             .ttsAttributeInfo(createAttribute())
@@ -427,7 +409,6 @@ class TestBatchSave {
         SentenceInfo updateSentenceInfo2 = SentenceInfo.builder()
             .tsSeq(1L)
             .voiceSeq(1L)
-            .styleSeq(1L)
             .order(2)
             .text("Test text")
             .ttsAttributeInfo(createAttribute())
@@ -435,7 +416,6 @@ class TestBatchSave {
 
         SentenceInfo createSentenceInfo3 = SentenceInfo.builder()
             .voiceSeq(1L)
-            .styleSeq(1L)
             .order(3)
             .text("Test text")
             .ttsAttributeInfo(createAttribute())
@@ -443,7 +423,6 @@ class TestBatchSave {
 
         SentenceInfo createSentenceInfo4 = SentenceInfo.builder()
             .voiceSeq(1L)
-            .styleSeq(1L)
             .order(4)
             .text("Test text")
             .ttsAttributeInfo(createAttribute())
@@ -464,7 +443,6 @@ class TestBatchSave {
         Integer orderIndex) {
         SentenceInfo sentenceInfo = SentenceInfo.builder()
             .voiceSeq(1L)
-            .styleSeq(1L)
             .order(orderIndex)
             .text("Test text")
             .ttsAttributeInfo(createAttribute())
