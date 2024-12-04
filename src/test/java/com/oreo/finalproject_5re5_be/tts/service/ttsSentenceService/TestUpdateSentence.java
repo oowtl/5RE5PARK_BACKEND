@@ -1,27 +1,17 @@
 package com.oreo.finalproject_5re5_be.tts.service.ttsSentenceService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
-import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import jakarta.validation.ConstraintViolationException;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -48,8 +45,6 @@ class TestUpdateSentence {
     @MockBean
     private VoiceRepository voiceRepository;
 
-    @MockBean
-    private StyleRepository styleRepository;
 
     /*
     필수 정보 유효성 검증
@@ -60,8 +55,7 @@ class TestUpdateSentence {
     5. voiceSeq: 조회 가능한 voiceSeq (존재 여부)
 
     옵션 정보 유효성 검증
-    1. styleSeq: 조회 가능한 스타일 id (존재 여부)
-    2. attribute: 옵션 정보의 각 필드 유효성 검증
+    1. attribute: 옵션 정보의 각 필드 유효성 검증
     - volume: 0 이상 100 이하 (예: 음량)
     - speed: 적정 범위 내 속도 값
     - stPitch: -20 이상 20 이하 (시작 피치)
@@ -134,7 +128,6 @@ class TestUpdateSentence {
         // 2. voiceSeq가 null로 설정된 updateRequest 생성
         TtsSentenceRequest updateRequest = TtsSentenceRequest.builder()
             .voiceSeq(null)
-            .styleSeq(1L)
             .order(1)
             .text("Test text")
             .attribute(attribute)
@@ -182,49 +175,14 @@ class TestUpdateSentence {
             () -> ttsSentenceService.updateSentence(projectSeq, tsSeq, updateRequest));
     }
 
-    // 5. 옵션 정보 유효성 검증 : styleSeq가 존재하지 않을 때
-    @Test
-    @DisplayName("옵션 정보 유효성 검증 : styleSeq가 존재하지 않을 때")
-    void validateStyleSeqExists() {
-        // given: styleSeq가 데이터베이스에 존재하지 않음
-        Long projectSeq = 1L;
-        Long tsSeq = 1L;
-        Long notFoundStyleSeq = 99999L;
-
-        // 1. attribute 설정
-        TtsAttributeInfo attribute = createAttribute();
-
-        // 2. updateRequest 생성
-        TtsSentenceRequest updateRequest = TtsSentenceRequest.builder()
-            .voiceSeq(1L)
-            .order(1)
-            .styleSeq(notFoundStyleSeq)
-            .text("Test text")
-            .attribute(attribute)
-            .build();
-
-        Voice voice = Voice.builder().voiceSeq(1L).build();
-        Project project = Project.builder().proSeq(projectSeq).build();
-
-        // projectRepository, voiceRepository, styleRepository의 동작 설정
-        when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
-        when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
-        when(styleRepository.findById(notFoundStyleSeq)).thenReturn(Optional.empty());
-
-        // when, then: 존재하지 않는 styleSeq로 인해 EntityNotFoundException이 발생해야 함
-        assertThrows(EntityNotFoundException.class,
-            () -> ttsSentenceService.updateSentence(projectSeq, tsSeq, updateRequest));
-    }
-
     // 6. TtsSentence 수정 성공
     @Test
     @DisplayName("TtsSentence 수정 성공")
     void updateSentenceSuccess() {
-        // given: 유효한 projectSeq, voiceSeq, styleSeq와 수정 요청 생성
+        // given: 유효한 projectSeq, voiceSeq와 수정 요청 생성
         Long projectSeq = 1L;
         Long tsSeq = 1L;
         Long updatedVoiceSeq = 2L;
-        Long updatedStyleSeq = 3L;
         Integer updatedOrder = 2;
         String updatedText = "Updated text";
 
@@ -232,13 +190,12 @@ class TestUpdateSentence {
         TtsAttributeInfo attribute = createAttribute();
 
         // 2. updateRequest 생성
-        TtsSentenceRequest updateRequest = createRequest(updatedVoiceSeq, updatedStyleSeq,
+        TtsSentenceRequest updateRequest = createRequest(updatedVoiceSeq,
             updatedText, updatedOrder, attribute);
 
         // 3. mock 데이터 생성
         Project project = Project.builder().proSeq(projectSeq).build();
         Voice voice = Voice.builder().voiceSeq(updatedVoiceSeq).build();
-        Style style = Style.builder().styleSeq(updatedStyleSeq).build();
 
         // 4. 기존 TtsSentence 객체 생성
         TtsSentence originalSentence = TtsSentence.builder()
@@ -268,7 +225,6 @@ class TestUpdateSentence {
         // 6. mock 데이터를 반환하도록 설정
         when(projectRepository.findById(anyLong())).thenReturn(Optional.of(project));
         when(voiceRepository.findById(anyLong())).thenReturn(Optional.of(voice));
-        when(styleRepository.findById(anyLong())).thenReturn(Optional.of(style));
         when(ttsSentenceRepository.findById(tsSeq)).thenReturn(Optional.of(originalSentence));
         when(ttsSentenceRepository.save(any(TtsSentence.class))).thenReturn(updatedSentence);
 
@@ -301,24 +257,22 @@ class TestUpdateSentence {
     }
 
     private TtsAttributeInfo createAttribute() {
-        return TtsAttributeInfo.of(100, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
+        return TtsAttributeInfo.of(10, 1.0f, 0, "normal", 0, 16000, 0, 0.0f, "wav");
     }
 
     private TtsSentenceRequest createRequest(TtsAttributeInfo attribute) {
         return TtsSentenceRequest.builder()
             .voiceSeq(1L)
-            .styleSeq(1L)
             .order(1)
             .text("안녕하세요")
             .attribute(attribute)
             .build();
     }
 
-    private TtsSentenceRequest createRequest(Long voiceSeq, Long styleSeq, String text,
+    private TtsSentenceRequest createRequest(Long voiceSeq, String text,
         Integer order, TtsAttributeInfo attribute) {
         return TtsSentenceRequest.builder()
             .voiceSeq(voiceSeq)
-            .styleSeq(styleSeq)
             .order(order)
             .text(text)
             .attribute(attribute)

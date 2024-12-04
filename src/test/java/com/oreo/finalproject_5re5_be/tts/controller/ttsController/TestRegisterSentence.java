@@ -1,14 +1,5 @@
 package com.oreo.finalproject_5re5_be.tts.controller.ttsController;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
@@ -32,6 +23,15 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TtsController.class)
 class TestRegisterSentence {
@@ -77,10 +77,6 @@ class TestRegisterSentence {
     5. voiceSeq로 Voice 엔티티를 찾을 수 없는 경우
     - 유효한 projectSeq와 없는 voiceSeq 입력 시
     - HTTP 상태 400과 voiceSeq 관련 에러 메시지 반환을 확인
-
-    6. styleSeq로 Style 엔티티를 찾을 수 없는 경우
-    - 유효한 projectSeq와 없는 styleSeq 입력 시
-    - HTTP 상태 400과 styleSeq 관련 에러 메시지 반환을 확인
 
     7. 잘못된 속성 값으로 인한 유효성 검증 에러 테스트
     - 유효 범위를 벗어난 속성 값 (예: volume)을 가진 TtsSentenceRequest 입력 시
@@ -158,7 +154,6 @@ class TestRegisterSentence {
         // 텍스트 필드가 없는 요청 객체 생성
         TtsSentenceRequest requestBody = TtsSentenceRequest.builder()
             .voiceSeq(1L) // 유효한 voiceSeq 설정
-            .styleSeq(1L) // 유효한 styleSeq 설정
             .text(null)   // 텍스트 필드 누락
             .order(1)     // 표시 순서 설정
             .attribute(attributeInfo) // 빈 속성 정보 설정
@@ -197,7 +192,6 @@ class TestRegisterSentence {
         // 텍스트 필드가 없는 요청 객체 생성
         TtsSentenceRequest requestBody = TtsSentenceRequest.builder()
             .voiceSeq(null) // voiceSeq 필드 누락
-            .styleSeq(1L) // 유효한 styleSeq 설정
             .text("sample text")   // 텍스트 필드 누락
             .order(1)     // 표시 순서 설정
             .attribute(attributeInfo) // 빈 속성 정보 설정
@@ -298,38 +292,6 @@ class TestRegisterSentence {
             .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
     }
 
-    // 6. styleSeq로 Style 엔티티를 찾을 수 없는 경우
-    @Test
-    @DisplayName("유효성 검증 에러 - 잘못된 styleSeq")
-    @WithMockUser
-    void registerSentence_notFoundStyleEntity() throws Exception {
-        // Given - 유효한 projectSeq와 잘못된 styleSeq 설정
-        Long projectSeq = 1L;
-        TtsSentenceRequest request = TtsSentenceRequest.builder().voiceSeq(1L).styleSeq(-1L)
-            .text("Valid text").build();
-
-        // When
-        // 2. mock 객체 설정
-        when(ttsSentenceService.addSentence(eq(projectSeq),
-            any(TtsSentenceRequest.class))).thenThrow(new EntityNotFoundException());
-
-        // projectService.projectCheck 메서드가 호출되면 true 반환
-        when(projectService.projectCheck(1L, 1L)).thenReturn(true);
-
-        // mockHttpSession 생성
-        MockHttpSession mockHttpSession = new MockHttpSession();
-        mockHttpSession.setAttribute("memberSeq", 1L);
-
-        // Then
-        // 3. 요청 전송 및 응답 검증
-        mockMvc.perform(post("/api/project/{projectSeq}/tts/sentence", projectSeq)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .session(mockHttpSession)
-                .with(csrf())).andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
-            .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
-    }
-
     // 7. 잘못된 속성 값으로 인한 유효성 검증 에러 테스트
     @Test
     @DisplayName("유효성 검증 에러 - 잘못된 속성 값")
@@ -406,7 +368,7 @@ class TestRegisterSentence {
 
 
     private static TtsAttributeInfo createAttributeInfo() {
-        return TtsAttributeInfo.builder().volume(100) // 유효한 volume 설정
+        return TtsAttributeInfo.builder().volume(10) // 유효한 volume 설정
             .speed(1.0f) // 유효한 speed 설정
             .stPitch(0)  // 유효한 stPitch 설정
             .emotion("neutral") // 유효한 emotion 설정
@@ -420,7 +382,6 @@ class TestRegisterSentence {
 
     private static TtsSentenceRequest createSentenceRequest(TtsAttributeInfo attributeInfo) {
         return TtsSentenceRequest.builder().voiceSeq(1L) // 유효한 voiceSeq 설정
-            .styleSeq(1L) // 유효한 styleSeq 설정
             .text("Valid text") // 유효한 텍스트 설정
             .order(1) // 표시 순서 설정
             .attribute(attributeInfo) // 유효한 속성 정보 설정
