@@ -21,6 +21,10 @@ jobs:
       AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
       VC_URL: ${{ secrets.VC_URL }}
       VC_APIKEY: ${{ secrets.VC_APIKEY }}
+      AWS_SQS_ACCESS_KEY_ID: ${{ secrets.AWS_SQS_ACCESS_KEY_ID }}
+      AWS_SQS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SQS_SECRET_ACCESS_KEY }}
+      AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
+      AWS_SQS_VIRTUAL_QUEUE_NAME: ${{ secrets.AWS_SQS_VIRTUAL_QUEUE_NAME }}
 
     steps: # 1. 코드 체크아웃
     - name: Check out code
