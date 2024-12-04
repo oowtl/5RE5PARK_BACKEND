@@ -6,6 +6,7 @@ import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,12 @@ public class ProjectController {
     )
     @GetMapping("")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
-            @AuthenticationPrincipal CustomUserDetails userDetails){//session memberSeq값
+//            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session){//session memberSeq값
         try{
             //회원정보로 프로젝트 추출
-//        List<ProjectResponse> projectResponses = projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
-        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
+        List<ProjectResponse> projectResponses = projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
+//        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
             Map<String, List<Object>> map = new HashMap<>();//맵 생성
             map.put("row", Collections.singletonList(projectResponses));//row : [] 로 응답
             return ResponseEntity.ok()
@@ -62,9 +64,9 @@ public class ProjectController {
     )
     @PostMapping("")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
-            @AuthenticationPrincipal CustomUserDetails userDetails){//session memberSeq값
+            HttpSession session){//session memberSeq값
         //project 생성
-        Long projectSeq = projectService.projectSave(userDetails.getMember().getSeq());
+        Long projectSeq = projectService.projectSave((Long) session.getAttribute("memberSeq"));
         Map<String, Object> map = new HashMap<>();
         map.put("projectSeq", projectSeq);//프로젝트seq 응답에 추가
         map.put("msg", "프로젝트 생성 완료되었습니다.");//메시지 추가
@@ -78,10 +80,10 @@ public class ProjectController {
     )
     @PutMapping("")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session,
             @Valid @RequestBody Long proSeq,
             @Valid @RequestBody String projectName){
-        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq); //회원의 프로젝트인지 확인
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq); //회원의 프로젝트인지 확인
         projectService.projectUpdate(proSeq, projectName);//프로젝트 수정
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
@@ -94,8 +96,8 @@ public class ProjectController {
     @DeleteMapping("")
     public ResponseEntity<ResponseDto<String>> projectDelete(
             @RequestParam List<Long> proSeq,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
-        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq); //회원의 프로젝트인지 확인
+            HttpSession session){
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq); //회원의 프로젝트인지 확인
         projectService.projectDelete(proSeq);//프로젝트 삭제 배열로 받음
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),

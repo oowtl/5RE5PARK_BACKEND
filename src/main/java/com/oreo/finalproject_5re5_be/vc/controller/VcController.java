@@ -71,9 +71,9 @@ public class VcController {
             @Valid @Parameter(description = "프로젝트 ID")
             @PathVariable Long proSeq,
             @Valid @RequestParam List<MultipartFile> file,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            HttpSession session) {
         //회원의 정보인지 확인
-        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq);
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq);
         try{
             //저장을 위한 파일 정보로 객체 생성
             return ResponseEntity.ok()
@@ -102,9 +102,9 @@ public class VcController {
             @Valid @Parameter(description = "프로젝트 seq")
             @PathVariable Long proSeq,
             @RequestParam MultipartFile file,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
-        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq);
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq);
         try{
             //들어온 파일을 검사해서 확장자, 길이, 이름, 크기를 추출 + 파일을 S3에 업로드
             //DB에 저장할 객체 생성 + 저장
@@ -133,9 +133,9 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> resultSave(
             @RequestParam("srcSeq") @Valid List<Long> srcSeq,
             @RequestParam("trgSeq") @Valid Long trgSeq,
-            @AuthenticationPrincipal CustomUserDetails userDetails) throws IOException {
+            HttpSession session) throws IOException {
         //회원의 정보인지 확인
-        vcService.srcCheck(userDetails.getMember().getSeq(), srcSeq);
+        vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);
         //결과 파일 생성(VC API)
         List<MultipartFile> resultFile = vcApiService.resultFileCreate(
                 vcService.getSrcFile(srcSeq),//srcFile
@@ -165,10 +165,10 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> textSave(
             @Valid @Parameter(description = "Src Seq")
             @RequestBody List<VcTextRequest> vcText,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
         for (VcTextRequest vc : vcText) {
-            vcService.srcCheck(userDetails.getMember().getSeq(), vc.getSeq());
+            vcService.srcCheck((Long) session.getAttribute("memberSeq"), vc.getSeq());
         }
 
         try{
@@ -191,9 +191,9 @@ public class VcController {
     @GetMapping("/src/url/{srcSeq}")
     public ResponseEntity<ResponseDto<Map<String, Object>>> srcURL(
             @Valid @PathVariable Long srcSeq,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
-        vcService.srcCheck(userDetails.getMember().getSeq(), srcSeq);
+        vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);
         try{
             //SRCFile URL 호출
             return ResponseEntity.ok()
@@ -213,9 +213,9 @@ public class VcController {
     @GetMapping("/result/url/{resSeq}")
     public ResponseEntity<ResponseDto<Map<String, Object>>> resultURL(
             @Valid @PathVariable Long resSeq,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
-        vcService.resCheck(userDetails.getMember().getSeq(), resSeq);
+        vcService.resCheck((Long) session.getAttribute("memberSeq"), resSeq);
         //Result Seq 로 URL 정보 추출
         try{
             return ResponseEntity.ok()
@@ -236,9 +236,9 @@ public class VcController {
     @GetMapping("/{proSeq}")
     public ResponseEntity<ResponseDto<Map<String, Object>>> vc(
             @Valid @PathVariable Long proSeq,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
-        projectService.projectCheck(userDetails.getMember().getSeq(), proSeq);
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq);
         //Project 의 src, result, text 정보 추출
         try{
             return ResponseEntity.ok()
@@ -259,9 +259,9 @@ public class VcController {
     @DeleteMapping("/src")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(
             @Valid @RequestBody List<Long> srcSeq,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
-        vcService.srcCheck(userDetails.getMember().getSeq(), srcSeq);
+        vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);
         //삭제 호출
         try{
             return ResponseEntity.ok()
@@ -284,9 +284,9 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateText(
             @Valid @PathVariable Long textSeq,
             @Valid @RequestParam("text") String text,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
-        vcService.textCheck(userDetails.getMember().getSeq(), textSeq);
+        vcService.textCheck((Long) session.getAttribute("memberSeq"), textSeq);
         //textseq 로 text 값 변경
         try{
             return ResponseEntity.ok()
@@ -305,10 +305,10 @@ public class VcController {
     @PatchMapping("/row")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> updateRowOrder(
             @Valid @RequestBody List<VcRowRequest> rows,
-            @AuthenticationPrincipal CustomUserDetails userDetails){
+            HttpSession session){
         //회원의 정보인지 확인
         for (VcRowRequest row : rows) {
-            vcService.srcCheck(userDetails.getMember().getSeq(), row.getSeq());
+            vcService.srcCheck((Long) session.getAttribute("memberSeq"), row.getSeq());
         }
         //VC 행 순서 수정
         try{
