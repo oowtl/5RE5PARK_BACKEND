@@ -77,7 +77,7 @@ public class SwaggerConfig {
                                 .addApiResponse("200", new ApiResponse()
                                         .description("로그아웃 성공")
                                         .content(new Content()
-                                                .addMediaType("application/json", new MediaType()
+                                                .addMediaType("application/x-www-form-urlencoded", new MediaType()
                                                         .schema(new Schema<>().type("string").example("Logout successful"))))
                                 )
                         )
