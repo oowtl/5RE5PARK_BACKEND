@@ -3,18 +3,24 @@ package com.oreo.finalproject_5re5_be.concat.controller;
 import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatRowService;
 import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
+import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,9 +82,37 @@ public class AudioFileController {
         });
 
         concatRowSeq.sort(Long::compareTo);
-        List<AudioFile> audioFile = audioFileService.findByConcatRowSeq(concatRowSeq);
-        List<AudioFileDto> list = audioFile.stream().map(this::convertToDto).toList();
-        return buildResponse(HttpStatus.OK, list);
+        List<AudioFileDto> audioFileList = audioFileService.findByConcatRowSeq(concatRowSeq);
+        return buildResponse(HttpStatus.OK, audioFileList);
+    }
+
+    @Operation(
+            summary = "사용자가 업로드 한 모든 오디오 파일을 조회합니다.",
+            description = "업로드 된 오디오의 정보를 반환합니다."
+    )
+    @GetMapping("read/my/audio")
+    public ResponseEntity<ResponseDto<List<AudioFileDto>>> readMyAudio(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                       @RequestParam int page,
+                                                                       @RequestParam int size,
+                                                                       @RequestParam String sort) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String user =  authentication.getPrincipal().toString();
+        System.out.println("user = " + user);
+
+
+        Sort.Direction direction = Sort.Direction.fromString(sort); // "ASC" 또는 "DESC"
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdDate")); // "created_date"가 아니라 매핑된 엔티티 필드 이름 사용
+        return buildResponse(HttpStatus.OK, audioFileService.getMemberAudioFile(userDetails.getMember().getSeq(), pageable));
+    }
+
+    @Operation(
+            summary = "전달받은 페이지 사이즈로 계산한 페이지 배열을 반환 합니다.",
+            description = "숫자 배열을 반환합니다. 숫자는 0부터 시작합니다."
+    )
+    @GetMapping("read/my/audio/pages")
+    public ResponseEntity<ResponseDto<List<Integer>>> readMyAudioPages(@SessionAttribute Long memberSeq,
+                                                                       @RequestParam int size) {
+        return buildResponse(HttpStatus.OK, audioFileService.getAudioFilePages(memberSeq, size));
     }
 
     private List<AudioFileRequestDto> convertToDto(List<MultipartFile> audioFiles) {
@@ -89,17 +123,5 @@ public class AudioFileController {
 
     private <T> ResponseEntity<ResponseDto<T>> buildResponse(HttpStatus status, T data) {
         return new ResponseEntity<>(new ResponseDto<>(status.value(), data), status);
-    }
-
-    private AudioFileDto convertToDto(AudioFile audioFile) {
-        return AudioFileDto.builder()
-                .audioFileSeq(audioFile.getAudioFileSeq())
-                .audioUrl(audioFile.getAudioUrl())
-                .fileLength(audioFile.getFileLength())
-                .fileName(audioFile.getFileName())
-                .fileSize(audioFile.getFileSize())
-                .createdDate(audioFile.getCreatedDate())
-                .extension(audioFile.getExtension())
-                .build();
     }
 }
