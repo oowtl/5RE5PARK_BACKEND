@@ -33,6 +33,10 @@ jobs:
       AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
       VC_URL: ${{ secrets.VC_URL }}
       VC_APIKEY: ${{ secrets.VC_APIKEY }}
+      AWS_SQS_ACCESS_KEY_ID: ${{ secrets.AWS_SQS_ACCESS_KEY_ID }}
+      AWS_SQS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SQS_SECRET_ACCESS_KEY }}
+      AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
+      AWS_SQS_VIRTUAL_QUEUE_NAME: ${{ secrets.AWS_SQS_VIRTUAL_QUEUE_NAME }}
     permissions:
       pull-requests: write  # PR에 댓글, 체크 실행을 할 수 있는 권한
       checks: write          # 체크 결과를 기록할 권한
