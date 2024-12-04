@@ -95,11 +95,6 @@ public class AudioFileController {
                                                                        @RequestParam int page,
                                                                        @RequestParam int size,
                                                                        @RequestParam String sort) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String user =  authentication.getPrincipal().toString();
-        System.out.println("user = " + user);
-
-
         Sort.Direction direction = Sort.Direction.fromString(sort); // "ASC" 또는 "DESC"
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdDate")); // "created_date"가 아니라 매핑된 엔티티 필드 이름 사용
         return buildResponse(HttpStatus.OK, audioFileService.getMemberAudioFile(userDetails.getMember().getSeq(), pageable));
