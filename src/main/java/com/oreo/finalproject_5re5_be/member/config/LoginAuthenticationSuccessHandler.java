@@ -59,8 +59,12 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         log.info("memberSeq = {}", memberSeq);
         log.info("memberId = {}", memberId);
 
+        // 기존 세션 삭제
+        request.getSession().invalidate();
+
         // 세션 조회
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(true);
+
         // 세션에 아이디 등록
         session.setAttribute("memberId", memberId);
         session.setAttribute("memberSeq", memberSeq);
@@ -86,6 +90,8 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         if (rememberMe != null) {
             // 쿠키 생성
             Cookie cookie = new Cookie("memberId", memberId);
+            // 쿠키 도메인 설정
+            cookie.setDomain("5re5park.site");
             // 1일 간 유지
             cookie.setMaxAge(60 * 60 * 24 * 1);
             // 쿠키 등록
