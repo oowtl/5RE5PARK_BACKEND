@@ -59,22 +59,12 @@ public class MemberConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 허용된 Origin 설정
-        configuration.setAllowedOrigins(List.of(
-                "https://client.5re5park.site",
-                "https://5re5park.site",
-                "https://www.5re5park.site",
-                "http://localhost:8080",
-                "http://localhost:5173",
-                "http://127.0.0.1:8080",
-                "http://127.0.0.1:5173"
-        ));
-        // 허용된 HTTP 메서드 설정
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        // 허용된 헤더 설정
+
+        configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
-        // 인증 정보 전송 허용
+        configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
