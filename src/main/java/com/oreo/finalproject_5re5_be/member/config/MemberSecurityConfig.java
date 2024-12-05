@@ -115,12 +115,23 @@ public class MemberSecurityConfig {
     @Bean
     public TomcatServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+
         tomcat.addContextCustomizers(context -> {
-            context.setUseHttpOnly(true); // HTTP 요청에서도 쿠키 허용
-            // 쿠키 프로세서에 SameSite 속성 설정 (SameSite=None)
+            // HttpOnly 활성화
+            context.setUseHttpOnly(true);
+
+            // SameSite=None 설정
             Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-            cookieProcessor.setSameSiteCookies("None"); // SameSite=None 설정
+            cookieProcessor.setSameSiteCookies("None");
             context.setCookieProcessor(cookieProcessor);
+
+            // Secure 플래그 설정
+            boolean isSecure = "https".equals(System.getenv("SECURE_ENV")); // 환경 변수로 제어
+            if (isSecure) {
+                System.setProperty("server.servlet.session.cookie.secure", "true");
+            } else {
+                System.setProperty("server.servlet.session.cookie.secure", "false");
+            }
         });
 
         return tomcat;
