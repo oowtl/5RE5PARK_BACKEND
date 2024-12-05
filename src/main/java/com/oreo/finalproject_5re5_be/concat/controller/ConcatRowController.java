@@ -32,8 +32,9 @@ public class ConcatRowController {
     @PostMapping("save")
     public ResponseEntity<ResponseDto<Boolean>> save(
             @RequestBody ConcatRowSaveRequestDto concatRowSaveRequestDto,
-            @SessionAttribute Long memberSeq) throws IOException {
-        projectService.projectCheck(memberSeq, concatRowSaveRequestDto.getConcatTabId());
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(),
+                concatRowSaveRequestDto.getConcatTabId());
 
         return new ResponseDto<>(HttpStatus.OK.value(), concatRowService.saveConcatRows(concatRowSaveRequestDto))
                 .toResponseEntity();
@@ -45,8 +46,9 @@ public class ConcatRowController {
     )
     @PostMapping("disable")
     public ResponseEntity<ResponseDto<Boolean>> disable(@RequestParam List<Long> rowSeq,
-                                                        @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatRowService.readConcatRow(rowSeq.get(0)).getConcatTab().getProjectId());
+                                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(),
+                concatRowService.readConcatRow(rowSeq.get(0)).getConcatTab().getProjectId());
 
         return new ResponseDto<>(HttpStatus.OK.value(), concatRowService.disableConcatRows(rowSeq))
                 .toResponseEntity();
@@ -60,8 +62,9 @@ public class ConcatRowController {
     @GetMapping("read")
     public ResponseEntity<ResponseDto<List<ConcatRowDto>>> readOne(
             @RequestParam Long concatRowSequence,
-            @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatRowService.readConcatRow(concatRowSequence).getConcatTab().getProjectId());
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(),
+                concatRowService.readConcatRow(concatRowSequence).getConcatTab().getProjectId());
 
         //사용자 예외 처리
         return new ResponseDto<>(HttpStatus.OK.value(), concatRowService.readConcatRows(concatRowSequence))
@@ -75,8 +78,8 @@ public class ConcatRowController {
     @GetMapping("read/recent")
     public ResponseEntity<ResponseDto<List<ConcatRowDto>>> readRecent(
             @RequestParam Long projectSequence,
-            @AuthenticationPrincipal Long memberSeq) {
-        projectService.projectCheck(memberSeq, projectSequence);
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), projectSequence);
 
         //사용자 예외 처리
         return new ResponseDto<>(HttpStatus.OK.value(), concatRowService.readRecentConcatRows(projectSequence))

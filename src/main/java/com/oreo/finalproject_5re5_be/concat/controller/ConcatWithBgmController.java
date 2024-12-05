@@ -78,8 +78,8 @@ public class ConcatWithBgmController {
     public ResponseEntity<ResponseDto<ConcatResponseDto>> executeConcatWithBgm(
             @Parameter(description = "결과물이 나온 concatTab", required = true) @RequestParam Long concatTabSeq,
             @RequestBody BgmFunctionRequestDto bgmFunctionRequestDto,
-            @SessionAttribute Long memberSeq) {
-        projectService.projectCheck(memberSeq, concatTabSeq);
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), concatTabSeq);
 
         try {
 
