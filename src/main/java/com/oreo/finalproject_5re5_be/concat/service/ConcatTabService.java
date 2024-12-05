@@ -10,7 +10,6 @@ import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
 import com.oreo.finalproject_5re5_be.member.service.MemberServiceImpl;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
-
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ public class ConcatTabService {
         System.out.println("project.getProSeq() = " + project.getProSeq());
         ConcatTab concatTab = ConcatTab.builder()
                 .project(project) // Hibernate가 projectId를 자동으로 동기화
-                .option(null)
                 .status('Y')
                 .frontSilence(0.0f)
                 .build();
@@ -55,7 +53,7 @@ public class ConcatTabService {
         if (concatTabRepository.existsById(project.getProSeq())) {
             return false;
         }
-        ConcatTab concatTab = new ConcatTab(project.getProSeq(), project, null, 'Y', 0.0f);
+        ConcatTab concatTab = new ConcatTab(project.getProSeq(), project, 'Y', 0.0f);
         concatTabRepository.save(concatTab);
         return true;
     }
@@ -116,8 +114,6 @@ public class ConcatTabService {
             ConcatTab updatedTab = new ConcatTab(
                     concatUpdateRequestDto.getTabId(),
                     project,
-                    //concatUpdateRequestDto.getConcatOption(),
-                    null,
                     concatUpdateRequestDto.getStatus(),
                     concatUpdateRequestDto.getFrontSilence()
             );

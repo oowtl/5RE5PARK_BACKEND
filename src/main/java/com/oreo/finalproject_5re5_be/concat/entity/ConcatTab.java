@@ -20,10 +20,6 @@ public class ConcatTab extends BaseEntity {
     @JoinColumn(name = "pro_seq")
     private Project project;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "option_seq")
-    private ConcatOption option;
-
     @Column(name = "status")
     private Character status;
 

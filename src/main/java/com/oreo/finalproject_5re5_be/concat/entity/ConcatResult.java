@@ -21,9 +21,6 @@ public class ConcatResult extends BaseEntity {
     @JoinColumn(name = "pro_seq")
     private ConcatTab concatTab;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private ConcatOption option;
-
     @Column(name = "audio_url")
     private String audioUrl;
 
