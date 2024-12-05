@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -20,7 +21,9 @@ public class MemberSecurityConfig {
     private final LoginAuthenticationFailureHandler failureHandler;
     private final CorsConfigurationSource corsConfigurationSource;
 
-    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler, LoginAuthenticationFailureHandler failureHandler, CorsConfigurationSource corsConfigurationSource) {
+    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler,
+        LoginAuthenticationFailureHandler failureHandler,
+        CorsConfigurationSource corsConfigurationSource) {
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
         this.corsConfigurationSource = corsConfigurationSource;
@@ -57,27 +60,55 @@ public class MemberSecurityConfig {
 //                                         "/voice/**", "/style/**", "/vc/**", "/concat/**",
 //                                         "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html") // Swagger 관련 URL 허용
 
+//    // SecurityFilterChain을 빈으로 등록
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
+//                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+//                .authorizeHttpRequests(authorize -> authorize
+//                                .anyRequest() // 개발 단계로 모든 요청 열어둠
+//                                .permitAll() // 위 URL들은 인증 없이 접근 가능
+//                )
+//                .formLogin(formLogin -> formLogin
+//                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
+//                        .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
+//                        .failureHandler(failureHandler) // 로그인 실패 시 로그인 페이지로 이동
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
+//                        .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
+//                        .logoutSuccessUrl("/") // 로그아웃 성공 시 이동할 페이지
+//                );
+//
+//        return http.build();
+//    }
+
 
     // SecurityFilterChain을 빈으로 등록
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .authorizeHttpRequests(authorize -> authorize
-                                .anyRequest() // 개발 단계로 모든 요청 열어둠
-                                .permitAll() // 위 URL들은 인증 없이 접근 가능
-                )
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
-                        .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
-                        .failureHandler(failureHandler) // 로그인 실패 시 로그인 페이지로 이동
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
-                        .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
-                        .logoutSuccessUrl("/") // 로그아웃 성공 시 이동할 페이지
-                );
+            .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
+            .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+            .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+                SessionCreationPolicy.STATELESS)) // 세션 생성 정책 설정
+            .httpBasic(
+                httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.disable()) // HTTP Basic 인증 비활성화
+            .authorizeHttpRequests(authorize -> authorize
+                .anyRequest() // 개발 단계로 모든 요청 열어둠
+                .permitAll() // 위 URL들은 인증 없이 접근 가능
+            )
+            .formLogin(formLogin -> formLogin
+                .loginPage("/api/member/login") // 로그인 페이지 경로 설정
+                .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
+                .failureHandler(failureHandler) // 로그인 실패 시 로그인 페이지로 이동
+            )
+            .logout(logout -> logout
+                .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
+                .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
+                .logoutSuccessUrl("/") // 로그아웃 성공 시 이동할 페이지
+            );
 
         return http.build();
     }
