@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.config;
 
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -95,6 +96,9 @@ public class MemberSecurityConfig {
                 .anyRequest() // 개발 단계로 모든 요청 열어둠
                 .permitAll() // 위 URL들은 인증 없이 접근 가능
             )
+            .requiresChannel(channel -> channel
+                    .anyRequest().requiresSecure() // 모든 요청을 HTTPS로 리다이렉션
+            )
             .formLogin(formLogin -> formLogin
                 .loginPage("/api/member/login") // 로그인 페이지 경로 설정
                 .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
@@ -111,11 +115,24 @@ public class MemberSecurityConfig {
 
     @Bean
     public TomcatServletWebServerFactory servletContainer() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        tomcat.addContextCustomizers(context -> {
-            context.setUseHttpOnly(true); // HTTP 요청에서도 쿠키 허용
-        });
-        return tomcat;
+        return new TomcatServletWebServerFactory() {
+            @Override
+            protected void customizeConnector(org.apache.catalina.connector.Connector connector) {
+                super.customizeConnector(connector);
+                connector.setProperty("relaxedQueryChars", "|{}[]"); // 필요 시 추가 설정
+            }
+
+            @Override
+            protected void postProcessContext(org.apache.catalina.Context context) {
+                // 쿠키 프로세서에 SameSite 속성 추가
+                Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+                cookieProcessor.setSameSiteCookies("None"); // 명시적으로 SameSite=None 설정
+                context.setCookieProcessor(cookieProcessor);
+
+                // HttpOnly 설정
+                context.setUseHttpOnly(true);
+            }
+        };
     }
 
 }
