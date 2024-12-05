@@ -1,15 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.config;
 
-import java.util.List;
-import org.apache.catalina.filters.CorsFilter;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-
 import org.springframework.web.cors.CorsConfigurationSource;
 
 
@@ -91,8 +87,7 @@ public class MemberSecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-            .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-                SessionCreationPolicy.STATELESS)) // 세션 생성 정책 설정
+                .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(sessionFixation -> sessionFixation.migrateSession())) // 기본값
             .httpBasic(
                 httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.disable()) // HTTP Basic 인증 비활성화
             .authorizeHttpRequests(authorize -> authorize
@@ -111,6 +106,14 @@ public class MemberSecurityConfig {
             );
 
         return http.build();
+    }
+    @Bean
+    public TomcatServletWebServerFactory servletContainer() {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        tomcat.addContextCustomizers(context -> {
+            context.setUseHttpOnly(true); // HTTP 요청에서도 쿠키 허용
+        });
+        return tomcat;
     }
 
 }
