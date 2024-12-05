@@ -101,6 +101,8 @@ public class MemberSecurityConfig {
             .cors(cors -> cors.configurationSource(
                 memberConfig.corsConfigurationSource())); // 새로운 방식으로 CORS 설정 적용
         http
+            .csrf(AbstractHttpConfigurer::disable); // CSRF 비활성화
+        http
             .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
                     SessionFixationConfigurer::changeSessionId)
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); // 기본값
