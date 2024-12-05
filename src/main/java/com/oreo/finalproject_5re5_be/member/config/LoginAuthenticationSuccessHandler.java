@@ -22,127 +22,91 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
-        // 로그인 성공 시 세션 ID를 쿠키에 저장
+            Authentication authentication) throws IOException, ServletException {
+        // 로그인 성공시 유저 정보 반환
+        // 사용자 정보 추출
         Object principal = authentication.getPrincipal();
-        CustomUserDetails memberDetails = (CustomUserDetails) principal;
-        Member member = memberDetails.getMember();
+        Map<String, Object> memberInfo = new HashMap<>();
 
 
-        String memberId = member.getId();
-        Long memberSeq = member.getSeq();
-        HttpSession session = request.getSession();
-        session.setAttribute("memberSeq", memberSeq);
-        String sessionId = session.getId();
-        log.info("Session ID: {}", sessionId);
+        String memberId = "";
+        Long memberSeq = 0L;
 
-        // 쿠키 생성
-        Cookie sessionCookie = new Cookie("SESSIONID", sessionId);
-        sessionCookie.setHttpOnly(true);
-        sessionCookie.setSecure(true); // HTTPS 환경에서만 작동
-        sessionCookie.setPath("/");   // 모든 경로에서 쿠키 유효
-        sessionCookie.setMaxAge(-1);  // 세션이 유지되는 동안만 유효
+        if (principal instanceof CustomUserDetails) {
+            CustomUserDetails memberDetails = (CustomUserDetails) principal;
+            Member member = memberDetails.getMember();
 
-        // 쿠키 추가
-        response.addCookie(sessionCookie);
+            memberInfo.put("seq", member.getSeq());
+            memberInfo.put("id", member.getId());
+            memberInfo.put("name", member.getName());
+            memberInfo.put("email", member.getEmail());
 
+            memberId = member.getId();
+            memberSeq = member.getSeq();
 
-//         기존 세션 삭제
+        } else if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+
+            memberInfo.put("username", userDetails.getUsername());
+
+            memberId = userDetails.getUsername();
+            memberSeq = 0L;
+        }
+
+        log.info("memberSeq = {}", memberSeq);
+        log.info("memberId = {}", memberId);
+
+        // 기존 세션 삭제
         request.getSession().invalidate();
+
+        // 세션 조회
+        HttpSession session = request.getSession(true);
 
         // 세션에 아이디 등록
         session.setAttribute("memberId", memberId);
         session.setAttribute("memberSeq", memberSeq);
 
-        response.setContentType("application/json;charset=UTF-8");
-    }
-//    @Override
-//    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-//            Authentication authentication) throws IOException, ServletException {
-//        // 로그인 성공시 유저 정보 반환
-//        // 사용자 정보 추출
-//        Object principal = authentication.getPrincipal();
-//        Map<String, Object> memberInfo = new HashMap<>();
-//
-//
-//        String memberId = "";
-//        Long memberSeq = 0L;
-//
-//        if (principal instanceof CustomUserDetails) {
-//            CustomUserDetails memberDetails = (CustomUserDetails) principal;
-//            Member member = memberDetails.getMember();
-//
-//            memberInfo.put("seq", member.getSeq());
-//            memberInfo.put("id", member.getId());
-//            memberInfo.put("name", member.getName());
-//            memberInfo.put("email", member.getEmail());
-//
-//            memberId = member.getId();
-//            memberSeq = member.getSeq();
-//
-//        } else if (principal instanceof UserDetails) {
-//            UserDetails userDetails = (UserDetails) principal;
-//
-//            memberInfo.put("username", userDetails.getUsername());
-//
-//            memberId = userDetails.getUsername();
-//            memberSeq = 0L;
-//        }
-//
-//        log.info("memberSeq = {}", memberSeq);
-//        log.info("memberId = {}", memberId);
-//
-//        // 기존 세션 삭제
-//        request.getSession().invalidate();
-//
-//        // 세션 조회
-//        HttpSession session = request.getSession(true);
-//
-//        // 세션에 아이디 등록
-//        session.setAttribute("memberId", memberId);
-//        session.setAttribute("memberSeq", memberSeq);
-//
-//        // 세션 처리
-//        handleCookie(request, response, authentication);
-//
-//        // JSON으로 응답
-//        response.setContentType("application/json;charset=UTF-8");
-//        new ObjectMapper().writeValue(response.getWriter(), memberInfo);
-//    }
-//
-//    // 쿠키 등록
-//    // 만약 쿠키 체크가 rememberMe로 되어 있다고 가정. 이 부분 추후에 프론트랑 얘기해야함
-//    private void handleCookie(HttpServletRequest request, HttpServletResponse response,
-//            Authentication authentication) throws IOException {
-//        // Authentication에서 회원 아이디 조회
-//        String memberId = authentication.getName();
-//        // request에서 아이디 체크 유무 조회
-//        String rememberMe = request.getParameter("rememberMe");
-//
-//        // 아이디 체크가 되어 있음
-//        if (rememberMe != null) {
-//            // 쿠키 생성
-//            Cookie cookie = new Cookie("memberId", memberId);
-//            cookie.setDomain("5re5park.site");
-//            cookie.setSecure(true);
-//            cookie.setHttpOnly(true);
-//            cookie.setPath("/");
-//            // SameSite 설정 추가
-//            response.setHeader("Set-Cookie", String.format("%s; SameSite=None; Secure", cookie.toString()));
-//            // 1일 간 유지
-//            cookie.setMaxAge(60 * 60 * 24 * 1);
-//            // 쿠키 등록
-//            response.addCookie(cookie);
-//        } else {
-//            // 아이디 체크가 되어 있지 않음
-//            Cookie cookie = new Cookie("memberId", "");
-//            // 쿠키 수동 삭제
-//            cookie.setMaxAge(0);
-//            response.addCookie(cookie);
-//        }
+        // 세션 처리
+        handleCookie(request, response, authentication);
 
-//    }
+        // JSON으로 응답
+        response.setContentType("application/json;charset=UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), memberInfo);
+    }
+
+    // 쿠키 등록
+    // 만약 쿠키 체크가 rememberMe로 되어 있다고 가정. 이 부분 추후에 프론트랑 얘기해야함
+    private void handleCookie(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException {
+        // Authentication에서 회원 아이디 조회
+        String memberId = authentication.getName();
+        // request에서 아이디 체크 유무 조회
+        String rememberMe = request.getParameter("rememberMe");
+
+        // 아이디 체크가 되어 있음
+        if (rememberMe != null) {
+            // 쿠키 생성
+            Cookie cookie = new Cookie("memberId", memberId);
+            // 쿠키 도메인 설정
+            cookie.setDomain("5re5park.site");
+            cookie.setSecure(true);// XSS 방지
+            cookie.setHttpOnly(true);// HTTPS에서만 전송
+            cookie.setPath("/");     // 쿠키가 모든 경로에서 유효
+            // 1일 간 유지
+            cookie.setMaxAge(60 * 60 * 24 * 1);
+            // 쿠키 등록
+            response.addCookie(cookie);
+        } else {
+            // 아이디 체크가 되어 있지 않음
+            Cookie cookie = new Cookie("memberId", "");
+            // 쿠키 수동 삭제
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
+
+    }
 
 }
