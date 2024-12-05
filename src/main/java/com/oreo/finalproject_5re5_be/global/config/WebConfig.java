@@ -12,6 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOriginPatterns(
                         "https://*.5re5park.site", // 모든 서브도메인 허용
+                        "http://*.5re5park.site:*", // 모든 서브도메인 허용
                         "http://localhost:*",      // localhost의 모든 포트 허용
                         "http://127.0.0.1:*"       // 127.0.0.1의 모든 포트 허용
                 )
