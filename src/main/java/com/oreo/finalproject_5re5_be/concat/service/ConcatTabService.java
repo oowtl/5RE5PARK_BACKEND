@@ -112,8 +112,10 @@ public class ConcatTabService {
         }
 
         //Dto의 bgm오디오파일 seq를 통해 bgmFile 객체 찾기
-        AudioFile bgmFile = audioFileRepository.findById(concatUpdateRequestDto.getBgmSeq())
-                .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: " + concatUpdateRequestDto.getBgmSeq()));
+        //OriginAudioRequest의 seq를 통해 bgmFile 객체 만들기
+        AudioFile bgmFile = audioFileRepository.findById(concatUpdateRequestDto.getOriginAudioRequest().getSeq())
+                .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: "
+                        + concatUpdateRequestDto.getOriginAudioRequest().getSeq()));
 
         // 권한 확인
         if (project.getMember().getId().equals(member.getId())) {
@@ -133,21 +135,25 @@ public class ConcatTabService {
     }
 
     @Transactional
-    public void updateBgmAudioFile(Long tabSeq, Long bgmAudioFileSeq) {
+    public boolean updateBgmAudioFile(Long tabSeq, Long bgmAudioFileSeq) {
         // ConcatTab 찾기
         ConcatTab concatTab = concatTabRepository.findById(tabSeq)
                 .orElseThrow(() -> new NoSuchElementException("ConcatTab not found"));
 
-        // bgmAudioFileSeq가 null이면 제거
+        // bgmAudioFileSeq가 null이면 bgm파일이 탭에 없다는 뜻
         if (bgmAudioFileSeq == null) {
             concatTab.setBgmAudioFile(null);
         } else {
             // bgmAudioFileSeq가 있으면 AudioFile 설정
-            AudioFile bgmFile = audioFileRepository.findAudioFileById(bgmAudioFileSeq);
+            AudioFile bgmFile = Optional.ofNullable(audioFileRepository.findAudioFileById(bgmAudioFileSeq))
+                    .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: " + bgmAudioFileSeq));
             concatTab.setBgmAudioFile(bgmFile);
         }
 
         // 업데이트된 ConcatTab 저장
         concatTabRepository.save(concatTab);
+
+        //작업 성공하면 true 반환
+        return true;
     }
 }
