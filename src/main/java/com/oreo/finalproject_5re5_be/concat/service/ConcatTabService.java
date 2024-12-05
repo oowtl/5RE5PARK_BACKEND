@@ -4,6 +4,7 @@ import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
+import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
@@ -24,6 +25,7 @@ public class ConcatTabService {
     private ProjectRepository projectRepository;
     private MemberServiceImpl memberService;
     private ConcatTabHelper concatTabHelper;
+    private AudioFileRepository audioFileRepository;
 
     /**
      * @param concatCreateRequestDto
