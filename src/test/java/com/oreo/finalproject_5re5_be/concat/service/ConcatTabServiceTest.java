@@ -96,13 +96,12 @@ class ConcatTabServiceTest {
         //given : 프로젝트와 ConcatTab이 존재
         Project project = Project.builder().proSeq(1L).build();
         Long memberSeq = 1L;
-        ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
+        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f);
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
         when(concatTabHelper.prepareConcatTab(concatTab, memberSeq)).thenReturn(new ConcatTabResponseDto(
                 concatTab.getProjectId(),
-                null,
                 concatTab.getFrontSilence(),
                 concatTab.getStatus()
         ));
@@ -120,7 +119,7 @@ class ConcatTabServiceTest {
     void readConcatTab_CreateConcatTabAndReturn() {
         //given : 프로젝트가 존재하지만 ConcatTab이 존재하지 않음
         Project project = Project.builder().proSeq(1L).build();
-        ConcatTab concatTab = new ConcatTab(1L, project, null, 'Y', 0.5f);
+        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f);
         Long memberSeq = 1L;
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
@@ -128,8 +127,7 @@ class ConcatTabServiceTest {
                 .thenReturn(Optional.empty())//첫 번째 리턴
                 .thenReturn(Optional.of(concatTab));// 두 번쨰 리턴
         when(concatTabHelper.prepareConcatTab(concatTab, memberSeq)).thenReturn(new ConcatTabResponseDto(
-                concatTab.getProjectId()
-                , null,
+                concatTab.getProjectId(),
                 concatTab.getFrontSilence(),
                 concatTab.getStatus()
         ));

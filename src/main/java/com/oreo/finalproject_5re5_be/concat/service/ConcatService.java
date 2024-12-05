@@ -15,7 +15,6 @@ import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,7 +83,6 @@ public class ConcatService {
         //결과 저장
         ConcatResult result = ConcatResult.builder().concatTab(ConcatTab.builder()
                         .projectId(concatTabResponseDto.getTabId()).build())
-                .option(null)
                 .audioUrl(uploadUrl)
                 .extension("WAV")
                 .fileSize((long) audioData.length)

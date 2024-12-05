@@ -37,10 +37,10 @@ class MaterialAudioRepositoryTest {
 
 
     /**
-    *  [ result seq로 concat row 리스트 읽기 테스트 ]
-    *   1. 재료 2개로 만든 resultSeq로 조회 - 성공
-    *   2. 존재하지 않는 resultSeq로 조회 - 실패
-    * */
+     * [ result seq로 concat row 리스트 읽기 테스트 ]
+     * 1. 재료 2개로 만든 resultSeq로 조회 - 성공
+     * 2. 존재하지 않는 resultSeq로 조회 - 실패
+     */
 
     // result seq로 concat row 리스트 읽기 테스트 -  1. 재료 2개로 만든 resultSeq로 조회 - 성공
     @Test
@@ -56,7 +56,7 @@ class MaterialAudioRepositoryTest {
         Project project = Project.builder().member(save1).proSeq(1L).build();
         Project save = projectRepository.save(project);
         // 1-1. ConcatTab 저장
-        ConcatTab concatTab = ConcatTab.builder().status('Y').frontSilence(0.0f).option(null).project(save).build();
+        ConcatTab concatTab = ConcatTab.builder().status('Y').frontSilence(0.0f).project(save).build();
         ConcatTab savedConcatTab = concatTabRepository.save(concatTab);
         assertNotNull(savedConcatTab);
 
@@ -117,7 +117,7 @@ class MaterialAudioRepositoryTest {
         return ConcatRow.builder()
                 .rowText("여기 왜 테스트 코드가 없죠?")
                 .rowIndex(i)
-                .silence((float)(i+0.22))
+                .silence((float) (i + 0.22))
                 .status('y')
                 .selected('n')
                 .build();
@@ -129,8 +129,8 @@ class MaterialAudioRepositoryTest {
                 .concatRow(concatRow)
                 .audioUrl("test/audio.test")
                 .extension(".test")
-                .fileLength((long)i*1000)
-                .fileSize((long)i*1024)
+                .fileLength((long) i * 1000)
+                .fileSize((long) i * 1024)
                 .fileName("test-audio-name")
                 .createdDate(LocalDateTime.now())
                 .build();
@@ -139,7 +139,7 @@ class MaterialAudioRepositoryTest {
     // concatResult 엔티티 생성 메서드
     private ConcatResult createConcatResultEntity(int i) {
         return ConcatResult.builder()
-                .concatResultSequence((long)i)
+                .concatResultSequence((long) i)
                 .audioUrl("test/result-audio.test")
                 .extension(".result")
                 .fileLength(0.0f)
