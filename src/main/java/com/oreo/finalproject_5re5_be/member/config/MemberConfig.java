@@ -80,7 +80,7 @@ public class MemberConfig {
         configuration.addAllowedHeader("*");
 
         // 인증 정보 전송 허용
-        configuration.setAllowCredentials(false);
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

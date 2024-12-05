@@ -87,7 +87,8 @@ public class MemberSecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(sessionFixation -> sessionFixation.migrateSession())) // 기본값
+            .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
+                sessionFixation -> sessionFixation.changeSessionId())) // 기본값
             .httpBasic(
                 httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.disable()) // HTTP Basic 인증 비활성화
             .authorizeHttpRequests(authorize -> authorize
@@ -107,6 +108,7 @@ public class MemberSecurityConfig {
 
         return http.build();
     }
+
     @Bean
     public TomcatServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
