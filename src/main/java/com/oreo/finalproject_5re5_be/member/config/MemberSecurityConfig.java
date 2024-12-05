@@ -3,13 +3,12 @@ package com.oreo.finalproject_5re5_be.member.config;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 
 @Configuration
@@ -97,50 +96,50 @@ public class MemberSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(
-                        memberConfig.corsConfigurationSource())) // 새로운 방식으로 CORS 설정 적용
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
-                                SessionFixationConfigurer::changeSessionId)
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 기본값
-                .httpBasic(
-                        httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.disable()) // HTTP Basic 인증 비활성화
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest() // 개발 단계로 모든 요청 열어둠
-                        .permitAll() // 위 URL들은 인증 없이 접근 가능
-                )
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/api/member/login") // 로그인 페이지 경로 설정
-                        .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
-                        .failureHandler(failureHandler) // 로그인 실패 시 로그인 페이지로 이동
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
-                        .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
-                        .logoutSuccessUrl("/") // 로그아웃 성공 시 이동할 페이지
-                );
+            .cors(cors -> cors.configurationSource(
+                memberConfig.corsConfigurationSource())) // 새로운 방식으로 CORS 설정 적용
+            .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+            .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
+                    SessionFixationConfigurer::changeSessionId)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // 기본값
+            .httpBasic(
+                httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.disable()) // HTTP Basic 인증 비활성화
+            .authorizeHttpRequests(authorize -> authorize
+                .anyRequest() // 개발 단계로 모든 요청 열어둠
+                .permitAll() // 위 URL들은 인증 없이 접근 가능
+            )
+            .formLogin(formLogin -> formLogin
+                .loginPage("/api/member/login") // 로그인 페이지 경로 설정
+                .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
+                .failureHandler(failureHandler) // 로그인 실패 시 로그인 페이지로 이동
+            )
+            .logout(logout -> logout
+                .logoutUrl("/api/member/logout") // 로그아웃 경로 설정
+                .invalidateHttpSession(true) // 로그아웃 시 세션 무효화
+                .logoutSuccessUrl("/") // 로그아웃 성공 시 이동할 페이지
+            );
 
         return http.build();
     }
 
-//    @Bean
-//    public TomcatServletWebServerFactory servletContainer() {
-//        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-//
-//        tomcat.addContextCustomizers(context -> {
-//            // HttpOnly 활성화
-//            context.setUseHttpOnly(true);
-////
-////            // Secure 플래그 설정
-////            boolean isSecure = "https".equals(System.getenv("SECURE_ENV")); // 환경 변수로 제어
-////            if (isSecure) {
-////                System.setProperty("server.servlet.session.cookie.secure", "true");
-////            } else {
-////                System.setProperty("server.servlet.session.cookie.secure", "false");
-////            }
-//        });
-//
-//        return tomcat;
-//    }
+    @Bean
+    public TomcatServletWebServerFactory servletContainer() {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+
+        tomcat.addContextCustomizers(context -> {
+            // HttpOnly 활성화
+            context.setUseHttpOnly(true);
+
+            // Secure 플래그 설정
+            boolean isSecure = "https".equals(System.getenv("SECURE_ENV")); // 환경 변수로 제어
+            if (isSecure) {
+                System.setProperty("server.servlet.session.cookie.secure", "true");
+            } else {
+                System.setProperty("server.servlet.session.cookie.secure", "false");
+            }
+        });
+
+        return tomcat;
+    }
 
 }
