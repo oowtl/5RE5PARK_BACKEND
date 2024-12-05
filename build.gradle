@@ -92,6 +92,16 @@ dependencies {
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
     implementation 'com.amazonaws:aws-java-sdk-s3'
 
+    // https://mvnrepository.com/artifact/software.amazon.awssdk/sqs
+    implementation group: 'software.amazon.awssdk', name: 'sqs', version: '2.21.46'
+
+    // https://mvnrepository.com/artifact/software.amazon.awssdk/auth
+    implementation group: 'software.amazon.awssdk', name: 'auth', version: '2.21.46'
+
+    // https://mvnrepository.com/artifact/com.amazonaws/amazon-sqs-java-temporary-queues-client
+    implementation group: 'com.amazonaws', name: 'amazon-sqs-java-temporary-queues-client', version: '2.0.1'
+
+
     //http request
     // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'

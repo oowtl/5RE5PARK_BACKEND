@@ -2,19 +2,18 @@ package com.oreo.finalproject_5re5_be.concat.controller;
 
 import com.oreo.finalproject_5re5_be.concat.dto.ConcatResponseDto;
 import com.oreo.finalproject_5re5_be.concat.dto.RowInfoDto;
+import com.oreo.finalproject_5re5_be.concat.dto.request.BgmFunctionRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.SelectedConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
 import com.oreo.finalproject_5re5_be.concat.service.AudioStreamService;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatResultService;
 import com.oreo.finalproject_5re5_be.concat.service.MaterialAudioService;
-import com.oreo.finalproject_5re5_be.concat.service.bgm.BgmProcessor;
-import com.oreo.finalproject_5re5_be.concat.service.concatenator.AudioProperties;
-import com.oreo.finalproject_5re5_be.concat.service.concatenator.IntervalConcatenator;
-import com.oreo.finalproject_5re5_be.concat.service.concatenator.StereoIntervalConcatenator;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.SqsService;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
+import com.oreo.finalproject_5re5_be.global.constant.MessageType;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
@@ -29,10 +28,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +45,7 @@ public class ConcatWithBgmController {
     private final S3Service s3Service;
     private final MaterialAudioService materialAudioService;
     private final ConcatResultService concatResultService;
+    private final SqsService sqsService;
     private final AudioFileService audioFileService;
     private final AudioStreamService audioStreamService; // 추가된 서비스
     private final AudioResample audioResample = new AudioResample(); // 리샘플링 유틸. Bean이 아니라 new로 생성
@@ -76,48 +76,57 @@ public class ConcatWithBgmController {
     )
     @PostMapping("/execute-with-bgm")
     public ResponseEntity<ResponseDto<ConcatResponseDto>> executeConcatWithBgm(
-            @RequestBody SelectedConcatRowRequest selectedRows,
-            @Parameter(description = "S3에 저장된 BGM 파일의 URL", required = true) @RequestParam String bgmFileUrl,
             @Parameter(description = "결과물이 나온 concatTab", required = true) @RequestParam Long concatTabSeq,
-            @Parameter(description = "user가 설정한 결과물 파일 이름", required = true) @RequestParam String concatResultFileName,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        projectService.projectCheck(customUserDetails.getMember().getSeq(), concatTabSeq);
+            @RequestBody BgmFunctionRequestDto bgmFunctionRequestDto,
+            @SessionAttribute Long memberSeq) {
+        projectService.projectCheck(memberSeq, concatTabSeq);
+
         try {
-            IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
 
-            // 1. Row 오디오 파일 로드 및 무음 처리
-            List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(selectedRows);
+            //SQS로 메세지 보내기. 각각 messageBody와 messageAttribute로 들어갈 내용
+            Message message = sqsService.sendMessage(bgmFunctionRequestDto, MessageType.CONCAT_BGM_MAKE);
 
-            // 2. 병합된 오디오 생성
-            ByteArrayOutputStream concatenatedAudioBuffer = intervalConcatenator.intervalConcatenate(audioProperties, selectedRows.getInitialSilence());
 
-            // 3. 병합된 오디오를 AudioInputStream으로 변환
-            AudioInputStream concatenatedAudioStream = audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
+//            IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
+//
+//            // Concat 작업: 1. Row 오디오 파일 로드 및 무음 처리
+//            List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(selectedRows);
+//
+//            // 2. 병합된 오디오 생성
+//            ByteArrayOutputStream concatenatedAudioBuffer = intervalConcatenator.intervalConcatenate(audioProperties, selectedRows.getInitialSilence());
+//
+//            // Bgm 작업: 1. 병합된 오디오를 AudioInputStream으로 변환
+//            AudioInputStream concatenatedAudioStream = audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
+//
+//            // 2. BGM 스트림 로드 및 버퍼링
+//            AudioInputStream bufferedBgmStream = s3Service.loadAsBufferedStream(bgmFileUrl);
+//
+//            // 3. BGM 길이 조정
+//            long targetFrames = audioStreamService.getValidFrameLength(concatenatedAudioStream);
+//            long bgmFrames = audioStreamService.getValidFrameLength(bufferedBgmStream);
+//            bufferedBgmStream = BgmProcessor.adjustBgmLength(bufferedBgmStream, targetFrames, bgmFrames);
+//
+//            // 4. 믹싱
+//            AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
+//
+//            // 결과파일 S3 업로드
+//            String audioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
 
-            // 4. BGM 스트림 로드 및 버퍼링
-            AudioInputStream bufferedBgmStream = s3Service.loadAsBufferedStream(bgmFileUrl);
+            String audioUrl = "";
+            String concatResultFileName = "";
+            AudioInputStream mixedAudioStream = null;
+            SelectedConcatRowRequest selectedRows = null;
 
-            // 5. BGM 길이 조정
-            long targetFrames = audioStreamService.getValidFrameLength(concatenatedAudioStream);
-            long bgmFrames = audioStreamService.getValidFrameLength(bufferedBgmStream);
-            bufferedBgmStream = BgmProcessor.adjustBgmLength(bufferedBgmStream, targetFrames, bgmFrames);
-
-            // 6. 믹싱
-            AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
-
-            // 7. 결과파일 S3 업로드
-            String audioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
-
-            // 8. DB ConcatResult테이블에 결과 저장
+            // DB ConcatResult테이블에 결과 저장
             ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatTabSeq, audioUrl, concatResultFileName, mixedAudioStream);
 
-            // 9. Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
+            // Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
             materialAudioService.saveMaterialsForSelectedRows(selectedRows, concatResultResponse);
 
-            // 10. 성공 응답 생성
+            // 성공 응답 생성
             return createSuccessResponse(audioUrl, selectedRows);
         } catch (Exception e) {
-            // 11. 실패 응답 생성
+            // 실패 응답 생성
             return createErrorResponse();
         }
     }
