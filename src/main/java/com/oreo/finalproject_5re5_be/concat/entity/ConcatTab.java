@@ -5,10 +5,13 @@ import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @ToString
 @Getter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "concat_tab")
 public class ConcatTab extends BaseEntity {
     @Id
@@ -25,20 +28,12 @@ public class ConcatTab extends BaseEntity {
     @Column(name = "front_silence")
     private Float frontSilence;
 
-    // Setter 메서드 추가
-    //bgm으로 지정된 오디오파일과 일대일 매칭
+    // 하나의 ConcatTab에 여러 bgmFile들 매칭
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab")
+    @Column(nullable = true)
     @Setter
-    @OneToOne
-    @JoinColumn(name = "bgm_audio_file_id", nullable = true)
-    private AudioFile bgmAudioFile;
+    private List<BgmFile> bgmFiles;
 
-    public ConcatTab(Long projectId, Project project, Character status, Float frontSilence, AudioFile bgmAudioFile) {
-        this.projectId = projectId;
-        this.project = project;
-        this.status = status;
-        this.frontSilence = frontSilence;
-        this.bgmAudioFile = bgmAudioFile;
-    }
 
 }
 

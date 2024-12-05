@@ -3,9 +3,10 @@ package com.oreo.finalproject_5re5_be.concat.service;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
+import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
+import com.oreo.finalproject_5re5_be.concat.repository.BgmFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
@@ -16,6 +17,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -27,6 +29,7 @@ public class ConcatTabService {
     private MemberServiceImpl memberService;
     private ConcatTabHelper concatTabHelper;
     private AudioFileRepository audioFileRepository;
+    private BgmFileRepository bgmFileRepository;
 
     /**
      * @param concatCreateRequestDto
@@ -44,7 +47,7 @@ public class ConcatTabService {
                 .project(project) // Hibernate가 projectId를 자동으로 동기화
                 .status('Y')
                 .frontSilence(0.0f)
-                .bgmAudioFile(null) //기본값은 null
+                .bgmFiles(null)//create라서 처음엔 null
                 .build();
 
         concatTabRepository.save(concatTab);
@@ -92,9 +95,10 @@ public class ConcatTabService {
         throw new NoSuchElementException("해당하는 구성요소를 찾을 수 없습니다.");
     }
 
-
+    // concatTab에 대한 정보들 모두 수정
     @Transactional
     public boolean updateConcatTab(ConcatUpdateRequestDto concatUpdateRequestDto, Long memberSeq) {
+        // 회원 조회
         MemberReadResponse member = memberService.read(memberSeq);
 
         if (member == null) {
@@ -102,58 +106,55 @@ public class ConcatTabService {
         }
 
         // ConcatTab 및 Project 조회
-        ConcatTab concatTab = concatTabRepository.findById(concatUpdateRequestDto.getTabId())
-                .orElse(null);
+        ConcatTab existingTab = concatTabRepository.findById(concatUpdateRequestDto.getTabId())
+                .orElseThrow(() -> new NoSuchElementException("수정할 프로젝트가 없습니다."));
+
         Project project = projectRepository.findById(concatUpdateRequestDto.getTabId())
-                .orElse(null);
-        // 조회 실패 처리
-        if (concatTab == null || project == null) {
-            throw new NoSuchElementException("수정할 프로젝트가 없습니다.");
-        }
+                .orElseThrow(() -> new NoSuchElementException("수정할 프로젝트가 없습니다."));
 
-        //Dto의 bgm오디오파일 seq를 통해 bgmFile 객체 찾기
-        //OriginAudioRequest의 seq를 통해 bgmFile 객체 만들기
-        AudioFile bgmFile = audioFileRepository.findById(concatUpdateRequestDto.getOriginAudioRequest().getSeq())
-                .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: "
-                        + concatUpdateRequestDto.getOriginAudioRequest().getSeq()));
+        // Dto의 originAudioRequests를 통해 bgmFiles 리스트 생성
+        List<BgmFile> bgmFiles = concatUpdateRequestDto.getOriginAudioRequests().stream()
+                .map(request -> bgmFileRepository.findById(request.getSeq())
+                        .orElseThrow(() -> new NoSuchElementException("BgmFile not found with ID: " + request.getSeq())))
+                .toList();
 
-        // 권한 확인
-        if (project.getMember().getId().equals(member.getId())) {
-            // 저장
-            ConcatTab updatedTab = new ConcatTab(
-                    concatUpdateRequestDto.getTabId(),
-                    project,
-                    concatUpdateRequestDto.getStatus(),
-                    concatUpdateRequestDto.getFrontSilence(),
-                    bgmFile
-            );
+        // Builder로 새로운 ConcatTab 생성
+        ConcatTab updatedTab = ConcatTab.builder()
+                .projectId(existingTab.getProjectId()) // 기존 값 유지
+                .project(existingTab.getProject()) // 기존 값 유지
+                .frontSilence(concatUpdateRequestDto.getFrontSilence()) // 업데이트된 값
+                .status(concatUpdateRequestDto.getStatus()) // 업데이트된 값
+                .bgmFiles(bgmFiles) // 새로운 BgmFile 리스트
+                .build();
 
-            concatTabRepository.save(updatedTab);
-            return true;
-        }
-        throw new IllegalArgumentException("알 수 없는 오류가 발생했습니다.");
+        concatTabRepository.save(updatedTab);
+        return true;
+
     }
 
+    // bgmFile들만 수정
     @Transactional
-    public boolean updateBgmAudioFile(Long tabSeq, Long bgmAudioFileSeq) {
+    public boolean updateBgmAudioFiles(Long tabSeq, List<Long> bgmFileSeqs) {
         // ConcatTab 찾기
         ConcatTab concatTab = concatTabRepository.findById(tabSeq)
-                .orElseThrow(() -> new NoSuchElementException("ConcatTab not found"));
+                .orElseThrow(() -> new NoSuchElementException("ConcatTab not found with ID: " + tabSeq));
 
-        // bgmAudioFileSeq가 null이면 bgm파일이 탭에 없다는 뜻
-        if (bgmAudioFileSeq == null) {
-            concatTab.setBgmAudioFile(null);
+        if (bgmFileSeqs == null || bgmFileSeqs.isEmpty()) {
+            // bgmFileSeqs가 비어있으면 기존 bgmFiles 제거
+            concatTab.setBgmFiles(null);
         } else {
-            // bgmAudioFileSeq가 있으면 AudioFile 설정
-            AudioFile bgmFile = Optional.ofNullable(audioFileRepository.findAudioFileById(bgmAudioFileSeq))
-                    .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: " + bgmAudioFileSeq));
-            concatTab.setBgmAudioFile(bgmFile);
+            // bgmFileSeqs를 통해 BgmFile 리스트 생성
+            List<BgmFile> bgmFiles = bgmFileSeqs.stream()
+                    .map(seq -> bgmFileRepository.findById(seq)
+                            .orElseThrow(() -> new NoSuchElementException("BgmFile not found with ID: " + seq)))
+                    .toList();
+
+            // ConcatTab에 새로운 BgmFile 리스트 설정
+            concatTab.setBgmFiles(bgmFiles);
         }
 
         // 업데이트된 ConcatTab 저장
         concatTabRepository.save(concatTab);
-
-        //작업 성공하면 true 반환
         return true;
     }
 }
