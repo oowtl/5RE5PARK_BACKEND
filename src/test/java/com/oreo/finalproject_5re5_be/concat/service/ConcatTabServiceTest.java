@@ -3,7 +3,7 @@ package com.oreo.finalproject_5re5_be.concat.service;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
+import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,29 +100,41 @@ class ConcatTabServiceTest {
         Project project = Project.builder().proSeq(1L).build();
         Long memberSeq = 1L;
 
-        // AudioFile 객체 생성
-        AudioFile bgmAudioFile = AudioFile.builder()
-                .audioFileSeq(10L)
-                .audioUrl("testUrl")
+        // BgmFile 객체 생성
+        BgmFile bgmFile1 = BgmFile.builder()
+                .bgmFileSeq(10L)
+                .audioUrl("testUrl1")
                 .extension(".mp3")
                 .fileSize(12345L)
                 .fileLength(60L)
-                .fileName("testAudio.mp3")
+                .fileName("testAudio1.mp3")
                 .build();
+
+        BgmFile bgmFile2 = BgmFile.builder()
+                .bgmFileSeq(11L)
+                .audioUrl("testUrl2")
+                .extension(".mp3")
+                .fileSize(67890L)
+                .fileLength(120L)
+                .fileName("testAudio2.mp3")
+                .build();
+
+        List<BgmFile> bgmFiles = List.of(bgmFile1, bgmFile2);
 
         // ConcatTab 객체 생성
-        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmAudioFile);
+        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmFiles);
 
-
-        // BgmAudioFile -> OriginAudioRequest 변환
-        OriginAudioRequest bgmAudioRequest = OriginAudioRequest.builder()
-                .seq(concatTab.getBgmAudioFile().getAudioFileSeq())
-                .audioUrl(concatTab.getBgmAudioFile().getAudioUrl())
-                .extension(concatTab.getBgmAudioFile().getExtension())
-                .fileSize(concatTab.getBgmAudioFile().getFileSize())
-                .fileLength(concatTab.getBgmAudioFile().getFileLength())
-                .fileName(concatTab.getBgmAudioFile().getFileName())
-                .build();
+        // BgmFile -> OriginAudioRequest 변환
+        List<OriginAudioRequest> bgmAudioRequests = bgmFiles.stream()
+                .map(file -> OriginAudioRequest.builder()
+                        .seq(file.getBgmFileSeq())
+                        .audioUrl(file.getAudioUrl())
+                        .extension(file.getExtension())
+                        .fileSize(file.getFileSize())
+                        .fileLength(file.getFileLength())
+                        .fileName(file.getFileName())
+                        .build())
+                .toList();
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
@@ -129,7 +142,7 @@ class ConcatTabServiceTest {
                 concatTab.getProjectId(),
                 concatTab.getFrontSilence(),
                 concatTab.getStatus(),
-                bgmAudioRequest
+                bgmAudioRequests
         ));
 
         //when : ConcatTab 조회
@@ -147,28 +160,41 @@ class ConcatTabServiceTest {
         Project project = Project.builder().proSeq(1L).build();
         Long memberSeq = 1L;
 
-        // AudioFile 객체 생성
-        AudioFile bgmAudioFile = AudioFile.builder()
-                .audioFileSeq(10L)
-                .audioUrl("testUrl")
+        // BgmFile 객체 생성
+        BgmFile bgmFile1 = BgmFile.builder()
+                .bgmFileSeq(10L)
+                .audioUrl("testUrl1")
                 .extension(".mp3")
                 .fileSize(12345L)
                 .fileLength(60L)
-                .fileName("testAudio.mp3")
+                .fileName("testAudio1.mp3")
                 .build();
+
+        BgmFile bgmFile2 = BgmFile.builder()
+                .bgmFileSeq(11L)
+                .audioUrl("testUrl2")
+                .extension(".mp3")
+                .fileSize(67890L)
+                .fileLength(120L)
+                .fileName("testAudio2.mp3")
+                .build();
+
+        List<BgmFile> bgmFiles = List.of(bgmFile1, bgmFile2);
 
         // ConcatTab 객체 생성
-        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmAudioFile);
+        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmFiles);
 
-        // BgmAudioFile -> OriginAudioRequest 변환
-        OriginAudioRequest bgmAudioRequest = OriginAudioRequest.builder()
-                .seq(bgmAudioFile.getAudioFileSeq())
-                .audioUrl(bgmAudioFile.getAudioUrl())
-                .extension(bgmAudioFile.getExtension())
-                .fileSize(bgmAudioFile.getFileSize())
-                .fileLength(bgmAudioFile.getFileLength())
-                .fileName(bgmAudioFile.getFileName())
-                .build();
+        // BgmFile -> OriginAudioRequest 변환
+        List<OriginAudioRequest> bgmAudioRequests = bgmFiles.stream()
+                .map(file -> OriginAudioRequest.builder()
+                        .seq(file.getBgmFileSeq())
+                        .audioUrl(file.getAudioUrl())
+                        .extension(file.getExtension())
+                        .fileSize(file.getFileSize())
+                        .fileLength(file.getFileLength())
+                        .fileName(file.getFileName())
+                        .build())
+                .toList();
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq()))
@@ -178,7 +204,7 @@ class ConcatTabServiceTest {
                 concatTab.getProjectId(),
                 concatTab.getFrontSilence(),
                 concatTab.getStatus(),
-                bgmAudioRequest
+                bgmAudioRequests
         ));
         when(concatTabRepository.existsById(project.getProSeq())).thenReturn(false);
 
