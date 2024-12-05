@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 
 @Configuration
@@ -99,8 +101,6 @@ public class MemberSecurityConfig {
             .cors(cors -> cors.configurationSource(
                 memberConfig.corsConfigurationSource())); // 새로운 방식으로 CORS 설정 적용
         http
-            .csrf(AbstractHttpConfigurer::disable); // CSRF 비활성화
-        http
             .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
                     SessionFixationConfigurer::changeSessionId)
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); // 기본값
@@ -152,4 +152,8 @@ public class MemberSecurityConfig {
         return tomcat;
     }
 
+    @Bean
+    public SecurityContextRepository securityContextRepository(){
+        return new HttpSessionSecurityContextRepository(); // 기본 세션 저장소 사용
+    }
 }
