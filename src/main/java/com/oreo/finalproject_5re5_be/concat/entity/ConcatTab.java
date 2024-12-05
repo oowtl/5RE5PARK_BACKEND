@@ -25,6 +25,20 @@ public class ConcatTab extends BaseEntity {
 
     @Column(name = "front_silence")
     private Float frontSilence;
+
+    //bgm으로 지정된 오디오파일과 일대일 매칭
+    @OneToOne
+    @JoinColumn(name = "bgm_audio_file_id")
+    private AudioFile bgmAudioFile;
+
+    // 명시적인 생성자 추가
+    public ConcatTab(Long projectId, Project project, Character status, Float frontSilence) {
+        this.projectId = projectId;
+        this.project = project;
+        this.status = status;
+        this.frontSilence = frontSilence;
+    }
+
 }
 
 
