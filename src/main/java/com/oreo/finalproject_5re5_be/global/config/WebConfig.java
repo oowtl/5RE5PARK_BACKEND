@@ -9,16 +9,21 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("https://client.5re5park.site")
-                .allowedOrigins("https://5re5park.site")
-                .allowedOrigins("https://www.5re5park.site")
+                .allowedOriginPatterns(
+                        "https://*.5re5park.site",
+                        "http://localhost:*",
+                        "http://127.0.0.1:*"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .exposedHeaders("location")
                 .allowedHeaders("*")
-                .allowCredentials(false);
+                .allowCredentials(true);
+
         // Swagger를 위한 CORS 설정
         registry.addMapping("/swagger-ui/**")
-                .allowedOrigins("https://client.5re5park.site", "https://5re5park.site", "https://www.5re5park.site")
+                .allowedOriginPatterns(
+                        "https://*.5re5park.site"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(false);
