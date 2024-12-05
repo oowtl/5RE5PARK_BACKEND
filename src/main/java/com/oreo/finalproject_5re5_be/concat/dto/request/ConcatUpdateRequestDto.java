@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.List;
+
 @ToString
 @AllArgsConstructor
 @Builder
@@ -13,6 +15,6 @@ public class ConcatUpdateRequestDto {
     private final Long tabId;
     private final float frontSilence;
     private final Character status;
-    private final OriginAudioRequest originAudioRequest;
+    private final List<OriginAudioRequest> originAudioRequests; // BgmFile 정보 리스트
 
 }
