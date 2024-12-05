@@ -44,29 +44,21 @@ public class ProjectController {
 //            @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpSession session){//session memberSeq값
         Object memberSeq = session.getAttribute("memberSeq");
-        log.info("[ProjectController] memberSeq - memberSeq : {}", memberSeq != null ? memberSeq : "null");
+        log.info("[ProjectController] projectGet : memberSeq - memberSeq : {}", memberSeq != null ? memberSeq : "null");
 
         Long memberSeqLong = (Long) memberSeq;
-        log.info("[ProjectController] memberSeq - memberSeqLong : {}", memberSeqLong);
+        log.info("[ProjectController] projectGet : memberSeq1 - memberSeqLong : {}", memberSeqLong);
+        log.info("[ProjectController] projectGet - memberSeq2 : {} ", (Long) session.getAttribute("memberSeq"));
 
-        log.info("[ProjectController] projectGet - session : {} ", session);
-        try{
-            //회원정보로 프로젝트 추출
-            log.info("[ProjectController] projectGet - memberSeq : {} ", (Long) session.getAttribute("memberSeq"));
-            List<ProjectResponse> projectResponses = projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
+        List<ProjectResponse> projectResponses =
+                projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
 //        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
-            log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
+        log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
 
-            Map<String, List<Object>> map = new HashMap<>();//맵 생성
-            map.put("row", Collections.singletonList(projectResponses));//row : [] 로 응답
-            return ResponseEntity.ok()
-                    .body(new ResponseDto<>(HttpStatus.OK.value(), map));
-        }catch (Exception e){
-            Map<String, List<Object>> map = new HashMap<>();//맵 생성
-            map.put("error", Collections.singletonList(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), map));
-        }
+        Map<String, List<Object>> map = new HashMap<>();//맵 생성
+        map.put("row", Collections.singletonList(projectResponses));//row : [] 로 응답
+        return ResponseEntity.ok()
+                .body(new ResponseDto<>(HttpStatus.OK.value(), map));
     }
     @Operation(
             summary = "Project 생성",

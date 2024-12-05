@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice(value = "com.oreo.finalproject_5re5_be.vc")
 public class VcExceptionHandler {
-
     @ExceptionHandler(value = Exception.class) // 어떤 예외클래스를 처리할건지 지정
     public ResponseEntity<ResponseDto<String>> handle(Exception e, HttpServletRequest request) {
-        log.error("Advice 내 handlerException 호출 , {} , {}", request.getRequestURI(), e.getMessage());
-        return ResponseEntity.ok()
+        log.error("VC RestController 내 handlerException 호출 , {} , {}",
+                request.getRequestURI(), e.getMessage());
+        return ResponseEntity.badRequest()
                 .body(new ResponseDto<> (HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }
