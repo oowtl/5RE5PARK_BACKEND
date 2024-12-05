@@ -81,6 +81,9 @@ public class MemberConfig {
         // 인증 정보 전송 허용
         configuration.setAllowCredentials(true);
 
+        // origin pattern
+        configuration.addAllowedOriginPattern("*");
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
