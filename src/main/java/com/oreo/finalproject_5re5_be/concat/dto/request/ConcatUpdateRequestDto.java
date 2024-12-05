@@ -13,5 +13,6 @@ public class ConcatUpdateRequestDto {
     private final Long tabId;
     private final float frontSilence;
     private final Character status;
+    private final Long bgmSeq;
 
 }
