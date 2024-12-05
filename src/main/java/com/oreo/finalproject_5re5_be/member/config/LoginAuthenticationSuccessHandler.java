@@ -92,6 +92,9 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             Cookie cookie = new Cookie("memberId", memberId);
             // 쿠키 도메인 설정
             cookie.setDomain("5re5park.site");
+            cookie.setSecure(true);// XSS 방지
+            cookie.setHttpOnly(true);// HTTPS에서만 전송
+            cookie.setPath("/");     // 쿠키가 모든 경로에서 유효
             // 1일 간 유지
             cookie.setMaxAge(60 * 60 * 24 * 1);
             // 쿠키 등록
