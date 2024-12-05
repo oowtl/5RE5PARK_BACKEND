@@ -3,6 +3,7 @@ package com.oreo.finalproject_5re5_be.concat.service;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
+import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
@@ -43,6 +44,7 @@ public class ConcatTabService {
                 .project(project) // Hibernate가 projectId를 자동으로 동기화
                 .status('Y')
                 .frontSilence(0.0f)
+                .bgmAudioFile(null) //기본값은 null
                 .build();
 
         concatTabRepository.save(concatTab);
@@ -55,7 +57,7 @@ public class ConcatTabService {
         if (concatTabRepository.existsById(project.getProSeq())) {
             return false;
         }
-        ConcatTab concatTab = new ConcatTab(project.getProSeq(), project, 'Y', 0.0f);
+        ConcatTab concatTab = new ConcatTab(project.getProSeq(), project, 'Y', 0.0f, null);
         concatTabRepository.save(concatTab);
         return true;
     }
@@ -104,11 +106,16 @@ public class ConcatTabService {
                 .orElse(null);
         Project project = projectRepository.findById(concatUpdateRequestDto.getTabId())
                 .orElse(null);
-
         // 조회 실패 처리
         if (concatTab == null || project == null) {
             throw new NoSuchElementException("수정할 프로젝트가 없습니다.");
         }
+
+        //Dto의 bgm오디오파일 seq를 통해 bgmFile 객체 찾기
+        //OriginAudioRequest의 seq를 통해 bgmFile 객체 만들기
+        AudioFile bgmFile = audioFileRepository.findById(concatUpdateRequestDto.getOriginAudioRequest().getSeq())
+                .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: "
+                        + concatUpdateRequestDto.getOriginAudioRequest().getSeq()));
 
         // 권한 확인
         if (project.getMember().getId().equals(member.getId())) {
@@ -117,12 +124,36 @@ public class ConcatTabService {
                     concatUpdateRequestDto.getTabId(),
                     project,
                     concatUpdateRequestDto.getStatus(),
-                    concatUpdateRequestDto.getFrontSilence()
+                    concatUpdateRequestDto.getFrontSilence(),
+                    bgmFile
             );
 
             concatTabRepository.save(updatedTab);
             return true;
         }
         throw new IllegalArgumentException("알 수 없는 오류가 발생했습니다.");
+    }
+
+    @Transactional
+    public boolean updateBgmAudioFile(Long tabSeq, Long bgmAudioFileSeq) {
+        // ConcatTab 찾기
+        ConcatTab concatTab = concatTabRepository.findById(tabSeq)
+                .orElseThrow(() -> new NoSuchElementException("ConcatTab not found"));
+
+        // bgmAudioFileSeq가 null이면 bgm파일이 탭에 없다는 뜻
+        if (bgmAudioFileSeq == null) {
+            concatTab.setBgmAudioFile(null);
+        } else {
+            // bgmAudioFileSeq가 있으면 AudioFile 설정
+            AudioFile bgmFile = Optional.ofNullable(audioFileRepository.findAudioFileById(bgmAudioFileSeq))
+                    .orElseThrow(() -> new NoSuchElementException("AudioFile not found with ID: " + bgmAudioFileSeq));
+            concatTab.setBgmAudioFile(bgmFile);
+        }
+
+        // 업데이트된 ConcatTab 저장
+        concatTabRepository.save(concatTab);
+
+        //작업 성공하면 true 반환
+        return true;
     }
 }

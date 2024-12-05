@@ -57,10 +57,26 @@ public class ConcatTabController {
     )
     @PostMapping("update")
     public ResponseEntity<ResponseDto<Boolean>> update(@RequestBody ConcatUpdateRequestDto updateRequestDto,
-                                                        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         projectService.projectCheck(customUserDetails.getMember().getSeq(), updateRequestDto.getTabId());
         return new ResponseDto<>(HttpStatus.OK.value(),
                 concatTabService.updateConcatTab(updateRequestDto, customUserDetails.getMember().getSeq()))
                 .toResponseEntity();
     }
+
+    @Operation(
+            summary = "BGM 오디오 파일 업데이트",
+            description = "BGM 오디오 파일을 추가하거나 제거합니다."
+    )
+    @PostMapping("update-bgm")
+    public ResponseEntity<ResponseDto<Boolean>> updateBgm(
+            @RequestParam Long tabSeq,
+            @RequestParam(required = false) Long bgmAudioFileSeq,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), tabSeq);
+        boolean result = concatTabService.updateBgmAudioFile(tabSeq, bgmAudioFileSeq);
+        return new ResponseDto<>(HttpStatus.OK.value(), result).toResponseEntity();
+    }
+
+
 }

@@ -46,12 +46,15 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
             "JOIN af.concatRow cr " +
             "JOIN cr.concatTab p " +
             "WHERE p.project.member.seq = :member_seq")
-    List<AudioFile> findAudioFileByMember(@Param("member_seq")Long memberSeq, Pageable pageable);
+    List<AudioFile> findAudioFileByMember(@Param("member_seq") Long memberSeq, Pageable pageable);
 
     @Query("SELECT COUNT(af) FROM audio_file af " +
             "JOIN af.concatRow cr " +
             "JOIN cr.concatTab p " +
             "WHERE p.project.member.seq = :memberSeq")
     long countByMemberSeq(@Param("memberSeq") Long memberSeq);
+
+    @Query("SELECT a FROM audio_file a WHERE a.audioFileSeq = :audioFileSeq")
+    AudioFile findAudioFileById(Long audioFileSeq);
 
 }

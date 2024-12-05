@@ -8,7 +8,6 @@ import lombok.*;
 @ToString
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "concat_tab")
 public class ConcatTab extends BaseEntity {
@@ -26,17 +25,19 @@ public class ConcatTab extends BaseEntity {
     @Column(name = "front_silence")
     private Float frontSilence;
 
+    // Setter 메서드 추가
     //bgm으로 지정된 오디오파일과 일대일 매칭
+    @Setter
     @OneToOne
-    @JoinColumn(name = "bgm_audio_file_id")
+    @JoinColumn(name = "bgm_audio_file_id", nullable = true)
     private AudioFile bgmAudioFile;
 
-    // 명시적인 생성자 추가
-    public ConcatTab(Long projectId, Project project, Character status, Float frontSilence) {
+    public ConcatTab(Long projectId, Project project, Character status, Float frontSilence, AudioFile bgmAudioFile) {
         this.projectId = projectId;
         this.project = project;
         this.status = status;
         this.frontSilence = frontSilence;
+        this.bgmAudioFile = bgmAudioFile;
     }
 
 }

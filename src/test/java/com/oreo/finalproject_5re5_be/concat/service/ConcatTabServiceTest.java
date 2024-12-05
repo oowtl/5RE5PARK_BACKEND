@@ -1,7 +1,9 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatCreateRequestDto;
+import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
+import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
@@ -96,14 +98,38 @@ class ConcatTabServiceTest {
         //given : 프로젝트와 ConcatTab이 존재
         Project project = Project.builder().proSeq(1L).build();
         Long memberSeq = 1L;
-        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f);
+
+        // AudioFile 객체 생성
+        AudioFile bgmAudioFile = AudioFile.builder()
+                .audioFileSeq(10L)
+                .audioUrl("testUrl")
+                .extension(".mp3")
+                .fileSize(12345L)
+                .fileLength(60L)
+                .fileName("testAudio.mp3")
+                .build();
+
+        // ConcatTab 객체 생성
+        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmAudioFile);
+
+
+        // BgmAudioFile -> OriginAudioRequest 변환
+        OriginAudioRequest bgmAudioRequest = OriginAudioRequest.builder()
+                .seq(concatTab.getBgmAudioFile().getAudioFileSeq())
+                .audioUrl(concatTab.getBgmAudioFile().getAudioUrl())
+                .extension(concatTab.getBgmAudioFile().getExtension())
+                .fileSize(concatTab.getBgmAudioFile().getFileSize())
+                .fileLength(concatTab.getBgmAudioFile().getFileLength())
+                .fileName(concatTab.getBgmAudioFile().getFileName())
+                .build();
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq())).thenReturn(Optional.of(concatTab));
         when(concatTabHelper.prepareConcatTab(concatTab, memberSeq)).thenReturn(new ConcatTabResponseDto(
                 concatTab.getProjectId(),
                 concatTab.getFrontSilence(),
-                concatTab.getStatus()
+                concatTab.getStatus(),
+                bgmAudioRequest
         ));
 
         //when : ConcatTab 조회
@@ -119,26 +145,49 @@ class ConcatTabServiceTest {
     void readConcatTab_CreateConcatTabAndReturn() {
         //given : 프로젝트가 존재하지만 ConcatTab이 존재하지 않음
         Project project = Project.builder().proSeq(1L).build();
-        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f);
         Long memberSeq = 1L;
+
+        // AudioFile 객체 생성
+        AudioFile bgmAudioFile = AudioFile.builder()
+                .audioFileSeq(10L)
+                .audioUrl("testUrl")
+                .extension(".mp3")
+                .fileSize(12345L)
+                .fileLength(60L)
+                .fileName("testAudio.mp3")
+                .build();
+
+        // ConcatTab 객체 생성
+        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmAudioFile);
+
+        // BgmAudioFile -> OriginAudioRequest 변환
+        OriginAudioRequest bgmAudioRequest = OriginAudioRequest.builder()
+                .seq(bgmAudioFile.getAudioFileSeq())
+                .audioUrl(bgmAudioFile.getAudioUrl())
+                .extension(bgmAudioFile.getExtension())
+                .fileSize(bgmAudioFile.getFileSize())
+                .fileLength(bgmAudioFile.getFileLength())
+                .fileName(bgmAudioFile.getFileName())
+                .build();
 
         when(projectRepository.findById(project.getProSeq())).thenReturn(Optional.of(project));
         when(concatTabRepository.findById(project.getProSeq()))
-                .thenReturn(Optional.empty())//첫 번째 리턴
-                .thenReturn(Optional.of(concatTab));// 두 번쨰 리턴
+                .thenReturn(Optional.empty()) // 첫 번째 리턴
+                .thenReturn(Optional.of(concatTab)); // 두 번째 리턴
         when(concatTabHelper.prepareConcatTab(concatTab, memberSeq)).thenReturn(new ConcatTabResponseDto(
                 concatTab.getProjectId(),
                 concatTab.getFrontSilence(),
-                concatTab.getStatus()
+                concatTab.getStatus(),
+                bgmAudioRequest
         ));
         when(concatTabRepository.existsById(project.getProSeq())).thenReturn(false);
 
-        //when : 컨캣탭이 없다면 재생성 후 다시 조회
+        //when : ConcatTab이 없다면 생성 후 다시 조회
         ConcatTabResponseDto result = concatTabService.readConcatTab(project.getProSeq(), memberSeq);
 
         //then : 생성된 탭을 조회
         assertThat(result).isNotNull();
-        verify(projectRepository, times(1)).findById(project.getProSeq());//프로젝트 확인시 조회 1번
-        verify(concatTabRepository, times(2)).findById(project.getProSeq());//요청 받을 때, 재생성 후
+        verify(projectRepository, times(1)).findById(project.getProSeq()); // 프로젝트 확인 시 조회 1번
+        verify(concatTabRepository, times(2)).findById(project.getProSeq()); // 요청 받을 때, 재생성 후
     }
 }
