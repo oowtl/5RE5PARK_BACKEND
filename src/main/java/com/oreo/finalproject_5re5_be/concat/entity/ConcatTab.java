@@ -8,7 +8,6 @@ import lombok.*;
 @ToString
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "concat_tab")
 public class ConcatTab extends BaseEntity {
@@ -32,6 +31,14 @@ public class ConcatTab extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "bgm_audio_file_id", nullable = true)
     private AudioFile bgmAudioFile;
+
+    public ConcatTab(Long projectId, Project project, Character status, Float frontSilence, AudioFile bgmAudioFile) {
+        this.projectId = projectId;
+        this.project = project;
+        this.status = status;
+        this.frontSilence = frontSilence;
+        this.bgmAudioFile = bgmAudioFile;
+    }
 
 }
 
