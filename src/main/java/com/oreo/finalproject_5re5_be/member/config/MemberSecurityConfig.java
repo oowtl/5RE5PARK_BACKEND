@@ -1,8 +1,5 @@
 package com.oreo.finalproject_5re5_be.member.config;
 
-import org.apache.catalina.Context;
-import org.apache.tomcat.util.http.CookieProcessor;
-import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +15,23 @@ public class MemberSecurityConfig {
 
     private final LoginAuthenticationSuccessHandler successHandler;
     private final LoginAuthenticationFailureHandler failureHandler;
-    private final CorsConfigurationSource corsConfigurationSource;
+//    private final CorsConfigurationSource corsConfigurationSource;
+//
+//    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler,
+//        LoginAuthenticationFailureHandler failureHandler,
+//        CorsConfigurationSource corsConfigurationSource) {
+//        this.successHandler = successHandler;
+//        this.failureHandler = failureHandler;
+//        this.corsConfigurationSource = corsConfigurationSource;
+//    }
+
+    private final MemberConfig memberConfig;
 
     public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler,
-        LoginAuthenticationFailureHandler failureHandler,
-        CorsConfigurationSource corsConfigurationSource) {
+        LoginAuthenticationFailureHandler failureHandler, MemberConfig memberConfig) {
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
-        this.corsConfigurationSource = corsConfigurationSource;
+        this.memberConfig = memberConfig;
     }
 
     // SecurityFilterChain 설정 빈 등록, 추후에 적용 예정(다른 파트 작업 완료후 인증/인가 처리 적용예정)
@@ -88,7 +94,8 @@ public class MemberSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
+            .cors(cors -> cors.configurationSource(
+                memberConfig.corsConfigurationSource())) // 새로운 방식으로 CORS 설정 적용
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
                 sessionFixation -> sessionFixation.changeSessionId())) // 기본값
@@ -119,11 +126,6 @@ public class MemberSecurityConfig {
         tomcat.addContextCustomizers(context -> {
             // HttpOnly 활성화
             context.setUseHttpOnly(true);
-
-            // SameSite=None 설정
-            Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-            cookieProcessor.setSameSiteCookies("None");
-            context.setCookieProcessor(cookieProcessor);
 
             // Secure 플래그 설정
             boolean isSecure = "https".equals(System.getenv("SECURE_ENV")); // 환경 변수로 제어
