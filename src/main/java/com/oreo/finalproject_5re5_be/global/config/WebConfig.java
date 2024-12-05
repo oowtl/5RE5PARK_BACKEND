@@ -8,19 +8,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins("https://client.5re5park.site")
-                .allowedOrigins("https://5re5park.site")
-                .allowedOrigins("https://www.5re5park.site")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .exposedHeaders("location")
-                .allowedHeaders("*")
-                .allowCredentials(false);
-        // Swagger를 위한 CORS 설정
-        registry.addMapping("/swagger-ui/**")
-                .allowedOrigins("https://client.5re5park.site", "https://5re5park.site", "https://www.5re5park.site")
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
-                .allowCredentials(false);
+                .allowCredentials(true);
     }
 }
