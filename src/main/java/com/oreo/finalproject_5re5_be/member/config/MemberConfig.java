@@ -61,20 +61,20 @@ public class MemberConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 허용된 Origin 설정
-//        configuration.setAllowedOrigins(List.of(
-//                "https://client.5re5park.site",
-//                "https://5re5park.site",
-//                "https://www.5re5park.site",
-//                "http://5re5park.site:8080",
-//                "http://localhost:8080",
-//                "http://localhost:5173",
-//                "http://127.0.0.1:8080",
-//                "http://127.0.0.1:5173"
-//        ));
+        configuration.setAllowedOrigins(List.of(
+                "https://client.5re5park.site",
+                "https://5re5park.site",
+                "https://www.5re5park.site",
+                "http://5re5park.site:8080",
+                "http://localhost:8080",
+                "http://localhost:5173",
+                "http://127.0.0.1:8080",
+                "http://127.0.0.1:5173"
+        ));
 
         // 전체 허용
-        configuration.addAllowedOriginPattern("https://*");
-        configuration.addAllowedOriginPattern("http://*");
+//        configuration.addAllowedOriginPattern("https://*");
+//        configuration.addAllowedOriginPattern("http://*");
 
         // 허용된 HTTP 메서드 설정
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
