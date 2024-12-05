@@ -94,9 +94,6 @@ public class MemberSecurityConfig {
                 .anyRequest() // 개발 단계로 모든 요청 열어둠
                 .permitAll() // 위 URL들은 인증 없이 접근 가능
             )
-            .requiresChannel(channel -> channel
-                    .anyRequest().requiresSecure() // 모든 요청을 HTTPS로 리다이렉션
-            )
             .formLogin(formLogin -> formLogin
                 .loginPage("/api/member/login") // 로그인 페이지 경로 설정
                 .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
