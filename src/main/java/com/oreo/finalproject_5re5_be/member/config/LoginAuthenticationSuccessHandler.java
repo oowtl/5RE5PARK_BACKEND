@@ -55,6 +55,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             memberId = userDetails.getUsername();
             memberSeq = 0L;
         }
+
         log.info("memberSeq = {}", memberSeq);
         log.info("memberId = {}", memberId);
 

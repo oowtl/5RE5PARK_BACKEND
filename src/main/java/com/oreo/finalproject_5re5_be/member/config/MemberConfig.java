@@ -75,7 +75,7 @@ public class MemberConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
 
         // 허용된 헤더 설정
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.addAllowedHeader("*");
 
         // 인증 정보 전송 허용
         configuration.setAllowCredentials(true);
