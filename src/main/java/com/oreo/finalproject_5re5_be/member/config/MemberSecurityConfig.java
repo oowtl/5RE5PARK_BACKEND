@@ -105,6 +105,9 @@ public class MemberSecurityConfig {
                     SessionFixationConfigurer::changeSessionId)
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); // 기본값
         http
+            .securityContext(securityContext -> securityContext
+                .requireExplicitSave(true)); // 인증 정보 지속성 설정
+        http
             .formLogin(formLogin -> formLogin
                 .loginPage("/api/member/login") // 로그인 페이지 경로 설정
                 .successHandler(successHandler) // 로그인 성공 시 처리되는 핸들러 설정
