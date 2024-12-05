@@ -83,6 +83,7 @@ public class MemberConfig {
 
         // 인증 정보 전송 허용
         configuration.setAllowCredentials(true);
+        configuration.addExposedHeader("Set-Cookie"); // 쿠키를 클라이언트에서 읽을 수 있도록 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
