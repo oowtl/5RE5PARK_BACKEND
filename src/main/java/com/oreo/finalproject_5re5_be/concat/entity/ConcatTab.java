@@ -28,9 +28,10 @@ public class ConcatTab extends BaseEntity {
     @Column(name = "front_silence")
     private Float frontSilence;
 
-    // Setter 메서드 추가
-    //bgm으로 지정된 오디오파일과 일대일 매칭
+    // 하나의 ConcatTab에 여러 bgmFile들 매칭
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab")
+    @Column(nullable = true)
+    @Setter
     private List<BgmFile> bgmFiles;
 
 
