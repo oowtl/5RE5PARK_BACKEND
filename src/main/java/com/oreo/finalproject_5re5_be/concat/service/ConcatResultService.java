@@ -36,7 +36,6 @@ public class ConcatResultService {
         //조회한 값과 입력한 값 저장을 하기 위한 ConcatResult 객체 생성
         ConcatResult concatResult = ConcatResult.builder()
                 .concatTab(concatTab) //concatTab 객체 필요
-                .option(null) //option 객체 필요. 일단 null 고정
                 .audioUrl(request.getResultUrl())
                 .extension(request.getResultExtension())
                 .fileLength(request.getResultFileLength())

@@ -2,6 +2,7 @@ package com.oreo.finalproject_5re5_be.project.service;
 
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
+import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
@@ -55,6 +56,9 @@ public class ProjectServiceImpl implements ProjectService {
         log.info("[projectService] projectFindAll - memberSeq : {} ", memberSeq);
         Member member = memberFind(memberSeq);
         log.info("[projectService] projectFindAll - member : {} ", member.toString());
+        //member 확인후 예외 던지기
+//        memberSeqCheck(member.getSeq());
+
         //회원 정보로 전체 조회
         List<Project> project = projectRepository
                 .findByMemberSeq(member.getSeq());
@@ -89,6 +93,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Long projectSave(Long memberSeq) {
         //회원정보 추출
         Member member = memberFind(memberSeq);
+        memberSeqCheck(member.getSeq());
         //회원정보로 프로젝트 객체 생성
         Project project = Project.builder()
                 .member(member)
@@ -190,5 +195,11 @@ public class ProjectServiceImpl implements ProjectService {
         return memberRepository.findById(seq)
                 .orElseThrow(
                         () -> new IllegalArgumentException("Member not found"));
+    }
+
+    private void memberSeqCheck(Long seq){
+        if(seq == null){
+            throw new MemberNotFoundException();
+        }
     }
 }

@@ -18,7 +18,6 @@ public class ConcatTabHelper {
         if (validateMemberCurrent(concatTab, memberSeq)) {
             return ConcatTabResponseDto.builder()
                     .tabId(concatTab.getProjectId())
-                    .concatOptionDto(null)
                     .frontSilence(concatTab.getFrontSilence())
                     .status(concatTab.getStatus())
                     .build();
