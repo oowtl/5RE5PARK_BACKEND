@@ -1,10 +1,15 @@
 package com.oreo.finalproject_5re5_be.vc.controller;
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.AudioFileRequestDto;
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
+import com.oreo.finalproject_5re5_be.global.component.SqsService;
+import com.oreo.finalproject_5re5_be.global.constant.MessageType;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
+import com.oreo.finalproject_5re5_be.vc.dto.request.VcApiRequest;
+import com.oreo.finalproject_5re5_be.vc.dto.request.VcAudioRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcRowRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcTextRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.response.VcResponse;
@@ -25,6 +30,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 @Tag(name = "VC", description = "VC 관련 API")
 @RestController
@@ -46,6 +53,7 @@ public class VcController {
     private VcApiService vcApiService;
     private VcHistoryService vcHistoryService;
     private ProjectService projectService;
+    private SqsService sqsService;
 
     @Autowired
     public VcController(VcService vcService,
@@ -53,13 +61,15 @@ public class VcController {
                         S3Service s3Service,
                         VcApiService vcApiService,
                         VcHistoryService vcHistoryService,
-                        ProjectService projectService) {
+                        ProjectService projectService,
+                        SqsService sqsService) {
         this.vcService = vcService;
         this.audioInfo = audioInfo;
         this.s3Service = s3Service;
         this.vcApiService = vcApiService;
         this.vcHistoryService = vcHistoryService;
         this.projectService = projectService;
+        this.sqsService = sqsService;
     }
 
     @Operation(
@@ -126,6 +136,38 @@ public class VcController {
 
     }
 
+//    @Operation(
+//            summary = "Result 파일 저장(VC 생성)",
+//            description = "src seq 와 파일을 받아 Result 파일을 S3와 DB에 저장합니다."
+//    )
+//    @PostMapping(value = "/result")
+//    public ResponseEntity<ResponseDto<Map<String, List<Object>>>> resultSave(
+//            @RequestParam("srcSeq") @Valid List<Long> srcSeq,
+//            @RequestParam("trgSeq") @Valid Long trgSeq,
+//            HttpSession session) throws IOException {
+//        //회원의 정보인지 확인
+//        vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);
+//        //결과 파일 생성(VC API)
+//        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
+//                vcService.getSrcFile(srcSeq),//srcFile
+//                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
+////        List<MultipartFile> resultFile = new ArrayList<>();
+////        MultipartFile file = AudioFileTypeConverter.convertFileToMultipartFile(new File("ttsoutput.mp3"));
+////        resultFile.add(file);//API가 사용되지 않게 test로 반환
+//        log.info("[VcController] resultSave  resultFile: {} ", resultFile);
+//
+//        //SRC 파일 삭제(spring 서버에서 삭제)
+//        s3Service.deleteFolder(new File("file"));
+//        //응답 생성
+//        return ResponseEntity.ok()
+//                .body(new ResponseDto<>(HttpStatus.OK.value(),
+//                        mapCreate(vcService.resultSave(
+//                                        vcService.audioRequestBuilder(vcService.vcSrcUrlRequests(srcSeq),
+//                                                audioInfo.extractAudioFileInfo(resultFile),
+//                                                s3Service.upload(resultFile, "vc/result"))),
+//                                "result 파일 저장이 완료되었습니다.")));
+//    }
+
     @Operation(
             summary = "Result 파일 저장(VC 생성)",
             description = "src seq 와 파일을 받아 Result 파일을 S3와 DB에 저장합니다."
@@ -134,27 +176,34 @@ public class VcController {
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> resultSave(
             @RequestParam("srcSeq") @Valid List<Long> srcSeq,
             @RequestParam("trgSeq") @Valid Long trgSeq,
-            HttpSession session) throws IOException {
+            HttpSession session) throws IOException, TimeoutException {
         //회원의 정보인지 확인
         vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);
-        //결과 파일 생성(VC API)
-        List<MultipartFile> resultFile = vcApiService.resultFileCreate(
-                vcService.getSrcFile(srcSeq),//srcFile
-                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
-//        List<MultipartFile> resultFile = new ArrayList<>();
-//        MultipartFile file = AudioFileTypeConverter.convertFileToMultipartFile(new File("ttsoutput.mp3"));
-//        resultFile.add(file);//API가 사용되지 않게 test로 반환
-        log.info("[VcController] resultSave  resultFile: {} ", resultFile);
 
-        //SRC 파일 삭제(spring 서버에서 삭제)
-        s3Service.deleteFolder(new File("file"));
+        VcApiRequest vcApiRequest = VcApiRequest.builder()
+                .srcUrls(vcService.getSrcUrl(srcSeq))
+                .trgUrl(vcService.getTrgUrl(trgSeq))
+                .build();
+        Message message = sqsService.sendMessage(vcApiRequest, MessageType.VC_MAKE);
+        log.info("[VcController] resultSave - message : {}", message);
+
+        Long seq = 0L;
+        String name = message.attributes().get("name").toString();
+        log.info("[VcController] resultSave - message : {}", message);
+        String fileUrl = message.attributes().get("s3Url").toString();
+        log.info("[VcController] resultSave - fileUrl : {}", fileUrl);
+        Integer length = Integer.valueOf(message.attributes().get("length").toString());
+        log.info("[VcController] resultSave - length : {}", length);
+        String size = message.attributes().get("size").toString();
+        log.info("[VcController] resultSave - size : {}", size);
+        String extension = message.attributes().get("extension").toString();
+        log.info("[VcController] resultSave - extension : {}", extension);
+
+        VcAudioRequest vcAudioRequest = VcAudioRequest.of(seq, name, fileUrl, length, size, extension);
         //응답 생성
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
-                        mapCreate(vcService.resultSave(
-                                        vcService.audioRequestBuilder(vcService.vcSrcUrlRequests(srcSeq),
-                                                audioInfo.extractAudioFileInfo(resultFile),
-                                                s3Service.upload(resultFile, "vc/result"))),
+                        mapCreate(vcService.resultSave(vcAudioRequest),
                                 "result 파일 저장이 완료되었습니다.")));
     }
 

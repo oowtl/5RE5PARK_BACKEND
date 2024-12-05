@@ -51,6 +51,7 @@ public interface VcService {
 
     List<VcResponse> getVcResponse(@Valid @NotNull Long projectSeq);
 
+    List<String> getSrcUrl(List<Long> srcSeq);
     VcUrlResponse getSrcUrl(@Valid @NotNull Long seq);
     VcUrlResponse getResultUrl(@Valid @NotNull Long seq);
 
@@ -62,9 +63,7 @@ public interface VcService {
     VcActivateResponse deleteSrcFile(@Valid @NotNull Long seq);
     List<VcActivateResponse> deleteSrcFile(@Valid @NotNull List<Long> seqs);
 
-    List<VcSrcRequest> vcSrcRequestBuilder(List<AudioFileInfo> audioFileInfos,
-                                                   List<String> upload,
-                                                   Long proSeq);
+    List<VcSrcRequest> vcSrcRequestBuilder(List<AudioFileInfo> audioFileInfos, List<String> upload, Long proSeq);
 
     VcAudioRequest audioRequestBuilder(Long proSeq, AudioFileInfo info, String url);
     List<VcAudioRequest> audioRequestBuilder(List<VcUrlRequest> vcUrlRequest, List<AudioFileInfo> info, List<String> url);
@@ -73,6 +72,7 @@ public interface VcService {
     List<VcUrlRequest> vcSrcUrlRequests(List<Long> srcSeq);
     VcUrlRequest vcTrgUrlRequest(Long trgSeq);
 
+    String getTrgUrl(Long trgSeq);
     MultipartFile getTrgFile(Long trgSeq) throws IOException;
     List<MultipartFile> getSrcFile(List<Long> srcSeq);
 

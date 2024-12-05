@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -454,6 +455,11 @@ public class VcServiceImpl implements VcService{
     }
 
     @Override
+    public String getTrgUrl(Long trgSeq){
+        return vcTrgFileRepository.findById(trgSeq).get().getFileUrl();
+    }
+
+    @Override
     public MultipartFile getTrgFile(Long trgSeq) throws IOException {
         try{
             MultipartFile multipartFile = AudioFileTypeConverter
@@ -466,6 +472,21 @@ public class VcServiceImpl implements VcService{
         }catch (Exception e) {
             throw new IOException("TRG File 오류");
         }
+    }
+
+    /**
+     * srcSeq가지고 url 추출
+     * @param srcSeq
+     * @return
+     */
+    @Override
+    public List<String> getSrcUrl(List<Long> srcSeq){
+        List<VcUrlRequest> vcUrlRequests = vcSrcUrlRequests(srcSeq);
+        List<String> srcUrl = new ArrayList<>();
+        for (int i = 0; i < vcUrlRequests.size(); i++) {
+            srcUrl.add(vcUrlRequests.get(i).getUrl());
+        }
+        return srcUrl;
     }
 
     @Override
