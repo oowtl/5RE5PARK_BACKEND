@@ -74,7 +74,9 @@ public class MemberConfig {
         configuration.addAllowedOriginPattern("*");
 
         // 허용된 HTTP 메서드 설정
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.addAllowedMethod("*");
+
 
         // 허용된 헤더 설정
         configuration.addAllowedHeader("*");
