@@ -22,21 +22,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - request : {} -> {} -> {}", request.toString(), response.toString(), authentication.toString());
         // 로그인 성공시 유저 정보 반환
+        // 사용자 정보 추출
         Object principal = authentication.getPrincipal();
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - principal : {} ", principal);
         Map<String, Object> memberInfo = new HashMap<>();
+
 
         String memberId = "";
         Long memberSeq = 0L;
 
         if (principal instanceof CustomUserDetails) {
+            log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - principal : {} ", principal);
             CustomUserDetails memberDetails = (CustomUserDetails) principal;
+            log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - memberDetails : {} ", memberDetails);
             Member member = memberDetails.getMember();
-
+            log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - member : {} ", member.toString());
             memberInfo.put("seq", member.getSeq());
             memberInfo.put("id", member.getId());
             memberInfo.put("name", member.getName());
@@ -46,11 +51,14 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             memberSeq = member.getSeq();
 
         } else if (principal instanceof UserDetails) {
+            log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - principal : {} ", principal);
             UserDetails userDetails = (UserDetails) principal;
+            log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - userDetails : {} ", userDetails);
 
             memberInfo.put("username", userDetails.getUsername());
 
             memberId = userDetails.getUsername();
+            log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - memberId = : {} ", memberId);
             memberSeq = 0L;
         }
 
@@ -60,42 +68,62 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         // 기존 세션 삭제
         request.getSession().invalidate();
 
-        // 새로운 세션 생성
+        // 세션 조회
         HttpSession session = request.getSession(true);
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - session = : {} ", session.toString());
+
+        // 세션에 아이디 등록
         session.setAttribute("memberId", memberId);
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - session-memberId = : {} ", session.getAttribute("memberId"));
         session.setAttribute("memberSeq", memberSeq);
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - session-memberSeq = : {} ", session.getAttribute("memberSeq"));
 
-        // 세션 ID를 쿠키로 설정
-        setSessionCookie(request, response, session.getId());
+        // 세션 처리
+        handleCookie(request, response, authentication);
 
-        // JSON 응답
+        // JSON으로 응답
         response.setContentType("application/json;charset=UTF-8");
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - response : {} ", response);
         new ObjectMapper().writeValue(response.getWriter(), memberInfo);
     }
 
-    /**
-     * 세션 쿠키 설정 (포트 간 전달 가능하게 설정)
-     */
-    private void setSessionCookie(HttpServletRequest request, HttpServletResponse response, String sessionId) {
-        Cookie sessionCookie = new Cookie("SESSIONID", sessionId);
+    // 쿠키 등록
+    // 만약 쿠키 체크가 rememberMe로 되어 있다고 가정. 이 부분 추후에 프론트랑 얘기해야함
+    private void handleCookie(HttpServletRequest request, HttpServletResponse response,
+                              Authentication authentication) throws IOException {
+        log.info("[LoginAuthenticationSuccessHandler] handleCookie - request : {} -> {} -> {}", request.toString(), response.toString(), authentication.toString());
+        // Authentication에서 회원 아이디 조회
+        String memberId = authentication.getName();
+        log.info("[LoginAuthenticationSuccessHandler] handleCookie - memberId : {} ", memberId);
+        // request에서 아이디 체크 유무 조회
+        String rememberMe = request.getParameter("rememberMe");
+        log.info("[LoginAuthenticationSuccessHandler] handleCookie - rememberMe : {} ", rememberMe);
 
-        // 도메인 설정
-        String domain = request.getServerName();
-        if (!"localhost".equals(domain)) {
-            sessionCookie.setDomain(domain); // 실제 도메인 사용
+        // 아이디 체크가 되어 있음
+        if (rememberMe != null) {
+            // 쿠키 생성
+            Cookie cookie = new Cookie("memberId", memberId);
+            log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie1 : {} ", cookie);
+            // 쿠키 도메인 설정
+            cookie.setDomain("5re5park.site");
+            cookie.setSecure(true);// XSS 방지
+            cookie.setHttpOnly(true);// HTTPS에서만 전송
+            cookie.setPath("/");     // 쿠키가 모든 경로에서 유효
+            // 1일 간 유지
+            cookie.setMaxAge(60 * 60 * 24 * 1);
+            log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie2 : {} ", cookie);
+            // 쿠키 등록
+            response.addCookie(cookie);
+
+        } else {
+            // 아이디 체크가 되어 있지 않음
+            Cookie cookie = new Cookie("memberId", "");
+            log.info("[LoginAuthenticationSuccessHandler] handleCookie - No cookie : {} ", cookie);
+            // 쿠키 수동 삭제
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
         }
 
-        sessionCookie.setHttpOnly(true);
-        sessionCookie.setSecure(!"localhost".equals(domain)); // 로컬에서는 Secure 비활성화
-        sessionCookie.setPath("/"); // 모든 경로에서 사용 가능
-        sessionCookie.setMaxAge(-1); // 세션이 종료될 때 삭제
-
-        // SameSite 설정 (Set-Cookie 헤더로 처리)
-        String cookieHeader = String.format("%s=%s; Path=%s; HttpOnly; Secure; SameSite=None",
-                sessionCookie.getName(), sessionCookie.getValue(), sessionCookie.getPath());
-        response.setHeader("Set-Cookie", cookieHeader);
-
-        log.info("Set-Cookie Header: {}", cookieHeader);
     }
 
 }
