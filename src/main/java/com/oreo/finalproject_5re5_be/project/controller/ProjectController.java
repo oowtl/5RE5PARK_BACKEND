@@ -41,17 +41,12 @@ public class ProjectController {
             summary = "Project 정보 검색",
             description = "회원 Seq로 프로젝트 정보를 가지고옵니다."
     )
-    @GetMapping()
+    @GetMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            HttpSession session) {
-//            @PathVariable Long memSeq){//session memberSeq값
-
-        Object memberSeq = session.getAttribute("memberSeq");
-
-        Long memberSeqLong = (Long) memberSeq;
+//            HttpSession session) {
+            @PathVariable Long memSeq){//session memberSeq값
         List<ProjectResponse> projectResponses =
-                projectService.projectFindAll(memberSeqLong);
+                projectService.projectFindAll(memSeq);
 //        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
         log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
 
