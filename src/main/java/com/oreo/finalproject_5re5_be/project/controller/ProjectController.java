@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.project.controller;
 
+import com.google.api.Http;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,19 +41,12 @@ public class ProjectController {
             summary = "Project 정보 검색",
             description = "회원 Seq로 프로젝트 정보를 가지고옵니다."
     )
-    @GetMapping("")
+    @GetMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-            HttpSession session){//session memberSeq값
-        Object memberSeq = session.getAttribute("memberSeq");
-        log.info("[ProjectController] projectGet : memberSeq - memberSeq : {}", memberSeq != null ? memberSeq : "null");
-
-        Long memberSeqLong = (Long) memberSeq;
-        log.info("[ProjectController] projectGet : memberSeq1 - memberSeqLong : {}", memberSeqLong);
-        log.info("[ProjectController] projectGet - memberSeq2 : {} ", (Long) session.getAttribute("memberSeq"));
-
+//            HttpSession session) {
+            @PathVariable Long memSeq){//session memberSeq값
         List<ProjectResponse> projectResponses =
-                projectService.projectFindAll((Long) session.getAttribute("memberSeq"));
+                projectService.projectFindAll(memSeq);
 //        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
         log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
 
@@ -60,15 +55,16 @@ public class ProjectController {
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), map));
     }
+
     @Operation(
             summary = "Project 생성",
             description = "회원 Seq로 프로젝트를 생성 합니다."
     )
-    @PostMapping("")
+    @PostMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
-            HttpSession session){//session memberSeq값
+            @PathVariable Long memSeq){//session memberSeq값
         //project 생성
-        Long projectSeq = projectService.projectSave((Long) session.getAttribute("memberSeq"));
+        Long projectSeq = projectService.projectSave(memSeq);
         Map<String, Object> map = new HashMap<>();
         map.put("projectSeq", projectSeq);//프로젝트seq 응답에 추가
         map.put("msg", "프로젝트 생성 완료되었습니다.");//메시지 추가
@@ -80,12 +76,12 @@ public class ProjectController {
             summary = "Project 이름 수정(저장)",
             description = "프로젝트 Seq와 변경할 이름을 받아 수정합니다."
     )
-    @PutMapping("")
+    @PutMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
-            HttpSession session,
+            @PathVariable Long memSeq,
             @Valid @RequestBody Long proSeq,
             @Valid @RequestBody String projectName){
-        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq); //회원의 프로젝트인지 확인
+        projectService.projectCheck(memSeq, proSeq); //회원의 프로젝트인지 확인
         projectService.projectUpdate(proSeq, projectName);//프로젝트 수정
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
@@ -95,15 +91,14 @@ public class ProjectController {
             summary = "Project 삭제",
             description = "프로젝트 Seq를 받아 activate 상태를 'N'으로 변경합니다."
     )
-    @DeleteMapping("")
+    @DeleteMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<String>> projectDelete(
             @RequestParam List<Long> proSeq,
-            HttpSession session){
-        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq); //회원의 프로젝트인지 확인
+            @PathVariable Long memSeq){
+        projectService.projectCheck(memSeq, proSeq); //회원의 프로젝트인지 확인
         projectService.projectDelete(proSeq);//프로젝트 삭제 배열로 받음
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
                         "Project 삭제 완료되었습니다."));//모두 삭제
     }
-
 }

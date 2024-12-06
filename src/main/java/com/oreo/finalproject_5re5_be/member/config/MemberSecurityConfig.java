@@ -9,7 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -18,12 +20,9 @@ public class MemberSecurityConfig {
 
     private final LoginAuthenticationSuccessHandler successHandler;
     private final LoginAuthenticationFailureHandler failureHandler;
-    private final CorsConfigurationSource corsConfigurationSource;
-
-    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler, LoginAuthenticationFailureHandler failureHandler, CorsConfigurationSource corsConfigurationSource) {
+    public MemberSecurityConfig(LoginAuthenticationSuccessHandler successHandler, LoginAuthenticationFailureHandler failureHandler) {
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
-        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     // SecurityFilterChain 설정 빈 등록, 추후에 적용 예정(다른 파트 작업 완료후 인증/인가 처리 적용예정)
@@ -62,7 +61,7 @@ public class MemberSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource)) // 새로운 방식으로 CORS 설정 적용
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 새로운 방식으로 CORS 설정 적용
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
                                 .anyRequest() // 개발 단계로 모든 요청 열어둠
@@ -82,4 +81,20 @@ public class MemberSecurityConfig {
         return http.build();
     }
 
+
+    // CorsConfigurationSource 빈 등록
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
