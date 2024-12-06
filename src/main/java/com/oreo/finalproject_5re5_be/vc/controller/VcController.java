@@ -140,7 +140,7 @@ public class VcController {
         //결과 파일 생성(VC API)
         List<MultipartFile> resultFile = vcApiService.resultFileCreate(
                 vcService.getSrcFile(srcSeq),//srcFile
-                vcApiService.trgIdCreate(vcService.getTrgFile(trgSeq)));//trgId
+                "cF93iu2tCjN27q5YbEHg");//trgId
 //        List<MultipartFile> resultFile = new ArrayList<>();
 //        MultipartFile file = AudioFileTypeConverter.convertFileToMultipartFile(new File("ttsoutput.mp3"));
 //        resultFile.add(file);//API가 사용되지 않게 test로 반환
