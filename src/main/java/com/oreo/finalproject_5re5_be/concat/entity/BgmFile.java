@@ -25,6 +25,9 @@ public class BgmFile extends BaseEntity {
     @JoinColumn(name = "concat_tab_seq") // 외래 키: concat_tab의 ID
     private ConcatTab concatTab;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "concat_result_seq", nullable = true)
+    private ConcatResult concatResult;
 
     private String audioUrl;
     private String extension;

@@ -17,8 +17,6 @@ public class ConcatResultRequest {
     @NotNull(message = "ConcatTab Seq는 null 일 수 없습니다.")
     private Long concatTabSeq; // ConcatTab의 Seq (Project와 연결된)
 
-    private Long optionSeq; // ConcatOption의 Seq. option 안 쓰는 방법도 생각중이라 일단 null가능
-
     @NotNull(message = "AudioFormat Seq는 null 일 수 없습니다.")
     private Long audioFormatSeq; // AudioFormat의 Seq
 
