@@ -18,7 +18,7 @@ public class ConcatTab extends BaseEntity {
     private Long projectId;
 
     @MapsId // Project 엔티티의 ID를 ConcatTab의 ID로 사용
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "pro_seq")
     private Project project;
 
@@ -29,7 +29,7 @@ public class ConcatTab extends BaseEntity {
     private Float frontSilence;
 
     // 하나의 ConcatTab에 여러 bgmFile들 매칭
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab")
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab", fetch = FetchType.EAGER)
     @Column(nullable = true)
     @Setter
     private List<BgmFile> bgmFiles;
