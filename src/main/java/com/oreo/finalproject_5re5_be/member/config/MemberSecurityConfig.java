@@ -104,7 +104,7 @@ public class MemberSecurityConfig {
             .csrf(AbstractHttpConfigurer::disable); // CSRF 비활성화
         http
             .sessionManagement(sessionManagement -> sessionManagement.sessionFixation(
-                    SessionFixationConfigurer::changeSessionId)
+                    SessionFixationConfigurer::none)
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)); // 기본값
         http
             .securityContext(securityContext -> securityContext

@@ -1,5 +1,6 @@
 package com.oreo.finalproject_5re5_be.project.controller;
 
+import com.google.api.Http;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,12 +41,17 @@ public class ProjectController {
             summary = "Project 정보 검색",
             description = "회원 Seq로 프로젝트 정보를 가지고옵니다."
     )
-    @GetMapping("/{memSeq}")
+    @GetMapping()
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long memSeq){//session memberSeq값
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            HttpSession session) {
+//            @PathVariable Long memSeq){//session memberSeq값
+
+        Object memberSeq = session.getAttribute("memberSeq");
+
+        Long memberSeqLong = (Long) memberSeq;
         List<ProjectResponse> projectResponses =
-                projectService.projectFindAll(memSeq);
+                projectService.projectFindAll(memberSeqLong);
 //        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
         log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
 
@@ -53,6 +60,7 @@ public class ProjectController {
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(), map));
     }
+
     @Operation(
             summary = "Project 생성",
             description = "회원 Seq로 프로젝트를 생성 합니다."
