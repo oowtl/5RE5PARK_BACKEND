@@ -1,13 +1,12 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.request.SelectedConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
-import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
-import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
-import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
-import com.oreo.finalproject_5re5_be.concat.entity.MaterialAudio;
+import com.oreo.finalproject_5re5_be.concat.entity.*;
 import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
+import com.oreo.finalproject_5re5_be.concat.repository.BgmFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.MaterialAudioRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,36 @@ public class MaterialAudioService {
     private final MaterialAudioRepository materialAudioRepository;
     private final ConcatResultRepository concatResultRepository;
     private final AudioFileRepository audioFileRepository;
+    private final BgmFileRepository bgmFileRepository;
+
+    // 결과에 사용된 BGM 파일 조회
+    public BgmFile findBgmFileByConcatResultSeq(Long concatResultSeq) {
+        List<BgmFile> bgmFiles = bgmFileRepository.findByConcatResultSeq(concatResultSeq);
+
+        // 첫 번째 요소 반환 (없으면 null). 어차피 브금에 bgmFile 하나 들어감
+        return bgmFiles.isEmpty() ? null : bgmFiles.get(0);
+    }
+
+    // 결과에 사용된 Material 파일 조회
+    public List<OriginAudioRequest> findMaterialAudioFilesByConcatResultSeq(Long concatResultSeq) {
+        return materialAudioRepository.findByConcatResultSeq(concatResultSeq).stream()
+                .map(material -> OriginAudioRequest.builder()
+                        .seq(material.getAudioFile().getAudioFileSeq())
+                        .audioUrl(material.getAudioFile().getAudioUrl())
+                        .extension(material.getAudioFile().getExtension())
+                        .fileSize(material.getAudioFile().getFileSize())
+                        .fileLength(material.getAudioFile().getFileLength())
+                        .fileName(material.getAudioFile().getFileName())
+                        .build())
+                .toList();
+    }
+
+    //결과물seq로 결과물url조회
+    public String findResultAudioUrlByConcatResultSeq(Long concatResultSeq) {
+        ConcatResult concatResult = concatResultRepository.findById(concatResultSeq)
+                .orElseThrow(() -> new IllegalArgumentException("ConcatResult not found with seq: " + concatResultSeq));
+        return concatResult.getAudioUrl();
+    }
 
     // 1개의 concatResult와 그에 매칭되는 1개의 AudioFile을 저장 (1개)
     public MaterialAudio saveMaterial(Long concatResultSeq, Long audioFileSeq) {
