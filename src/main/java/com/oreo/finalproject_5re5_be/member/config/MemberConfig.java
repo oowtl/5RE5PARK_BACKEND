@@ -55,43 +55,6 @@ public class MemberConfig {
         return mailSender;
     }
 
-    // CorsConfigurationSource 빈 등록
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        // 허용된 Origin 설정
-        configuration.setAllowedOrigins(List.of(
-                "https://client.5re5park.site",
-                "https://5re5park.site",
-                "https://www.5re5park.site",
-                "http://5re5park.site:8080",
-                "http://localhost:8080",
-                "http://localhost:5173",
-                "http://127.0.0.1:8080",
-                "http://127.0.0.1:5173"
-        ));
-
-        // 전체 허용
-//        configuration.addAllowedOriginPattern("https://*");
-//        configuration.addAllowedOriginPattern("http://*");
-
-        // 허용된 HTTP 메서드 설정
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-
-
-        // 허용된 헤더 설정
-        configuration.addAllowedHeader("*");
-
-        // 인증 정보 전송 허용
-        configuration.setAllowCredentials(true);
-//        configuration.addExposedHeader("Set-Cookie"); // 쿠키를 클라이언트에서 읽을 수 있도록 허용
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
-    }
 }
 
 
