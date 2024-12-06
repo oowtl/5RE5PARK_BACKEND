@@ -243,6 +243,33 @@ public class TtsController {
             );
     }
 
+    @Operation(summary = "TTS 생성 요청(큐 작업)", description = "TTS 문장을 저장한 후 수행해주세요!")
+    @GetMapping("/sentence/{tsSeq}/maketts/multi")
+    public ResponseEntity<ResponseDto<TtsSentenceDto>> makeTtsMuti(
+             @Parameter(description = "TTS Sentence ID (문장 식별 번호)") @Min(value = 1L) @PathVariable Long tsSeq
+            ,@Parameter(description = "Project ID") @Min(value = 1L) @PathVariable Long proSeq
+            , @SessionAttribute(value = "memberSeq") Long memberSeq
+    ) {
+
+        // 회원의 정보인지 확인
+        projectService.projectCheck(memberSeq, proSeq);
+
+        // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
+        ttsSentenceService.checkSentenceWithMember(memberSeq, proSeq, tsSeq);
+
+        // tts 생성
+        TtsSentenceDto ttsMakeResult = ttsMakeService.makeTtsMulti(tsSeq);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        new ResponseDto<>(
+                                HttpStatus.CREATED.value(),
+                                ttsMakeResult
+                        )
+                );
+    }
+
     @Operation(summary = "TTS 문장 삭제 요청")
     @DeleteMapping("/sentence/{tsSeq}")
     public ResponseEntity<ResponseDto<String>> deleteSentence(
