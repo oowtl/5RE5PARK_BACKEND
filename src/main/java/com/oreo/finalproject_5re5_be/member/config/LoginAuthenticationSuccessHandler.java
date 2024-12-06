@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -77,6 +78,8 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - session-memberId = : {} ", session.getAttribute("memberId"));
         session.setAttribute("memberSeq", memberSeq);
         log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - session-memberSeq = : {} ", session.getAttribute("memberSeq"));
+        // 로그인 성공 후 context 등록
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 세션 처리
         handleCookie(request, response, authentication);
