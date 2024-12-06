@@ -39,7 +39,7 @@ public class ProjectController {
             summary = "Project 정보 검색",
             description = "회원 Seq로 프로젝트 정보를 가지고옵니다."
     )
-    @GetMapping("")
+    @GetMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
 //            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long memSeq){//session memberSeq값
@@ -57,7 +57,7 @@ public class ProjectController {
             summary = "Project 생성",
             description = "회원 Seq로 프로젝트를 생성 합니다."
     )
-    @PostMapping("")
+    @PostMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
             @PathVariable Long memSeq){//session memberSeq값
         //project 생성
@@ -73,7 +73,7 @@ public class ProjectController {
             summary = "Project 이름 수정(저장)",
             description = "프로젝트 Seq와 변경할 이름을 받아 수정합니다."
     )
-    @PutMapping("")
+    @PutMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
             @PathVariable Long memSeq,
             @Valid @RequestBody Long proSeq,
@@ -88,7 +88,7 @@ public class ProjectController {
             summary = "Project 삭제",
             description = "프로젝트 Seq를 받아 activate 상태를 'N'으로 변경합니다."
     )
-    @DeleteMapping("")
+    @DeleteMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<String>> projectDelete(
             @RequestParam List<Long> proSeq,
             @PathVariable Long memSeq){
@@ -98,5 +98,4 @@ public class ProjectController {
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
                         "Project 삭제 완료되었습니다."));//모두 삭제
     }
-
 }
