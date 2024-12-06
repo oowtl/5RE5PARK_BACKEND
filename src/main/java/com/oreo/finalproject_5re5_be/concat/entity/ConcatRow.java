@@ -24,7 +24,7 @@ public class ConcatRow extends BaseEntity {
     private Long concatRowSeq;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "pro_seq")
     private ConcatTab concatTab;
 
