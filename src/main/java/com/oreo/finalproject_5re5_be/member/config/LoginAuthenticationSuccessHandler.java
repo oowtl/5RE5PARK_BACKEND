@@ -108,11 +108,16 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             cookie.setDomain("5re5park.site");
             cookie.setHttpOnly(true);// HTTPS에서만 전송
             cookie.setPath("/");     // 쿠키가 모든 경로에서 유효
+            cookie.setSecure(true); // HTTPS에서만 쿠키 전송
+            response.setHeader("Set-Cookie", String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None",
+                    cookie.getName(), cookie.getValue()));
             // 1일 간 유지
             cookie.setMaxAge(60 * 60 * 24 * 1);
             log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie2 : {} ", cookie);
             // 쿠키 등록
             response.addCookie(cookie);
+            response.setHeader("Access-Control-Allow-Origin", "https://5re5park.site");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
 
         } else {
             // 아이디 체크가 되어 있지 않음
