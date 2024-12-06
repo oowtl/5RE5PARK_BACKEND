@@ -83,7 +83,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
 
         // JSON으로 응답
         response.setContentType("application/json;charset=UTF-8");
-        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - response : {} ", response);
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - response : {} ", response.toString());
         new ObjectMapper().writeValue(response.getWriter(), memberInfo);
     }
 
@@ -99,34 +99,24 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         String rememberMe = request.getParameter("rememberMe");
         log.info("[LoginAuthenticationSuccessHandler] handleCookie - rememberMe : {} ", rememberMe);
 
-        // 아이디 체크가 되어 있음
-        if (rememberMe != null) {
-            // 쿠키 생성
-            Cookie cookie = new Cookie("memberId", memberId);
-            log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie1 : {} ", cookie);
-            // 쿠키 도메인 설정
-            cookie.setDomain("5re5park.site");
-            cookie.setHttpOnly(true);// HTTPS에서만 전송
-            cookie.setPath("/");     // 쿠키가 모든 경로에서 유효
-            cookie.setSecure(true); // HTTPS에서만 쿠키 전송
-            response.setHeader("Set-Cookie", String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None",
-                    cookie.getName(), cookie.getValue()));
-            // 1일 간 유지
-            cookie.setMaxAge(60 * 60 * 24 * 1);
-            log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie2 : {} ", cookie);
-            // 쿠키 등록
-            response.addCookie(cookie);
-            response.setHeader("Access-Control-Allow-Origin", "https://5re5park.site");
-            response.setHeader("Access-Control-Allow-Credentials", "true");
+        // 쿠키 생성
+        Cookie cookie = new Cookie("memberId", memberId);
+        log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie1 : {} ", cookie);
+        // 쿠키 도메인 설정
+        cookie.setDomain("5re5park.site");
+        cookie.setHttpOnly(true);// HTTPS에서만 전송
+        cookie.setPath("/");     // 쿠키가 모든 경로에서 유효
+        cookie.setSecure(true); // HTTPS에서만 쿠키 전송
+        response.setHeader("Set-Cookie", String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None",
+                cookie.getName(), cookie.getValue()));
+        // 1일 간 유지
+        cookie.setMaxAge(60 * 60 * 24 * 1);
+        log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie2 : {} ", cookie);
+        // 쿠키 등록
+        response.addCookie(cookie);
+        response.setHeader("Access-Control-Allow-Origin", "https://5re5park.site");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        } else {
-            // 아이디 체크가 되어 있지 않음
-            Cookie cookie = new Cookie("memberId", "");
-            log.info("[LoginAuthenticationSuccessHandler] handleCookie - No cookie : {} ", cookie);
-            // 쿠키 수동 삭제
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        }
 
     }
 }
