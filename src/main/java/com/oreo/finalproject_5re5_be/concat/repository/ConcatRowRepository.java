@@ -21,4 +21,13 @@ public interface ConcatRowRepository extends JpaRepository<ConcatRow, Long> {
                                    @Param("status") Character status);
 
     List<ConcatRow> findByConcatRowSeq(long concatRowSequence);
+
+
+    @Query(value = "SELECT concat_row_seq " +
+            " FROM concat_row" +
+            " WHERE pro_seq=:proSeq",
+            nativeQuery = true)
+    List<Long> findConcatRowIdByProjectSeq(@Param("proSeq") Long projectSeq);
+
+
 }

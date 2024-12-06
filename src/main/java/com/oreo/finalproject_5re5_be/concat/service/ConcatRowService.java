@@ -1,10 +1,8 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 import com.oreo.finalproject_5re5_be.concat.dto.ConcatRowDto;
-import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequest;
-import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequestDto;
-import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
-import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
+import com.oreo.finalproject_5re5_be.concat.dto.RowAudioFileDto;
+import com.oreo.finalproject_5re5_be.concat.dto.request.*;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
@@ -16,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -59,9 +58,7 @@ public class ConcatRowService {
 
     @Transactional
     public boolean disableConcatRows(List<Long> rowSeq) {
-
-        concatRowRepository.updateStatusByConcatRowSeq(rowSeq, 'N');//행 비활성 처리
-        return true;
+        return concatRowRepository.updateStatusByConcatRowSeq(rowSeq, 'N') == rowSeq.size();//행 비활성 처리
     }
 
 
@@ -79,9 +76,10 @@ public class ConcatRowService {
     private boolean disableConcatRowsForUpdate(List<ConcatRowRequest> concatRows) {
 
         List<Long> concatRowSeq = concatRows
-                .stream().map(ConcatRowRequest::getSeq).toList();
+                .stream().map(ConcatRowRequest::getSeq)
+                .filter(Objects::nonNull).toList();
         //행 비활성 처리
-        return concatRowRepository.updateStatusByConcatRowSeq(concatRowSeq, 'N') != 0;
+        return concatRowRepository.updateStatusByConcatRowSeq(concatRowSeq, 'N') == concatRowSeq.size();
     }
 
     public ConcatRow readConcatRow(Long concatRowSeq) {
@@ -97,30 +95,29 @@ public class ConcatRowService {
 
         List<AudioFile> audioFiles = new ArrayList<>();
         // 2. ConcatRowRequest 처리
-        List<ConcatRow> concatRows = getConcatRows(requestDto.getConcatRowRequests(), concatTab, audioFiles);
+        List<ConcatRow> saveRows = getConcatRows(requestDto.getConcatRowRequests(), concatTab, audioFiles);
 
         // 3. ConcatRow, 저장
-        concatRowHelper.batchInsert(concatRows);
+//        concatRowHelper.batchInsert(saveRows);
         audioFileService.saveAudioFiles(audioFiles);
         return true;
     }
 
-    @Transactional
-    public boolean saveConcatRows(ConcatRowRequestDto requestDto) {
-        // 1. ConcatTab 확인 및 조회
-        ConcatTab concatTab = concatTabRepository.findById(requestDto.getConcatTabId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid ConcatTab ID: " + requestDto.getConcatTabId()));
-
-        List<AudioFile> audioFiles = new ArrayList<>();
-        // 2. ConcatRowRequest 처리
-        List<ConcatRow> concatRows = getConcatRows(requestDto.getConcatRowRequests(), concatTab, audioFiles);
-
-        // 3. ConcatRow, 저장
-        concatRowHelper.batchInsert(concatRows);
-        audioFileService.saveAudioFiles(audioFiles);
-        return true;
-    }
-
+    //    @Transactional
+//    public boolean saveConcatRows(ConcatRowRequestDto requestDto) {
+//        // 1. ConcatTab 확인 및 조회
+//        ConcatTab concatTab = concatTabRepository.findById(requestDto.getConcatTabId())
+//                .orElseThrow(() -> new IllegalArgumentException("Invalid ConcatTab ID: " + requestDto.getConcatTabId()));
+//
+//        List<AudioFile> audioFiles = new ArrayList<>();
+//        // 2. ConcatRowRequest 처리
+//        List<ConcatRow> concatRows = getConcatRows(requestDto.getConcatRowRequests(), concatTab, audioFiles);
+//
+//        // 3. ConcatRow, 저장
+//        concatRowHelper.batchInsert(concatRows);
+//        audioFileService.saveAudioFiles(audioFiles);
+//        return true;
+//    }
     private List<ConcatRow> getConcatRows(List<ConcatRowRequest> requestDto, ConcatTab concatTab, List<AudioFile> audioFiles) {
         return requestDto.stream()
                 .filter(rowRequest -> rowRequest.getStatus() != 'N').map(rowRequest -> {
@@ -168,5 +165,46 @@ public class ConcatRowService {
                 .rowText(cr.getRowText()).build()).toList();
         concatRowHelper.batchInsert(list);
         return true;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public boolean updateConcatRows(List<RowAudioFileDto> rowAudioFiles, Long tabId) {
+        disableConcatRows(rowAudioFiles.stream().map(RowAudioFileDto::getConcatRow));
+//        List<AudioFile> audioFiles = getAudioFiles(rowAudioFiles, tabId);
+        List<AudioFile> audioFiles = audioFileService.saveAll(getAudioFiles(rowAudioFiles, tabId));
+//        audioFileService.saveAudioFiles(audioFiles);
+        return true;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public boolean disableConcatRows(Stream<ConcatRowDto> concatRows) {
+        List<Long> rowSeqs = concatRows.map(ConcatRowDto::getConcatRowSequence).toList();
+        return disableConcatRows(rowSeqs);
+    }
+
+    private List<AudioFile> getAudioFiles(List<RowAudioFileDto> concatRowAudios, Long tabId) {
+
+        ConcatTab concatTab = concatTabRepository.findById(tabId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid ConcatTab ID: " + tabId));
+
+        return concatRowAudios.stream().map(a -> {
+            ConcatRow concatRow = ConcatRow.builder()
+                    .rowText(a.getConcatRow().getRowText())
+                    .selected(a.getConcatRow().getSelected())
+                    .silence(a.getConcatRow().getSilence())
+                    .rowIndex(a.getConcatRow().getRowIndex())
+                    .status(a.getConcatRow().getStatus())
+                    .concatTab(concatTab) // 기존 객체 사용
+                    .build();
+
+            return AudioFile.builder()
+                    .audioUrl(a.getAudioUrl())
+                    .extension(a.getExtension())
+                    .fileSize(a.getFileSize())
+                    .fileLength(a.getFileLength())
+                    .fileName(a.getFileName())
+                    .concatRow(concatRow)
+                    .build();
+        }).toList();
     }
 }

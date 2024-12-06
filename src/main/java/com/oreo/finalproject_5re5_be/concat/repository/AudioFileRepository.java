@@ -57,4 +57,10 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     @Query("SELECT a FROM audio_file a WHERE a.audioFileSeq = :audioFileSeq")
     AudioFile findAudioFileById(Long audioFileSeq);
 
+    @Query("SELECT af FROM audio_file af" +
+            " JOIN af.concatRow cr" +
+            " JOIN cr.concatTab ct" +
+            " WHERE ct.projectId = :proSeq" +
+            " AND cr.status = 'Y'")
+    List<AudioFile> findAudioFileByProjectSeq(@Param("proSeq") Long projectSeq);
 }
