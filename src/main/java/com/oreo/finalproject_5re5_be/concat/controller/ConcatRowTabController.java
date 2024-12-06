@@ -10,6 +10,7 @@ import com.oreo.finalproject_5re5_be.concat.service.ConcatTabService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Concat", description = "Concat 관련 API")
 
 @RestController
 @RequiredArgsConstructor
@@ -68,6 +70,11 @@ public class ConcatRowTabController {
 //        return new ResponseDto<>(HttpStatus.OK.value(), updateTab && updateRow).toResponseEntity();
 //    }
 //
+
+    @Operation(
+            summary = "ConcatRow, ConcatTab을 조회합니다.",
+            description = ""
+    )
     @GetMapping("read")
     public ResponseEntity<ResponseDto<TabRowResponseDto>> readRowAndTab(
             @RequestParam Long projectSeq,
