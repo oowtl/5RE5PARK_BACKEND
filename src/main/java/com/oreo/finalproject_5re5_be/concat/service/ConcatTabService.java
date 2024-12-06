@@ -113,7 +113,7 @@ public class ConcatTabService {
                 .orElseThrow(() -> new NoSuchElementException("수정할 프로젝트가 없습니다."));
 
         // Dto의 originAudioRequests를 통해 bgmFiles 리스트 생성
-        List<BgmFile> bgmFiles = concatUpdateRequestDto.getOriginAudioRequests().stream()
+        List<BgmFile> bgmFiles = concatUpdateRequestDto.getBgmFileList().stream()
                 .map(request -> bgmFileRepository.findById(request.getSeq())
                         .orElseThrow(() -> new NoSuchElementException("BgmFile not found with ID: " + request.getSeq())))
                 .toList();

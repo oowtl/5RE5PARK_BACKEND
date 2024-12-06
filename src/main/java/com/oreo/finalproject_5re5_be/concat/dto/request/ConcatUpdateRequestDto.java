@@ -15,6 +15,6 @@ public class ConcatUpdateRequestDto {
     private final Long tabId;
     private final float frontSilence;
     private final Character status;
-    private final List<OriginAudioRequest> originAudioRequests; // BgmFile 정보 리스트
+    private final List<OriginAudioRequest> bgmFileList; // BgmFile 정보 리스트
 
 }
