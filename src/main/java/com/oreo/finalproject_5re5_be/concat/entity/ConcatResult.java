@@ -4,6 +4,9 @@ import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ToString
 @Getter
 @Builder
@@ -20,6 +23,9 @@ public class ConcatResult extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pro_seq")
     private ConcatTab concatTab;
+
+    @OneToMany(mappedBy = "concatResult", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BgmFile> bgmFiles = new ArrayList<>();
 
     @Column(name = "audio_url")
     private String audioUrl;
