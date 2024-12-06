@@ -3,10 +3,15 @@ package com.oreo.finalproject_5re5_be.tts.service;
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.dto.response.AudioFileInfo;
+import com.oreo.finalproject_5re5_be.tts.dto.external.TtsMakeResponse;
 import com.oreo.finalproject_5re5_be.tts.dto.response.TtsSentenceDto;
-import com.oreo.finalproject_5re5_be.tts.entity.*;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsAudioFile;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsProcessHistory;
+import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.exception.SaveTtsMakeResultException;
-import com.oreo.finalproject_5re5_be.tts.repository.*;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsAudioFileRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsProcessHistoryRepository;
+import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -22,7 +27,6 @@ public class SaveTtsMakeResultService {
     private final TtsSentenceRepository ttsSentenceRepository;
     private final TtsAudioFileRepository ttsAudioFileRepository;
     private final TtsProcessHistoryRepository ttsProcessHistoryRepository;
-    private final TtsProgressStatusRepository ttsProgressStatusRepository;
     private final AudioInfo audioInfo;
     private final S3Service s3Service;
 
@@ -30,14 +34,12 @@ public class SaveTtsMakeResultService {
             TtsSentenceRepository ttsSentenceRepository,
             TtsAudioFileRepository ttsAudioFileRepository,
             TtsProcessHistoryRepository ttsProcessHistoryRepository,
-            TtsProgressStatusRepository ttsProgressStatusRepository,
             AudioInfo audioInfo,
             S3Service s3Service
     ) {
         this.ttsSentenceRepository = ttsSentenceRepository;
         this.ttsAudioFileRepository = ttsAudioFileRepository;
         this.ttsProcessHistoryRepository = ttsProcessHistoryRepository;
-        this.ttsProgressStatusRepository = ttsProgressStatusRepository;
         this.audioInfo = audioInfo;
         this.s3Service = s3Service;
     }
@@ -56,6 +58,32 @@ public class SaveTtsMakeResultService {
     public TtsSentenceDto saveTtsMakeResult(@NotNull MultipartFile ttsFile, @NotNull String uploadedUrl,@NotNull TtsSentence ttsSentence) {
         // 1. 오디오 파일 메타데이터 DB 저장
         TtsAudioFile savedTtsAudioFile = saveTtsAudioFile(ttsFile, uploadedUrl);
+
+        // 2. TTS 문장 정보 업데이트
+        // TTS 행 엔티티의 ttsAudioFile 정보 수정 후 저장
+        TtsSentence updatedSentence = ttsSentence.toBuilder().ttsAudiofile(savedTtsAudioFile).build();
+        TtsSentence savedSentence = ttsSentenceRepository.save(updatedSentence);
+
+        // 3. TTS 처리 내역 저장
+        saveTtsProcessHistory(savedSentence, savedTtsAudioFile);
+
+        // 4. 업데이트 된 문장 정보 반환
+        return TtsSentenceDto.of(updatedSentence);
+    }
+
+    @Retryable(
+            retryFor = {RuntimeException.class},
+            maxAttempts = 3,    // 최대 재시도 횟수
+            backoff = @Backoff( // 재시도 간격
+                    delay = 1000,
+                    maxDelay = 3000,
+                    multiplier = 2.0 // 시도 후 지연 시간 두배
+            )
+    )
+    @Transactional(rollbackFor = RuntimeException.class)
+    public TtsSentenceDto saveTtsMakeResult(@NotNull TtsMakeResponse ttsMakeResponse, @NotNull TtsSentence ttsSentence) {
+        // 1. 오디오 파일 메타데이터 DB 저장
+        TtsAudioFile savedTtsAudioFile = saveTtsAudioFile(ttsMakeResponse);
 
         // 2. TTS 문장 정보 업데이트
         // TTS 행 엔티티의 ttsAudioFile 정보 수정 후 저장
@@ -99,6 +127,23 @@ public class SaveTtsMakeResultService {
                 .audioPath(url)
                 .audioTime(audioFileInfo.getLength())
                 .audioSize(audioFileInfo.getSize())
+                .audioPlayYn('y')
+                .downloadYn('y')
+                .downloadCount(0)
+                .build();
+
+        // TTS 오디오 파일 엔티티 저장
+        return ttsAudioFileRepository.save(ttsAudioFile);
+    }
+
+    private TtsAudioFile saveTtsAudioFile(TtsMakeResponse ttsMakeResponse) {
+        // 저장할 TTS 오디오 파일 엔티티 생성
+        TtsAudioFile ttsAudioFile = TtsAudioFile.builder()
+                .audioName(ttsMakeResponse.getFileName())
+                .audioExtension(ttsMakeResponse.getFileExtension())
+                .audioPath(ttsMakeResponse.getUrl())
+                .audioTime(ttsMakeResponse.getFileLength())
+                .audioSize(ttsMakeResponse.getFileSize())
                 .audioPlayYn('y')
                 .downloadYn('y')
                 .downloadCount(0)
