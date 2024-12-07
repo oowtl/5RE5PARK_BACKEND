@@ -3,7 +3,6 @@ package com.oreo.finalproject_5re5_be.vc.controller;
 import com.oreo.finalproject_5re5_be.global.component.AudioInfo;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
-import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcRowRequest;
 import com.oreo.finalproject_5re5_be.vc.dto.request.VcTextRequest;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -263,7 +261,7 @@ public class VcController {
     )
     @DeleteMapping("/src")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(
-            @Valid @RequestBody @Parameter(description = "List<Long> srcSeq") List<Long> srcSeq,
+            @Valid @RequestParam @Parameter(description = "List<Long> srcSeq") List<Long> srcSeq,
             HttpSession session){
         //회원의 정보인지 확인
         vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);

@@ -3,6 +3,7 @@ package com.oreo.finalproject_5re5_be.tts.service;
 import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.exception.ProjectNotFoundException;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
@@ -16,13 +17,17 @@ import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import com.oreo.finalproject_5re5_be.tts.exception.InValidRequestException;
 import com.oreo.finalproject_5re5_be.tts.exception.ProjectMismatchException;
 import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceInValidInput;
+import com.oreo.finalproject_5re5_be.tts.exception.TtsSentenceNotFound;
+import com.oreo.finalproject_5re5_be.tts.exception.VoiceEntityNotFound;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsProgressStatusRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -60,13 +65,12 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         // 2.1 projectSeq 유효성 검증 : not null => @NotNull
         // 2.2. projectSeq : 조회 가능한 projectSeq (존재 여부) 검증 및 할당
         Project project = projectRepository.findById(projectSeq)
-            .orElseThrow(() -> new IllegalArgumentException("projectSeq is invalid"));
+            .orElseThrow(ProjectNotFoundException::new);
 
         // 3.1 TtsSentenceRequest.voiceSeq 유효성 검증 : not null => @NotNull
         // 3.2 voiceSeq : 조회 가능한 voiceSeq (존재 여부) 검증 및 할당
         Voice voice = voiceRepository.findById(createRequest.getVoiceSeq())
-            .orElseThrow(() -> new IllegalArgumentException("voiceSeq is invalid"));
-
+            .orElseThrow(VoiceEntityNotFound::new);
 
         // 4. TtsSentenceRequest -> TtsSentence 변환
         TtsAttributeInfo attribute = createRequest.getAttribute();
@@ -114,26 +118,22 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         @Valid @NotNull Long tsSeq, @Valid TtsSentenceRequest updateRequest) {
         // 1. TtsSentenceRequest 유효성 검증
         if (updateRequest == null) {
-            throw new IllegalArgumentException("Update request cannot be null");
+            throw new InValidRequestException();
         }
 
         // 2. DB 유효성 검증
         // 2.1 projectSeq 조회 가능한 projectSeq (존재 여부) 검증 및 할당
         Project project = projectRepository.findById(projectSeq)
-            .orElseThrow(
-                () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
+            .orElseThrow(ProjectNotFoundException::new);
 
         // 2.2 voiceSeq 조회 가능한 voiceSeq (존재 여부) 검증 및 할당
         Voice voice = voiceRepository.findById(updateRequest.getVoiceSeq())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "Voice not found with id: " + updateRequest.getVoiceSeq()));
-
+            .orElseThrow(VoiceEntityNotFound::new);
 
         // 3. TtsSentenceRequest -> TtsSentence 변환
         // 3.1 TtsSentence 엔티티 조회
         TtsSentence sentence = ttsSentenceRepository.findById(tsSeq)
-            .orElseThrow(
-                () -> new EntityNotFoundException("TtsSentence not found with id: " + tsSeq));
+            .orElseThrow(TtsSentenceNotFound::new);
 
         // 3.2 TtsSentence 엔티티 수정
         TtsSentence updateSentence = sentence.toBuilder()
@@ -167,12 +167,10 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
         @Valid TtsSentenceBatchRequest batchRequest) {
         // 10개의 TTSSentence 가 있다고 가정했을 때 5개의 TTSSentence 를 수정하고 전체 정렬을 했을 때, 순서를 보장하기 위해서는?
 
-
         // 1. DELETE 를 먼저 삭제한다. (삭제할 것들은 삭제 후에 정렬)
         batchRequest.getSentenceList().stream()
             .filter(sentence -> sentence.getBatchProcessType() == BatchProcessType.DELETE)
             .forEach(sentence -> deleteSentence(projectSeq, sentence.getSentence().getTsSeq()));
-
 
         List<TtsSentenceBatchInfo> alivedList = batchRequest.getSentenceList().stream()
             .filter(sentence -> sentence.getBatchProcessType() != BatchProcessType.DELETE)
@@ -184,13 +182,12 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 2. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
         // 3. 정렬 및 정렬 순서 수정
-        List<TtsSentenceBatchInfo> batchList = alivedRequest.sortSentenceList();
+//        List<TtsSentenceBatchInfo> batchList = alivedRequest.sortSentenceList();
 
-        // 4. TtsSentenceDto List 변환
-        List<TtsSentenceDto> batchedList = batchList.stream()
-            .map(batchInfo -> toSentenceDto(projectSeq, batchInfo))
-            .filter(Objects::nonNull) // not null
-            .toList();
+        // 4. 하나씩 처리
+        for (TtsSentenceBatchInfo batchInfo : alivedRequest.getSentenceList()) {
+            toSentenceDto(projectSeq, batchInfo);
+        }
 
         return getSentenceList(projectSeq);
     }
@@ -257,7 +254,8 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
                 () -> new EntityNotFoundException("Project not found with id: " + projectSeq));
 
         // 2. Project 에 연관된 TtsSentence 리스트 조회
-        List<TtsSentence> ttsSentenceList = ttsSentenceRepository.findAllByProjectOrderBySortOrder(project);
+        List<TtsSentence> ttsSentenceList = ttsSentenceRepository.findAllByProjectOrderBySortOrder(
+            project);
 
         // 3. TtsSentenceDto 리스트 변환 및 반환
         return TtsSentenceListDto.of(ttsSentenceList);

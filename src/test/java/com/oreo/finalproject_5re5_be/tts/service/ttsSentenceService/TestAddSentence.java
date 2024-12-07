@@ -1,6 +1,8 @@
 package com.oreo.finalproject_5re5_be.tts.service.ttsSentenceService;
 
+import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
+import com.oreo.finalproject_5re5_be.project.exception.ProjectNotFoundException;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsAttributeInfo;
 import com.oreo.finalproject_5re5_be.tts.dto.request.TtsSentenceRequest;
@@ -9,6 +11,7 @@ import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatus;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsProgressStatusCode;
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import com.oreo.finalproject_5re5_be.tts.exception.VoiceEntityNotFound;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsProgressStatusRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
@@ -138,7 +141,7 @@ class TestAddSentence {
 
         // when, then
         // 3. IllegalArgumentException 발생
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ProjectNotFoundException.class,
             () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest));
     }
 
@@ -159,7 +162,7 @@ class TestAddSentence {
 
         // when, then
         // 3. ConstraintViolationException 발생
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ProjectNotFoundException.class,
             () -> ttsSentenceService.addSentence(projectSeq, nullVoiceSeqCreateRequest));
     }
 
@@ -187,7 +190,7 @@ class TestAddSentence {
 
         // when, then
         // 3. IllegalArgumentException 발생
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(VoiceEntityNotFound.class,
             () -> ttsSentenceService.addSentence(projectSeq, ttsSentenceRequest));
     }
 
