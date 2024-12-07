@@ -3,7 +3,6 @@ package com.oreo.finalproject_5re5_be.member.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,8 +24,9 @@ import java.util.Map;
 public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
-        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - request : {} -> {} -> {}", request.toString(), response.toString(), authentication.toString());
+                                        Authentication authentication) throws IOException {
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - request : {} -> {} -> {}",
+                request.toString(), response.toString(), authentication.toString());
         // 로그인 성공시 유저 정보 반환
         // 사용자 정보 추출
         Object principal = authentication.getPrincipal();
@@ -66,8 +66,6 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         log.info("memberSeq = {}", memberSeq);
         log.info("memberId = {}", memberId);
 
-        // 기존 세션 삭제
-        request.getSession().invalidate();
 
         // 세션 조회
         HttpSession session = request.getSession(true);
@@ -86,14 +84,14 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
 
         // JSON으로 응답
         response.setContentType("application/json;charset=UTF-8");
-        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - response : {} ", response.toString());
+        log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - response : {} ", response);
         new ObjectMapper().writeValue(response.getWriter(), memberInfo);
     }
 
     // 쿠키 등록
     // 만약 쿠키 체크가 rememberMe로 되어 있다고 가정. 이 부분 추후에 프론트랑 얘기해야함
     private void handleCookie(HttpServletRequest request, HttpServletResponse response,
-                              Authentication authentication) throws IOException {
+                              Authentication authentication) {
         log.info("[LoginAuthenticationSuccessHandler] handleCookie - request : {} -> {} -> {}", request.toString(), response.toString(), authentication.toString());
         // Authentication에서 회원 아이디 조회
         String memberId = authentication.getName();
@@ -113,7 +111,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             response.setHeader("Set-Cookie", String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None",
                     cookie.getName(), cookie.getValue()));
             // 1일 간 유지
-            cookie.setMaxAge(60 * 60 * 24 * 1);
+            cookie.setMaxAge(60 * 60 * 24);
             log.info("[LoginAuthenticationSuccessHandler] handleCookie - cookie2 : {} ", cookie);
             // 쿠키 등록
             response.addCookie(cookie);
