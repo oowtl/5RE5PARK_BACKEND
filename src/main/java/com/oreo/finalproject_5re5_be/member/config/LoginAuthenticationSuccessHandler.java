@@ -118,6 +118,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
             // 쿠키 등록
             response.addCookie(cookie);
             response.setHeader("Access-Control-Allow-Origin", "https://5re5park.site");
+            response.setHeader("Access-Control-Allow-Origin", "https://dev1.5re5park.site");
             response.setHeader("Access-Control-Allow-Credentials", "true");
 
         } else {

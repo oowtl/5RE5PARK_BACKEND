@@ -42,7 +42,7 @@ public class ProjectController {
             summary = "Project 정보 검색",
             description = "회원 Seq로 프로젝트 정보를 가지고옵니다."
     )
-    @GetMapping("/{memSeq}")
+    @GetMapping("")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
             HttpSession session) {
 //            @PathVariable Long memSeq){//session memberSeq값
@@ -62,7 +62,7 @@ public class ProjectController {
             summary = "Project 생성",
             description = "회원 Seq로 프로젝트를 생성 합니다."
     )
-    @PostMapping("/{memSeq}")
+    @PostMapping("")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
             HttpSession session){//session memberSeq값
         //project 생성
@@ -78,7 +78,7 @@ public class ProjectController {
             summary = "Project 이름 수정(저장)",
             description = "프로젝트 Seq와 변경할 이름을 받아 수정합니다."
     )
-    @PutMapping("/{memSeq}")
+    @PutMapping("")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
             HttpSession session,
             @Valid @RequestBody ProjectTextRequest request){
@@ -92,7 +92,7 @@ public class ProjectController {
             summary = "Project 삭제",
             description = "프로젝트 Seq를 받아 activate 상태를 'N'으로 변경합니다."
     )
-    @DeleteMapping("/{memSeq}")
+    @DeleteMapping("")
     public ResponseEntity<ResponseDto<String>> projectDelete(
             @RequestParam List<Long> proSeq,
             HttpSession session){
