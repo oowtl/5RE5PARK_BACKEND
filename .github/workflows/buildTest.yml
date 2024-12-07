@@ -75,7 +75,7 @@ jobs:
         shell: bash
       - name: Create JSON Config File
         env:
-          TTS_JSON_CONTENT: ${{ secrets.TTS_JSON }}
+          TTS_JSON_CONTENT: ${{ secrets.TTS_JSON_CONTENT }}
         run: |
           echo "${TTS_JSON_CONTENT}" > src/main/resources/tts.json
           echo $TTS_JSON_CONTENT
