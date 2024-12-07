@@ -2,6 +2,8 @@ package com.oreo.finalproject_5re5_be.tts.client;
 
 import com.google.cloud.texttospeech.v1.AudioConfig;
 import com.google.cloud.texttospeech.v1.AudioEncoding;
+import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
+import com.oreo.finalproject_5re5_be.tts.exception.TtsMakeInvalidParamException;
 
 public class AudioConfigGenerator {
     // Google TTS AudioConfig 정책
@@ -24,9 +26,7 @@ public class AudioConfigGenerator {
     public static AudioConfig generate(double speed, double pitch, double volume) {
 
         // 1. 검증 통과 못하면 예외 던지기
-        if( !vaildSpeed(speed) || !validPitch(pitch) || !validVolume(volume) ) {
-            throw new IllegalArgumentException("잘못된 파라미터 값 입니다.");
-        }
+        checkParams(speed, pitch, volume);
 
         // 2. 객체 생성
         return AudioConfig.newBuilder()
@@ -40,12 +40,12 @@ public class AudioConfigGenerator {
 
     // 음성 속도 값 검증
     private static boolean vaildSpeed(double speed) {
-        return speed > MIN_SPEED && speed < MAX_SPEED;
+        return speed >= MIN_SPEED && speed <= MAX_SPEED;
     }
 
     // 피치 값 검증
     private static boolean validPitch(double pitch) {
-        return pitch > MIN_PITCH && pitch < MAX_PITCH;
+        return pitch >= MIN_PITCH && pitch <= MAX_PITCH;
     }
 
     // 볼륨 값 검증
@@ -53,4 +53,17 @@ public class AudioConfigGenerator {
         return volume > MIN_VOLUME && volume < MAX_VOLUME ;
     }
 
+
+    private static void checkParams(double speed, double pitch, double volume) {
+        if( !vaildSpeed(speed)) {
+            throw new TtsMakeInvalidParamException(ErrorCode.TTS_MAKE_INVALID_SPEED);
+        }
+
+        if( !validPitch(pitch)) {
+            throw new TtsMakeInvalidParamException(ErrorCode.TTS_MAKE_FAILED_ERROR);
+        }
+        if(!validVolume(volume) ) {
+            throw new TtsMakeInvalidParamException(ErrorCode.TTS_MAKE_INVALID_VOLUME);
+        }
+    }
 }
