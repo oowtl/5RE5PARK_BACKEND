@@ -259,11 +259,11 @@ public class VcController {
 
     @Operation(
             summary = "SRC 행 삭제",
-            description = "SRC 행을 비활성화 상태로 변경합니다. active = 'N' "
+            description = "srcSeq를 배열 형태로 넣어 SRC 행을 비활성화 상태로 변경합니다. active = 'N' "
     )
     @DeleteMapping("/src")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> deleteSrc(
-            @Valid @RequestBody List<Long> srcSeq,
+            @Valid @RequestBody @Parameter(description = "List<Long> srcSeq") List<Long> srcSeq,
             HttpSession session){
         //회원의 정보인지 확인
         vcService.srcCheck((Long) session.getAttribute("memberSeq"), srcSeq);
