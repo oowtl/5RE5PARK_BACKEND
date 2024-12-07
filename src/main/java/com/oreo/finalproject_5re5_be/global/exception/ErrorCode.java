@@ -43,7 +43,14 @@ public enum ErrorCode {
     // TTS ERROR 처리
     PROJECT_MISMATCH_ERROR(400, "요청하신 프로젝트를 소유하고 있지 않습니다."),
     VOICE_ENTITY_NOT_FOUND_ERROR(404, "해당 음성을 찾을 수 없습니다."),
-    TTS_SENTENCE_NOT_FOUND_ERROR(404, "해당 문장을 찾을 수 없습니다.");
+    TTS_SENTENCE_NOT_FOUND_ERROR(404, "해당 문장을 찾을 수 없습니다."),
+
+    // TTS 생성 ERROR 처리
+    TTS_MAKE_FAILED_ERROR(500, "TTS 생성에 실패했습니다."),
+    TTS_MAKE_INVALID_INPUT_VALUE_ERROR(400, "TTS 생성 입력값이 올바르지 않습니다."),
+    TTS_MAKE_INVALID_SPEED(400, "허용되지 않는 TTS 속도입니다."),
+    TTS_MAKE_INVALID_PITCH(400, "허용되지 않는 TTS 음높이입니다."),
+    TTS_MAKE_INVALID_VOLUME(400, "허용되지 않는 TTS 음량입니다.");
 
 
     private final String message;
