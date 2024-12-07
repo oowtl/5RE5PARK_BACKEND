@@ -124,7 +124,6 @@ public class ConcatTabService {
                 .project(existingTab.getProject()) // 기존 값 유지
                 .frontSilence(concatUpdateRequestDto.getFrontSilence()) // 업데이트된 값
                 .status(concatUpdateRequestDto.getStatus()) // 업데이트된 값
-                .bgmFiles(bgmFiles) // 새로운 BgmFile 리스트
                 .build();
 
         concatTabRepository.save(updatedTab);
