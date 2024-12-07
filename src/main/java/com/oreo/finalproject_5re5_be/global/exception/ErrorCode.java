@@ -35,7 +35,16 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(400, " Entity Not Found"),
     INTERNAL_SERVER_ERROR(500, "Server Error"),
     INVALID_TYPE_VALUE(400, " Invalid Type Value"),
-    HANDLE_ACCESS_DENIED(403, "Access is Denied");
+    HANDLE_ACCESS_DENIED(403, "Access is Denied"),
+
+    // 프로젝트 ERROR 처리
+    PROJECT_NOT_FOUND_ERROR(404, "해당 프로젝트를 찾을 수 없습니다."),
+
+    // TTS ERROR 처리
+    PROJECT_MISMATCH_ERROR(400, "요청하신 프로젝트를 소유하고 있지 않습니다."),
+    VOICE_ENTITY_NOT_FOUND_ERROR(404, "해당 음성을 찾을 수 없습니다."),
+    TTS_SENTENCE_NOT_FOUND_ERROR(404, "해당 문장을 찾을 수 없습니다.");
+
 
     private final String message;
     private final int status;
