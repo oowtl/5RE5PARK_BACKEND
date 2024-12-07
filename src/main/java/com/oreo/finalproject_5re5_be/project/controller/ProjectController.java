@@ -3,6 +3,7 @@ package com.oreo.finalproject_5re5_be.project.controller;
 import com.google.api.Http;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
+import com.oreo.finalproject_5re5_be.project.dto.request.ProjectTextRequest;
 import com.oreo.finalproject_5re5_be.project.dto.response.ProjectResponse;
 import com.oreo.finalproject_5re5_be.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,11 +44,12 @@ public class ProjectController {
     )
     @GetMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String, List<Object>>>> projectGet(
-//            HttpSession session) {
-            @PathVariable Long memSeq){//session memberSeq값
-        List<ProjectResponse> projectResponses =
-                projectService.projectFindAll(memSeq);
-//        List<ProjectResponse> projectResponses = projectService.projectFindAll(userDetails.getMember().getSeq());
+            HttpSession session) {
+//            @PathVariable Long memSeq){//session memberSeq값
+//        List<ProjectResponse> projectResponses =
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
+        projectService.projectFindAll(memberSeq);
+        List<ProjectResponse> projectResponses = projectService.projectFindAll(memberSeq);
         log.info("[ProjectController] projectGet - projectResponses : {} ", projectResponses.toString());
 
         Map<String, List<Object>> map = new HashMap<>();//맵 생성
@@ -62,9 +64,9 @@ public class ProjectController {
     )
     @PostMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<Map<String,Object>>> projectSave(
-            @PathVariable Long memSeq){//session memberSeq값
+            HttpSession session){//session memberSeq값
         //project 생성
-        Long projectSeq = projectService.projectSave(memSeq);
+        Long projectSeq = projectService.projectSave((Long) session.getAttribute("memberSeq"));
         Map<String, Object> map = new HashMap<>();
         map.put("projectSeq", projectSeq);//프로젝트seq 응답에 추가
         map.put("msg", "프로젝트 생성 완료되었습니다.");//메시지 추가
@@ -78,14 +80,13 @@ public class ProjectController {
     )
     @PutMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<String>> projectUpdate(
-            @PathVariable Long memSeq,
-            @Valid @RequestBody Long proSeq,
-            @Valid @RequestBody String projectName){
-        projectService.projectCheck(memSeq, proSeq); //회원의 프로젝트인지 확인
-        projectService.projectUpdate(proSeq, projectName);//프로젝트 수정
+            HttpSession session,
+            @Valid @RequestBody ProjectTextRequest request){
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), request.getProSeq()); //회원의 프로젝트인지 확인
+        projectService.projectUpdate(request.getProSeq(), request.getProjectName());//프로젝트 수정
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
-                        "Project 이름 변경 완료되었습니다.")); //응답 
+                        "Project 이름 변경 완료되었습니다.")); //응답
     }
     @Operation(
             summary = "Project 삭제",
@@ -94,8 +95,8 @@ public class ProjectController {
     @DeleteMapping("/{memSeq}")
     public ResponseEntity<ResponseDto<String>> projectDelete(
             @RequestParam List<Long> proSeq,
-            @PathVariable Long memSeq){
-        projectService.projectCheck(memSeq, proSeq); //회원의 프로젝트인지 확인
+            HttpSession session){
+        projectService.projectCheck((Long) session.getAttribute("memberSeq"), proSeq); //회원의 프로젝트인지 확인
         projectService.projectDelete(proSeq);//프로젝트 삭제 배열로 받음
         return ResponseEntity.ok()
                 .body(new ResponseDto<>(HttpStatus.OK.value(),
