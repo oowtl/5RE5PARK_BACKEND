@@ -14,6 +14,7 @@ import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -135,8 +136,9 @@ public class TtsController {
     public ResponseEntity<ResponseDto<TtsSentenceDto>> registerSentence(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceRequest createRequest,
-        @SessionAttribute(value = "memberSeq") Long memberSeq) {
+        HttpSession session) {
         //회원의 정보인지 확인
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
         projectService.projectCheck(memberSeq, proSeq);
 
         // 문장 생성
@@ -153,8 +155,9 @@ public class TtsController {
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq,
         @Parameter(description = "tts 문장 수정 요청 body") @Valid @RequestBody TtsSentenceRequest updateRequest,
-        @SessionAttribute(value = "memberSeq") Long memberSeq) {
+        HttpSession session) {
         // 회원의 정보인지 확인
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
         projectService.projectCheck(memberSeq, proSeq);
 
         // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
@@ -174,12 +177,14 @@ public class TtsController {
     public ResponseEntity<ResponseDto<TtsSentenceListDto>> batchSave(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "tts 문장 생성 요청 body") @Valid @RequestBody TtsSentenceBatchRequest batchRequest,
-        @SessionAttribute(value = "memberSeq") Long memberSeq) {
+        HttpSession session) {
         // 회원의 정보인지 확인
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
         projectService.projectCheck(memberSeq, proSeq);
 
         // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
-        ttsSentenceService.checkSentenceWithMember(memberSeq, proSeq, batchRequest.getSentenceList());
+        ttsSentenceService.checkSentenceWithMember(memberSeq, proSeq,
+            batchRequest.getSentenceList());
 
         // 문장 생성 및 수정
         TtsSentenceListDto response = ttsSentenceService.batchSaveSentence(proSeq,
@@ -222,9 +227,9 @@ public class TtsController {
     public ResponseEntity<ResponseDto<TtsSentenceDto>> makeTts(
         @Parameter(description = "TTS Sentence ID (문장 식별 번호)") @Min(value = 1L) @PathVariable Long tsSeq,
         @Parameter(description = "Project ID") @Min(value = 1L) @PathVariable Long proSeq,
-        @SessionAttribute(value = "memberSeq") Long memberSeq) {
-
+        HttpSession session) {
         // 회원의 정보인지 확인
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
         projectService.projectCheck(memberSeq, proSeq);
 
         // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
@@ -246,12 +251,11 @@ public class TtsController {
     @Operation(summary = "TTS 생성 요청(큐 작업)", description = "TTS 문장을 저장한 후 수행해주세요!")
     @GetMapping("/sentence/{tsSeq}/maketts/multi")
     public ResponseEntity<ResponseDto<TtsSentenceDto>> makeTtsMuti(
-             @Parameter(description = "TTS Sentence ID (문장 식별 번호)") @Min(value = 1L) @PathVariable Long tsSeq
-            ,@Parameter(description = "Project ID") @Min(value = 1L) @PathVariable Long proSeq
-            , @SessionAttribute(value = "memberSeq") Long memberSeq
-    ) {
-
+        @Parameter(description = "TTS Sentence ID (문장 식별 번호)") @Min(value = 1L) @PathVariable Long tsSeq,
+        @Parameter(description = "Project ID") @Min(value = 1L) @PathVariable Long proSeq,
+        HttpSession session) {
         // 회원의 정보인지 확인
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
         projectService.projectCheck(memberSeq, proSeq);
 
         // 해당 문장을 소유한 멤버인지 확인 (문장 수정 권한 확인)
@@ -261,13 +265,13 @@ public class TtsController {
         TtsSentenceDto ttsMakeResult = ttsMakeService.makeTtsMulti(tsSeq);
 
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(
-                        new ResponseDto<>(
-                                HttpStatus.CREATED.value(),
-                                ttsMakeResult
-                        )
-                );
+            .status(HttpStatus.CREATED)
+            .body(
+                new ResponseDto<>(
+                    HttpStatus.CREATED.value(),
+                    ttsMakeResult
+                )
+            );
     }
 
     @Operation(summary = "TTS 문장 삭제 요청")
@@ -275,9 +279,9 @@ public class TtsController {
     public ResponseEntity<ResponseDto<String>> deleteSentence(
         @Parameter(description = "Project ID") @Min(value = 1L, message = "projectSeq is invalid") @PathVariable Long proSeq,
         @Parameter(description = "TTS 문장 ID") @Min(value = 1L, message = "tsSeq is invalid") @PathVariable Long tsSeq,
-        @SessionAttribute(value = "memberSeq") Long memberSeq) {
-
+        HttpSession session) {
         // 회원의 정보인지 확인
+        Long memberSeq = (Long) session.getAttribute("memberSeq");
         projectService.projectCheck(memberSeq, proSeq);
 
         // 회원이 소유한 tts 문장인지 확인
