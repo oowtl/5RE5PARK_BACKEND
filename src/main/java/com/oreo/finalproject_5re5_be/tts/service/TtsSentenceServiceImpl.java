@@ -182,16 +182,11 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
 
         // 2. TtsSentenceBatchRequest.sentenceList -> TtsSentenceDto List 변환
         // 3. 정렬 및 정렬 순서 수정
-        List<TtsSentenceBatchInfo> batchList = alivedRequest.sortSentenceList();
+//        List<TtsSentenceBatchInfo> batchList = alivedRequest.sortSentenceList();
 
-        // 4. TtsSentenceDto List 변환
-        // not null
-        List<TtsSentenceDto> batchedList = new ArrayList<>();
-        for (TtsSentenceBatchInfo batchInfo : batchList) {
-            TtsSentenceDto sentenceDto = toSentenceDto(projectSeq, batchInfo);
-            if (sentenceDto != null) {
-                batchedList.add(sentenceDto);
-            }
+        // 4. 하나씩 처리
+        for (TtsSentenceBatchInfo batchInfo : alivedRequest.getSentenceList()) {
+            toSentenceDto(projectSeq, batchInfo);
         }
 
         return getSentenceList(projectSeq);
