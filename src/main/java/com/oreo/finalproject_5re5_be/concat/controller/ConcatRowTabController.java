@@ -4,9 +4,8 @@ import com.oreo.finalproject_5re5_be.concat.dto.RowAudioFileDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.*;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.TabRowResponseDto;
-import com.oreo.finalproject_5re5_be.concat.service.AudioFileService;
-import com.oreo.finalproject_5re5_be.concat.service.ConcatRowService;
-import com.oreo.finalproject_5re5_be.concat.service.ConcatTabService;
+import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
+import com.oreo.finalproject_5re5_be.concat.service.*;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +27,8 @@ public class ConcatRowTabController {
     private final ConcatRowService concatRowService;
     private final ConcatTabService concatTabService;
     private final AudioFileService audioFileService;
+    private final BgmFileService bgmFileservice;
+    private final ConcatRowTabService concatRowTabService;
 
     //탭 로우 조회
     //탭 로우 저장
@@ -40,36 +41,14 @@ public class ConcatRowTabController {
     public ResponseEntity<ResponseDto<Boolean>> saveRowAndTab(
             @RequestBody TabRowUpdateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        ConcatRowSaveRequestDto concatRows = dto.getConcatRows();
-        ConcatUpdateRequestDto concatTabs = dto.getConcatTab();
-        boolean updateConcatTab = concatTabService.updateConcatTab(concatTabs, customUserDetails.getMember().getSeq());
-        boolean updateConcatRows = concatRowService.updateConcatRows(concatRows);
-        return new ResponseDto<>(HttpStatus.OK.value(), updateConcatTab && updateConcatRows).toResponseEntity();
-
+        try {
+            boolean result = concatRowTabService.saveTabAndRows(dto, customUserDetails.getMember().getSeq());
+            return new ResponseDto<>(HttpStatus.OK.value(), result).toResponseEntity();
+        } catch (Exception e) {
+            return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), false).toResponseEntity();
+        }
     }
 
-//    @Operation(
-//            summary = "ConcatRow, ConcatTab을 저장합니다.",
-//            description = ""
-//    )
-//    @PostMapping("save")
-//    public ResponseEntity<ResponseDto<Boolean>> saveRowAndTab(
-//            @RequestBody TabRowUpdateRequestDto dto,
-//            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-//        ConcatUpdateRequestDto concatUpdateRequestDto = dto.getConcatTab();
-//        Long memberSeq = customUserDetails.getMember().getSeq();
-//        List<RowAudioFileDto> rowAudioFiles = dto.getAudioFiles();
-//        boolean updateTab = false;
-//        boolean updateRow = false;
-//        if (concatUpdateRequestDto != null) {
-//            updateTab = concatTabService.updateConcatTab(concatUpdateRequestDto,
-//                    memberSeq);
-//            updateRow = concatRowService.updateConcatRows(rowAudioFiles, concatUpdateRequestDto.getTabId());
-//        }
-//
-//        return new ResponseDto<>(HttpStatus.OK.value(), updateTab && updateRow).toResponseEntity();
-//    }
-//
 
     @Operation(
             summary = "ConcatRow, ConcatTab을 조회합니다.",
@@ -79,11 +58,37 @@ public class ConcatRowTabController {
     public ResponseEntity<ResponseDto<TabRowResponseDto>> readRowAndTab(
             @RequestParam Long projectSeq,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        // Tab setting
         ConcatTabResponseDto concatTabResponseDto
                 = concatTabService.readConcatTab(projectSeq, customUserDetails.getMember().getSeq());
 
-        List<RowAudioFileDto> audioFiles = audioFileService.getAudioFilesByProjectAndStatusTrue(projectSeq);
+        // Tabseq로 bgmFile 리스트 불러오기
+        List<BgmFile> bgmFiles = bgmFileservice.getBgmFilesByTabSeq(concatTabResponseDto.getTabId());
 
+        // BgmFile 리스트를 OriginAudioRequest 형태로 변환
+        List<OriginAudioRequest> bgmFileList = bgmFiles.stream()
+                .map(bgm -> OriginAudioRequest.builder()
+                        .seq(bgm.getBgmFileSeq())
+                        .audioUrl(bgm.getAudioUrl())
+                        .fileName(bgm.getFileName())
+                        .fileSize(bgm.getFileSize())
+                        .fileLength(bgm.getFileLength())
+                        .extension(bgm.getExtension())
+                        .build())
+                .toList();
+
+        // ConcatTabResponseDto에 bgmFileList 추가
+        concatTabResponseDto = ConcatTabResponseDto.builder()
+                .tabId(concatTabResponseDto.getTabId())
+                .frontSilence(concatTabResponseDto.getFrontSilence())
+                .status(concatTabResponseDto.getStatus())
+                .bgmFileList(bgmFileList) // BgmFile 리스트 추가
+                .build();
+
+        // Row setting
+        // ConcatRow와 AudioFile 리스트 조회
+        List<RowAudioFileDto> audioFiles = audioFileService.getAudioFilesByProjectAndStatusTrue(projectSeq);
 
         List<ConcatRowRequest> concatRowRequests = audioFiles.stream().map(x -> ConcatRowRequest.builder()
                 .originAudioRequest(OriginAudioRequest.builder()
@@ -107,5 +112,4 @@ public class ConcatRowTabController {
                 .toResponseEntity();
     }
 }
-
 
