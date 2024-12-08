@@ -6,8 +6,10 @@ import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 /**
@@ -22,7 +24,8 @@ public class ConcatTabHelper {
         // 사용자 검증
         if (validateMemberCurrent(concatTab, memberSeq)) {
             // bgmFile객체들을 그대로 프론트에게 줄 수 없으니 bgmFiles를 OriginAudioRequest(DTO)로 변환
-            List<OriginAudioRequest> bgmList = concatTab.getBgmFiles().stream()
+            List<OriginAudioRequest> bgmList = Optional.ofNullable(concatTab.getBgmFiles())
+                    .orElse(new ArrayList<>()).stream()
                     .map(this::convertToOriginAudioRequest)
                     .toList();
 
