@@ -32,10 +32,12 @@ public class ConcatTabController {
             description = "생성이 성공했다면 True를 반환합니다."
     )
     @PostMapping("create")
-    public ResponseEntity<ResponseDto<Boolean>> create(@RequestBody ConcatCreateRequestDto createRequestDto) {
-        projectService.projectCheck(createRequestDto.getMemberSequence(), createRequestDto.getProjectSequence());
+    public ResponseEntity<ResponseDto<Boolean>> create(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                           @RequestParam Long projectSeq) {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), projectSeq);
         //사용자 예외처리
-        return new ResponseDto<>(HttpStatus.OK.value(), concatTabService.createConcatTab(createRequestDto))
+        return new ResponseDto<>(HttpStatus.OK.value(), concatTabService
+                .createConcatTab(new ConcatCreateRequestDto(projectSeq, customUserDetails.getMember().getSeq())))
                 .toResponseEntity();
     }
 
