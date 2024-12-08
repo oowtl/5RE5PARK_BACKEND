@@ -122,7 +122,12 @@ class ConcatTabServiceTest {
         List<BgmFile> bgmFiles = List.of(bgmFile1, bgmFile2);
 
         // ConcatTab 객체 생성
-        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmFiles);
+        ConcatTab concatTab = ConcatTab.builder()
+                .project(project)
+                .status('Y')
+                .frontSilence(0.0f)
+                .bgmFiles(bgmFiles)
+                .build();
 
         // BgmFile -> OriginAudioRequest 변환
         List<OriginAudioRequest> bgmAudioRequests = bgmFiles.stream()
@@ -182,7 +187,12 @@ class ConcatTabServiceTest {
         List<BgmFile> bgmFiles = List.of(bgmFile1, bgmFile2);
 
         // ConcatTab 객체 생성
-        ConcatTab concatTab = new ConcatTab(1L, project, 'Y', 0.5f, bgmFiles);
+        ConcatTab concatTab = ConcatTab.builder()
+                .project(project)
+                .status('Y')
+                .frontSilence(0.0f)
+                .bgmFiles(bgmFiles)
+                .build();
 
         // BgmFile -> OriginAudioRequest 변환
         List<OriginAudioRequest> bgmAudioRequests = bgmFiles.stream()

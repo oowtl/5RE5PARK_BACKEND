@@ -60,7 +60,15 @@ public class ConcatTabService {
         if (concatTabRepository.existsById(project.getProSeq())) {
             return false;
         }
-        ConcatTab concatTab = new ConcatTab(project.getProSeq(), project, 'Y', 0.0f, null);
+
+        ConcatTab concatTab = ConcatTab.builder()
+                .project(project) // Hibernate가 projectId를 자동으로 동기화
+                .status('Y')
+                .frontSilence(0.0f)
+                .bgmFiles(null)//create라서 처음엔 null
+                .build();
+
+        System.out.println("concatTab = " + concatTab);
         concatTabRepository.save(concatTab);
         return true;
     }

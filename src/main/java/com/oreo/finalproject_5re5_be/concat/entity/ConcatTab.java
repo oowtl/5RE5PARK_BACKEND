@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity(name = "concat_tab")
 public class ConcatTab extends BaseEntity {
     @Id
