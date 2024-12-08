@@ -1,47 +1,18 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
+import com.oreo.finalproject_5re5_be.code.entity.Code;
+import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermCheckOrNotRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
-import com.oreo.finalproject_5re5_be.code.entity.Code;
-import com.oreo.finalproject_5re5_be.member.entity.Member;
-import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
-import com.oreo.finalproject_5re5_be.member.entity.MemberConnectionHistory;
-import com.oreo.finalproject_5re5_be.member.entity.MemberDelete;
-import com.oreo.finalproject_5re5_be.member.entity.MemberState;
-import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
+import com.oreo.finalproject_5re5_be.member.entity.*;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedIdException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
-import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberStateRepository;
-import com.oreo.finalproject_5re5_be.member.repository.MemberTermsHistoryRepository;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import com.oreo.finalproject_5re5_be.member.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,6 +25,15 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceImplTestByMock {
