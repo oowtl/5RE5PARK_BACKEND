@@ -12,4 +12,12 @@ public class TtsMakeException extends BusinessException {
     public TtsMakeException(String message) {
         super(message, ErrorCode.INTERNAL_SERVER_ERROR);
     }
+
+    public TtsMakeException(String message, ErrorCode errorCode) {
+        super(message, errorCode);
+    }
+
+    public TtsMakeException(ErrorCode errorCode) {
+        super(errorCode.getMessage(), errorCode);
+    }
 }
