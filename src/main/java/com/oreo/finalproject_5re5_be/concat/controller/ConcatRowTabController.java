@@ -45,6 +45,7 @@ public class ConcatRowTabController {
             boolean result = concatRowTabService.saveTabAndRows(dto, customUserDetails.getMember().getSeq());
             return new ResponseDto<>(HttpStatus.OK.value(), result).toResponseEntity();
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), false).toResponseEntity();
         }
     }

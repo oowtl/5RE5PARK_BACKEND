@@ -73,6 +73,8 @@ dependencies {
 
     // MONITORING
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // Prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     // LOGGER
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
@@ -106,6 +108,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
     implementation 'org.apache.httpcomponents:httpmime:4.5.13'
+
+
 }
 
 test {

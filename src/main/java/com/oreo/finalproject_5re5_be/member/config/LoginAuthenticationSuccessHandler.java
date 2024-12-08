@@ -66,7 +66,6 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         log.info("memberSeq = {}", memberSeq);
         log.info("memberId = {}", memberId);
 
-
         // 세션 조회
         HttpSession session = request.getSession(true);
         log.info("[LoginAuthenticationSuccessHandler] onAuthenticationSuccess - session = : {} ", session.toString());
