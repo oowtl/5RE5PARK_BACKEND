@@ -4,7 +4,6 @@ import com.oreo.finalproject_5re5_be.concat.dto.RowAudioFileDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.*;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.TabRowResponseDto;
-import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.service.*;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
@@ -24,18 +23,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/v2/concat")
 public class ConcatRowTabController {
-    private final ConcatRowService concatRowService;
     private final ConcatTabService concatTabService;
     private final AudioFileService audioFileService;
-    private final BgmFileService bgmFileservice;
     private final ConcatRowTabService concatRowTabService;
 
     //탭 로우 조회
     //탭 로우 저장
 
     @Operation(
-            summary = "ConcatRow, ConcatTab을 저장합니다.",
-            description = ""
+            summary = "ConcatRow, ConcatTab을 저장합니다."
     )
     @PostMapping("save")
     public ResponseEntity<ResponseDto<Boolean>> saveRowAndTab(
@@ -52,9 +48,7 @@ public class ConcatRowTabController {
 
 
     @Operation(
-            summary = "ConcatRow, ConcatTab을 조회합니다.",
-            description = ""
-    )
+            summary = "ConcatRow, ConcatTab을 조회합니다.")
     @GetMapping("read")
     public ResponseEntity<ResponseDto<TabRowResponseDto>> readRowAndTab(
             @RequestParam Long projectSeq,
@@ -64,27 +58,12 @@ public class ConcatRowTabController {
         ConcatTabResponseDto concatTabResponseDto
                 = concatTabService.readConcatTab(projectSeq, customUserDetails.getMember().getSeq());
 
-        // Tabseq로 bgmFile 리스트 불러오기
-        List<BgmFile> bgmFiles = bgmFileservice.getBgmFilesByTabSeq(concatTabResponseDto.getTabId());
-
-        // BgmFile 리스트를 OriginAudioRequest 형태로 변환
-        List<OriginAudioRequest> bgmFileList = bgmFiles.stream()
-                .map(bgm -> OriginAudioRequest.builder()
-                        .seq(bgm.getBgmFileSeq())
-                        .audioUrl(bgm.getAudioUrl())
-                        .fileName(bgm.getFileName())
-                        .fileSize(bgm.getFileSize())
-                        .fileLength(bgm.getFileLength())
-                        .extension(bgm.getExtension())
-                        .build())
-                .toList();
-
         // ConcatTabResponseDto에 bgmFileList 추가
         concatTabResponseDto = ConcatTabResponseDto.builder()
                 .tabId(concatTabResponseDto.getTabId())
                 .frontSilence(concatTabResponseDto.getFrontSilence())
                 .status(concatTabResponseDto.getStatus())
-                .bgmFileList(bgmFileList) // BgmFile 리스트 추가
+                .bgmFileList(concatTabResponseDto.getBgmFileList()) // BgmFile 리스트 추가
                 .build();
 
         // Row setting
