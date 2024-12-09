@@ -336,7 +336,7 @@ class MemberServiceImplTestByMock {
         when(memberRepository.existsByEmailNotContainingMemberSeq(memberSeq, request.getEmail())).thenReturn(false);
         when(memberRepository.findById(memberSeq)).thenReturn(Optional.of(foundMember));
         when(codeRepository.findCodeByCode("MF001")).thenReturn(memberIdFeildCode);
-        when(codeRepository.findCodeByCode("MBS002")).thenReturn(memberStateCode);
+        when(codeRepository.findCodeByCode("MBS0002")).thenReturn(memberStateCode);
         when(memberStateRepository.save(memberState)).thenReturn(savedMemberState);
         when(memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, "MF001")).thenReturn(Optional.of(history));
         when(memberChangeHistoryRepository.saveAll(any())).thenReturn(responseHistories);
@@ -392,7 +392,7 @@ class MemberServiceImplTestByMock {
         // - 3. 회원 비활성 상태 엔티티 생성 -> memberState
         // - 4. 회원 30일 유해 기간 설정, 회원 삭제 유형 코드와 사유 기록 -> MemberDelete
         when(memberRepository.findById(memberSeq)).thenReturn(Optional.of(foundMember));
-        when(codeRepository.findCodeByCode("MBS003")).thenReturn(removeMemberCode);
+        when(codeRepository.findCodeByCode("MBS0003")).thenReturn(removeMemberCode);
         when(memberStateRepository.save(memberState)).thenReturn(savedMemberState);
         when(memberDeleteRepository.save(any())).thenReturn(savedMemberDelete);
 
@@ -514,7 +514,7 @@ class MemberServiceImplTestByMock {
         verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
         verify(memberTermsHistoryRepository, times(1)).deleteAll(anyList());
         verify(memberChangeHistoryRepository, times(1)).deleteAll(anyList());
-        verify(codeRepository, times(1)).findCodeByCode("MBS004");
+        verify(codeRepository, times(1)).findCodeByCode("MBS0004");
     }
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {

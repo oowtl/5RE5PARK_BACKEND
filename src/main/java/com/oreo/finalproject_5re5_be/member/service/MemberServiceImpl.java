@@ -146,7 +146,7 @@ public class MemberServiceImpl implements UserDetailsService {
         // 회원 약관 이력 엔티티 저장
         saveMemberTermsHistory(request, savedMember);
         // 회원 초기 상태 엔티티 저장
-        saveMemberState(savedMember, "MBS0001"); // 초기 상태 코드 : MBS001 - 신규 등록
+        saveMemberState(savedMember, "MBS001"); // 초기 상태 코드 : MBS001 - 신규 등록
         return savedMember;
     }
 
