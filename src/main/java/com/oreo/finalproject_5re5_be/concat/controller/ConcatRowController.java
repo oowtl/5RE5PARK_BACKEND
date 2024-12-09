@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.controller;
 
 import com.oreo.finalproject_5re5_be.concat.dto.ConcatRowDto;
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
 import com.oreo.finalproject_5re5_be.concat.service.ConcatRowService;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
@@ -107,10 +108,15 @@ public class ConcatRowController {
     public ResponseEntity<ResponseDto<Boolean>> uploadText(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody ConcatRowSaveRequestDto concatRowSaveRequestDto) {
-        boolean uploadText = concatRowService.uploadText(concatRowSaveRequestDto.getConcatRowRequests());
+
+        // 서비스 호출
+        boolean uploadText = concatRowService.uploadText(concatRowSaveRequestDto);
+
+        // 결과 응답 생성
         if (uploadText) {
             return new ResponseDto<>(HttpStatus.OK.value(), uploadText).toResponseEntity();
+        } else {
+            return new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), uploadText).toResponseEntity();
         }
-        return new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), uploadText).toResponseEntity();
     }
 }
