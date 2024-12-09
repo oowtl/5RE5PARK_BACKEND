@@ -38,11 +38,11 @@ public class ConcatController {
     )
     @PostMapping("")
     public ResponseEntity<ResponseDto<ConcatResultDto>> concat(@RequestBody ConcatRowRequestDto audioRequests,
-                                                               @RequestParam Long memberSeq) throws IOException {
-        projectService.projectCheck(memberSeq, audioRequests.getConcatTabId());
+                                                               @AuthenticationPrincipal CustomUserDetails customUserDetails) throws IOException {
+        projectService.projectCheck(customUserDetails.getMember().getSeq(), audioRequests.getConcatTabId());
 
         ConcatTabResponseDto concatTabResponseDto
-                = concatTabService.readConcatTab(audioRequests.getConcatTabId(), memberSeq);
+                = concatTabService.readConcatTab(audioRequests.getConcatTabId(), customUserDetails.getMember().getSeq());
         ConcatResultDto concat = concatService.concat(concatTabResponseDto, audioRequests);
         return new ResponseDto<>(HttpStatus.OK.value(), concat).toResponseEntity();
     }
