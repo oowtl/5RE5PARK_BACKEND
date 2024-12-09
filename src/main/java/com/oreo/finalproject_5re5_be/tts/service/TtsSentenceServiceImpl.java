@@ -30,6 +30,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
@@ -58,6 +59,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     }
 
     @Override
+    @Transactional
     public TtsSentenceDto addSentence(@Valid @NotNull Long projectSeq,
         @Valid TtsSentenceRequest createRequest) {
         // 1. TtsSentenceRequest 유효성 검증 : Text (not blank) => @NotBlank
@@ -262,6 +264,7 @@ public class TtsSentenceServiceImpl implements TtsSentenceService {
     }
 
     @Override
+    @Transactional
     public boolean deleteSentence(Long projectSeq, Long tsSeq) {
         // 1. TtsSentence 엔티티 조회
         TtsSentence ttsSentence = ttsSentenceRepository.findById(tsSeq)
