@@ -3,7 +3,7 @@ package com.oreo.finalproject_5re5_be.tts.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
-import com.oreo.finalproject_5re5_be.global.component.SqsService;
+//import com.oreo.finalproject_5re5_be.global.component.SqsService;
 import com.oreo.finalproject_5re5_be.global.constant.MessageType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.tts.client.AudioConfigGenerator;
@@ -39,7 +39,7 @@ public class TtsMakeService {
     private final GoogleTTSService googleTTSService;
     private final S3Service s3Service;
     private final SaveTtsMakeResultService saveTtsMakeResultService;
-    private final SqsService sqsService;
+//    private final SqsService sqsService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public TtsMakeService(
@@ -48,8 +48,8 @@ public class TtsMakeService {
             S3Service s3Service,
             SaveTtsMakeResultService saveTtsMakeResultService,
             VoiceRepository voiceRepository,
-            TtsProgressStatusRepository ttsProgressStatusRepository,
-            SqsService sqsService
+            TtsProgressStatusRepository ttsProgressStatusRepository
+//            SqsService sqsService
     ) {
         this.ttsSentenceRepository = ttsSentenceRepository;
         this.googleTTSService = googleTTSService;
@@ -57,7 +57,7 @@ public class TtsMakeService {
         this.saveTtsMakeResultService = saveTtsMakeResultService;
         this.voiceRepository = voiceRepository;
         this.ttsProgressStatusRepository = ttsProgressStatusRepository;
-        this.sqsService = sqsService;
+//        this.sqsService = sqsService;
     }
 
     // TTS 생성 서비스
@@ -89,42 +89,42 @@ public class TtsMakeService {
         }
     }
 
-    public TtsSentenceDto makeTtsMulti(@NotNull Long sentenceSeq) {
-
-        // 0. sentenceSeq 로 행 정보 조회
-        TtsSentence ttsSentence = ttsSentenceRepository.findById(sentenceSeq)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 TTS 행입니다. id:" + sentenceSeq));
-        try {
-            // 1. TTS 문장 '진행중' 상태 저장
-            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.IN_PROGRESS);
-
-            // 2. TTS 생성 및 s3 업로드 요청
-            Message message = sqsService.sendMessage(
-                    TtsMakeRequest.of(ttsSentence, makeFilename(ttsSentence)),
-                    MessageType.TTS_MAKE
-            );
-            TtsMakeResponse ttsMakeResponse = objectMapper.readValue(message.body(), TtsMakeResponse.class);
-
-            // 3. TTS 결과 저장
-            TtsSentenceDto ttsSentenceDto = saveTtsMakeResultService.saveTtsMakeResult(ttsMakeResponse, ttsSentence);
-
-            // 4. TTS 문장 '완료' 상태 저장
-            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FINISHED);
-
-            return ttsSentenceDto;
-
-        } catch (RuntimeException e) {
-            // 예외 발생 시 TTS 문장 '실패' 상태 저장
-            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
-            throw new TtsMakeException("TTS 생성 중 예외 발생");
-        } catch (JsonProcessingException e) {
-            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
-            throw new TtsMakeException("tts 생성 응답 메세지 body 값을 TtsMakeResponse 객체로 변환 중 에러 발생");
-        } catch (TimeoutException e) {
-            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
-            throw new TtsMakeException("tts make sqs request timeout...");
-        }
-    }
+//    public TtsSentenceDto makeTtsMulti(@NotNull Long sentenceSeq) {
+//
+//        // 0. sentenceSeq 로 행 정보 조회
+//        TtsSentence ttsSentence = ttsSentenceRepository.findById(sentenceSeq)
+//                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 TTS 행입니다. id:" + sentenceSeq));
+//        try {
+//            // 1. TTS 문장 '진행중' 상태 저장
+//            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.IN_PROGRESS);
+//
+//            // 2. TTS 생성 및 s3 업로드 요청
+//            Message message = sqsService.sendMessage(
+//                    TtsMakeRequest.of(ttsSentence, makeFilename(ttsSentence)),
+//                    MessageType.TTS_MAKE
+//            );
+//            TtsMakeResponse ttsMakeResponse = objectMapper.readValue(message.body(), TtsMakeResponse.class);
+//
+//            // 3. TTS 결과 저장
+//            TtsSentenceDto ttsSentenceDto = saveTtsMakeResultService.saveTtsMakeResult(ttsMakeResponse, ttsSentence);
+//
+//            // 4. TTS 문장 '완료' 상태 저장
+//            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FINISHED);
+//
+//            return ttsSentenceDto;
+//
+//        } catch (RuntimeException e) {
+//            // 예외 발생 시 TTS 문장 '실패' 상태 저장
+//            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
+//            throw new TtsMakeException("TTS 생성 중 예외 발생");
+//        } catch (JsonProcessingException e) {
+//            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
+//            throw new TtsMakeException("tts 생성 응답 메세지 body 값을 TtsMakeResponse 객체로 변환 중 에러 발생");
+//        } catch (TimeoutException e) {
+//            saveTtsProgressStatus(ttsSentence, TtsProgressStatusCode.FAILED);
+//            throw new TtsMakeException("tts make sqs request timeout...");
+//        }
+//    }
 
     // TTS 생성
     private MultipartFile makeTtsAudioFile(@NotNull TtsSentence ttsSentence) {
