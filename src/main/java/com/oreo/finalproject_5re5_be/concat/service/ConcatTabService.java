@@ -5,7 +5,6 @@ import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatUpdateRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
 import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
-import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.BgmFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatTabHelper;
@@ -28,7 +27,6 @@ public class ConcatTabService {
     private ProjectRepository projectRepository;
     private MemberServiceImpl memberService;
     private ConcatTabHelper concatTabHelper;
-    private AudioFileRepository audioFileRepository;
     private BgmFileRepository bgmFileRepository;
 
     /**
@@ -142,7 +140,7 @@ public class ConcatTabService {
 
         if (bgmFileSeqs == null || bgmFileSeqs.isEmpty()) {
             // bgmFileSeqs가 비어있으면 기존 bgmFiles 제거
-            concatTab.setBgmFiles(null);
+            concatTab.addBgmFile(new BgmFile());
         } else {
             // bgmFileSeqs를 통해 BgmFile 리스트 생성
             List<BgmFile> bgmFiles = bgmFileSeqs.stream()
@@ -151,7 +149,7 @@ public class ConcatTabService {
                     .toList();
 
             // ConcatTab에 새로운 BgmFile 리스트 설정
-            concatTab.setBgmFiles(bgmFiles);
+            concatTab.addBgmFile(bgmFiles);
         }
 
         // 업데이트된 ConcatTab 저장
