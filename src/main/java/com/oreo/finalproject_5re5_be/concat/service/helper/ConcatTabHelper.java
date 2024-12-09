@@ -36,8 +36,7 @@ public class ConcatTabHelper {
                     .bgmFileList(bgmList)
                     .build();
         }
-        throw new IllegalArgumentException("사용자가 소유한 프로젝트가 아닙니다. 소유한 사용자 : "
-                + concatTab.getProject().getMember());
+        throw new IllegalArgumentException("사용자가 소유한 프로젝트가 아닙니다.");
     }
 
 
