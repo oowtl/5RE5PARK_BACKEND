@@ -15,7 +15,7 @@ import com.oreo.finalproject_5re5_be.concat.service.concatenator.AudioProperties
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.IntervalConcatenator;
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.StereoIntervalConcatenator;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
-import com.oreo.finalproject_5re5_be.global.component.SqsService;
+//import com.oreo.finalproject_5re5_be.global.component.SqsService;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import com.oreo.finalproject_5re5_be.global.dto.response.ResponseDto;
@@ -49,7 +49,7 @@ public class ConcatWithBgmController {
     private final S3Service s3Service;
     private final MaterialAudioService materialAudioService;
     private final ConcatResultService concatResultService;
-    private final SqsService sqsService;
+//    private final SqsService sqsService;
     private final AudioFileService audioFileService;
     private final AudioStreamService audioStreamService; // 추가된 서비스
     private final AudioResample audioResample = new AudioResample(); // 리샘플링 유틸. Bean이 아니라 new로 생성
