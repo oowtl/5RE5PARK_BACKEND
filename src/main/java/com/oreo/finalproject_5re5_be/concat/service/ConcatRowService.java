@@ -9,6 +9,7 @@ import com.oreo.finalproject_5re5_be.concat.entity.ConcatTab;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatRowRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatTabRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.ConcatRowHelper;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -152,18 +153,36 @@ public class ConcatRowService {
                 .build();
     }
 
-    public boolean uploadText(List<ConcatRowRequest> concatRowSaveRequestDto) {
-        boolean check = concatRowSaveRequestDto.stream()
+    public boolean uploadText(ConcatRowSaveRequestDto concatRowSaveRequestDto) {
+
+        // 1. 요청 데이터의 유효성 검사
+        boolean check = concatRowSaveRequestDto.getConcatRowRequests().stream()
                 .anyMatch(rowRequest -> rowRequest.getStatus() == 'N' || rowRequest.getSeq() == null);
         if (check) {
             return false;
         }
 
-        List<ConcatRow> list = concatRowSaveRequestDto.stream().map(cr -> ConcatRow
-                .builder()
-                .concatRowSeq(cr.getSeq())
-                .rowText(cr.getRowText()).build()).toList();
-        concatRowHelper.batchInsert(list);
+        // 2. ConcatTab 조회
+        Long concatTabId = concatRowSaveRequestDto.getConcatTabId();
+        ConcatTab concatTab = concatTabRepository.findById(concatTabId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid ConcatTab ID: " + concatTabId));
+
+        // 3. ConcatRow 리스트 생성
+        List<ConcatRow> concatRows = concatRowSaveRequestDto.getConcatRowRequests().stream()
+                .map(request -> ConcatRow.builder()
+                        .concatRowSeq(request.getSeq())
+                        .rowIndex(request.getRowIndex())
+                        .selected(request.getSelected())
+                        .silence(request.getRowSilence())
+                        .status(request.getStatus())
+                        .concatTab(concatTab) // 조회한 concatTab 설정
+                        .rowText(request.getRowText())
+                        .build())
+                .toList();
+
+        // 4. ConcatRow 저장
+        concatRowRepository.saveAll(concatRows);
+
         return true;
     }
 
