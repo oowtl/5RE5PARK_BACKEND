@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.sqs.model.Message;
+//import software.amazon.awssdk.services.sqs.model.Message;
 
 import java.util.concurrent.TimeoutException;
 
