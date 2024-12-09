@@ -101,6 +101,7 @@ public class ConcatRowTabController {
                         .extension(x.getExtension()).build()
                 )
                 .rowText(x.getConcatRow().getRowText())
+                .selected(x.getConcatRow().getSelected())
                 .rowIndex(x.getConcatRow().getRowIndex())
                 .rowSilence(x.getConcatRow().getSilence())
                 .status(x.getConcatRow().getStatus())
