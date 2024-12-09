@@ -129,7 +129,7 @@ public class ConcatService {
         return audios.stream().map(aud -> MaterialAudio.builder()
                 .concatResult(concatResult)
                 .method("Normal")
-                .audioFile(AudioFile.builder().audioFileSeq(aud.getSeq()).build())
+                .audioFile(AudioFile.builder().audioFileSeq(aud.getOriginAudioRequest().getSeq()).build())
                 .build()).toList();
 
     }
