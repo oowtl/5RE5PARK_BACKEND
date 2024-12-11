@@ -16,6 +16,12 @@ public class BgmFileService {
 
     public List<BgmFile> getBgmFilesByTabSeq(Long tabSeq) {
         return bgmFileRepository.findByConcatTabSeq(tabSeq);
-
     }
+
+    public BgmFile getBgmFileByUrl(String bgmFileUrl) {
+        return bgmFileRepository.findByAudioUrl(bgmFileUrl)
+                .orElseThrow(() -> new IllegalArgumentException("BGM File not found with URL: " + bgmFileUrl));
+    }
+
+
 }
