@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,6 +43,7 @@ import java.util.List;
 
 @Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
+@Log4j2
 @RequestMapping("/api/concat")
 @RequiredArgsConstructor
 public class ConcatWithBgmController {
@@ -94,13 +96,23 @@ public class ConcatWithBgmController {
 //            //SQS로 메세지 보내기. 각각 messageBody와 messageAttribute로 들어갈 내용
 //            Message message = sqsService.sendMessage(bgmFunctionRequestDto, MessageType.CONCAT_BGM_MAKE);
 
+            log.info("Request Parameters: concatTabSeq={}, bgmFileUrl={}, concatResultFileName={}",
+                    concatTabSeq, bgmFileUrl, concatResultFileName);
+            log.info("Selected Rows: {}", selectedRows);
+
             IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
+
+            log.info("IntervalConcatenator 초기화 성공");
 
             // Concat 작업: 1. Row 오디오 파일 로드 및 무음 처리
             List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(selectedRows);
 
+            log.info("AudioProperties 로드 성공: {}", audioProperties);
+
             // 2. 병합된 오디오 생성
             ByteArrayOutputStream concatenatedAudioBuffer = intervalConcatenator.intervalConcatenate(audioProperties, selectedRows.getInitialSilence());
+
+            log.info("병합된 오디오 버퍼 생성 성공");
 
             // Bgm 작업: 1. 병합된 오디오를 AudioInputStream으로 변환
             AudioInputStream concatenatedAudioStream = audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
@@ -108,16 +120,24 @@ public class ConcatWithBgmController {
             // 2. BGM 스트림 로드 및 버퍼링
             AudioInputStream bufferedBgmStream = s3Service.loadAsBufferedStream(bgmFileUrl);
 
+            log.info("BGM 파일 로드 성공");
+
             // 3. BGM 길이 조정
             long targetFrames = audioStreamService.getValidFrameLength(concatenatedAudioStream);
             long bgmFrames = audioStreamService.getValidFrameLength(bufferedBgmStream);
             bufferedBgmStream = BgmProcessor.adjustBgmLength(bufferedBgmStream, targetFrames, bgmFrames);
 
+            log.info("BGM 길이 조정 성공");
+
             // 4. 믹싱
             AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
 
+            log.info("오디오 믹싱 성공");
+
             // 결과파일 S3 업로드
             String resultAudioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
+
+            log.info("S3 업로드 성공: {}", resultAudioUrl);
 
 //            String audioUrl = "";
 //            String concatResultFileName = "";
@@ -126,8 +146,13 @@ public class ConcatWithBgmController {
 
             // DB ConcatResult테이블에 결과 저장
             ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatTabSeq, resultAudioUrl, concatResultFileName, mixedAudioStream);
+
+            log.info("ConcatResult 저장 성공: {}", concatResultResponse);
+
             // Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
             materialAudioService.saveMaterialsForSelectedRows(selectedRows, concatResultResponse);
+
+            log.info("Material 데이터 저장 성공");
 
             // Concat 재료 파일 정보 생성
             List<OriginAudioRequest> concatRowFiles = selectedRows.getRows().stream()
@@ -155,6 +180,7 @@ public class ConcatWithBgmController {
 
             return new ResponseDto<>(HttpStatus.OK.value(), responseDto).toResponseEntity();
         } catch (Exception e) {
+            log.error("ConcatWithBgmController execute 실패", e);
             // 실패 응답 생성
             return createErrorResponse();
         }
