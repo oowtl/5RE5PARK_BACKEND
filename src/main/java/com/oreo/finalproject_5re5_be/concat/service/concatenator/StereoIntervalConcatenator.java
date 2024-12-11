@@ -3,6 +3,7 @@ package com.oreo.finalproject_5re5_be.concat.service.concatenator;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
 import com.oreo.finalproject_5re5_be.global.component.audio.BeepMaker;
+import lombok.extern.log4j.Log4j2;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -20,6 +21,8 @@ import static com.oreo.finalproject_5re5_be.concat.service.concatenator.Interval
  * @see AudioExtensionConverter
  *
  */
+
+@Log4j2
 public class StereoIntervalConcatenator extends StereoConcatenator implements IntervalConcatenator {
 
     private final AudioFormat AUDIO_FORMAT;
@@ -38,7 +41,17 @@ public class StereoIntervalConcatenator extends StereoConcatenator implements In
     @Override
     public ByteArrayOutputStream intervalConcatenate(List<AudioProperties> audioStreams, float start) throws IOException {
         List<AudioInputStream> list = prepareAudioStreams(audioStreams, AUDIO_FORMAT);
+
+        AudioInputStream initialSilenceStream = BeepMaker.makeSound(start * 1000, AUDIO_FORMAT);
+
+        // 로그 추가: 무음 구간 (맨앞) 생성
+        log.info("[intervalConcatenate] 맨앞 무음 구간 추가: duration={}ms, frameLength={}",
+                (int) (start * 1000), initialSilenceStream.getFrameLength());
+
+
         list.add(0, BeepMaker.makeSound(start * 1000, AUDIO_FORMAT));
+
+
         return super.concatenate(list);
     }
 }
