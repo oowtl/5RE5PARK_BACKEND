@@ -42,4 +42,16 @@ public class ConcatResult extends BaseEntity {
     @Column(name = "file_size")
     private Long fileSize;
 
+    public void addBgmFile(BgmFile bgmFile) {
+        this.bgmFiles.add(BgmFile.builder()
+                .concatResult(this)
+                .audioUrl(bgmFile.getAudioUrl())
+                .fileName(bgmFile.getFileName())
+                .fileLength(bgmFile.getFileLength())
+                .extension(bgmFile.getExtension()).build());
+    }
+
+    public void addBgmFiles(List<BgmFile> bgmFiles) {
+        bgmFiles.forEach(this::addBgmFile);
+    }
 }

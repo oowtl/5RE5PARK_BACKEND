@@ -30,9 +30,21 @@ public class ConcatTab extends BaseEntity {
 
     // 하나의 ConcatTab에 여러 bgmFile들 매칭
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab", fetch = FetchType.EAGER)
-    @Column(nullable = true)
-    @Setter
     private List<BgmFile> bgmFiles;
+
+
+    public void addBgmFile(BgmFile bgmFile) {
+        bgmFiles.add(BgmFile.builder()
+                .concatTab(this)
+                .audioUrl(bgmFile.getAudioUrl())
+                .fileName(bgmFile.getFileName())
+                .fileLength(bgmFile.getFileLength())
+                .extension(bgmFile.getExtension()).build());
+    }
+
+    public void addBgmFile(List<BgmFile> bgmFiles) {
+        bgmFiles.forEach(this::addBgmFile);
+    }
 
 
 }
