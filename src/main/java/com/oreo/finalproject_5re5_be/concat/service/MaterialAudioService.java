@@ -152,7 +152,7 @@ public class MaterialAudioService {
     public void saveMaterialsForSelectedRows(SelectedConcatRowRequest selectedRows, ConcatUrlResponse concatResultResponse) {
         List<Long> usedAudioFileSeqs = selectedRows.getRows().stream()
                 .map(SelectedConcatRowRequest.Row::getAudioUrl) // URL 추출
-                .map(audioFileRepository::findByAudioUrl) // URL로 AudioFile 조회
+                .map(audioFileRepository::findFirstByAudioUrlNative) // URL로 AudioFile 조회
                 .map(audioFile -> audioFile.orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioFile.get().getAudioUrl())))
                 .map(AudioFile::getAudioFileSeq) // Seq 추출
                 .toList();
