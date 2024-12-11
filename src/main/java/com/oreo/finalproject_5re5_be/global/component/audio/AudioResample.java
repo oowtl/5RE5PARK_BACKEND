@@ -62,9 +62,9 @@ public class AudioResample {
         audioFormat = new AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED,
                 44100, // 44.1kHz로 변환
-                32,    // 32비트
+                16,    // 16비트
                 2,     // 스테레오
-                8,     // 2 bytes/frame
+                4,     // 2 bytes/frame
                 44100, // frame rate와 샘플링 레이트 일치
                 false  // 리틀 엔디안
         );
