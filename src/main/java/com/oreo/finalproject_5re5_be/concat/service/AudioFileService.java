@@ -55,7 +55,7 @@ public class AudioFileService {
 
     // audioFile Url로 audioFile 정보 조회 (1개)
     public AudioFile getAudioFileByUrl(String audioUrl) {
-        return audioFileRepository.findByAudioUrl(audioUrl)
+        return audioFileRepository.findFirstByAudioUrlNative(audioUrl)
                 .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioUrl));
     }
 
