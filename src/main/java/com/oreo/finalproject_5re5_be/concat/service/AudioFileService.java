@@ -54,16 +54,9 @@ public class AudioFileService {
     }
 
     // audioFile Url로 audioFile 정보 조회 (1개)
-    public AudioFile getAudioFileByUrl(String audioUrl) {
-        return audioFileRepository.findFirstByAudioUrlNative(audioUrl)
-                .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioUrl));
-    }
-
-    // audioFile Url로 audioFileSeq 정보 조회 (N개)
-    public List<Long> getAudioFileSeqsByUrls(List<String> audioUrls) {
-        return audioUrls.stream()
-                .map(url -> getAudioFileByUrl(url).getAudioFileSeq()) // URL로 AudioFile 조회 후 Seq 추출
-                .toList();
+    public AudioFile getAudioFileByUrl(Long audioSeq) {
+        return audioFileRepository.findByAudioFileSeq(audioSeq)
+                .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioSeq));
     }
 
     // audioFile Name으로 audioFile 정보 조회 (1개)
