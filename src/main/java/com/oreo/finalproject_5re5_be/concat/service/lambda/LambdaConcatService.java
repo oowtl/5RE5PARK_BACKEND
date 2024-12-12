@@ -60,6 +60,8 @@ public class LambdaConcatService {
                         .fileLength(concatResult.getFileLength())
                         .fileSize(concatResult.getFileSize())
                         .extension(concatResult.getExtension())
+                        .seperated(concatResult.getSeperated())
+                        .processId(concatResult.getProcessId())
                         .build()).toList();
     }
 
@@ -114,6 +116,8 @@ public class LambdaConcatService {
                 .fileSize(concatResult.getInfo().getContentSize())
                 .fileLength(concatResult.getInfo().getContentLength())
                 .audioUrl(concatResult.getS3Url())
+                .processId(concatResult.getProcessId())
+                .seperated(concatResult.getI())
                 .build();
         return concatResultService.saveConcatResult(build);
 

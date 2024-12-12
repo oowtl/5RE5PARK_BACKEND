@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.sound.sampled.AudioInputStream;
-import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -49,7 +48,7 @@ public class ConcatResultService {
 
     // AudioInputStream에서 ConcatResult 저장
     public ConcatUrlResponse saveConcatResult(
-            Long concatTabSeq, String audioUrl, String fileName, AudioInputStream mixedAudioStream) throws IOException {
+            Long concatTabSeq, String audioUrl, String fileName, AudioInputStream mixedAudioStream) {
         // 1. AudioInputStream을 사용하여 길이 계산
         long fileLength = (long) (mixedAudioStream.getFrameLength() / mixedAudioStream.getFormat().getFrameRate());
 
@@ -108,6 +107,8 @@ public class ConcatResultService {
                 .fileSize(cr.getFileSize())
                 .audioUrl(cr.getAudioUrl())
                 .fileLength(cr.getFileLength())
+                .seperated(cr.getSeperated())
+                .processId(cr.getProcessId())
                 .build()).toList();
     }
 }
