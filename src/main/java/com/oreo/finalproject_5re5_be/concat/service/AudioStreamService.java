@@ -52,10 +52,9 @@ public class AudioStreamService {
         List<AudioProperties> audioPropertiesList = new ArrayList<>();
         for (ConcatRowRequest row : selectedRows.getConcatRowRequests()) {
             OriginAudioRequest originAudio = row.getOriginAudioRequest();
-            log.info("[loadAudioFiles] SelectedConcatRowRequest의 Row에 박혀있는 URL: {}", originAudio.getAudioUrl());
+
             try {
                 AudioInputStream audioStream = S3Service.load(originAudio.getAudioUrl());
-                log.info("[loadAudioFiles] S3에서 오디오 파일 load 완료: ");
 
                 // 리샘플링 처리
                 audioStream = audioResample.formatting(audioStream); // 리샘플링 처리
@@ -77,14 +76,11 @@ public class AudioStreamService {
         try {
             URL url = new URL(s3Url);
 
-            log.info("[loadAsBufferedStream] BGM으로 쓰일 S3 URL: {}", s3Url);
-
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
             log.info("[loadAsBufferedStream] AudioInputStream 가져오기 성공. Format: {}", audioInputStream.getFormat());
 
             // mp3 -> WAV 변환
             byte[] wavData = AudioExtensionConverter.mp3ToWav(audioInputStream);
-            log.info("[loadAsBufferedStream] mp3ToWAV 변환 성공. Data Size: {} bytes", wavData.length);
 
             // Target Format으로 변환 (formatting)
             AudioInputStream wavStream = new AudioInputStream(new ByteArrayInputStream(wavData), defaultAudioFormat, wavData.length / defaultAudioFormat.getFrameSize());
@@ -94,19 +90,15 @@ public class AudioStreamService {
             // 데이터를 메모리에 버퍼링
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             AudioSystem.write(formattedStream, AudioFileFormat.Type.WAVE, buffer);
-            log.info("[loadASBufferedStream] AudioInputStream 데이터를 ByteArrayOutputStream으로 버퍼링 성공. 크기: {} bytes", buffer.size());
 
             byte[] bufferedData = buffer.toByteArray();
             AudioFormat format = formattedStream.getFormat();
-            log.info("[loadASBufferedStream] Buffered Data 생성 성공. 총 길이: {} bytes, FrameSize: {}", bufferedData.length, format.getFrameSize());
 
             AudioInputStream bufferedStream = new AudioInputStream(
                     new ByteArrayInputStream(bufferedData),
                     format,
                     bufferedData.length / format.getFrameSize()
             );
-
-            log.info("[loadAsBufferedStream] Buffered AudioInputStream 생성 성공. Frame Length: {}", bufferedStream.getFrameLength());
 
             return bufferedStream;
 

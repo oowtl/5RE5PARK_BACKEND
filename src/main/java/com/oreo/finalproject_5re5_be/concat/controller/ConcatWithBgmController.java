@@ -4,7 +4,6 @@ import com.oreo.finalproject_5re5_be.concat.dto.ConcatResponseDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.*;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
 import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
-import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.service.*;
 import com.oreo.finalproject_5re5_be.concat.service.bgm.BgmProcessor;
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.AudioProperties;
@@ -91,105 +90,60 @@ public class ConcatWithBgmController {
             float frontSilence = concatTab.getFrontSilence();
             String bgmFileUrl = concatTab.getBgmFileList().get(0).getAudioUrl();
 
+            log.info("concatTab:{}",concatTabSeq);
+
             projectService.projectCheck(customUserDetails.getMember().getSeq(), requestDto.getConcatTab().getTabId());
 
             IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
 
-            // Concat 작업: 1. Row 오디오 파일 로드 및 무음 처리
-//            List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(selectedRows);
-
             List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(concatRows);
-
-
-            log.info("[BGM] Row Concat 작업 1: AudioProperties 로드 성공: {}", audioProperties);
 
             // 2. 병합된 오디오 생성
             ByteArrayOutputStream concatenatedAudioBuffer = intervalConcatenator.intervalConcatenate(audioProperties, frontSilence);
 
-            log.info("[BGM] Row Concat 작업 2: AudioProperties와 initialSilence로 IntervalConcatenate 성공. ByteArrayOutputStream Buffer 사이즈: {}", concatenatedAudioBuffer.size());
-
             AudioInputStream concatenatedAudioStream = audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
-
-            log.info("[BGM] Row Concat 작업 3: buffer로 AudioInputStream 변환 성공. Frame Length: {}", concatenatedAudioStream.getFrameLength());
 
             // BGM 작업 1: BGM 스트림 로드 및 버퍼링
             AudioInputStream bufferedBgmStream = audioStreamService.loadAsBufferedStream(bgmFileUrl);
-
-            log.info("[BGM] BGM 파일 loadASBufferedStream 성공. Frame Length: {}", bufferedBgmStream.getFrameLength());
 
             // 3. BGM 길이 조정
             long targetFrames = audioStreamService.getValidFrameLength(concatenatedAudioStream);
             long bgmFrames = audioStreamService.getValidFrameLength(bufferedBgmStream);
 
             // 로그 추가: 프레임 길이 확인
-            log.info("[BGM] Concatenated Audio Frames: {}", targetFrames);
-            log.info("[BGM] Original BGM Frames: {}", bgmFrames);
 
             bufferedBgmStream = BgmProcessor.adjustBgmLength(bufferedBgmStream, targetFrames, bgmFrames);
-
-            log.info("BGM 길이 조정 성공");
 
             // 4. 믹싱
             AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
 
-            log.info("오디오 믹싱 성공");
-
             // 결과파일 S3 업로드
             String resultAudioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
 
-            log.info("S3 업로드 성공: {}", resultAudioUrl);
-
-            log.info("Saving ConcatResult to database with tabSeq: {}, result URL: {}, file name: {}", concatTabSeq, resultAudioUrl, concatResultFileName);
-
-            // DB에 결과파일, bgm파일, row에 들어가는 audio파일, row, materials 에 정보들을 넣어야한다.
-            // DB ConcatResult테이블에 결과 저장
+            // DB 저장1. ConcatResult DB
             ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatTabSeq, resultAudioUrl, concatResultFileName, mixedAudioStream);
 
-            log.info("ConcatResult 저장 성공: {}", concatResultResponse);
-
-            log.info("Fetching BGM AudioFile information from requestDto");
             OriginAudioRequest bgmRequest = concatTab.getBgmFileList().get(0);
-            log.info("BGM information from requestDto: {}", bgmRequest);
 
-            // BGM 파일 정보를 DB에 저장
-            BgmFile bgmAudioFile = bgmFileService.saveBgmFile(
-                    BgmFile.builder()
-                            .audioUrl(bgmRequest.getAudioUrl())
-                            .extension(bgmRequest.getExtension())
-                            .fileSize(bgmRequest.getFileSize())
-                            .fileLength(bgmRequest.getFileLength())
-                            .fileName(bgmRequest.getFileName())
-                            .build()
-            );
+            // BGM 데이터와 ConcatResult 매칭 업데이트
+            try {
+                bgmFileService.updateBgmFileWithConcatResult(bgmFileUrl, concatResultResponse.getSeq());
+            } catch (IllegalArgumentException e) {
+                log.warn("[BGM] Failed to update BgmFile: {}", e.getMessage());
+            }
 
-            log.info("Saved BGM AudioFile in DB: {}", bgmAudioFile);
-
-            log.info("Saving Material data for provided rows and concat result");
-
-
-            // Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
+            // DB 저장2. Material 데이터 저장 (재료 파일, 결과파일 저장되어 있는 상태로 교차테이블에 데이터 저장)
             materialAudioService.saveMaterialsForConcatRows(concatRows, concatResultResponse);
 
-            log.info("Material data saved successfully");
-
-            log.info("Fetching AudioFile for each row in concatRows");
-
-            // Concat 재료 파일 정보 생성
+            // 응답에 들어갈 concatRowFiles 생성
             List<OriginAudioRequest> concatRowFiles = concatRows.getConcatRowRequests().stream()
                     .map(row -> {
-                        log.info("Fetching AudioFile for URL: {}", row.getOriginAudioRequest());
-                        AudioFile audioFile = audioFileService.getAudioFileByUrl(row.getOriginAudioRequest().getAudioUrl());
-                        log.info("Fetched AudioFile: {}", audioFile);
+                        AudioFile audioFile = audioFileService.getAudioFileByUrl(row.getOriginAudioRequest().getSeq());
                         return audioFile;
                     })
                     .map(this::convertToOriginAudioRequest)
                     .peek(originAudioRequest -> log.info("Converted to OriginAudioRequest: {}", originAudioRequest))
                     .toList();
-
-            log.info("Generated ConcatRowFiles: {}", concatRowFiles);
-
-            log.info("Creating final response with result URL: {}, BGM file: {}, ConcatRow files: {}",
-                    resultAudioUrl, bgmRequest.getAudioUrl(), concatRowFiles);
 
             // 응답 생성
             ConcatResponseDto responseDto = ConcatResponseDto.builder()
@@ -197,8 +151,6 @@ public class ConcatWithBgmController {
                     .bgmFile(bgmRequest)
                     .concatRowFiles(concatRowFiles)
                     .build();
-
-            log.info("Created final response: {}", responseDto);
 
             return new ResponseDto<>(HttpStatus.OK.value(), responseDto).toResponseEntity();
         } catch (Exception e) {
