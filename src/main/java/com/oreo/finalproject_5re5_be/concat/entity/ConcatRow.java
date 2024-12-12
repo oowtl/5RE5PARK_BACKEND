@@ -4,7 +4,6 @@ import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@ToString
 @Getter
 @Builder
 @AllArgsConstructor
