@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
 
-    Optional<AudioFile> findByAudioUrl(String audioUrl);
+//    Optional<AudioFile> findByAudioUrl(String audioUrl);
 
     Optional<AudioFile> findByFileName(String filename);
 
@@ -63,4 +63,10 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
             " WHERE ct.projectId = :proSeq" +
             " AND cr.status = 'Y'")
     List<AudioFile> findAudioFileByProjectSeq(@Param("proSeq") Long projectSeq);
+
+    @Query(value = "SELECT * FROM audio_file WHERE audio_file_seq = :audioFileSeq ", nativeQuery = true)
+    Optional<AudioFile> findByAudioFileSeq(Long audioFileSeq);
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.global.component.audio;
 
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.Concatenator;
+import lombok.extern.log4j.Log4j2;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -15,6 +16,8 @@ import java.util.List;
  * @apiNote 병합 되거나 병합되기 이전의 오디오 형식을 일치 시키기 위한 클래스
  * @see Concatenator
  */
+
+@Log4j2
 public class AudioResample {
     private final AudioFormat audioFormat;
 
@@ -62,9 +65,9 @@ public class AudioResample {
         audioFormat = new AudioFormat(
                 AudioFormat.Encoding.PCM_SIGNED,
                 44100, // 44.1kHz로 변환
-                32,    // 32비트
+                16,    // 16비트
                 2,     // 스테레오
-                8,     // 2 bytes/frame
+                4,     // 2 bytes/frame
                 44100, // frame rate와 샘플링 레이트 일치
                 false  // 리틀 엔디안
         );
@@ -97,9 +100,23 @@ public class AudioResample {
 
     //리샘플링 포맷 일치화
     public AudioInputStream formatting(AudioInputStream audioInputStream) {
+        log.info("[formatting] 현재 오디오 포맷과 타겟 오디오 포맷이 일치하는지 확인 중...");
+        log.info("[formatting] 현재 오디오 포맷: {}", audioInputStream.getFormat());
+        log.info("[formatting] 타겟 오디오 포맷: {}", audioFormat);
+
         if (audioInputStream.getFormat().matches(audioFormat)) {
+            log.info("[formatting] 타겟 오디오 포맷과 이미 일치하여, 리샘플링이 필요없습니다.");
             return audioInputStream;
         }
-        return AudioSystem.getAudioInputStream(audioFormat, audioInputStream);
+
+        log.info("[formatting] 타겟 오디오 포맷과 일치하지 않아서 리샘플링 중...");
+        try {
+            AudioInputStream resampledStream = AudioSystem.getAudioInputStream(audioFormat, audioInputStream);
+            log.info("[formatting] 리샘플링된 포맷: {}", resampledStream.getFormat());
+            return resampledStream;
+        } catch (Exception e) {
+            log.error("Failed to resample audio format", e);
+            throw new IllegalArgumentException("Resampling failed");
+        }
     }
 }

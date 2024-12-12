@@ -157,7 +157,7 @@ public class ConcatTabService {
         return true;
     }
 
-    //
+
     @Transactional
     public ConcatTab getConcatTabBySeq(Long tabSeq) {
         return concatTabRepository.findById(tabSeq)

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BgmFileRepository extends JpaRepository<BgmFile, Long> {
@@ -17,5 +18,10 @@ public interface BgmFileRepository extends JpaRepository<BgmFile, Long> {
     // 특정 ConcatResult에 연결된 모든 BgmFile 조회
     @Query("SELECT b FROM bgm_file b WHERE b.concatResult.concatResultSequence = :resultSeq")
     List<BgmFile> findByConcatResultSeq(@Param("resultSeq") Long concatResultSeq);
+
+    Optional<BgmFile> findByAudioUrl(String audioUrl);
+
+    // 특정 audioUrl로 모든 BgmFile 조회
+    List<BgmFile> findAllByAudioUrl(String audioUrl);
 
 }
