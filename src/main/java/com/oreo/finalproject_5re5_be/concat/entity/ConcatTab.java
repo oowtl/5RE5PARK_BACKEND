@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.util.List;
 
-@ToString
 @Getter
 @Builder
 @NoArgsConstructor
@@ -18,7 +17,7 @@ public class ConcatTab extends BaseEntity {
     private Long projectId;
 
     @MapsId // Project 엔티티의 ID를 ConcatTab의 ID로 사용
-    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "pro_seq")
     private Project project;
 
@@ -28,8 +27,9 @@ public class ConcatTab extends BaseEntity {
     @Column(name = "front_silence")
     private Float frontSilence;
 
+    @ToString.Exclude
     // 하나의 ConcatTab에 여러 bgmFile들 매칭
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "concatTab", fetch = FetchType.LAZY)
     private List<BgmFile> bgmFiles;
 
 
