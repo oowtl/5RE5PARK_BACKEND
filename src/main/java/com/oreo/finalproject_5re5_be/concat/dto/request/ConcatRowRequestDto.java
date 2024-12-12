@@ -14,8 +14,6 @@ public class ConcatRowRequestDto {
     @NotNull
     private Long concatTabId;
     @NotNull
-    private Long memberSeq;
-    @NotNull
     private String fileName;
     @NotNull
     private List<ConcatRowRequest> concatRowRequests;
