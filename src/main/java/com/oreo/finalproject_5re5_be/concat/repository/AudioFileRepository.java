@@ -64,7 +64,9 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
             " AND cr.status = 'Y'")
     List<AudioFile> findAudioFileByProjectSeq(@Param("proSeq") Long projectSeq);
 
-    @Query(value = "SELECT * FROM audio_file WHERE audio_url = :audioUrl ORDER BY audio_file_seq ASC LIMIT 1", nativeQuery = true)
-    Optional<AudioFile> findFirstByAudioUrlNative(String audioUrl);
+    @Query(value = "SELECT * FROM audio_file WHERE audio_file_seq = :audioFileSeq ", nativeQuery = true)
+    Optional<AudioFile> findByAudioFileSeq(Long audioFileSeq);
+
+
 
 }
