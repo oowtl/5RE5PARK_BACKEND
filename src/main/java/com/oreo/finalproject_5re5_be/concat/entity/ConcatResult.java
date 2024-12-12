@@ -43,6 +43,12 @@ public class ConcatResult extends BaseEntity {
     @Column(name = "file_size")
     private Long fileSize;
 
+    @Column(name = "process_id")
+    private String processId;
+
+    @Column
+    private Integer seperated;
+
     public void addBgmFile(BgmFile bgmFile) {
         this.bgmFiles.add(BgmFile.builder()
                 .concatResult(this)

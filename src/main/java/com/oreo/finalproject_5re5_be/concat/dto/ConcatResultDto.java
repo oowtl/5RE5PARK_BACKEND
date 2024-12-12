@@ -9,8 +9,10 @@ public class ConcatResultDto {
     private Long concatResultSequence;
     private Long fileSize;
     private Float fileLength;
+    private Integer seperated;
 
     private String audioUrl;
     private String fileName;
     private String extension;
+    private String processId;
 }
