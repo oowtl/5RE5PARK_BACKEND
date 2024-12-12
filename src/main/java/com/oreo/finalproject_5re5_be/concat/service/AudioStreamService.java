@@ -1,5 +1,8 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequest;
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
+import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.request.SelectedConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.service.bgm.BgmProcessor;
 import com.oreo.finalproject_5re5_be.concat.service.concatenator.AudioProperties;
@@ -45,26 +48,26 @@ public class AudioStreamService {
         return frameLength > 0 ? frameLength : BgmProcessor.calculateTargetFrames(audioStream);
     }
 
-    public List<AudioProperties> loadAudioFiles(SelectedConcatRowRequest selectedRows) {
+    public List<AudioProperties> loadAudioFiles(ConcatRowSaveRequestDto selectedRows) {
         List<AudioProperties> audioPropertiesList = new ArrayList<>();
-        for (SelectedConcatRowRequest.Row row : selectedRows.getRows()) {
-            log.info("[loadAudioFiles] SelectedConcatRowRequest의 Row에 박혀있는 URL: {}", row.getAudioUrl());
+        for (ConcatRowRequest row : selectedRows.getConcatRowRequests()) {
+            OriginAudioRequest originAudio = row.getOriginAudioRequest();
+            log.info("[loadAudioFiles] SelectedConcatRowRequest의 Row에 박혀있는 URL: {}", originAudio.getAudioUrl());
             try {
-                AudioInputStream audioStream = S3Service.load(row.getAudioUrl());
-                log.info("[loadAudioFiles] load 완료: ");
+                AudioInputStream audioStream = S3Service.load(originAudio.getAudioUrl());
+                log.info("[loadAudioFiles] S3에서 오디오 파일 load 완료: ");
 
+                // 리샘플링 처리
                 audioStream = audioResample.formatting(audioStream); // 리샘플링 처리
+                log.info("[loadAudioFiles] 리샘플링 완료된 오디오 포맷: {}", audioStream.getFormat());
 
-                // 리샘플링 후 포맷 로그
-                log.info("[loadAudioFiles] 리샘플링 완료하고 나온 포맷: {}", audioStream.getFormat());
-
-                AudioProperties audioProperties = new AudioProperties(audioStream, row.getSilenceInterval());
+                AudioProperties audioProperties = new AudioProperties(audioStream, row.getRowSilence());
                 log.info("[loadAudioFiles] 생성된 AudioProperties: silenceInterval={}, frameLength={}",
-                        row.getSilenceInterval(), audioStream.getFrameLength());
+                        row.getRowSilence(), audioStream.getFrameLength());
 
                 audioPropertiesList.add(audioProperties);
             } catch (Exception e) {
-                log.error("Failed to load or process audio file from URL: {}", row.getAudioUrl(), e);
+                log.error("Failed to load or process audio file from URL: {}", originAudio.getAudioUrl(), e);
             }
         }
         return audioPropertiesList;

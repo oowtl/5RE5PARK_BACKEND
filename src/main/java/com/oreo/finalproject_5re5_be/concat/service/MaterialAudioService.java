@@ -1,6 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
 
+import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.request.SelectedConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
@@ -149,9 +150,9 @@ public class MaterialAudioService {
     }
 
     // 기존 기능 외 추가 메서드: SelectedConcatRowRequest 처리
-    public void saveMaterialsForSelectedRows(SelectedConcatRowRequest selectedRows, ConcatUrlResponse concatResultResponse) {
-        List<Long> usedAudioFileSeqs = selectedRows.getRows().stream()
-                .map(SelectedConcatRowRequest.Row::getAudioUrl) // URL 추출
+    public void saveMaterialsForConcatRows(ConcatRowSaveRequestDto concatRows, ConcatUrlResponse concatResultResponse) {
+        List<Long> usedAudioFileSeqs = concatRows.getConcatRowRequests().stream()
+                .map(row -> row.getOriginAudioRequest().getAudioUrl()) // URL 추출
                 .map(audioFileRepository::findFirstByAudioUrlNative) // URL로 AudioFile 조회
                 .map(audioFile -> audioFile.orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioFile.get().getAudioUrl())))
                 .map(AudioFile::getAudioFileSeq) // Seq 추출

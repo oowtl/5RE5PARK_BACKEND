@@ -23,5 +23,9 @@ public class BgmFileService {
                 .orElseThrow(() -> new IllegalArgumentException("BGM File not found with URL: " + bgmFileUrl));
     }
 
+    public BgmFile saveBgmFile(BgmFile bgmFile) {
+        return bgmFileRepository.save(bgmFile);
+    }
+
 
 }
