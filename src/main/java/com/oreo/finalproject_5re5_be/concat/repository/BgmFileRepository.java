@@ -21,4 +21,7 @@ public interface BgmFileRepository extends JpaRepository<BgmFile, Long> {
 
     Optional<BgmFile> findByAudioUrl(String audioUrl);
 
+    // 특정 audioUrl로 모든 BgmFile 조회
+    List<BgmFile> findAllByAudioUrl(String audioUrl);
+
 }
