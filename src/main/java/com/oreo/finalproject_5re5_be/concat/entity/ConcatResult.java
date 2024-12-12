@@ -24,6 +24,7 @@ public class ConcatResult extends BaseEntity {
     @JoinColumn(name = "pro_seq")
     private ConcatTab concatTab;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "concatResult", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BgmFile> bgmFiles = new ArrayList<>();
 
