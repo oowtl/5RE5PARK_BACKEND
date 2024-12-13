@@ -1,12 +1,13 @@
 package com.oreo.finalproject_5re5_be.concat.service.concatenator;
 
-
-import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import javax.sound.sampled.AudioInputStream;
 
 /**
+ *
+ *
  * <table class="striped">
  * <caption>기본 병합 클래스</caption>
  * <thead>
@@ -28,14 +29,15 @@ public class MonoConcatenator implements Concatenator {
 
     @Override
     public ByteArrayOutputStream concatenate(List<AudioInputStream> audioStreams) throws IOException {
-        boolean mono = audioStreams.stream().allMatch(as -> as.getFormat().getChannels() == 1);//모노 포맷인지 확인
+        boolean mono =
+                audioStreams.stream().allMatch(as -> as.getFormat().getChannels() == 1); // 모노 포맷인지 확인
         if (mono) {
-            return merge(audioStreams);//병합
+            return merge(audioStreams); // 병합
         }
         throw new IllegalArgumentException("잘못된 포맷 입니다.");
     }
 
-    //오디오 파일 병합 메소드
+    // 오디오 파일 병합 메소드
     private ByteArrayOutputStream merge(List<AudioInputStream> audioStreams) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         int bytesRead;
@@ -49,6 +51,6 @@ public class MonoConcatenator implements Concatenator {
 
     @Override
     public void setBufferSize(int bufferSize) {
-        buffer = new byte[bufferSize];//버퍼 사이즈 변경
+        buffer = new byte[bufferSize]; // 버퍼 사이즈 변경
     }
 }

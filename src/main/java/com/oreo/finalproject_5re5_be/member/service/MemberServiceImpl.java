@@ -1,12 +1,14 @@
 package com.oreo.finalproject_5re5_be.member.service;
 
+import com.oreo.finalproject_5re5_be.code.entity.Code;
+import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
+import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.dto.CustomUserDetails;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberChangePasswordRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRegisterRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberRemoveRequest;
 import com.oreo.finalproject_5re5_be.member.dto.request.MemberUpdateRequest;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberReadResponse;
-import com.oreo.finalproject_5re5_be.code.entity.Code;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberChangeHistory;
 import com.oreo.finalproject_5re5_be.member.entity.MemberConnectionHistory;
@@ -14,7 +16,6 @@ import com.oreo.finalproject_5re5_be.member.entity.MemberDelete;
 import com.oreo.finalproject_5re5_be.member.entity.MemberState;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsHistory;
-import com.oreo.finalproject_5re5_be.code.exeption.CodeNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.DeletedMemberException;
 import com.oreo.finalproject_5re5_be.member.exception.HumanMemberException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberDuplicatedEmailException;
@@ -26,7 +27,6 @@ import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundExcepti
 import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import com.oreo.finalproject_5re5_be.member.exception.RestrictedMemberException;
 import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
-import com.oreo.finalproject_5re5_be.code.repository.CodeRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberChangeHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberConnectionHistoryRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberDeleteRepository;
@@ -93,11 +93,17 @@ public class MemberServiceImpl implements UserDetailsService {
     private final MemberChangeHistoryRepository memberChangeHistoryRepository;
     private final MemberDeleteRepository memberDeleteRepository;
 
-
-    public MemberServiceImpl(MemberConnectionHistoryRepository memberConnectionHistoryRepository, MemberRepository memberRepository, MemberStateRepository memberStateRepository,
-                             MemberTermsHistoryRepository memberTermsHistoryRepository, MemberTermsRepository memberTermsRepository, PasswordEncoder passwordEncoder,
-                             JavaMailSender mailSender, CodeRepository codeRepository,
-                             MemberDeleteRepository memberDeleteRepository, MemberChangeHistoryRepository memberChangeHistoryRepository) {
+    public MemberServiceImpl(
+            MemberConnectionHistoryRepository memberConnectionHistoryRepository,
+            MemberRepository memberRepository,
+            MemberStateRepository memberStateRepository,
+            MemberTermsHistoryRepository memberTermsHistoryRepository,
+            MemberTermsRepository memberTermsRepository,
+            PasswordEncoder passwordEncoder,
+            JavaMailSender mailSender,
+            CodeRepository codeRepository,
+            MemberDeleteRepository memberDeleteRepository,
+            MemberChangeHistoryRepository memberChangeHistoryRepository) {
         this.memberConnectionHistoryRepository = memberConnectionHistoryRepository;
         this.memberRepository = memberRepository;
         this.memberStateRepository = memberStateRepository;
@@ -122,7 +128,10 @@ public class MemberServiceImpl implements UserDetailsService {
             // 회원 약관 유효성 확인
             request.checkValidTerms();
             request.checkValidTermsCount();
-        } catch (MemberDuplicatedEmailException | MemberDuplicatedIdException | MemberMandatoryTermNotAgreedException | MemberWrongCountTermCondition e) {
+        } catch (MemberDuplicatedEmailException
+                | MemberDuplicatedIdException
+                | MemberMandatoryTermNotAgreedException
+                | MemberWrongCountTermCondition e) {
             // 회원가입 처리가 불가능할 경우 컨트롤러에 비즈니스 예외 전달
             throw e;
         }
@@ -136,8 +145,7 @@ public class MemberServiceImpl implements UserDetailsService {
     @Retryable(
             value = {RuntimeException.class},
             maxAttempts = MAX_RETRY,
-            backoff = @Backoff(delay = RETRY_DELAY)
-    )
+            backoff = @Backoff(delay = RETRY_DELAY))
     public Member retryableCreateMember(MemberRegisterRequest request) {
         // 비밀번호 암호화
         encodePassword(request);
@@ -164,7 +172,6 @@ public class MemberServiceImpl implements UserDetailsService {
         if (foundMember != null) {
             throw new MemberDuplicatedEmailException();
         }
-
     }
 
     // 중복된 아이디 확인
@@ -203,10 +210,12 @@ public class MemberServiceImpl implements UserDetailsService {
         }
 
         // 입력 데이터로부터 회원 약관 이력 엔티티 생성
-        MemberTermsHistory memberTermsHistory = request.createMemberTermsHistoryEntity(member, foundTerms);
+        MemberTermsHistory memberTermsHistory =
+                request.createMemberTermsHistoryEntity(member, foundTerms);
 
         // 회원 약관 이력 엔티티 저장
-        MemberTermsHistory savedMemberTermsHistory = memberTermsHistoryRepository.save(memberTermsHistory);
+        MemberTermsHistory savedMemberTermsHistory =
+                memberTermsHistoryRepository.save(memberTermsHistory);
 
         return savedMemberTermsHistory;
     }
@@ -227,11 +236,10 @@ public class MemberServiceImpl implements UserDetailsService {
         return savedMemberState;
     }
 
-
-
     // 2. 로그인 : 아이디로 회원 조회하여 UserDetails 반환, 스프링 시큐리티 내부적으로 호출하여 로그인 처리
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        ;
         // 아이디로 회원 조회
         Member foundMember = memberRepository.findById(username);
 
@@ -262,7 +270,7 @@ public class MemberServiceImpl implements UserDetailsService {
         StringBuilder sb = new StringBuilder();
 
         // 6자리 랜덤 숫자 코드 생성
-        for (int i=0; i<6; i++) {
+        for (int i = 0; i < 6; i++) {
             int random = (int) (Math.random() * 10);
             sb.append(random);
         }
@@ -295,7 +303,6 @@ public class MemberServiceImpl implements UserDetailsService {
             // 이메일 전송 실패시 예외 발생
             throw new MailSendException("이메일 전송에 실패했습니다");
         }
-
     }
 
     // 4. 회원정보 상세 조회
@@ -321,7 +328,8 @@ public class MemberServiceImpl implements UserDetailsService {
 
         // 조회된 회원의 상태를 확인함
         // - 휴먼회원(MBS003), 제재회원(MBS007), 탈퇴회원(MBS004)일 경우 거르기
-        MemberState memberState = memberStateRepository.findLatestHistoryByMemberSeq(foundMember.getSeq());
+        MemberState memberState =
+                memberStateRepository.findLatestHistoryByMemberSeq(foundMember.getSeq());
 
         // 휴먼 회원인지 확인
         if ("MBS003".equals(memberState.getCode().getCode())) {
@@ -345,29 +353,29 @@ public class MemberServiceImpl implements UserDetailsService {
         return MemberReadResponse.of(foundMember);
     }
 
-
     // 5. 회원정보 수정
     @Transactional
     public void update(Long memberSeq, MemberUpdateRequest request) {
         // 5-1. 전달받은 데이터가 유효한지 검증한다
         // 5-2. 아이디, 이메일을 수정할 경우, 다른 회원과 중복된 아이디, 이메일이 있는지 확인한다
-        boolean isDuplicatedId = memberRepository.existsByIdNotContainingMemberSeq(memberSeq, request.getId());
+        boolean isDuplicatedId =
+                memberRepository.existsByIdNotContainingMemberSeq(memberSeq, request.getId());
         if (isDuplicatedId) {
             throw new MemberDuplicatedIdException();
         }
 
-        boolean isDuplicatedEmail = memberRepository.existsByEmailNotContainingMemberSeq(memberSeq, request.getEmail());
+        boolean isDuplicatedEmail =
+                memberRepository.existsByEmailNotContainingMemberSeq(memberSeq, request.getEmail());
         if (isDuplicatedEmail) {
             throw new MemberDuplicatedEmailException();
         }
 
         // 5-3. 회원 시퀀스로 엔티티를 조회한다
-        Member foundMember = memberRepository.findById(memberSeq)
-                                             .orElseThrow(MemberNotFoundException::new);
-
+        Member foundMember =
+                memberRepository.findById(memberSeq).orElseThrow(MemberNotFoundException::new);
 
         // 5-4. 어느 부분이 변경되었는지 파악하고 이력으로 기록한다
-        List<MemberChangeHistory > changeHistories = new ArrayList<>();
+        List<MemberChangeHistory> changeHistories = new ArrayList<>();
 
         // 현재 시간과 최대 시간 세팅
         LocalDateTime now = LocalDateTime.now();
@@ -379,7 +387,6 @@ public class MemberServiceImpl implements UserDetailsService {
         // 포맷팅된 문자열로 변환
         String formattedNow = now.format(formatter);
         String formattedEnd = end.format(formatter);
-
 
         boolean isChangedId = false;
         boolean isChangedEmail = false;
@@ -412,35 +419,37 @@ public class MemberServiceImpl implements UserDetailsService {
             Code memberIdFiledCode = codeRepository.findCodeByCode("MF001"); // 회원 아이디 필드 코드
 
             // 가장 최근 이력 시간 업데이트
-            memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, memberIdFiledCode.getCode())
-                                         .ifPresent(history -> history.setEndDate(formattedNow));
+            memberChangeHistoryRepository
+                    .findLatestHistoryByIdAndCode(memberSeq, memberIdFiledCode.getCode())
+                    .ifPresent(history -> history.setEndDate(formattedNow));
 
-
-
-            MemberChangeHistory memberIdChangeHistory = MemberChangeHistory.builder()
-                                                                        .member(foundMember)
-                                                                        .chngFieldCode(memberIdFiledCode)
-                                                                        .befVal(foundMember.getId())
-                                                                        .aftVal(request.getId())
-                                                                        .applDate(formattedNow)
-                                                                        .endDate(formattedEnd)
-                                                                        .build();
+            MemberChangeHistory memberIdChangeHistory =
+                    MemberChangeHistory.builder()
+                            .member(foundMember)
+                            .chngFieldCode(memberIdFiledCode)
+                            .befVal(foundMember.getId())
+                            .aftVal(request.getId())
+                            .applDate(formattedNow)
+                            .endDate(formattedEnd)
+                            .build();
             changeHistories.add(memberIdChangeHistory);
         }
 
         if (isChangedEmail) {
             Code emailFiledCode = codeRepository.findCodeByCode("MF002"); // 회원 이메일 필드 코드
-            MemberChangeHistory emailChangeHistory = MemberChangeHistory.builder()
-                                                                        .member(foundMember)
-                                                                        .chngFieldCode(emailFiledCode)
-                                                                        .befVal(foundMember.getEmail())
-                                                                        .aftVal(request.getEmail())
-                                                                        .applDate(formattedNow)
-                                                                        .endDate(formattedEnd)
-                                                                        .build();
+            MemberChangeHistory emailChangeHistory =
+                    MemberChangeHistory.builder()
+                            .member(foundMember)
+                            .chngFieldCode(emailFiledCode)
+                            .befVal(foundMember.getEmail())
+                            .aftVal(request.getEmail())
+                            .applDate(formattedNow)
+                            .endDate(formattedEnd)
+                            .build();
             // 가장 최근 이력 시간 업데이트
-            memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, emailFiledCode.getCode())
-                                         .ifPresent(history -> history.setEndDate(formattedNow));
+            memberChangeHistoryRepository
+                    .findLatestHistoryByIdAndCode(memberSeq, emailFiledCode.getCode())
+                    .ifPresent(history -> history.setEndDate(formattedNow));
 
             changeHistories.add(emailChangeHistory);
         }
@@ -450,57 +459,61 @@ public class MemberServiceImpl implements UserDetailsService {
             String encodedPassword = passwordEncoder.encode(foundMember.getPassword());
 
             // 가장 최근 이력 시간 업데이트
-            memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, passwordFiledCode.getCode())
-                                         .ifPresent(history -> history.setEndDate(formattedNow));
+            memberChangeHistoryRepository
+                    .findLatestHistoryByIdAndCode(memberSeq, passwordFiledCode.getCode())
+                    .ifPresent(history -> history.setEndDate(formattedNow));
 
-            MemberChangeHistory passwordChangeHistory = MemberChangeHistory.builder()
-                                                                            .member(foundMember)
-                                                                            .chngFieldCode(passwordFiledCode)
-                                                                            .befVal(foundMember.getPassword())
-                                                                            .aftVal(encodedPassword)
-                                                                            .applDate(formattedNow)
-                                                                            .endDate(formattedEnd)
-                                                                            .build();
+            MemberChangeHistory passwordChangeHistory =
+                    MemberChangeHistory.builder()
+                            .member(foundMember)
+                            .chngFieldCode(passwordFiledCode)
+                            .befVal(foundMember.getPassword())
+                            .aftVal(encodedPassword)
+                            .applDate(formattedNow)
+                            .endDate(formattedEnd)
+                            .build();
             changeHistories.add(passwordChangeHistory);
         }
 
         if (isChangedName) {
             Code nameFiledCode = codeRepository.findCodeByCode("MF004"); // 회원 이름 필드 코드
-            MemberChangeHistory nameChangeHistory = MemberChangeHistory.builder()
-                                                                        .member(foundMember)
-                                                                        .chngFieldCode(nameFiledCode)
-                                                                        .befVal(foundMember.getName())
-                                                                        .aftVal(request.getName())
-                                                                        .applDate(formattedNow)
-                                                                        .endDate(formattedEnd)
-                                                                        .build();
+            MemberChangeHistory nameChangeHistory =
+                    MemberChangeHistory.builder()
+                            .member(foundMember)
+                            .chngFieldCode(nameFiledCode)
+                            .befVal(foundMember.getName())
+                            .aftVal(request.getName())
+                            .applDate(formattedNow)
+                            .endDate(formattedEnd)
+                            .build();
 
             // 가장 최근 이력 시간 업데이트
-            memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, nameFiledCode.getCode())
-                                         .ifPresent(history -> history.setEndDate(formattedNow));
+            memberChangeHistoryRepository
+                    .findLatestHistoryByIdAndCode(memberSeq, nameFiledCode.getCode())
+                    .ifPresent(history -> history.setEndDate(formattedNow));
 
             changeHistories.add(nameChangeHistory);
         }
 
         if (isChangedNormAddr) {
             Code normAddrFiledCode = codeRepository.findCodeByCode("MF005"); // 회원 주소 필드 코드
-            MemberChangeHistory normAddrChangeHistory = MemberChangeHistory.builder()
-                                                                            .member(foundMember)
-                                                                            .chngFieldCode(normAddrFiledCode)
-                                                                            .befVal(foundMember.getNormAddr())
-                                                                            .aftVal(request.getNormAddr())
-                                                                            .applDate(formattedNow)
-                                                                            .endDate(formattedEnd)
-                                                                            .build();
+            MemberChangeHistory normAddrChangeHistory =
+                    MemberChangeHistory.builder()
+                            .member(foundMember)
+                            .chngFieldCode(normAddrFiledCode)
+                            .befVal(foundMember.getNormAddr())
+                            .aftVal(request.getNormAddr())
+                            .applDate(formattedNow)
+                            .endDate(formattedEnd)
+                            .build();
 
             // 가장 최근 이력 시간 업데이트
-            memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, normAddrFiledCode.getCode())
-                                         .ifPresent(history -> history.setEndDate(formattedNow));
+            memberChangeHistoryRepository
+                    .findLatestHistoryByIdAndCode(memberSeq, normAddrFiledCode.getCode())
+                    .ifPresent(history -> history.setEndDate(formattedNow));
 
             changeHistories.add(normAddrChangeHistory);
         }
-
-
 
         // 5-6. 해당 엔티티를 수정한다
         foundMember.update(request);
@@ -512,7 +525,6 @@ public class MemberServiceImpl implements UserDetailsService {
         memberChangeHistoryRepository.saveAll(changeHistories);
     }
 
-
     // 6. 회원 탈퇴(유해기간 30일 설정, 그 이후에 삭제)
     // (1) 삭제 처리가 요청된 회원
     // - 해당 회원을 비활성 회원으로 업데이트한다
@@ -520,8 +532,8 @@ public class MemberServiceImpl implements UserDetailsService {
     // - 회원 삭제 유형 코드와 사유를 기록한다
     public void remove(Long memberSeq, MemberRemoveRequest request) {
         // - 해당 회원을 조회한다
-        Member foundMember = memberRepository.findById(memberSeq)
-                                             .orElseThrow(MemberNotFoundException::new);
+        Member foundMember =
+                memberRepository.findById(memberSeq).orElseThrow(MemberNotFoundException::new);
 
         // - 해당 회원을 비활성 회원으로 업데이트한다
         Code removeMemberCode = codeRepository.findCodeByCode("MBS003"); // 휴먼 회원으로 등록
@@ -534,7 +546,6 @@ public class MemberServiceImpl implements UserDetailsService {
         MemberDelete memberDelete = MemberDelete.of(memberSeq, request, removeReaseonCode);
         memberDeleteRepository.save(memberDelete);
     }
-
 
     // (2) 매일 새벽 4:00 마다 삭제 회원 중 유해기간 30일이 지난 회원들을 삭제(스프링 스케쥴러 적용)
     // - applDate가 현재와 30일 차이 나는 회원을 대상으로 한다
@@ -549,41 +560,50 @@ public class MemberServiceImpl implements UserDetailsService {
         // 현재 시간 조회
         LocalDateTime now = LocalDateTime.now();
 
-
         // - applDate가 현재와 30일 차이 나는 회원을 대상으로 한다
         List<MemberDelete> foundAllDeletedMembers = memberDeleteRepository.findAll();
-        List<MemberDelete> candidates = foundAllDeletedMembers.stream()
-                                                             .filter(m -> {
-                                                                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                                                                 LocalDateTime applDate = LocalDateTime.parse(m.getApplDate(), formatter);
-                                                                 return applDate.isBefore(now.minusMonths(1)) || applDate.isEqual(now.minusMonths(1));
-                                                             })
-                                                            .toList();
+        List<MemberDelete> candidates =
+                foundAllDeletedMembers.stream()
+                        .filter(
+                                m -> {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                    LocalDateTime applDate = LocalDateTime.parse(m.getApplDate(), formatter);
+                                    return applDate.isBefore(now.minusMonths(1))
+                                            || applDate.isEqual(now.minusMonths(1));
+                                })
+                        .toList();
 
         // 삭제 대상 회원을 반복해서 삭제 처리한다
         for (MemberDelete candidate : candidates) {
             // - 회원을 삭제한다
-            Member foundMember = memberRepository.findById(candidate.getMemberSeq())
-                                                 .orElseThrow(MemberNotFoundException::new);
+            Member foundMember =
+                    memberRepository
+                            .findById(candidate.getMemberSeq())
+                            .orElseThrow(MemberNotFoundException::new);
 
             memberRepository.delete(foundMember);
 
             // - 회원의 상태를 삭제한다
-            List<MemberState> foundMemberStates = memberStateRepository.findAllByMemberSeq(candidate.getMemberSeq());
+            List<MemberState> foundMemberStates =
+                    memberStateRepository.findAllByMemberSeq(candidate.getMemberSeq());
             memberStateRepository.deleteAll(foundMemberStates);
 
-
             // - 회원의 약관 이력을 삭제한다
-            List<MemberTermsHistory> foundMemberTermsHistories = memberTermsHistoryRepository.findByMemberSeq(candidate.getMemberSeq());
+            List<MemberTermsHistory> foundMemberTermsHistories =
+                    memberTermsHistoryRepository.findByMemberSeq(candidate.getMemberSeq());
             memberTermsHistoryRepository.deleteAll(foundMemberTermsHistories);
 
             // - 회원의 접속 이력을 삭제한다
-            List<MemberConnectionHistory> foundMemberConnectionsHistories = memberConnectionHistoryRepository.findMemberConnectionHistoriesByMemberSeq(candidate.getMemberSeq());
+            List<MemberConnectionHistory> foundMemberConnectionsHistories =
+                    memberConnectionHistoryRepository.findMemberConnectionHistoriesByMemberSeq(
+                            candidate.getMemberSeq());
             memberConnectionHistoryRepository.deleteAll(foundMemberConnectionsHistories);
 
             // - 회원의 변경 이력을 삭제한다
             // - 회원 삭제 테이블에 처리 완료 체크표시 넣기
-            List<MemberChangeHistory> foundMemberChangeHistories = memberChangeHistoryRepository.findMemberChangeHistoriesByMemberSeq(candidate.getMemberSeq());
+            List<MemberChangeHistory> foundMemberChangeHistories =
+                    memberChangeHistoryRepository.findMemberChangeHistoriesByMemberSeq(
+                            candidate.getMemberSeq());
             memberChangeHistoryRepository.deleteAll(foundMemberChangeHistories);
 
             // 회원 삭제 데이터 업데이트
@@ -626,22 +646,23 @@ public class MemberServiceImpl implements UserDetailsService {
         String formattedEnd = end.format(formatter);
 
         // 가장 최근 이력 시간 업데이트
-        memberChangeHistoryRepository.findLatestHistoryByIdAndCode(memberSeq, passwordFiledCode.getCode())
+        memberChangeHistoryRepository
+                .findLatestHistoryByIdAndCode(memberSeq, passwordFiledCode.getCode())
                 .ifPresent(history -> history.setEndDate(formattedNow));
 
-        MemberChangeHistory passwordChangeHistory = MemberChangeHistory.builder()
-                                                                        .member(foundMember)
-                                                                        .chngFieldCode(passwordFiledCode)
-                                                                        .befVal(foundMember.getPassword())
-                                                                        .aftVal(encodedPassword)
-                                                                        .applDate(formattedNow)
-                                                                        .endDate(formattedEnd)
-                                                                        .build();
+        MemberChangeHistory passwordChangeHistory =
+                MemberChangeHistory.builder()
+                        .member(foundMember)
+                        .chngFieldCode(passwordFiledCode)
+                        .befVal(foundMember.getPassword())
+                        .aftVal(encodedPassword)
+                        .applDate(formattedNow)
+                        .endDate(formattedEnd)
+                        .build();
 
         // 변경 이력 저장
         memberChangeHistoryRepository.save(passwordChangeHistory);
     }
-
 
     public String findId(String email) {
         // 이메일로 회원 조회
@@ -653,5 +674,4 @@ public class MemberServiceImpl implements UserDetailsService {
         // 조회된 회원의 아이디 반환
         return foundMember.getId();
     }
-
 }

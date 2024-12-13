@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
-
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowSaveRequestDto;
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatUrlResponse;
@@ -9,12 +8,11 @@ import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.BgmFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.MaterialAudioRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -37,81 +35,97 @@ public class MaterialAudioService {
     // 결과에 사용된 Material 파일 조회
     public List<OriginAudioRequest> findMaterialAudioFilesByConcatResultSeq(Long concatResultSeq) {
         return materialAudioRepository.findByConcatResultSeq(concatResultSeq).stream()
-                .map(material -> OriginAudioRequest.builder()
-                        .seq(material.getAudioFile().getAudioFileSeq())
-                        .audioUrl(material.getAudioFile().getAudioUrl())
-                        .extension(material.getAudioFile().getExtension())
-                        .fileSize(material.getAudioFile().getFileSize())
-                        .fileLength(material.getAudioFile().getFileLength())
-                        .fileName(material.getAudioFile().getFileName())
-                        .build())
+                .map(
+                        material ->
+                                OriginAudioRequest.builder()
+                                        .seq(material.getAudioFile().getAudioFileSeq())
+                                        .audioUrl(material.getAudioFile().getAudioUrl())
+                                        .extension(material.getAudioFile().getExtension())
+                                        .fileSize(material.getAudioFile().getFileSize())
+                                        .fileLength(material.getAudioFile().getFileLength())
+                                        .fileName(material.getAudioFile().getFileName())
+                                        .build())
                 .toList();
     }
 
-    //결과물seq로 결과물url조회
+    // 결과물seq로 결과물url조회
     public String findResultAudioUrlByConcatResultSeq(Long concatResultSeq) {
-        ConcatResult concatResult = concatResultRepository.findById(concatResultSeq)
-                .orElseThrow(() -> new IllegalArgumentException("ConcatResult not found with seq: " + concatResultSeq));
+        ConcatResult concatResult =
+                concatResultRepository
+                        .findById(concatResultSeq)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "ConcatResult not found with seq: " + concatResultSeq));
         return concatResult.getAudioUrl();
     }
 
     // 1개의 concatResult와 그에 매칭되는 1개의 AudioFile을 저장 (1개)
     public MaterialAudio saveMaterial(Long concatResultSeq, Long audioFileSeq) {
         // ConcatResult 조회
-        ConcatResult concatResult = concatResultRepository.findById(concatResultSeq)
-                .orElseThrow(() -> new IllegalArgumentException("ConcatResult not found with id: " + concatResultSeq));
+        ConcatResult concatResult =
+                concatResultRepository
+                        .findById(concatResultSeq)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "ConcatResult not found with id: " + concatResultSeq));
 
         // AudioFile 조회
-        AudioFile audioFile = audioFileRepository.findById(audioFileSeq)
-                .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with id: " + audioFileSeq));
+        AudioFile audioFile =
+                audioFileRepository
+                        .findById(audioFileSeq)
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("AudioFile not found with id: " + audioFileSeq));
 
         // MaterialAudio 생성
-        MaterialAudio materialAudio = MaterialAudio.builder()
-                .concatResult(concatResult)
-                .audioFile(audioFile)
-                .build();
+        MaterialAudio materialAudio =
+                MaterialAudio.builder().concatResult(concatResult).audioFile(audioFile).build();
 
-        //객체를 저장
+        // 객체를 저장
         return materialAudioRepository.save(materialAudio);
-
     }
-
 
     // 1개의 concatResult와 그에 매칭되는 여러개의 AudioFile을 저장 (N개)
     public List<MaterialAudio> saveMaterials(Long concatResultSeq, List<AudioFile> audioFiles) {
         // ConcatResult 조회
-        ConcatResult concatResult = concatResultRepository.findById(concatResultSeq)
-                .orElseThrow(() -> new IllegalArgumentException("ConcatResult not found with id: " + concatResultSeq));
+        ConcatResult concatResult =
+                concatResultRepository
+                        .findById(concatResultSeq)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "ConcatResult not found with id: " + concatResultSeq));
 
         // AudioFileSeq를 하나씩 처리하여 MaterialAudio 생성 및 저장
         return audioFiles.stream()
-                .map(audioFile -> {
-                    // MaterialAudio 생성
-                    MaterialAudio materialAudio = MaterialAudio.builder()
-                            .concatResult(concatResult)
-                            .audioFile(audioFile)
-                            .build();
+                .map(
+                        audioFile -> {
+                            // MaterialAudio 생성
+                            MaterialAudio materialAudio =
+                                    MaterialAudio.builder().concatResult(concatResult).audioFile(audioFile).build();
 
-                    // 저장
-                    return materialAudioRepository.save(materialAudio);
-                })
+                            // 저장
+                            return materialAudioRepository.save(materialAudio);
+                        })
                 .collect(Collectors.toList());
     }
 
-
     // concatResultSeq와 매칭되는 audioFile List 조회
     public List<ConcatUrlResponse> findAudioFilesByConcatResultSeq(Long concatResultSeq) {
-        //MaterialAudio에서 AudioFile 리스트 조회
-        List<AudioFile> audioFiles = materialAudioRepository.findAudioFilesByConcatResult(concatResultSeq);
+        // MaterialAudio에서 AudioFile 리스트 조회
+        List<AudioFile> audioFiles =
+                materialAudioRepository.findAudioFilesByConcatResult(concatResultSeq);
 
-        //AudioFile -> ConcatUrlResponse 변환
+        // AudioFile -> ConcatUrlResponse 변환
         return audioFiles.stream()
-                .map(audioFile -> ConcatUrlResponse.builder()
-                        .seq(audioFile.getAudioFileSeq())
-                        .url(audioFile.getAudioUrl())
-                        .build())
+                .map(
+                        audioFile ->
+                                ConcatUrlResponse.builder()
+                                        .seq(audioFile.getAudioFileSeq())
+                                        .url(audioFile.getAudioUrl())
+                                        .build())
                 .collect(Collectors.toList());
-
     }
 
     // AudioFile과 매칭되는 concatResult List 조회
@@ -126,8 +140,7 @@ public class MaterialAudioService {
 
     // concatResult의 seq로 매칭되는 audioFile seq들을 조회
     public List<Long> findAudioFileSeqsByConcatResultSeq(Long concatResultSeq) {
-        return materialAudioRepository.findByConcatResultSeq(concatResultSeq)
-                .stream()
+        return materialAudioRepository.findByConcatResultSeq(concatResultSeq).stream()
                 .map(materialAudio -> materialAudio.getAudioFile().getAudioFileSeq()) // AudioFile의 seq를 추출
                 .collect(Collectors.toList());
     }
@@ -146,26 +159,34 @@ public class MaterialAudioService {
         }
     }
 
-
-    public void saveMaterialsForConcatRows(ConcatRowSaveRequestDto concatRows, ConcatUrlResponse concatResultResponse) {
+    public void saveMaterialsForConcatRows(
+            ConcatRowSaveRequestDto concatRows, ConcatUrlResponse concatResultResponse) {
         Long concatResultSeq = concatResultResponse.getSeq();
-        if(concatResultSeq == null){
+        if (concatResultSeq == null) {
             throw new IllegalArgumentException("ConcatResult seq is null, cannot save materials.");
         }
 
         log.info("[saveMaterialsForConcatRows] Processing concatRows: {}", concatRows);
 
-        List<AudioFile> usedAudioFileSeqs = concatRows.getConcatRowRequests().stream()
-                .map(row -> {
-                    Long seq = row.getOriginAudioRequest().getSeq();
-                    log.info("[saveMaterialsForConcatRows] Fetching AudioFile for seq: {}", seq);
+        List<AudioFile> usedAudioFileSeqs =
+                concatRows.getConcatRowRequests().stream()
+                        .map(
+                                row -> {
+                                    Long seq = row.getOriginAudioRequest().getSeq();
+                                    log.info("[saveMaterialsForConcatRows] Fetching AudioFile for seq: {}", seq);
 
-                    return audioFileRepository.findByAudioFileSeq(seq)
-                            .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with seq: " + seq));
-                })
-                .toList();
+                                    return audioFileRepository
+                                            .findByAudioFileSeq(seq)
+                                            .orElseThrow(
+                                                    () ->
+                                                            new IllegalArgumentException("AudioFile not found with seq: " + seq));
+                                })
+                        .toList();
 
-        log.info("[saveMaterialsForConcatRows] Saving materials with ConcatResult seq: {} and AudioFile seqs: {}", concatResultSeq, usedAudioFileSeqs);
+        log.info(
+                "[saveMaterialsForConcatRows] Saving materials with ConcatResult seq: {} and AudioFile seqs: {}",
+                concatResultSeq,
+                usedAudioFileSeqs);
 
         // 기존 saveMaterials 메서드를 호출하여 저장
         saveMaterials(concatResultResponse.getSeq(), usedAudioFileSeqs);
@@ -183,12 +204,16 @@ public class MaterialAudioService {
 
         // 첫 번째 결과에 대해서만 처리
         BgmFile bgmFile = bgmFiles.get(0);
-        ConcatResult concatResult = concatResultRepository.findById(concatResultSeq)
-                .orElseThrow(() -> new IllegalArgumentException("ConcatResult not found for id: " + concatResultSeq));
+        ConcatResult concatResult =
+                concatResultRepository
+                        .findById(concatResultSeq)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "ConcatResult not found for id: " + concatResultSeq));
         bgmFile.setConcatResult(concatResult);
         bgmFileRepository.save(bgmFile);
 
         log.info("[updateBgmFileWithConcatResult] Updated BgmFile with ConcatResult: {}", bgmFile);
     }
-
 }

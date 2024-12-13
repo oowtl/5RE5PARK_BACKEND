@@ -1,12 +1,11 @@
 package com.oreo.finalproject_5re5_be.tts.dto.response;
 
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @Builder
@@ -15,14 +14,9 @@ import java.util.List;
 public class LanguageListDto {
     private List<LanguageDto> languageList;
 
-
     public static LanguageListDto of(List<Language> languageList) {
-        List<LanguageDto> list = languageList.stream()
-                .map(LanguageDto::of)
-                .toList();
+        List<LanguageDto> list = languageList.stream().map(LanguageDto::of).toList();
 
-        return LanguageListDto.builder()
-                .languageList(list)
-                .build();
+        return LanguageListDto.builder().languageList(list).build();
     }
 }

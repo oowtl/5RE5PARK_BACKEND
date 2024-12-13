@@ -18,10 +18,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_change_history")
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,10 +42,13 @@ public class MemberChangeHistory extends BaseEntity {
 
     @Column(name = "bef_val", nullable = false)
     private String befVal;
+
     @Column(name = "aft_val", nullable = false)
     private String aftVal;
+
     @Column(name = "appl_date", nullable = false)
     private String applDate;
+
     @Column(name = "end_date", nullable = false)
     private String endDate;
 }

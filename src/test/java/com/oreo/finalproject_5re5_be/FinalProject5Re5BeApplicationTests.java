@@ -9,7 +9,5 @@ import org.springframework.test.context.TestPropertySource;
 class FinalProject5Re5BeApplicationTests {
 
     @Test
-    void contextLoads() {
-    }
-
+    void contextLoads() {}
 }

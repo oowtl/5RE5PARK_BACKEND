@@ -1,16 +1,16 @@
-//package com.oreo.finalproject_5re5_be.global.config;
+// package com.oreo.finalproject_5re5_be.global.config;
 //
-//import com.amazonaws.services.sqs.AmazonSQSRequester;
-//import com.amazonaws.services.sqs.AmazonSQSRequesterClientBuilder;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-//import software.amazon.awssdk.regions.Region;
-//import software.amazon.awssdk.services.sqs.SqsClient;
+// import com.amazonaws.services.sqs.AmazonSQSRequester;
+// import com.amazonaws.services.sqs.AmazonSQSRequesterClientBuilder;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+// import software.amazon.awssdk.regions.Region;
+// import software.amazon.awssdk.services.sqs.SqsClient;
 //
-//@Configuration
-//public class SqsConfig {
+// @Configuration
+// public class SqsConfig {
 //
 //    @Value("${AWS_SQS_ACCESS_KEY_ID}")
 //    private String sqsAccessKey;
@@ -38,4 +38,4 @@
 //            .withAmazonSQS(sqsClient)
 //            .build();
 //    }
-//}
+// }

@@ -1,12 +1,11 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
-import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.code.entity.Code;
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vc_result_history")

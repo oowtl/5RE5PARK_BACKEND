@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.concat.dto.request;
 
-
 import lombok.*;
 
 @Getter
@@ -18,5 +17,4 @@ public class AudioFormatRequest {
     private Integer frameSize;
     private Short frameRate;
     private Character isBigEndian;
-
 }

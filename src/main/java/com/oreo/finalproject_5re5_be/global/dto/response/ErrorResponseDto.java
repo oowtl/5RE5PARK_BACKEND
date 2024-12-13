@@ -1,9 +1,8 @@
 package com.oreo.finalproject_5re5_be.global.dto.response;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -31,7 +30,8 @@ public class ErrorResponseDto {
         }
     }
 
-    public static ErrorResponseDto of(int status, String message, List<FieldErrorDetail> fieldErrors) {
+    public static ErrorResponseDto of(
+            int status, String message, List<FieldErrorDetail> fieldErrors) {
         return new ErrorResponseDto(status, new Response(message, fieldErrors));
     }
 

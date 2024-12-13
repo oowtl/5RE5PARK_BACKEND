@@ -12,11 +12,11 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConcatRowRequest { //화면을 저장하기 위해 SelectedConcatRowRequest와 달리 selected여부도 저장해야함
+public class ConcatRowRequest { // 화면을 저장하기 위해 SelectedConcatRowRequest와 달리 selected여부도 저장해야함
     private Long seq;
 
     @NotNull(message = "originAudioRequest 필드는 null 일 수 없습니다.")
-    private OriginAudioRequest originAudioRequest; //행마다 매칭되는 원본 오디오파일
+    private OriginAudioRequest originAudioRequest; // 행마다 매칭되는 원본 오디오파일
 
     @Size(max = 255, message = "rowText 필드는 최대 255자까지 허용됩니다.")
     private String rowText;
@@ -31,7 +31,7 @@ public class ConcatRowRequest { //화면을 저장하기 위해 SelectedConcatRo
 
     @Positive(message = "rowIndex 필드는 양수여야 합니다.")
     @NotNull(message = "rowIndex 필드는 null 일 수 없습니다.")
-    private Integer rowIndex; //행 순서
+    private Integer rowIndex; // 행 순서
 
     private Character status;
 }

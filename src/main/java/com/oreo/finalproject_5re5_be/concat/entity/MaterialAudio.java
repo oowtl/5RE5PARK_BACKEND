@@ -20,15 +20,15 @@ public class MaterialAudio extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "concat_result_seq")
     @ToString.Exclude // 순환 참조 방지
-    @JsonIgnore        // JSON 직렬화에서 제외
+    @JsonIgnore // JSON 직렬화에서 제외
     private ConcatResult concatResult;
 
     @ManyToOne
     @JoinColumn(name = "audio_file_seq")
     @ToString.Exclude // 순환 참조 방지
-    @JsonIgnore        // JSON 직렬화에서 제외
+    @JsonIgnore // JSON 직렬화에서 제외
     private AudioFile audioFile;
 
-    @Column(name ="method")
+    @Column(name = "method")
     private String method;
 }

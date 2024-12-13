@@ -1,9 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.dto.request;
 
-
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
@@ -19,7 +17,7 @@ public class BgmFunctionRequestDto {
     private String bgmFileUrl;
     // 결과 파일 S3에 저장에 필요한 정보
     private String concatResultFileName;
-    
+
     @Getter
     @Setter
     @Builder
@@ -29,5 +27,4 @@ public class BgmFunctionRequestDto {
         private String audioUrl; // S3 URL 또는 파일 경로
         private float silenceInterval; // 해당 행 뒤에 삽입될 무음 간격
     }
-
 }

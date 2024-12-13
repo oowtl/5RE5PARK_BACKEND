@@ -16,10 +16,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_roles")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 public class MemberRoles extends BaseEntity {
 
@@ -34,13 +34,16 @@ public class MemberRoles extends BaseEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
+
     @Column(name = "detail_cont", nullable = false)
     private String detailCont;
+
     @Column(name = "appl_reas", nullable = false)
     private String applReas;
+
     @Column(name = "chk_use", nullable = false)
     private Character chkUse;
+
     @Column(name = "appl_date", nullable = false)
     private LocalDateTime poliCodeRegDate;
-
 }

@@ -30,24 +30,17 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TestPatchSentenceOrder {
 
-    @Autowired
-    private TtsSentenceService ttsSentenceService;
+    @Autowired private TtsSentenceService ttsSentenceService;
 
-    @MockBean
-    private TtsSentenceRepository ttsSentenceRepository;
+    @MockBean private TtsSentenceRepository ttsSentenceRepository;
 
-    @MockBean
-    private ProjectRepository projectRepository;
+    @MockBean private ProjectRepository projectRepository;
 
-    @MockBean
-    private VoiceRepository voiceRepository;
+    @MockBean private VoiceRepository voiceRepository;
 
-    @MockBean
-    private StyleRepository styleRepository;
+    @MockBean private StyleRepository styleRepository;
 
-    @MockBean
-    private TtsProgressStatusRepository ttsProgressStatusRepository;
-
+    @MockBean private TtsProgressStatusRepository ttsProgressStatusRepository;
 
     /*
     테스트 시나리오: patchSentenceOrder 메서드
@@ -89,17 +82,11 @@ class TestPatchSentenceOrder {
         Integer oldOrder = 1;
         Integer newOrder = 2;
 
-        TtsSentence existingSentence = TtsSentence.builder()
-            .tsSeq(tsSeq)
-            .sortOrder(oldOrder)
-            .build();
+        TtsSentence existingSentence = TtsSentence.builder().tsSeq(tsSeq).sortOrder(oldOrder).build();
 
-        TtsSentence updatedSentence = existingSentence.toBuilder()
-            .sortOrder(newOrder)
-            .build();
+        TtsSentence updatedSentence = existingSentence.toBuilder().sortOrder(newOrder).build();
 
-        when(ttsSentenceRepository.findById(tsSeq)).thenReturn(
-            java.util.Optional.of(existingSentence));
+        when(ttsSentenceRepository.findById(tsSeq)).thenReturn(java.util.Optional.of(existingSentence));
         when(ttsSentenceRepository.save(any(TtsSentence.class))).thenReturn(updatedSentence);
 
         // when
@@ -122,8 +109,8 @@ class TestPatchSentenceOrder {
 
         // when, then
         assertThrows(
-            EntityNotFoundException.class,
-            () -> ttsSentenceService.patchSentenceOrder(1L, tsSeq, newOrder));
+                EntityNotFoundException.class,
+                () -> ttsSentenceService.patchSentenceOrder(1L, tsSeq, newOrder));
     }
 
     // 3. null order
@@ -134,8 +121,9 @@ class TestPatchSentenceOrder {
         Long tsSeq = 1L;
 
         // when, then
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.patchSentenceOrder(1L, tsSeq, null));
+        assertThrows(
+                ConstraintViolationException.class,
+                () -> ttsSentenceService.patchSentenceOrder(1L, tsSeq, null));
     }
 
     // 4. 유효하지 않은 order 값
@@ -147,7 +135,8 @@ class TestPatchSentenceOrder {
         Integer invalidOrder = -1; // 음수 값
 
         // when, then
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.patchSentenceOrder(1L, tsSeq, invalidOrder));
+        assertThrows(
+                ConstraintViolationException.class,
+                () -> ttsSentenceService.patchSentenceOrder(1L, tsSeq, invalidOrder));
     }
 }

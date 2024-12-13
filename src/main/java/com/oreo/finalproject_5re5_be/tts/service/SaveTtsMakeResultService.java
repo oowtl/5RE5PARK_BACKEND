@@ -35,8 +35,7 @@ public class SaveTtsMakeResultService {
             TtsAudioFileRepository ttsAudioFileRepository,
             TtsProcessHistoryRepository ttsProcessHistoryRepository,
             AudioInfo audioInfo,
-            S3Service s3Service
-    ) {
+            S3Service s3Service) {
         this.ttsSentenceRepository = ttsSentenceRepository;
         this.ttsAudioFileRepository = ttsAudioFileRepository;
         this.ttsProcessHistoryRepository = ttsProcessHistoryRepository;
@@ -47,15 +46,18 @@ public class SaveTtsMakeResultService {
     // tts 생성 결과 저장 메서드 (일시적 문제가 발생할 경우 최대 3회 재시도)
     @Retryable(
             retryFor = {RuntimeException.class},
-            maxAttempts = 3,    // 최대 재시도 횟수
-            backoff = @Backoff( // 재시도 간격
-                    delay = 1000,
-                    maxDelay = 3000,
-                    multiplier = 2.0 // 시도 후 지연 시간 두배
-            )
-    )
+            maxAttempts = 3, // 최대 재시도 횟수
+            backoff =
+                    @Backoff( // 재시도 간격
+                            delay = 1000,
+                            maxDelay = 3000,
+                            multiplier = 2.0 // 시도 후 지연 시간 두배
+                            ))
     @Transactional(rollbackFor = RuntimeException.class)
-    public TtsSentenceDto saveTtsMakeResult(@NotNull MultipartFile ttsFile, @NotNull String uploadedUrl,@NotNull TtsSentence ttsSentence) {
+    public TtsSentenceDto saveTtsMakeResult(
+            @NotNull MultipartFile ttsFile,
+            @NotNull String uploadedUrl,
+            @NotNull TtsSentence ttsSentence) {
         // 1. 오디오 파일 메타데이터 DB 저장
         TtsAudioFile savedTtsAudioFile = saveTtsAudioFile(ttsFile, uploadedUrl);
 
@@ -73,15 +75,16 @@ public class SaveTtsMakeResultService {
 
     @Retryable(
             retryFor = {RuntimeException.class},
-            maxAttempts = 3,    // 최대 재시도 횟수
-            backoff = @Backoff( // 재시도 간격
-                    delay = 1000,
-                    maxDelay = 3000,
-                    multiplier = 2.0 // 시도 후 지연 시간 두배
-            )
-    )
+            maxAttempts = 3, // 최대 재시도 횟수
+            backoff =
+                    @Backoff( // 재시도 간격
+                            delay = 1000,
+                            maxDelay = 3000,
+                            multiplier = 2.0 // 시도 후 지연 시간 두배
+                            ))
     @Transactional(rollbackFor = RuntimeException.class)
-    public TtsSentenceDto saveTtsMakeResult(@NotNull TtsMakeResponse ttsMakeResponse, @NotNull TtsSentence ttsSentence) {
+    public TtsSentenceDto saveTtsMakeResult(
+            @NotNull TtsMakeResponse ttsMakeResponse, @NotNull TtsSentence ttsSentence) {
         // 1. 오디오 파일 메타데이터 DB 저장
         TtsAudioFile savedTtsAudioFile = saveTtsAudioFile(ttsMakeResponse);
 
@@ -99,9 +102,10 @@ public class SaveTtsMakeResultService {
 
     // tts 생성 결과 저장 실패할 경우 처리
     @Recover
-    public TtsSentenceDto recoverSaveTtsMakeResult(RuntimeException e, MultipartFile ttsFile, String uploadUrl, TtsSentence ttsSentence) {
+    public TtsSentenceDto recoverSaveTtsMakeResult(
+            RuntimeException e, MultipartFile ttsFile, String uploadUrl, TtsSentence ttsSentence) {
         // 1. 업로드 된 s3 파일 삭제
-        if(!uploadUrl.isEmpty() && !uploadUrl.isBlank())  {
+        if (!uploadUrl.isEmpty() && !uploadUrl.isBlank()) {
             s3Service.deleteFile("tts", uploadUrl.split("/")[3]);
         }
 
@@ -112,25 +116,25 @@ public class SaveTtsMakeResultService {
     /// TTS 오디오 파일 메타데이터 저장
     private TtsAudioFile saveTtsAudioFile(@NotNull MultipartFile ttsFile, @NotNull String url) {
 
-        if(ttsFile == null) {
+        if (ttsFile == null) {
             throw new IllegalArgumentException("TTS 파일이 없습니다.");
         }
 
         // TTS 오디오 파일로부터 메타 정보 추출
         AudioFileInfo audioFileInfo = audioInfo.extractAudioFileInfo(ttsFile);
 
-
         // 저장할 TTS 오디오 파일 엔티티 생성
-        TtsAudioFile ttsAudioFile = TtsAudioFile.builder()
-                .audioName(audioFileInfo.getName())
-                .audioExtension(audioFileInfo.getExtension())
-                .audioPath(url)
-                .audioTime(audioFileInfo.getLength())
-                .audioSize(audioFileInfo.getSize())
-                .audioPlayYn('y')
-                .downloadYn('y')
-                .downloadCount(0)
-                .build();
+        TtsAudioFile ttsAudioFile =
+                TtsAudioFile.builder()
+                        .audioName(audioFileInfo.getName())
+                        .audioExtension(audioFileInfo.getExtension())
+                        .audioPath(url)
+                        .audioTime(audioFileInfo.getLength())
+                        .audioSize(audioFileInfo.getSize())
+                        .audioPlayYn('y')
+                        .downloadYn('y')
+                        .downloadCount(0)
+                        .build();
 
         // TTS 오디오 파일 엔티티 저장
         return ttsAudioFileRepository.save(ttsAudioFile);
@@ -138,16 +142,17 @@ public class SaveTtsMakeResultService {
 
     private TtsAudioFile saveTtsAudioFile(TtsMakeResponse ttsMakeResponse) {
         // 저장할 TTS 오디오 파일 엔티티 생성
-        TtsAudioFile ttsAudioFile = TtsAudioFile.builder()
-                .audioName(ttsMakeResponse.getFileName())
-                .audioExtension(ttsMakeResponse.getFileExtension())
-                .audioPath(ttsMakeResponse.getUrl())
-                .audioTime(ttsMakeResponse.getFileLength())
-                .audioSize(ttsMakeResponse.getFileSize())
-                .audioPlayYn('y')
-                .downloadYn('y')
-                .downloadCount(0)
-                .build();
+        TtsAudioFile ttsAudioFile =
+                TtsAudioFile.builder()
+                        .audioName(ttsMakeResponse.getFileName())
+                        .audioExtension(ttsMakeResponse.getFileExtension())
+                        .audioPath(ttsMakeResponse.getUrl())
+                        .audioTime(ttsMakeResponse.getFileLength())
+                        .audioSize(ttsMakeResponse.getFileSize())
+                        .audioPlayYn('y')
+                        .downloadYn('y')
+                        .downloadCount(0)
+                        .build();
 
         // TTS 오디오 파일 엔티티 저장
         return ttsAudioFileRepository.save(ttsAudioFile);
@@ -157,24 +162,23 @@ public class SaveTtsMakeResultService {
     private TtsProcessHistory saveTtsProcessHistory(TtsSentence sentence, TtsAudioFile audioFile) {
 
         // TTS 행 엔티티와 TtsAudioFile 엔티티 정보로 TTS 처리 내역 엔티티 생성
-        TtsProcessHistory processHistory = TtsProcessHistory.builder()
-                .text(sentence.getText())
-                .voice(sentence.getVoice())
-                .volume(sentence.getVolume())
-                .speed(sentence.getSpeed())
-                .sampleRate(sentence.getSampleRate())
-                .startPitch(sentence.getStartPitch())
-                .alpha(sentence.getAlpha())
-                .endPitch(sentence.getEndPitch())
-                .emotionStrength(sentence.getEmotionStrength())
-                .audioFormat(sentence.getAudioFormat())
-                .ttsAudiofile(audioFile)
-                .project(sentence.getProject())
-                .build();
+        TtsProcessHistory processHistory =
+                TtsProcessHistory.builder()
+                        .text(sentence.getText())
+                        .voice(sentence.getVoice())
+                        .volume(sentence.getVolume())
+                        .speed(sentence.getSpeed())
+                        .sampleRate(sentence.getSampleRate())
+                        .startPitch(sentence.getStartPitch())
+                        .alpha(sentence.getAlpha())
+                        .endPitch(sentence.getEndPitch())
+                        .emotionStrength(sentence.getEmotionStrength())
+                        .audioFormat(sentence.getAudioFormat())
+                        .ttsAudiofile(audioFile)
+                        .project(sentence.getProject())
+                        .build();
 
         // TTS 처리 내역 엔티티 저장
         return ttsProcessHistoryRepository.save(processHistory);
     }
-
-
 }

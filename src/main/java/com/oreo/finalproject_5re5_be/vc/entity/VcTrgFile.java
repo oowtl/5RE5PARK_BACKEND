@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,14 +17,19 @@ public class VcTrgFile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trg_seq")
     private Long trgSeq;
+
     @Column(nullable = false, name = "name")
     private String fileName;
+
     @Column(nullable = false, name = "file_url")
     private String fileUrl;
+
     @Column(nullable = false, name = "length")
     private Integer fileLength;
+
     @Column(nullable = false, name = "size")
     private String fileSize;
+
     @Column(nullable = false, name = "extension")
     private String extension;
 
@@ -33,9 +37,13 @@ public class VcTrgFile extends BaseEntity {
     @JoinColumn(name = "pro_seq")
     private Vc vc;
 
-    public static VcTrgFile create(Vc vc, String fileName,
-                            String fileUrl, Integer fileLength,
-                            String fileSize, String extension){
+    public static VcTrgFile create(
+            Vc vc,
+            String fileName,
+            String fileUrl,
+            Integer fileLength,
+            String fileSize,
+            String extension) {
         return VcTrgFile.builder()
                 .vc(vc)
                 .fileName(fileName)

@@ -11,8 +11,6 @@ public class MultipartFileAccepter implements Converter<MultipartFile, AudioFile
     @SuppressWarnings("NullableProblems")
     @Override
     public AudioFileRequestDto convert(MultipartFile source) {
-        return AudioFileRequestDto.builder()
-                .audioFile(source)
-                .build();
+        return AudioFileRequestDto.builder().audioFile(source).build();
     }
 }

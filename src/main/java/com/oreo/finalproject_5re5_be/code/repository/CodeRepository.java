@@ -14,18 +14,16 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     Code findCodeByCodeSeq(Long codeSeq);
 
     // 각 파트별로 사용 가능한 코드를 조회.
-    @Query( "SELECT c " +
-            "FROM Code c " +
-            "WHERE c.cateNum = :cateNum " +
-            "AND c.chkUse = 'Y' " +
-            "ORDER BY c.ord")
+    @Query(
+            "SELECT c "
+                    + "FROM Code c "
+                    + "WHERE c.cateNum = :cateNum "
+                    + "AND c.chkUse = 'Y' "
+                    + "ORDER BY c.ord")
     List<Code> findAvailableCodesByCateNum(String cateNum);
 
     // 각 파트별로 모든 코드를 조회.
-    @Query( "SELECT c " +
-            "FROM Code c " +
-            "WHERE c.cateNum = :cateNum " +
-            "ORDER BY c.ord")
+    @Query("SELECT c " + "FROM Code c " + "WHERE c.cateNum = :cateNum " + "ORDER BY c.ord")
     List<Code> findCodesByCateNum(String cateNum);
 
     // 코드 번호로 코드가 존재하는지 확인.

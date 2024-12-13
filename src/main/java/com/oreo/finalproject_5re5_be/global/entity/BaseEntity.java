@@ -1,14 +1,13 @@
 package com.oreo.finalproject_5re5_be.global.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,7 +25,7 @@ public class BaseEntity {
     private LocalDateTime upDate;
 
     @CreatedBy
-    @Column(updatable = false, name ="reg_seq")
+    @Column(updatable = false, name = "reg_seq")
     private Long regSeq;
 
     @LastModifiedBy

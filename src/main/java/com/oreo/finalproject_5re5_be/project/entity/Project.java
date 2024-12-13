@@ -1,14 +1,12 @@
 package com.oreo.finalproject_5re5_be.project.entity;
 
-
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.member.entity.Member;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "project")
@@ -31,7 +29,7 @@ public class Project extends BaseEntity {
 
     @Builder.Default
     @Column(nullable = false, name = "pro_name")
-    private String proName="ProjectName";
+    private String proName = "ProjectName";
 
     @Column(name = "pro_cmt")
     private String proCmt;

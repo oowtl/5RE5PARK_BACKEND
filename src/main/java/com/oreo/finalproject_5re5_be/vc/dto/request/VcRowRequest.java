@@ -12,6 +12,7 @@ import lombok.*;
 public class VcRowRequest {
     @NotNull(message = "변경할 번호를 입력해주세요.")
     private Long seq;
+
     @NotNull(message = "변경할 행순서를 입력해주세요.")
     private Integer rowOrder;
 }

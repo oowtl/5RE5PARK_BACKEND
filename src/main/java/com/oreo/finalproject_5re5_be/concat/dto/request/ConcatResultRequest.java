@@ -2,9 +2,8 @@ package com.oreo.finalproject_5re5_be.concat.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -38,5 +37,4 @@ public class ConcatResultRequest {
 
     @NotNull(message = "createdDateTime 필드는 null 일 수 없습니다.")
     private LocalDateTime CreatedDateTime;
-
 }

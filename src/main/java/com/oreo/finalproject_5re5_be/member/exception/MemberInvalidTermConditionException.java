@@ -13,5 +13,4 @@ public class MemberInvalidTermConditionException extends BusinessException {
     public MemberInvalidTermConditionException(String message) {
         super(message, MEMBER_INVALID_TERM_CONDITION_ERROR);
     }
-
 }

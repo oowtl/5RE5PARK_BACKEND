@@ -14,5 +14,4 @@ public class MemberMandatoryTermNotAgreedException extends BusinessException {
     public MemberMandatoryTermNotAgreedException(String message) {
         super(message, MEMBER_MANDATORY_TERM_NOT_AGREED_ERROR);
     }
-
 }

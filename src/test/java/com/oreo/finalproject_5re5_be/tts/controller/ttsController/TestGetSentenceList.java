@@ -32,17 +32,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(TtsController.class)
 class TestGetSentenceList {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private TtsSentenceService ttsSentenceService;
+    @MockBean private TtsSentenceService ttsSentenceService;
 
-    @MockBean
-    private TtsMakeService ttsMakeService;
+    @MockBean private TtsMakeService ttsMakeService;
 
-    @MockBean
-    private ProjectService projectService;
+    @MockBean private ProjectService projectService;
 
     /*
     테스트 시나리오: getSentenceList 컨트롤러 메서드
@@ -100,21 +96,24 @@ class TestGetSentenceList {
         Project project = createProject(projectSeq);
         Voice voice = createVoice(voiceSeq);
 
-        List<TtsSentence> ttsSentenceList = IntStream.range(0, repeatCount)
-            .mapToObj(i -> createTtsSentence(project, (long) i, voice, "Test sentence " + i, i))
-            .toList();
+        List<TtsSentence> ttsSentenceList =
+                IntStream.range(0, repeatCount)
+                        .mapToObj(i -> createTtsSentence(project, (long) i, voice, "Test sentence " + i, i))
+                        .toList();
 
         TtsSentenceListDto response = TtsSentenceListDto.of(ttsSentenceList);
 
         when(ttsSentenceService.getSentenceList(projectSeq)).thenReturn(response);
 
         // when, then
-        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
-            .andExpect(jsonPath("$.response.sentenceList[0].sentence.tsSeq", is(0)))
-            .andExpect(jsonPath("$.response.sentenceList[1].sentence.text", is("Test sentence 1")));
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts", projectSeq)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
+                .andExpect(jsonPath("$.response.sentenceList[0].sentence.tsSeq", is(0)))
+                .andExpect(jsonPath("$.response.sentenceList[1].sentence.text", is("Test sentence 1")));
     }
 
     // 2. 프로젝트를 찾을 수 없음
@@ -125,16 +124,16 @@ class TestGetSentenceList {
         // given
         Long projectSeq = 999L;
 
-        when(ttsSentenceService.getSentenceList(projectSeq))
-            .thenThrow(new EntityNotFoundException());
+        when(ttsSentenceService.getSentenceList(projectSeq)).thenThrow(new EntityNotFoundException());
 
         // when, then
-        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
-            .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
-            .andExpect(
-                jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts", projectSeq)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+                .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
+                .andExpect(jsonPath("$.response.message", is(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
     }
 
     // 3. TtsSentence 리스트가 없음
@@ -150,11 +149,13 @@ class TestGetSentenceList {
         when(ttsSentenceService.getSentenceList(projectSeq)).thenReturn(response);
 
         // when, then
-        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
-            .andExpect(jsonPath("$.response.sentenceList").isEmpty());
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts", projectSeq)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())))
+                .andExpect(jsonPath("$.response.sentenceList").isEmpty());
     }
 
     // 4. 유효성 검증 실패 - 잘못된 projectSeq
@@ -166,11 +167,12 @@ class TestGetSentenceList {
         Long invalidProjectSeq = 0L;
 
         // when, then
-        mockMvc.perform(get("/api/project/{projectSeq}/tts", invalidProjectSeq)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
-            .andExpect(
-                jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts", invalidProjectSeq)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(ErrorCode.INVALID_INPUT_VALUE.getStatus()))
+                .andExpect(jsonPath("$.response.message", is(ErrorCode.INVALID_INPUT_VALUE.getMessage())));
     }
 
     // 5. 내부 서버 에러
@@ -182,31 +184,42 @@ class TestGetSentenceList {
         Long projectSeq = 1L;
 
         when(ttsSentenceService.getSentenceList(projectSeq))
-            .thenThrow(new RuntimeException("Unexpected error"));
+                .thenThrow(new RuntimeException("Unexpected error"));
 
         // when, then
-        mockMvc.perform(get("/api/project/{projectSeq}/tts", projectSeq)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
-            .andExpect(
-                jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts", projectSeq)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()))
+                .andExpect(
+                        jsonPath("$.response.message", is(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())));
     }
 
     private static Voice createVoice(Long voiceSeq) {
-        return Voice.builder().voiceSeq(voiceSeq) // 목소리 ID 설정
-            .name("Valid voice") // 목소리 이름 설정
-            .build();
+        return Voice.builder()
+                .voiceSeq(voiceSeq) // 목소리 ID 설정
+                .name("Valid voice") // 목소리 이름 설정
+                .build();
     }
 
     private static Project createProject(Long projectSeq) {
-        return Project.builder().proSeq(projectSeq) // 프로젝트 ID 설정
-            .proName("Valid project") // 프로젝트 이름 설정
-            .build();
+        return Project.builder()
+                .proSeq(projectSeq) // 프로젝트 ID 설정
+                .proName("Valid project") // 프로젝트 이름 설정
+                .build();
     }
 
-    private static TtsSentence createTtsSentence(Project project, Long tsSeq, Voice voice,
-        String text, int order) {
-        return TtsSentence.builder().tsSeq(tsSeq).text(text).sortOrder(order).volume(50).speed(1.0f)
-            .voice(voice).project(project).build();
+    private static TtsSentence createTtsSentence(
+            Project project, Long tsSeq, Voice voice, String text, int order) {
+        return TtsSentence.builder()
+                .tsSeq(tsSeq)
+                .text(text)
+                .sortOrder(order)
+                .volume(50)
+                .speed(1.0f)
+                .voice(voice)
+                .project(project)
+                .build();
     }
 }

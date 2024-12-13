@@ -3,9 +3,8 @@ package com.oreo.finalproject_5re5_be.tts.service;
 import com.oreo.finalproject_5re5_be.tts.dto.response.LanguageListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
 import com.oreo.finalproject_5re5_be.tts.repository.LanguageRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class LanguageService {

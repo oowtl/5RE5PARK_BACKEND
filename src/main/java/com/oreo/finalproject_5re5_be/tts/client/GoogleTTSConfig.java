@@ -3,11 +3,10 @@ package com.oreo.finalproject_5re5_be.tts.client;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.texttospeech.v1.TextToSpeechClient;
 import com.google.cloud.texttospeech.v1.TextToSpeechSettings;
+import java.io.IOException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-
-import java.io.IOException;
 
 @Configuration
 public class GoogleTTSConfig {

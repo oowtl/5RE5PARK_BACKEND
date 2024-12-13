@@ -19,10 +19,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_delete")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class MemberDelete extends BaseEntity {

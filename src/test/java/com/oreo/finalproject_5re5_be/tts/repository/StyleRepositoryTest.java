@@ -1,9 +1,14 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
 import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +16,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class StyleRepositoryTest {
 
-    @Autowired
-    private StyleRepository styleRepository;
-    @Autowired
-    private LanguageRepository languageRepository;
-    @Autowired
-    private VoiceRepository voiceRepository;
+    @Autowired private StyleRepository styleRepository;
+    @Autowired private LanguageRepository languageRepository;
+    @Autowired private VoiceRepository voiceRepository;
 
     /*
     StyleRepository 생성 테스트
@@ -84,10 +80,7 @@ public class StyleRepositoryTest {
     public void createPartialDataWithRequiredTest() {
         // given
         // 1. Style Entity 객체 생성
-        Style createStyle = Style.builder()
-                .name("styleName")
-                .mood("styleMood")
-                .build();
+        Style createStyle = Style.builder().name("styleName").mood("styleMood").build();
 
         // when
         // 2. Style Entity 객체 저장
@@ -111,11 +104,12 @@ public class StyleRepositoryTest {
     public void createPartialDataWithoutRequiredTest() {
         // given
         // 1. Style Entity 객체 생성
-        Style createStyle = Style.builder()
-                .mood("styleMood")
-                .contents("styleContents")
-                .description("styleDescription")
-                .build();
+        Style createStyle =
+                Style.builder()
+                        .mood("styleMood")
+                        .contents("styleContents")
+                        .description("styleDescription")
+                        .build();
 
         // when, then
         // 2. Style Entity 객체 저장
@@ -196,22 +190,24 @@ public class StyleRepositoryTest {
 
         // when
         // 4. 조회한 seq 로 Style Entity 객체 수정
-        Style updateStyle = Style.builder()
-                .styleSeq(savedStyleSeq)
-                .name(updateName)
-                .mood(updateMood)
-                .contents(updateContents)
-                .description(updateDescription)
-                .server(updateServer)
-                .enabled(updateEnabled)
-                .build();
+        Style updateStyle =
+                Style.builder()
+                        .styleSeq(savedStyleSeq)
+                        .name(updateName)
+                        .mood(updateMood)
+                        .contents(updateContents)
+                        .description(updateDescription)
+                        .server(updateServer)
+                        .enabled(updateEnabled)
+                        .build();
 
         // 5. 수정된 Style Entity 객체 저장
         Style manipulatedStyle = styleRepository.save(updateStyle);
 
         // then
         // 6. 수정된 Style Entity 객체 조회
-        Optional<Style> optionalResearchedStyle = styleRepository.findById(manipulatedStyle.getStyleSeq());
+        Optional<Style> optionalResearchedStyle =
+                styleRepository.findById(manipulatedStyle.getStyleSeq());
         assertTrue(optionalResearchedStyle.isPresent());
 
         // 7. 수정된 Style Entity 객체의 값 검증
@@ -239,11 +235,8 @@ public class StyleRepositoryTest {
 
         // when
         // 3. 조회한 seq 로 Style Entity 객체 수정
-        Style updateStyle = Style.builder()
-                .styleSeq(savedStyleSeq)
-                .name(updateName)
-                .mood(updateMood)
-                .build();
+        Style updateStyle =
+                Style.builder().styleSeq(savedStyleSeq).name(updateName).mood(updateMood).build();
 
         // 4. 수정된 Style Entity 객체 저장
         Style manipulatedStyle = styleRepository.save(updateStyle);
@@ -251,7 +244,8 @@ public class StyleRepositoryTest {
 
         // then
         // 5. 수정된 Style Entity 객체 조회
-        Optional<Style> optionalResearchedStyle = styleRepository.findById(manipulatedStyle.getStyleSeq());
+        Optional<Style> optionalResearchedStyle =
+                styleRepository.findById(manipulatedStyle.getStyleSeq());
         assertTrue(optionalResearchedStyle.isPresent());
 
         // 6. 수정된 Style Entity 객체의 값 검증
@@ -280,11 +274,12 @@ public class StyleRepositoryTest {
 
         // when
         // 3. 조회한 seq 로 Style Entity 객체 수정
-        Style updateStyle = savedStyle.toBuilder()
-                .mood(updateMood)
-                .contents(updateContents)
-                .description(updateDescription)
-                .build();
+        Style updateStyle =
+                savedStyle.toBuilder()
+                        .mood(updateMood)
+                        .contents(updateContents)
+                        .description(updateDescription)
+                        .build();
 
         // 4. 수정된 Style Entity 객체 저장
         Style manipulatedStyle = styleRepository.save(updateStyle);
@@ -292,7 +287,8 @@ public class StyleRepositoryTest {
 
         // then
         // 5. 수정된 Style Entity 객체 조회
-        Optional<Style> optionalResearchedStyle = styleRepository.findById(manipulatedStyle.getStyleSeq());
+        Optional<Style> optionalResearchedStyle =
+                styleRepository.findById(manipulatedStyle.getStyleSeq());
         assertTrue(optionalResearchedStyle.isPresent());
 
         // 6. 수정된 Style Entity 객체의 값 검증
@@ -318,10 +314,7 @@ public class StyleRepositoryTest {
 
         // when, then
         // 3. 존재하지 않는 seq 로 Style Entity 객체 수정
-        Style updateStyle = Style.builder()
-                .styleSeq(savedStyleSeq)
-                .mood(updateStyleMood)
-                .build();
+        Style updateStyle = Style.builder().styleSeq(savedStyleSeq).mood(updateStyleMood).build();
 
         // 4. 수정된 Style Entity 객체 저장
         assertThrows(DataIntegrityViolationException.class, () -> styleRepository.save(updateStyle));
@@ -351,7 +344,6 @@ public class StyleRepositoryTest {
         Optional<Style> optionalResearchedStyle = styleRepository.findById(savedStyleSeq);
         assertTrue(optionalResearchedStyle.isEmpty());
     }
-
 
     // language 기반 보이스가 존재하는 style 조회 테스트
     // 1. 조회 테스트 - 단건 데이터 조회
@@ -443,10 +435,10 @@ public class StyleRepositoryTest {
 
     private Language createLanguageEntity(int i) {
         return Language.builder()
-                .langCode("ts-Test"+i)
-                .langName("test-lang_name"+i)
-                .regionCode("ts-region"+i)
-                .regionName("ts-region-name"+i)
+                .langCode("ts-Test" + i)
+                .langName("test-lang_name" + i)
+                .regionCode("ts-region" + i)
+                .regionName("ts-region-name" + i)
                 .build();
     }
 
@@ -458,15 +450,14 @@ public class StyleRepositoryTest {
         return Voice.builder()
                 .style(style)
                 .language(language)
-                .name("test-voice-name"+i)
+                .name("test-voice-name" + i)
                 .age(0)
                 .isRecommend('n')
                 .enabled('y')
                 .useCnt(0)
-                .gender("female"+i)
+                .gender("female" + i)
                 .server(ServerCode.GOOGLE_CLOUD)
-                .description("test-description"+i)
+                .description("test-description" + i)
                 .build();
     }
-
 }

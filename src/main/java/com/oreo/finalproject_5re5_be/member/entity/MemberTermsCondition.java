@@ -18,17 +18,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_terms_condition")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class MemberTermsCondition extends BaseEntity  {
-
+public class MemberTermsCondition extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,7 +78,6 @@ public class MemberTermsCondition extends BaseEntity  {
 
     @Column(name = "short_cont", nullable = false, length = 255)
     private String shortCont;
-
 
     public void update(MemberTermConditionUpdateRequest updateRequest) {
         this.shortCont = updateRequest.getShortCont();

@@ -2,7 +2,6 @@ package com.oreo.finalproject_5re5_be.concat.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-
 import java.util.List;
 
 public class ConcatTabRequest {
@@ -15,5 +14,5 @@ public class ConcatTabRequest {
     @NotNull(message = "frontSilence 필드는 null 일 수 없습니다.")
     private Float frontSilence;
 
-    private String BgmFileUrl; //없을 수도 있음
+    private String BgmFileUrl; // 없을 수도 있음
 }

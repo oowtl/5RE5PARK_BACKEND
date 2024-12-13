@@ -1,38 +1,39 @@
-//package com.oreo.finalproject_5re5_be.member.controller;
+// package com.oreo.finalproject_5re5_be.member.controller;
 //
 //
-//import static org.junit.jupiter.api.Assertions.assertNotNull;
-//import static org.mockito.Mockito.doNothing;
-//import static org.mockito.Mockito.when;
-//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.mockito.Mockito.doNothing;
+// import static org.mockito.Mockito.when;
+// import static
+// org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 //
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.oreo.finalproject_5re5_be.code.dto.request.CodeRequest;
-//import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
-//import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponse;
-//import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponses;
-//import com.oreo.finalproject_5re5_be.code.service.CodeServiceImpl;
-//import java.util.ArrayList;
-//import java.util.List;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.test.context.support.WithMockUser;
-//import org.springframework.test.web.servlet.MockMvc;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.oreo.finalproject_5re5_be.code.dto.request.CodeRequest;
+// import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
+// import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponse;
+// import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponses;
+// import com.oreo.finalproject_5re5_be.code.service.CodeServiceImpl;
+// import java.util.ArrayList;
+// import java.util.List;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.http.MediaType;
+// import org.springframework.security.test.context.support.WithMockUser;
+// import org.springframework.test.web.servlet.MockMvc;
 //
 //
-//@WebMvcTest(CodeController.class)
-//class CodeControllerTest {
+// @WebMvcTest(CodeController.class)
+// class CodeControllerTest {
 //
 //    @Autowired
 //    private MockMvc mockMvc;
@@ -101,10 +102,14 @@
 //        // 컨트롤러 요청 보내기 및 결과 비교
 //        mockMvc.perform(get("/api/code/all"))
 //               .andExpect(status().isOk())
-//               .andExpect(jsonPath("$.codeResponses[0].cateNum").value(responses.getCodeResponses().get(0).getCateNum()))
-//               .andExpect(jsonPath("$.codeResponses[0].code").value(responses.getCodeResponses().get(0).getCode()))
-//               .andExpect(jsonPath("$.codeResponses[0].name").value(responses.getCodeResponses().get(0).getName()))
-//               .andExpect(jsonPath("$.codeResponses[0].ord").value(responses.getCodeResponses().get(0).getOrd()));
+//
+// .andExpect(jsonPath("$.codeResponses[0].cateNum").value(responses.getCodeResponses().get(0).getCateNum()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].code").value(responses.getCodeResponses().get(0).getCode()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].name").value(responses.getCodeResponses().get(0).getName()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].ord").value(responses.getCodeResponses().get(0).getOrd()));
 //
 //    }
 //
@@ -162,10 +167,14 @@
 //        // 컨트롤러 요청 보내기 및 결과 비교
 //        mockMvc.perform(get("/api/code/MB/available"))
 //               .andExpect(status().isOk())
-//               .andExpect(jsonPath("$.codeResponses[0].cateNum").value(responses.getCodeResponses().get(0).getCateNum()))
-//               .andExpect(jsonPath("$.codeResponses[0].code").value(responses.getCodeResponses().get(0).getCode()))
-//               .andExpect(jsonPath("$.codeResponses[0].name").value(responses.getCodeResponses().get(0).getName()))
-//               .andExpect(jsonPath("$.codeResponses[0].ord").value(responses.getCodeResponses().get(0).getOrd()));
+//
+// .andExpect(jsonPath("$.codeResponses[0].cateNum").value(responses.getCodeResponses().get(0).getCateNum()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].code").value(responses.getCodeResponses().get(0).getCode()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].name").value(responses.getCodeResponses().get(0).getName()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].ord").value(responses.getCodeResponses().get(0).getOrd()));
 //
 //    }
 //
@@ -182,10 +191,14 @@
 //        // 컨트롤러 요청 보내기 및 결과 비교
 //        mockMvc.perform(get("/api/code/MB/all"))
 //                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.codeResponses[0].cateNum").value(responses.getCodeResponses().get(0).getCateNum()))
-//                .andExpect(jsonPath("$.codeResponses[0].code").value(responses.getCodeResponses().get(0).getCode()))
-//                .andExpect(jsonPath("$.codeResponses[0].name").value(responses.getCodeResponses().get(0).getName()))
-//                .andExpect(jsonPath("$.codeResponses[0].ord").value(responses.getCodeResponses().get(0).getOrd()));
+//
+// .andExpect(jsonPath("$.codeResponses[0].cateNum").value(responses.getCodeResponses().get(0).getCateNum()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].code").value(responses.getCodeResponses().get(0).getCode()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].name").value(responses.getCodeResponses().get(0).getName()))
+//
+// .andExpect(jsonPath("$.codeResponses[0].ord").value(responses.getCodeResponses().get(0).getOrd()));
 //
 //
 //    }
@@ -288,4 +301,4 @@
 //
 //        responses = new CodeResponses(dummy);
 //    }
-//}
+// }

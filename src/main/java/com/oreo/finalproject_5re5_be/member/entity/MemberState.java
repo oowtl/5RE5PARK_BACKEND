@@ -20,7 +20,8 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "member_state")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @EqualsAndHashCode(callSuper = false)
 public class MemberState extends BaseEntity {
@@ -40,6 +41,7 @@ public class MemberState extends BaseEntity {
 
     @Column(name = "appl_date", nullable = false)
     private String applDate;
+
     @Column(name = "end_date", nullable = false)
     private String endDate;
 
@@ -63,8 +65,6 @@ public class MemberState extends BaseEntity {
         memberState.setApplDate(formattedDateTime);
         memberState.setEndDate(formattedEnd);
 
-
         return memberState;
-
     }
 }

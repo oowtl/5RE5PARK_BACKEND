@@ -3,7 +3,6 @@ package com.oreo.finalproject_5re5_be.member.exception;
 import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 
 import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
-import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 
 // 존재하지 않는 이메일일 때 사용하는 예외
 public class MemberNotFoundEmailException extends BusinessException {

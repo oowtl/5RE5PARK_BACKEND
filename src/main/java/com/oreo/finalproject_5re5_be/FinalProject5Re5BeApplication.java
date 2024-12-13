@@ -1,7 +1,5 @@
 package com.oreo.finalproject_5re5_be;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
@@ -15,5 +13,4 @@ public class FinalProject5Re5BeApplication {
     public static void main(String[] args) {
         SpringApplication.run(FinalProject5Re5BeApplication.class, args);
     }
-
 }

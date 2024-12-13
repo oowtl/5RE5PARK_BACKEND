@@ -34,17 +34,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(TtsController.class)
 class TestMakeTts {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private TtsSentenceService ttsSentenceService;
+    @MockBean private TtsSentenceService ttsSentenceService;
 
-    @MockBean
-    private TtsMakeService ttsMakeService;
+    @MockBean private TtsMakeService ttsMakeService;
 
-    @MockBean
-    private ProjectService projectService;
+    @MockBean private ProjectService projectService;
 
     /*
      *  [ tts 생성 컨트롤러 테스트 ]
@@ -63,8 +59,9 @@ class TestMakeTts {
 
         // 2. 응답 객체 생성
         // TtsSentence 객체 생성
-        TtsSentence ttsSentence = createTtsSentence(tsSeq, createProject(projectSeq),
-            createVoice(voiceSeq), createTtsAudioFile());
+        TtsSentence ttsSentence =
+                createTtsSentence(
+                        tsSeq, createProject(projectSeq), createVoice(voiceSeq), createTtsAudioFile());
         // TtsSentenceDto 객체 생성
         TtsSentenceDto response = TtsSentenceDto.of(ttsSentence);
 
@@ -72,26 +69,23 @@ class TestMakeTts {
         Mockito.when(ttsMakeService.makeTts(eq(tsSeq))).thenReturn(response); // 응답 객체 반환
 
         // 3.1 회원 조회에 관한 모의 동작 설정
-        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong()))
-            .thenReturn(true);
+        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong())).thenReturn(true);
 
         // 3.2 mock
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("memberSeq", 1L);
 
         // 4. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
-        mockMvc.perform(
-                get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .session(session)
-                    .with(csrf()))
-            // 5. 응답 상태와 데이터 확인
-            .andExpect(
-                status().isCreated())                                             // HTTP 상태 201 확인
-            .andExpect(
-                jsonPath("$.status", is(HttpStatus.CREATED.value())))    // 응답 데이터의 상태값이 201인지 확인
-            .andExpect(jsonPath(
-                "$.response.sentence").exists());               // JSON 응답에 sentence 필드가 존재하는지
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .session(session)
+                                .with(csrf()))
+                // 5. 응답 상태와 데이터 확인
+                .andExpect(status().isCreated()) // HTTP 상태 201 확인
+                .andExpect(jsonPath("$.status", is(HttpStatus.CREATED.value()))) // 응답 데이터의 상태값이 201인지 확인
+                .andExpect(jsonPath("$.response.sentence").exists()); // JSON 응답에 sentence 필드가 존재하는지
     }
 
     @WithMockUser
@@ -105,28 +99,27 @@ class TestMakeTts {
         // 3. TtsMakeService의 makeTts 메서드 결과로 EntityNotFoundException 예외를 발생하도록 설정
         String errorMassage = "존재하지 않는 TTS 행입니다. id:" + tsSeq;
         Mockito.when(ttsMakeService.makeTts(eq(tsSeq)))
-            .thenThrow(new EntityNotFoundException(errorMassage));
+                .thenThrow(new EntityNotFoundException(errorMassage));
 
         // 3.1 회원 조회에 관한 모의 동작 설정
-        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong()))
-            .thenReturn(true);
+        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong())).thenReturn(true);
 
         // 3.2 mock session 설정
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("memberSeq", 1L);
 
         // 4. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
-        mockMvc.perform(
-                get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .session(session)
-                    .with(csrf()))
-            // 5. 응답 상태와 데이터 확인
-            .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
-            .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
-            .andExpect(jsonPath("$.response.message", is(errorMassage)));
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .session(session)
+                                .with(csrf()))
+                // 5. 응답 상태와 데이터 확인
+                .andExpect(status().is(ErrorCode.ENTITY_NOT_FOUND.getStatus()))
+                .andExpect(jsonPath("$.status", is(ErrorCode.ENTITY_NOT_FOUND.getStatus())))
+                .andExpect(jsonPath("$.response.message", is(errorMassage)));
     }
-
 
     @WithMockUser
     @Test
@@ -138,54 +131,58 @@ class TestMakeTts {
 
         // 모의 동작 설정
         // 2.1 회원 조회에 관한 모의 동작 설정
-        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong()))
-            .thenReturn(true);
+        Mockito.when(projectService.projectCheck(eq(projectSeq), anyLong())).thenReturn(true);
 
         // 2.2 mock session 설정
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("memberSeq", 1L);
 
-
         // 3. maketts 컨트롤러 메서드에 요청을 전송하여 테스트
-        mockMvc.perform(
-                get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .session(session)
-                    .with(csrf()))
-            // 3. 응답 상태가 bad request여야 함
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+        mockMvc
+                .perform(
+                        get("/api/project/{projectSeq}/tts/sentence/{tsSeq}/maketts", projectSeq, tsSeq)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .session(session)
+                                .with(csrf()))
+                // 3. 응답 상태가 bad request여야 함
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
     private static Voice createVoice(Long voiceSeq) {
-        return Voice.builder().voiceSeq(voiceSeq) // 목소리 ID 설정
-            .name("Valid voice") // 목소리 이름 설정
-            .build();
+        return Voice.builder()
+                .voiceSeq(voiceSeq) // 목소리 ID 설정
+                .name("Valid voice") // 목소리 이름 설정
+                .build();
     }
 
     private static Project createProject(Long projectSeq) {
-        return Project.builder().proSeq(projectSeq) // 프로젝트 ID 설정
-            .proName("Valid project") // 프로젝트 이름 설정
-            .build();
+        return Project.builder()
+                .proSeq(projectSeq) // 프로젝트 ID 설정
+                .proName("Valid project") // 프로젝트 이름 설정
+                .build();
     }
 
     private static TtsAudioFile createTtsAudioFile() {
         return TtsAudioFile.builder()
-            .audioName("project-1-tts-1")
-            .audioPath("/tts/123123_porject-1-tts-1.wav")
-            .audioExtension(".wav")
-            .audioSize("194.3KB")
-            .audioTime(100)
-            .audioPlayYn('y')
-            .downloadCount(0)
-            .downloadYn('y')
-            .build();
+                .audioName("project-1-tts-1")
+                .audioPath("/tts/123123_porject-1-tts-1.wav")
+                .audioExtension(".wav")
+                .audioSize("194.3KB")
+                .audioTime(100)
+                .audioPlayYn('y')
+                .downloadCount(0)
+                .downloadYn('y')
+                .build();
     }
 
-    private static TtsSentence createTtsSentence(Long tsSeq, Project project, Voice voice,
-        TtsAudioFile ttsAudioFile) {
+    private static TtsSentence createTtsSentence(
+            Long tsSeq, Project project, Voice voice, TtsAudioFile ttsAudioFile) {
         return TtsSentence.builder()
-            .tsSeq(tsSeq).project(project).voice(voice).ttsAudiofile(ttsAudioFile)
-            .build();
+                .tsSeq(tsSeq)
+                .project(project)
+                .voice(voice)
+                .ttsAudiofile(ttsAudioFile)
+                .build();
     }
 }

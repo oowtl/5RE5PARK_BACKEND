@@ -9,12 +9,10 @@ public class SynthesisInputGenerator {
 
     // 텍스트 값을 전달 받아 SynthesisInput 객체를 만드는 메서드
     public static SynthesisInput generate(String text) {
-        if(checkInvalidText(text)) {
+        if (checkInvalidText(text)) {
             throw new InvalidTTSParamException("text 값이 유효하지 않습니다.");
         }
-        return SynthesisInput.newBuilder()
-                .setText(text)
-                .build();
+        return SynthesisInput.newBuilder().setText(text).build();
     }
 
     // 텍스트 길이 검증 메서드

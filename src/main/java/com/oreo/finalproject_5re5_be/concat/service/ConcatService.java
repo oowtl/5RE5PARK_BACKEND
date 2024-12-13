@@ -15,28 +15,29 @@ import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+import javax.sound.sampled.AudioInputStream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.sound.sampled.AudioInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ConcatService {
-    private final IntervalConcatenator concatenator
-            = new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
-    private final AudioResample audioResample = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);
+    private final IntervalConcatenator concatenator =
+            new StereoIntervalConcatenator(AudioFormats.STEREO_FORMAT_SR441_B16);
+    private final AudioResample audioResample =
+            new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B16);
     private final S3Service s3Service;
     private final MaterialAudioService materialAudioService;
     private final ConcatResultService concatResultService;
 
-    public ConcatResultDto concat(ConcatTabResponseDto concatTabResponseDto, ConcatRowRequestDto concatRowRequests)
+    public ConcatResultDto concat(
+            ConcatTabResponseDto concatTabResponseDto, ConcatRowRequestDto concatRowRequests)
             throws IOException {
 
         Result concatResult = getResult(concatTabResponseDto, concatRowRequests);
@@ -44,8 +45,9 @@ public class ConcatService {
             throw new IllegalArgumentException("허용되지 않은 접근입니다.");
         }
 
-        //재료 오디오 저장
-        materialAudioService.saveMaterialAudio(prepareMaterialAudio(concatResult.audios(), concatResult.result()));
+        // 재료 오디오 저장
+        materialAudioService.saveMaterialAudio(
+                prepareMaterialAudio(concatResult.audios(), concatResult.result()));
         return ConcatResultDto.builder()
                 .concatResultSequence(concatResult.result().getConcatResultSequence())
                 .extension(concatResult.result().getExtension())
@@ -54,11 +56,11 @@ public class ConcatService {
                 .fileSize(concatResult.result().getFileSize())
                 .fileLength(concatResult.result().getFileLength())
                 .build();
-
     }
 
-    //책임 : s3 저장, 결과 저장
-    private Result getResult(ConcatTabResponseDto concatTabResponseDto, ConcatRowRequestDto concatRowRequests)
+    // 책임 : s3 저장, 결과 저장
+    private Result getResult(
+            ConcatTabResponseDto concatTabResponseDto, ConcatRowRequestDto concatRowRequests)
             throws IOException {
         List<ConcatRowRequest> audios = concatRowRequests.getConcatRowRequests();
         if (checkNull(audios)) {
@@ -69,26 +71,31 @@ public class ConcatService {
         return new Result(audios, result);
     }
 
-    private ConcatResult getConcatResult(ConcatTabResponseDto concatTabResponseDto, ConcatRowRequestDto concatRowRequests, List<ConcatRowRequest> audios) throws IOException {
+    private ConcatResult getConcatResult(
+            ConcatTabResponseDto concatTabResponseDto,
+            ConcatRowRequestDto concatRowRequests,
+            List<ConcatRowRequest> audios)
+            throws IOException {
         AudioInputStream concat = resampleAudio(concatTabResponseDto, audios);
 
         byte[] audioData = AudioExtensionConverter.mp3ToWav(concat); // AudioInputStream을 byte[]로 변환
 
-        MultipartFile multipartFile
-                = new AudioMultipartFile(audioData, concatRowRequests.getFileName(), "audio/wav");
+        MultipartFile multipartFile =
+                new AudioMultipartFile(audioData, concatRowRequests.getFileName(), "audio/wav");
 
         String uploadUrl = getUploadtoS3(multipartFile);
         log.info("[Uploaded file URL : {}] ", uploadUrl);
 
-        //결과 저장
-        ConcatResult result = ConcatResult.builder().concatTab(ConcatTab.builder()
-                        .projectId(concatTabResponseDto.getTabId()).build())
-                .audioUrl(uploadUrl)
-                .extension("WAV")
-                .fileSize((long) audioData.length)
-                .fileLength(concat.getFrameLength() / concat.getFormat().getFrameRate())
-                .fileName(concatRowRequests.getFileName())
-                .build();
+        // 결과 저장
+        ConcatResult result =
+                ConcatResult.builder()
+                        .concatTab(ConcatTab.builder().projectId(concatTabResponseDto.getTabId()).build())
+                        .audioUrl(uploadUrl)
+                        .extension("WAV")
+                        .fileSize((long) audioData.length)
+                        .fileLength(concat.getFrameLength() / concat.getFormat().getFrameRate())
+                        .fileName(concatRowRequests.getFileName())
+                        .build();
         return concatResultService.saveConcatResult(result);
     }
 
@@ -107,57 +114,48 @@ public class ConcatService {
                 "concat/result",
                 multipartFile.getOriginalFilename(),
                 multipartFile.getSize(),
-                multipartFile.getContentType()
-        );
+                multipartFile.getContentType());
     }
 
-    private AudioInputStream resampleAudio(ConcatTabResponseDto concatTabResponseDto, List<ConcatRowRequest> audios) throws IOException {
-        List<AudioProperties> audioProperties = audios.stream().map(cr -> new AudioProperties(
-                resample(S3Service.load(cr.getOriginAudioRequest().getAudioUrl()))
-                , cr.getRowSilence()
-        )).toList();//오디오 받아오기
+    private AudioInputStream resampleAudio(
+            ConcatTabResponseDto concatTabResponseDto, List<ConcatRowRequest> audios) throws IOException {
+        List<AudioProperties> audioProperties =
+                audios.stream()
+                        .map(
+                                cr ->
+                                        new AudioProperties(
+                                                resample(S3Service.load(cr.getOriginAudioRequest().getAudioUrl())),
+                                                cr.getRowSilence()))
+                        .toList(); // 오디오 받아오기
 
-        ByteArrayOutputStream concatResult = concatenator
-                .intervalConcatenate(audioProperties, concatTabResponseDto.getFrontSilence());//결과 생성
+        ByteArrayOutputStream concatResult =
+                concatenator.intervalConcatenate(
+                        audioProperties, concatTabResponseDto.getFrontSilence()); // 결과 생성
 
-        //리샘플
+        // 리샘플
         return audioResample.resample(concatResult);
     }
 
-    public List<MaterialAudio> prepareMaterialAudio(List<ConcatRowRequest> audios, ConcatResult concatResult) {
+    public List<MaterialAudio> prepareMaterialAudio(
+            List<ConcatRowRequest> audios, ConcatResult concatResult) {
 
-        return audios.stream().map(aud -> MaterialAudio.builder()
-                .concatResult(concatResult)
-                .method("Normal")
-                .audioFile(AudioFile.builder().audioFileSeq(aud.getOriginAudioRequest().getSeq()).build())
-                .build()).toList();
-
+        return audios.stream()
+                .map(
+                        aud ->
+                                MaterialAudio.builder()
+                                        .concatResult(concatResult)
+                                        .method("Normal")
+                                        .audioFile(
+                                                AudioFile.builder()
+                                                        .audioFileSeq(aud.getOriginAudioRequest().getSeq())
+                                                        .build())
+                                        .build())
+                .toList();
     }
 
     public AudioInputStream resample(AudioInputStream audioInputStream) {
         return audioResample.resample(audioInputStream);
     }
 
-    private record Result(List<ConcatRowRequest> audios, ConcatResult result) {
-    }
-
+    private record Result(List<ConcatRowRequest> audios, ConcatResult result) {}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

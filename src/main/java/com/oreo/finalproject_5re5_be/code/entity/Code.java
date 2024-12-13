@@ -1,7 +1,7 @@
 package com.oreo.finalproject_5re5_be.code.entity;
 
-import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,6 +56,4 @@ public class Code extends BaseEntity {
         this.chkUse = request.getChkUse();
         this.comt = request.getComt();
     }
-
 }
-

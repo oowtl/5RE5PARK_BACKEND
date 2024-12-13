@@ -1,7 +1,6 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
-import com.oreo.finalproject_5re5_be.member.exception.MemberWrongCountTermCondition;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,10 +18,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_terms_history")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,23 +37,28 @@ public class MemberTermsHistory extends BaseEntity {
     @JoinColumn(name = "member_seq")
     private Member member;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "terms_seq")
     private MemberTerms terms;
 
     @Column(name = "hist_reg_date", nullable = false)
     private String histRegDate;
+
     @Column(name = "hist_end_date", nullable = false)
     private String histEndDate;
+
     @Column(name = "chk_term_1", nullable = false)
     private Character chkTerm1; // 'Y' or 'N'
+
     @Column(name = "chk_term_2", nullable = false)
     private Character chkTerm2;
+
     @Column(name = "chk_term_3", nullable = false)
     private Character chkTerm3;
+
     @Column(name = "chk_term_4", nullable = false)
     private Character chkTerm4;
+
     @Column(name = "chk_term_5", nullable = false)
     private Character chkTerm5;
 

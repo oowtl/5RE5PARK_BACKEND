@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.member.dto.request;
 
-import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +18,6 @@ import lombok.ToString;
 @EqualsAndHashCode // 목킹 테스트를 위해 추가
 public class MemberTermConditionRequest {
 
-
     @NotBlank(message = "약관 코드를 입력해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9]{1,20}$", message = "약관 코드는 1~20자의 영문 및 숫자만 허용됩니다.")
     private String condCode;
@@ -35,8 +33,7 @@ public class MemberTermConditionRequest {
     @NotNull(message = "사용여부 항목의 내용을 입력해주세요.")
     private Character chkUse;
 
-    @NotNull
-    private Integer ord;
+    @NotNull private Integer ord;
 
     private String law1;
     private String law2;
@@ -60,5 +57,4 @@ public class MemberTermConditionRequest {
                 .law3(law3)
                 .build();
     }
-
 }

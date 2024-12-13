@@ -1,10 +1,9 @@
 package com.oreo.finalproject_5re5_be.concat.dto.response;
 
 import com.oreo.finalproject_5re5_be.concat.dto.request.OriginAudioRequest;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Builder
 @Getter

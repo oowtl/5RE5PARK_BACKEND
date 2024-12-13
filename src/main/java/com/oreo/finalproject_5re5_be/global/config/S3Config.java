@@ -29,6 +29,6 @@ public class S3Config {
         return AmazonS3ClientBuilder.standard()
                 .withRegion(Regions.fromName(region)) // 리전 설정
                 .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)) // 자격 증명 등록
-                . build();
+                .build();
     }
 }

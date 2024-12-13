@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.member.dto.response;
 
-
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class OriginAudioRequest { //순수한 오디오 파일
+public class OriginAudioRequest { // 순수한 오디오 파일
     private Long seq;
 
     @Size(max = 1024, message = "fileUrl 필드는 최대 1024자까지 허용됩니다.")

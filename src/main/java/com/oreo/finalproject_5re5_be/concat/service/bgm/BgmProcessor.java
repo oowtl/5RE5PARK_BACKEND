@@ -4,26 +4,27 @@ import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionChecke
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioFormats;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 
 public class BgmProcessor {
 
     public static AudioInputStream prepareBgm(File bgmFile) throws IOException {
         try {
-            AudioResample resampler = new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B32); // 고정된 목표 포맷
+            AudioResample resampler =
+                    new AudioResample(AudioFormats.STEREO_FORMAT_SR441_B32); // 고정된 목표 포맷
 
             // 1. 파일 포맷 검사
             if (AudioExtensionChecker.isSupported(bgmFile)) {
                 System.out.println("BGM 파일이 MP3 형식입니다. WAV로 변환 중...");
                 byte[] wavBytes = AudioExtensionConverter.mp3ToWav(bgmFile);
-                AudioInputStream wavStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavBytes));
+                AudioInputStream wavStream =
+                        AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavBytes));
                 // 변환 후에도 리샘플링 수행
                 return resampler.resample(wavStream);
             } else if (AudioExtensionChecker.isWavExtension(bgmFile)) {
@@ -39,19 +40,15 @@ public class BgmProcessor {
         }
     }
 
-
     // BGM이 이미 source보다 길 경우 필요
-    public static AudioInputStream trimBgm(AudioInputStream bgm, long targetFrames) throws IOException {
+    public static AudioInputStream trimBgm(AudioInputStream bgm, long targetFrames)
+            throws IOException {
         System.out.println("Trimming BGM to " + targetFrames + " frames.");
-        return new AudioInputStream(
-                bgm,
-                bgm.getFormat(),
-                Math.min(targetFrames, bgm.getFrameLength())
-        );
+        return new AudioInputStream(bgm, bgm.getFormat(), Math.min(targetFrames, bgm.getFrameLength()));
     }
 
-
-    public static AudioInputStream extendBgm(AudioInputStream bgm, long targetFrames) throws IOException {
+    public static AudioInputStream extendBgm(AudioInputStream bgm, long targetFrames)
+            throws IOException {
         // BGM 데이터 읽기
         byte[] bgmData = bgm.readAllBytes();
         AudioFormat format = bgm.getFormat();
@@ -73,7 +70,8 @@ public class BgmProcessor {
                 throw new IllegalStateException("Frames to add is zero or negative, check the input data.");
             }
 
-            System.out.println("Current Total Frames: " + totalFrames + ", Frames To Add: " + framesToAdd);
+            System.out.println(
+                    "Current Total Frames: " + totalFrames + ", Frames To Add: " + framesToAdd);
 
             // 데이터 추가
             extendedStream.write(bgmData, 0, (int) (framesToAdd * frameSize));
@@ -84,10 +82,7 @@ public class BgmProcessor {
 
         // 새로운 AudioInputStream 생성
         return new AudioInputStream(
-                new ByteArrayInputStream(extendedStream.toByteArray()),
-                format,
-                totalFrames
-        );
+                new ByteArrayInputStream(extendedStream.toByteArray()), format, totalFrames);
     }
 
     public static long calculateTargetFrames(AudioInputStream audioStream) throws IOException {
@@ -107,25 +102,25 @@ public class BgmProcessor {
     }
 
     // BGM 길이 조정 로직 분리
-    public static AudioInputStream adjustBgmLength(AudioInputStream bgmStream, long targetFrames, long bgmFrames) throws IOException {
+    public static AudioInputStream adjustBgmLength(
+            AudioInputStream bgmStream, long targetFrames, long bgmFrames) throws IOException {
         return bgmFrames > targetFrames
                 ? BgmProcessor.trimBgm(bgmStream, targetFrames)
                 : BgmProcessor.extendBgm(bgmStream, targetFrames);
     }
 
-
-    public static AudioInputStream mixAudio(AudioInputStream source, AudioInputStream bgm) throws IOException {
+    public static AudioInputStream mixAudio(AudioInputStream source, AudioInputStream bgm)
+            throws IOException {
         AudioFormat format = source.getFormat();
         // 첫 번째 오디오 파일과 두 번째 오디오 파일의 길이를 얻음
         byte[] buffer1 = source.readAllBytes();
         byte[] buffer2 = bgm.readAllBytes();
 
-
         // 믹싱을 위한 새로운 버퍼 생성
         byte[] mixedBuffer = new byte[buffer1.length];
 
         // 두 오디오 파일을 샘플 단위로 믹싱
-        for (int i = 0; i < buffer1.length; i += 2) { //16비트 기준
+        for (int i = 0; i < buffer1.length; i += 2) { // 16비트 기준
             // 각 버퍼에서 샘플을 가져옴
             short sample1 = (short) ((buffer1[i + 1] << 8) | (buffer1[i] & 0xFF));
             short sample2 = (short) ((buffer2[i + 1] << 8) | (buffer2[i] & 0xFF));
@@ -140,11 +135,9 @@ public class BgmProcessor {
 
         // 믹싱된 오디오 데이터로 AudioInputStream 생성
         ByteArrayInputStream bais = new ByteArrayInputStream(mixedBuffer);
-        AudioInputStream mixedAudioStream = new AudioInputStream(bais, format, mixedBuffer.length / format.getFrameSize());
+        AudioInputStream mixedAudioStream =
+                new AudioInputStream(bais, format, mixedBuffer.length / format.getFrameSize());
 
         return mixedAudioStream;
-
     }
-
-
 }

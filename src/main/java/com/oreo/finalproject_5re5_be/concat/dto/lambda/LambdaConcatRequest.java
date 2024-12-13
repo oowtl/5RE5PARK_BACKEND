@@ -2,9 +2,8 @@ package com.oreo.finalproject_5re5_be.concat.dto.lambda;
 
 import com.oreo.finalproject_5re5_be.concat.dto.request.ConcatRowRequest;
 import com.oreo.finalproject_5re5_be.concat.dto.response.ConcatTabResponseDto;
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public class LambdaConcatRequest {
@@ -13,11 +12,13 @@ public class LambdaConcatRequest {
     private List<ConcatRowRequest> audios;
     private String fileName;
 
-    public LambdaConcatRequest() {
-    }
+    public LambdaConcatRequest() {}
 
-    public LambdaConcatRequest(ConcatTabResponseDto concatTabResponseDto, AudioFormatDto audioFormatDto,
-                               List<ConcatRowRequest> audios, String fileName) {
+    public LambdaConcatRequest(
+            ConcatTabResponseDto concatTabResponseDto,
+            AudioFormatDto audioFormatDto,
+            List<ConcatRowRequest> audios,
+            String fileName) {
         this.concatTabResponseDto = concatTabResponseDto;
         this.audioFormatDto = audioFormatDto;
         this.audios = audios;
@@ -55,5 +56,4 @@ public class LambdaConcatRequest {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
 }

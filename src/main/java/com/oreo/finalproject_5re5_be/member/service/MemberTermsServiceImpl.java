@@ -6,21 +6,17 @@ import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResp
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
 import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermsDetailResponse;
-import com.oreo.finalproject_5re5_be.member.entity.Member;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
 import com.oreo.finalproject_5re5_be.member.exception.MemberTermsNotFoundException;
-import com.oreo.finalproject_5re5_be.member.exception.RetryFailedException;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermConditionRepository;
 import com.oreo.finalproject_5re5_be.member.repository.MemberTermsRepository;
-import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 @Transactional
@@ -29,22 +25,25 @@ public class MemberTermsServiceImpl {
     private final MemberTermsRepository memberTermsRepository;
     private final MemberTermConditionRepository memberTermConditionRepository;
 
-    public MemberTermsServiceImpl(MemberTermsRepository memberTermsRepository, MemberTermConditionRepository memberTermConditionRepository) {
+    public MemberTermsServiceImpl(
+            MemberTermsRepository memberTermsRepository,
+            MemberTermConditionRepository memberTermConditionRepository) {
         this.memberTermsRepository = memberTermsRepository;
         this.memberTermConditionRepository = memberTermConditionRepository;
     }
-
 
     // 회원 약관 생성
     public MemberTermResponse create(MemberTermRequest request) {
         // 약관 엔티티를 생성함
         MemberTerms terms = new MemberTerms();
-        List<MemberTermsCondition> foundMemberTermConditions = findMemberTermsConditions(request.getMemberTermConditionCodes());
+        List<MemberTermsCondition> foundMemberTermConditions =
+                findMemberTermsConditions(request.getMemberTermConditionCodes());
 
         // 각 코드에 맞는 회원 약관 항목들을 찾아서 리스트에 담음
 
         // 각 약관 항목과 필수 여부를 세팅함
-        List<Character> memberTermConditionMandatoryOrNot = request.getMemberTermConditionMandatoryOrNot();
+        List<Character> memberTermConditionMandatoryOrNot =
+                request.getMemberTermConditionMandatoryOrNot();
         terms.setTermCond1(foundMemberTermConditions.get(0));
         terms.setChkTerm1(memberTermConditionMandatoryOrNot.get(0));
 
@@ -82,8 +81,6 @@ public class MemberTermsServiceImpl {
         return new MemberTermResponse(savedMemberTerm);
     }
 
-
-
     // 회원 약관 시퀀스로 조회
     public MemberTermResponse read(Long termSeq) {
         MemberTerms foundMemberTerm = findMemberTerm(termSeq);
@@ -101,9 +98,9 @@ public class MemberTermsServiceImpl {
         return new MemberTermResponse(foundMemberTerms);
     }
 
-
     /**
      * 밑에 코드들 중복, 추후에 리팩토링 처리[]
+     *
      * @return
      */
     // 추후에 페이징 처리 필요
@@ -112,9 +109,8 @@ public class MemberTermsServiceImpl {
         List<MemberTerms> foundMemberTerms = memberTermsRepository.findAll();
 
         // 조회된 모든 엔티티를 response로 변환한다
-        List<MemberTermResponse> memberTermResponseList = foundMemberTerms.stream()
-                                                                          .map(MemberTermResponse::new)
-                                                                          .toList();
+        List<MemberTermResponse> memberTermResponseList =
+                foundMemberTerms.stream().map(MemberTermResponse::new).toList();
 
         // 변환된 모든 response를 하나로 묶은 response에 담아서 반환한다
         return new MemberTermResponses(memberTermResponseList);
@@ -125,9 +121,8 @@ public class MemberTermsServiceImpl {
         List<MemberTerms> foundMemberTerms = memberTermsRepository.findAvailableMemberTerms();
 
         // 조회된 모든 엔티티를 response로 변환한다
-        List<MemberTermResponse> memberTermResponseList = foundMemberTerms.stream()
-                .map(MemberTermResponse::new)
-                .toList();
+        List<MemberTermResponse> memberTermResponseList =
+                foundMemberTerms.stream().map(MemberTermResponse::new).toList();
 
         // 변환된 모든 response를 하나로 묶은 response에 담아서 반환한다
         return new MemberTermResponses(memberTermResponseList);
@@ -138,9 +133,8 @@ public class MemberTermsServiceImpl {
         List<MemberTerms> foundMemberTerms = memberTermsRepository.findNotAvailableMemberTerms();
 
         // 조회된 모든 엔티티를 response로 변환한다
-        List<MemberTermResponse> memberTermResponseList = foundMemberTerms.stream()
-                .map(MemberTermResponse::new)
-                .toList();
+        List<MemberTermResponse> memberTermResponseList =
+                foundMemberTerms.stream().map(MemberTermResponse::new).toList();
 
         // 변환된 모든 response를 하나로 묶은 response에 담아서 반환한다
         return new MemberTermResponses(memberTermResponseList);
@@ -154,7 +148,6 @@ public class MemberTermsServiceImpl {
         // 업데이트 처리
         foundMemberTerms.update(request);
     }
-
 
     // 회원 약관 삭제
     public void remove(Long termSeq) {
@@ -195,13 +188,13 @@ public class MemberTermsServiceImpl {
 
     // 각 코드에 맞는 약관 항목을 찾아서 반환함
     private MemberTermsCondition findMemberTermsCondition(String condCode) {
-        MemberTermsCondition foundMemberTermCondition = memberTermConditionRepository.findMemberTermsConditionByCondCode(condCode);
+        MemberTermsCondition foundMemberTermCondition =
+                memberTermConditionRepository.findMemberTermsConditionByCondCode(condCode);
         if (foundMemberTermCondition == null) {
             throw new MemberTermsConditionNotFoundException();
         }
         return foundMemberTermCondition;
     }
-
 
     // 특정 코드로 호원 약관 상세 조회
     public MemberTermsDetailResponse readByTermCode(String termCode) {
@@ -239,11 +232,16 @@ public class MemberTermsServiceImpl {
         }
 
         // 응답 데이터로 전환
-        MemberTermConditionResponse memberTermConditionResponse1 = MemberTermConditionResponse.of(termCond1);
-        MemberTermConditionResponse memberTermConditionResponse2 = MemberTermConditionResponse.of(termCond2);
-        MemberTermConditionResponse memberTermConditionResponse3 = MemberTermConditionResponse.of(termCond3);
-        MemberTermConditionResponse memberTermConditionResponse4 = MemberTermConditionResponse.of(termCond4);
-        MemberTermConditionResponse memberTermConditionResponse5 = MemberTermConditionResponse.of(termCond5);
+        MemberTermConditionResponse memberTermConditionResponse1 =
+                MemberTermConditionResponse.of(termCond1);
+        MemberTermConditionResponse memberTermConditionResponse2 =
+                MemberTermConditionResponse.of(termCond2);
+        MemberTermConditionResponse memberTermConditionResponse3 =
+                MemberTermConditionResponse.of(termCond3);
+        MemberTermConditionResponse memberTermConditionResponse4 =
+                MemberTermConditionResponse.of(termCond4);
+        MemberTermConditionResponse memberTermConditionResponse5 =
+                MemberTermConditionResponse.of(termCond5);
 
         // 리스트에 추가
         memberTermConditionResponseList.add(memberTermConditionResponse1);
@@ -254,6 +252,5 @@ public class MemberTermsServiceImpl {
 
         // 응답 데이터 반환
         return MemberTermsDetailResponse.of(foundMemberTerms, memberTermConditionResponseList);
-
     }
 }

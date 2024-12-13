@@ -1,6 +1,11 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,17 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class LanguageRepositoryTest {
-    @Autowired
-    private LanguageRepository languageRepository;
+    @Autowired private LanguageRepository languageRepository;
 
     /*
     languageRepository 생성 테스트
@@ -53,7 +51,8 @@ public class LanguageRepositoryTest {
 
         // then
         // 3. 저장된 Language 객체 조회
-        Optional<Language> optionalResearchedLanguage = languageRepository.findById(savedLanguage.getLangSeq());
+        Optional<Language> optionalResearchedLanguage =
+                languageRepository.findById(savedLanguage.getLangSeq());
         assertTrue(optionalResearchedLanguage.isPresent());
 
         // 4. 생성한 Language 객체와 조회한 Language 객체 비교
@@ -67,16 +66,13 @@ public class LanguageRepositoryTest {
     public void createLanguageWithPartialDataTest() {
         // given
         // 1. Language 객체 생성
-        Language createLanguage = Language.builder()
-                .langCode("en-US")
-                .langName("English")
-                .build();
+        Language createLanguage = Language.builder().langCode("en-US").langName("English").build();
 
         // when, then
         // 2. Language 객체 저장
-        assertThrows(DataIntegrityViolationException.class, () -> languageRepository.save(createLanguage));
+        assertThrows(
+                DataIntegrityViolationException.class, () -> languageRepository.save(createLanguage));
     }
-
 
     // 3. 생성 테스트 - 데이터 미포함
     @Test
@@ -88,7 +84,8 @@ public class LanguageRepositoryTest {
 
         // when, then
         // 2. Language 객체 저장
-        assertThrows(DataIntegrityViolationException.class, () -> languageRepository.save(createLanguage));
+        assertThrows(
+                DataIntegrityViolationException.class, () -> languageRepository.save(createLanguage));
     }
 
     // 1. 조회 테스트 - 단건 데이터 조회
@@ -104,7 +101,8 @@ public class LanguageRepositoryTest {
 
         // when
         // 3. 저장된 Language 객체 조회
-        Optional<Language> optionalResearchedLanguage = languageRepository.findById(savedLanguage.getLangSeq());
+        Optional<Language> optionalResearchedLanguage =
+                languageRepository.findById(savedLanguage.getLangSeq());
         assertTrue(optionalResearchedLanguage.isPresent());
 
         // then
@@ -138,7 +136,8 @@ public class LanguageRepositoryTest {
 
             // 5. 저장된 Language 객체와 조회한 Language 객체 비교
             // 저장된 객체 조회
-            Optional<Language> optionalResearchedLanguage = languageRepository.findById(language.getLangSeq());
+            Optional<Language> optionalResearchedLanguage =
+                    languageRepository.findById(language.getLangSeq());
             assertTrue(optionalResearchedLanguage.isPresent());
 
             // 조회한 객체와 저장된 객체 비교
@@ -166,20 +165,22 @@ public class LanguageRepositoryTest {
 
         // when
         // 3. Language 수정하기
-        Language updateLanguage = savedLanguage.toBuilder()
-                .langCode("en-US")
-                .langName("English")
-                .regionCode("en-US")
-                .regionName("United States")
-                .enabled('N')
-                .build();
+        Language updateLanguage =
+                savedLanguage.toBuilder()
+                        .langCode("en-US")
+                        .langName("English")
+                        .regionCode("en-US")
+                        .regionName("United States")
+                        .enabled('N')
+                        .build();
 
         // 4. Language 객체 수정 (save)
         Language updatedLanguage = languageRepository.save(updateLanguage);
 
         // then
         // 5. 수정된 Language 객체 조회
-        Optional<Language> optionalManipulatedLanguage = languageRepository.findById(updatedLanguage.getLangSeq());
+        Optional<Language> optionalManipulatedLanguage =
+                languageRepository.findById(updatedLanguage.getLangSeq());
         assertTrue(optionalManipulatedLanguage.isPresent());
 
         // 6. 수정된 Language 객체와 조회한 Language 객체 비교
@@ -203,17 +204,16 @@ public class LanguageRepositoryTest {
 
         // when
         // 3. Language 수정하기
-        Language updateLanguage = savedLanguage.toBuilder()
-                .langCode("en-US")
-                .langName("English")
-                .build();
+        Language updateLanguage =
+                savedLanguage.toBuilder().langCode("en-US").langName("English").build();
 
         // 4. Language 객체 수정 (save)
         Language updatedLanguage = languageRepository.save(updateLanguage);
 
         // then
         // 5. 수정된 Language 객체 조회
-        Optional<Language> optionalManipulatedLanguage = languageRepository.findById(updatedLanguage.getLangSeq());
+        Optional<Language> optionalManipulatedLanguage =
+                languageRepository.findById(updatedLanguage.getLangSeq());
         assertTrue(optionalManipulatedLanguage.isPresent());
 
         // 6. 수정된 Language 객체와 조회한 Language 객체 비교
@@ -235,14 +235,13 @@ public class LanguageRepositoryTest {
 
         // when
         // 3. Language 수정하기 (필수 값 미포함)
-        Language updateLanguage = Language.builder()
-                .langSeq(savedLanguageSeq)
-                .langCode("en-US")
-                .build();
+        Language updateLanguage =
+                Language.builder().langSeq(savedLanguageSeq).langCode("en-US").build();
 
         // then
         // 4. Language 객체 수정 (save)
-        assertThrows(DataIntegrityViolationException.class, () -> languageRepository.save(updateLanguage));
+        assertThrows(
+                DataIntegrityViolationException.class, () -> languageRepository.save(updateLanguage));
     }
 
     // 1. 삭제 테스트 - 단건 데이터 삭제

@@ -1,11 +1,17 @@
 package com.oreo.finalproject_5re5_be.tts.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.tts.dto.response.StyleListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.repository.LanguageRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.StyleRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,42 +21,28 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class StyleServiceTest {
-    @Autowired
-    StyleService styleService;
+    @Autowired StyleService styleService;
 
-    @MockBean
-    StyleRepository styleRepository;
+    @MockBean StyleRepository styleRepository;
 
-    @MockBean
-    LanguageRepository languageRepository;
+    @MockBean LanguageRepository languageRepository;
 
     /**
-     *  [ 스타일 조회 서비스 테스트 ]
-     *  1. 여러 개의 데이터가 있는 목록 조회 테스트
-     *  2. 빈 목록 조회 테스트
+     * [ 스타일 조회 서비스 테스트 ] 1. 여러 개의 데이터가 있는 목록 조회 테스트 2. 빈 목록 조회 테스트
      *
-     *  [ 언어 기반 목소리가 있는 스타일만 조회 서비스 테스트 ]
-     *  1. 유효한 언어코드로 조회
-     *  2. 유효하지 않는 언어코드로 조회
-     * */
+     * <p>[ 언어 기반 목소리가 있는 스타일만 조회 서비스 테스트 ] 1. 유효한 언어코드로 조회 2. 유효하지 않는 언어코드로 조회
+     */
     @Test
     @DisplayName("스타일 조회 테스트 - 여러 개의 데이터가 있는 목록")
     public void getStyleListTest() {
         // 3개 데이터가 들어간 리스트 생성
         int cnt = 3;
         List<Style> styleList = new ArrayList<>();
-        for(int i=0; i<cnt; i++) {
+        for (int i = 0; i < cnt; i++) {
             styleList.add(createStyleEntity(i));
         }
 
@@ -59,7 +51,7 @@ class StyleServiceTest {
 
         // 스타일 전체 조회 서비스 실행 및 검증
         StyleListDto styleListDto = styleService.getStyleList();
-        assertEquals( styleListDto.getStyleList().get(0).getContents(), styleList.get(0).getContents());
+        assertEquals(styleListDto.getStyleList().get(0).getContents(), styleList.get(0).getContents());
         assertEquals(styleListDto.getStyleList().get(1).getMood(), styleList.get(1).getMood());
         assertEquals(styleListDto.getStyleList().get(2).getDesc(), styleList.get(2).getDescription());
     }
@@ -91,7 +83,8 @@ class StyleServiceTest {
 
         // 2. when
         // 2-1. 언어 코드로 조회할 때 언어 정보가 조회되도록 세팅
-        when(languageRepository.findByLangCode(language.getLangCode())).thenReturn(Optional.of(language));
+        when(languageRepository.findByLangCode(language.getLangCode()))
+                .thenReturn(Optional.of(language));
         // 2-2. 언어 식별번호로 조회할 때 스타일 정보가 조회되도록 세팅
         when(styleRepository.findListBylangSeq(langSeq)).thenReturn(List.of(style));
 
@@ -113,29 +106,29 @@ class StyleServiceTest {
         when(languageRepository.findByLangCode(notExistLangCode)).thenReturn(Optional.empty());
 
         // 3. when: 존재하지 않는 언어 코드로 조회하면 EntityNotFoundException 발생해야함
-        assertThrows(EntityNotFoundException.class, () -> styleService.getStyleListByLang(notExistLangCode));
-
+        assertThrows(
+                EntityNotFoundException.class, () -> styleService.getStyleListByLang(notExistLangCode));
     }
 
     // 스타일 엔티티 생성 메서드
     private Style createStyleEntity(int n) {
         return Style.builder()
-                .styleSeq((long)n)
-                .name("style-name"+n)
-                .mood("style-mood"+n)
-                .description("style-desc"+n)
-                .contents("contents-test"+n)
+                .styleSeq((long) n)
+                .name("style-name" + n)
+                .mood("style-mood" + n)
+                .description("style-desc" + n)
+                .contents("contents-test" + n)
                 .build();
     }
 
     // 언어 엔티티 생성 메서드
     private Language createLanguageEntity(int n) {
         return Language.builder()
-                .langSeq((long)n)
-                .langCode("lang-code"+n)
-                .langName("lang-name"+n)
-                .regionName("region-name"+n)
-                .regionCode("region-code"+n)
+                .langSeq((long) n)
+                .langCode("lang-code" + n)
+                .langName("lang-name" + n)
+                .regionName("region-name" + n)
+                .regionCode("region-code" + n)
                 .build();
     }
 }

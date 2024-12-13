@@ -13,5 +13,4 @@ public class MemberWrongCountTermCondition extends BusinessException {
     public MemberWrongCountTermCondition(String message) {
         super(message, MEMBER_WRONG_COUNT_TERM_CONDITION_ERROR);
     }
-
 }

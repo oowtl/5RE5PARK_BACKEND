@@ -1,11 +1,10 @@
 package com.oreo.finalproject_5re5_be.concat.dto;
 
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatRow;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.util.List;
 
 @Getter
 @Builder
@@ -20,8 +19,6 @@ public class ConcatRowListDto {
                 concatRowEntityList.stream().map(ConcatRowDto::of).toList();
 
         // ConcatRowDto 리스트를 넣으며 ConcatRowListDto 생성
-        return ConcatRowListDto.builder()
-                .rowList(concatRowDtoLList)
-                .build();
+        return ConcatRowListDto.builder().rowList(concatRowDtoLList).build();
     }
 }

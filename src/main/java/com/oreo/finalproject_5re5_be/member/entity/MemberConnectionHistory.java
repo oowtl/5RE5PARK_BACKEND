@@ -15,10 +15,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_connection_history")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 public class MemberConnectionHistory extends BaseEntity {
 
@@ -33,5 +33,4 @@ public class MemberConnectionHistory extends BaseEntity {
 
     @Column(name = "conn_date", nullable = false)
     private LocalDateTime connDate;
-
 }

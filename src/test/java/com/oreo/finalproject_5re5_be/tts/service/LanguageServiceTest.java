@@ -1,8 +1,12 @@
 package com.oreo.finalproject_5re5_be.tts.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 import com.oreo.finalproject_5re5_be.tts.dto.response.LanguageListDto;
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
 import com.oreo.finalproject_5re5_be.tts.repository.LanguageRepository;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,27 +16,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class LanguageServiceTest {
 
-    @Autowired
-    LanguageService languageService;
+    @Autowired LanguageService languageService;
 
-    @MockBean
-    LanguageRepository languageRepository;
+    @MockBean LanguageRepository languageRepository;
 
-    /**
-     *  [ 언어 전체 조회 테스트 ]
-     *  1. 한 개 데이터 조회
-     *  2. 여러 개 데이터 조회
-     */
+    /** [ 언어 전체 조회 테스트 ] 1. 한 개 데이터 조회 2. 여러 개 데이터 조회 */
     @Test
     @DisplayName("언어 전체 조회 테스트 - 한 개 데이터 조회")
     public void findLanguageListTest() {
@@ -45,9 +38,15 @@ class LanguageServiceTest {
 
         // 서비스 수행 및 검증
         LanguageListDto getLanguageListRes = languageService.getLanguageList();
-        assertEquals(getLanguageListRes.getLanguageList().get(0).getLanguageCode(), languageList.get(0).getLangCode());
-        assertEquals(getLanguageListRes.getLanguageList().get(0).getLanguageName(), languageList.get(0).getLangName());
-        assertEquals(getLanguageListRes.getLanguageList().get(0).getRegionName(), languageList.get(0).getRegionName());
+        assertEquals(
+                getLanguageListRes.getLanguageList().get(0).getLanguageCode(),
+                languageList.get(0).getLangCode());
+        assertEquals(
+                getLanguageListRes.getLanguageList().get(0).getLanguageName(),
+                languageList.get(0).getLangName());
+        assertEquals(
+                getLanguageListRes.getLanguageList().get(0).getRegionName(),
+                languageList.get(0).getRegionName());
     }
 
     @Test
@@ -66,22 +65,28 @@ class LanguageServiceTest {
 
         // 서비스 수행 및 검증
         LanguageListDto getLanguageListRes = languageService.getLanguageList();
-        assertEquals(getLanguageListRes.getLanguageList().get(0).getLanguageCode(), languageList.get(0).getLangCode());
-        assertEquals(getLanguageListRes.getLanguageList().get(1).getLanguageName(), languageList.get(1).getLangName());
-        assertEquals(getLanguageListRes.getLanguageList().get(2).getRegionName(), languageList.get(2).getRegionName());
+        assertEquals(
+                getLanguageListRes.getLanguageList().get(0).getLanguageCode(),
+                languageList.get(0).getLangCode());
+        assertEquals(
+                getLanguageListRes.getLanguageList().get(1).getLanguageName(),
+                languageList.get(1).getLangName());
+        assertEquals(
+                getLanguageListRes.getLanguageList().get(2).getRegionName(),
+                languageList.get(2).getRegionName());
     }
 
-    private Language createLanguageEntity(){
+    private Language createLanguageEntity() {
         return createLanguageEntity(0);
     }
+
     private Language createLanguageEntity(int n) {
         return Language.builder()
-                .langSeq((long)n)
-                .langCode("lang-code"+n)
-                .langName("lang-name"+n)
-                .regionName("region-name"+n)
-                .regionCode("region-code"+n)
+                .langSeq((long) n)
+                .langCode("lang-code" + n)
+                .langName("lang-name" + n)
+                .regionName("region-name" + n)
+                .regionCode("region-code" + n)
                 .build();
     }
-
 }

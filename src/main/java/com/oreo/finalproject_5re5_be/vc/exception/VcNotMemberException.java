@@ -7,6 +7,7 @@ public class VcNotMemberException extends BusinessException {
     public VcNotMemberException() {
         super(ErrorCode.HANDLE_ACCESS_DENIED.getMessage(), ErrorCode.HANDLE_ACCESS_DENIED);
     }
+
     public VcNotMemberException(String message) {
         super(message, ErrorCode.HANDLE_ACCESS_DENIED);
     }

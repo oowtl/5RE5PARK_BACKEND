@@ -4,14 +4,12 @@ import com.oreo.finalproject_5re5_be.concat.entity.AudioFile;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AudioFileHelper {
-    @PersistenceContext
-    private EntityManager entityManager;
+    @PersistenceContext private EntityManager entityManager;
 
     @Transactional
     public void batchInsert(List<AudioFile> rows) {
@@ -25,5 +23,4 @@ public class AudioFileHelper {
         entityManager.flush();
         entityManager.clear();
     }
-
 }

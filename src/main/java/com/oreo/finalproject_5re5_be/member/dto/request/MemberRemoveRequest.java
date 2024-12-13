@@ -15,5 +15,4 @@ public class MemberRemoveRequest {
 
     private String code;
     private String detailCont;
-
 }

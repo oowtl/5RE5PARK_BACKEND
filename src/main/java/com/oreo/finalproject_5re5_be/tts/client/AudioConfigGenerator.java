@@ -7,16 +7,15 @@ import com.oreo.finalproject_5re5_be.tts.exception.TtsMakeInvalidParamException;
 
 public class AudioConfigGenerator {
     // Google TTS AudioConfig 정책
-    private final static double MAX_SPEED = 4.0;
-    private final static double MIN_SPEED = 0.25;
-    private final static double MAX_PITCH= 20.0;
-    private final static double MIN_PITCH = -20.0;
-    private final static double MAX_VOLUME = 16.0;
-    private final static double MIN_VOLUME = -96.0;
+    private static final double MAX_SPEED = 4.0;
+    private static final double MIN_SPEED = 0.25;
+    private static final double MAX_PITCH = 20.0;
+    private static final double MIN_PITCH = -20.0;
+    private static final double MAX_VOLUME = 16.0;
+    private static final double MIN_VOLUME = -96.0;
 
     // 샘플링 레이트는 44100으로 고정(내부 결정)
-    private final static int SAMPLING_RATE = 44100;
-
+    private static final int SAMPLING_RATE = 44100;
 
     // 음성 속도, 피치, 볼륨 값을 받아 AudioConfig 객체로 생성하는 메서드
     public static AudioConfig generate() {
@@ -50,19 +49,18 @@ public class AudioConfigGenerator {
 
     // 볼륨 값 검증
     private static boolean validVolume(double volume) {
-        return volume > MIN_VOLUME && volume < MAX_VOLUME ;
+        return volume > MIN_VOLUME && volume < MAX_VOLUME;
     }
 
-
     private static void checkParams(double speed, double pitch, double volume) {
-        if( !vaildSpeed(speed)) {
+        if (!vaildSpeed(speed)) {
             throw new TtsMakeInvalidParamException(ErrorCode.TTS_MAKE_INVALID_SPEED);
         }
 
-        if( !validPitch(pitch)) {
+        if (!validPitch(pitch)) {
             throw new TtsMakeInvalidParamException(ErrorCode.TTS_MAKE_FAILED_ERROR);
         }
-        if(!validVolume(volume) ) {
+        if (!validVolume(volume)) {
             throw new TtsMakeInvalidParamException(ErrorCode.TTS_MAKE_INVALID_VOLUME);
         }
     }

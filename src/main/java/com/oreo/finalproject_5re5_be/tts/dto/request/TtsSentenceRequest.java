@@ -22,16 +22,17 @@ public class TtsSentenceRequest {
 
     @Schema(description = "텍스트 내용", example = "안녕하세요")
     @NotBlank(message = "text is required")
-    private String text;  // 텍스트 내용
+    private String text; // 텍스트 내용
 
     @Schema(description = "표시 순서", example = "1")
-    private Integer order;    // 표시 순서
+    private Integer order; // 표시 순서
 
     @Schema(description = "옵션 정보")
     @Valid
     private TtsAttributeInfo attribute; // 옵션 정보
 
-    public static TtsSentenceRequest of(Long voiceSeq, String text, Integer order, TtsAttributeInfo attribute) {
+    public static TtsSentenceRequest of(
+            Long voiceSeq, String text, Integer order, TtsAttributeInfo attribute) {
         return TtsSentenceRequest.builder()
                 .voiceSeq(voiceSeq)
                 .text(text)
@@ -39,6 +40,4 @@ public class TtsSentenceRequest {
                 .attribute(attribute)
                 .build();
     }
-
-
 }

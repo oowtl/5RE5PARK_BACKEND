@@ -42,7 +42,7 @@ public class Voice extends BaseEntity {
     private char enabled;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="server", nullable = false)
+    @Column(name = "server", nullable = false)
     private ServerCode server;
 
     @ManyToOne(fetch = FetchType.EAGER)

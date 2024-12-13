@@ -1,12 +1,10 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
-import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
+import com.oreo.finalproject_5re5_be.project.entity.Project;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
 @Table(name = "vc_table")
@@ -17,8 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class Vc extends BaseEntity {
-    @Id
-    private Long projectSeq;
+    @Id private Long projectSeq;
 
     @MapsId // Project 엔티티의 ID를 ConcatTab의 ID로 사용
     @OneToOne

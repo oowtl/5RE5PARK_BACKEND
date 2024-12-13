@@ -29,8 +29,6 @@ public enum ErrorCode {
     CODE_DUPLICATED_ERROR(409, "이미 사용중인 코드명입니다. 다른 코드명을 사용해 주세요."),
     CODE_INVALID_INPUT_VALUE_ERROR(400, "코드 입력값이 올바르지 않습니다."),
 
-
-
     INVALID_INPUT_VALUE(400, " Invalid Input Value"),
     ENTITY_NOT_FOUND(400, " Entity Not Found"),
     INTERNAL_SERVER_ERROR(500, "Server Error"),
@@ -51,7 +49,6 @@ public enum ErrorCode {
     TTS_MAKE_INVALID_SPEED(400, "허용되지 않는 TTS 속도입니다."),
     TTS_MAKE_INVALID_PITCH(400, "허용되지 않는 TTS 음높이입니다."),
     TTS_MAKE_INVALID_VOLUME(400, "허용되지 않는 TTS 음량입니다.");
-
 
     private final String message;
     private final int status;

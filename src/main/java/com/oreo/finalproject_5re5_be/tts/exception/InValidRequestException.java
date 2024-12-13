@@ -3,7 +3,6 @@ package com.oreo.finalproject_5re5_be.tts.exception;
 import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 import com.oreo.finalproject_5re5_be.global.exception.InValidValueException;
 
-
 public class InValidRequestException extends InValidValueException {
 
     public InValidRequestException() {

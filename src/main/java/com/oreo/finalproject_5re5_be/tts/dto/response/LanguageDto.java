@@ -24,5 +24,4 @@ public class LanguageDto {
                 .regionName(language.getRegionName())
                 .build();
     }
-
 }

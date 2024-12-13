@@ -1,43 +1,44 @@
-//package com.oreo.finalproject_5re5_be.member.controller;
+// package com.oreo.finalproject_5re5_be.member.controller;
 //
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.doNothing;
-//import static org.mockito.Mockito.times;
-//import static org.mockito.Mockito.verify;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.mockito.Mockito.when;
-//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// import static org.junit.jupiter.api.Assertions.*;
+// import static org.mockito.Mockito.doNothing;
+// import static org.mockito.Mockito.times;
+// import static org.mockito.Mockito.verify;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+// import static org.mockito.Mockito.when;
+// import static
+// org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
-//import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
-//import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
-//import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
-//import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
-//import com.oreo.finalproject_5re5_be.member.service.MemberTermsServiceImpl;
-//import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
-//import java.time.LocalDateTime;
-//import java.util.ArrayList;
-//import java.util.List;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.runner.RunWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.test.context.support.WithMockUser;
-//import org.springframework.test.web.servlet.MockMvc;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermRequest;
+// import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermUpdateRequest;
+// import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponse;
+// import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermResponses;
+// import com.oreo.finalproject_5re5_be.member.entity.MemberTerms;
+// import com.oreo.finalproject_5re5_be.member.service.MemberTermsServiceImpl;
+// import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
+// import java.time.LocalDateTime;
+// import java.util.ArrayList;
+// import java.util.List;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.junit.runner.RunWith;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.http.MediaType;
+// import org.springframework.security.test.context.support.WithMockUser;
+// import org.springframework.test.web.servlet.MockMvc;
 //
 //
-//@WebMvcTest(MemberTermsController.class)
-//class MemberTermsControllerTest {
+// @WebMvcTest(MemberTermsController.class)
+// class MemberTermsControllerTest {
 //
 //    @Autowired
 //    private MockMvc mockMvc;
@@ -119,8 +120,10 @@
 //        // 컨트롤러에 요청 보내기, 응답 데이터 확인
 //        MemberTermRequest wrongRequest = MemberTermRequest.builder()
 //                                                          .name("24년도회원약관A")
-//                                                          .memberTermConditionCodes(List.of("S001", "Tdawda", "213154", "dwa"))
-//                                                          .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y'))
+//
+// .memberTermConditionCodes(List.of("S001", "Tdawda", "213154", "dwa"))
+//
+// .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y'))
 //                                                          .chkUse('Y')
 //                                                          .build();
 //        mockMvc.perform(post("/api/member-term/register")
@@ -144,21 +147,34 @@
 //        mockMvc.perform(get("/api/member-term/all"))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.memberTermResponses").isArray())
-//                .andExpect(jsonPath("$.memberTermResponses[0].termSeq").value(responsesFixture.getMemberTermResponses().get(0).getTermSeq()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].name").value(responsesFixture.getMemberTermResponses().get(0).getName()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm1").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm1().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm2").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm2().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm3").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm3().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm4").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm4().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm5").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm5().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termSeq").value(responsesFixture.getMemberTermResponses().get(0).getTermSeq()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].name").value(responsesFixture.getMemberTermResponses().get(0).getName()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm1").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm1().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm2").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm2().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm3").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm3().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm4").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm4().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm5").value(responsesFixture.getMemberTermResponses().get(0).getChkTerm5().toString()))
 //                .andExpect(jsonPath("$.memberTermResponses[0].termEndDate").exists())
 //                .andExpect(jsonPath("$.memberTermResponses[0].termRegDate").exists())
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkUse").value(responsesFixture.getMemberTermResponses().get(0).getChkUse().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond1").value(responsesFixture.getMemberTermResponses().get(0).getTermCond1()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond2").value(responsesFixture.getMemberTermResponses().get(0).getTermCond2()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond3").value(responsesFixture.getMemberTermResponses().get(0).getTermCond3()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond4").value(responsesFixture.getMemberTermResponses().get(0).getTermCond4()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond5").value(responsesFixture.getMemberTermResponses().get(0).getTermCond5()));
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkUse").value(responsesFixture.getMemberTermResponses().get(0).getChkUse().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond1").value(responsesFixture.getMemberTermResponses().get(0).getTermCond1()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond2").value(responsesFixture.getMemberTermResponses().get(0).getTermCond2()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond3").value(responsesFixture.getMemberTermResponses().get(0).getTermCond3()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond4").value(responsesFixture.getMemberTermResponses().get(0).getTermCond4()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond5").value(responsesFixture.getMemberTermResponses().get(0).getTermCond5()));
 //
 //    }
 //
@@ -169,9 +185,11 @@
 //        // 3개의 약관을 등록했다고 가정함. 이때, 1개의 약관은 사용 불가능한 약관
 //        // 서비스 객체 목킹
 //        // 서비스에서 사용가능한 모든 약관 조회시 등록한 2개의 약관 반환하게 만듦
-//        List<MemberTermResponse> memberTermResponseList = responsesFixture.getMemberTermResponses()
+//        List<MemberTermResponse> memberTermResponseList =
+// responsesFixture.getMemberTermResponses()
 //                                                                          .stream()
-//                                                                          .filter(memberTermResponse -> memberTermResponse.getChkUse().equals('Y'))
+//
+// .filter(memberTermResponse -> memberTermResponse.getChkUse().equals('Y'))
 //                                                                          .toList();
 //        MemberTermResponses availableResponses = new MemberTermResponses(memberTermResponseList);
 //        when(memberTermsService.readAvailable()).thenReturn(availableResponses);
@@ -180,36 +198,62 @@
 //        mockMvc.perform(get("/api/member-term/available"))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.memberTermResponses").isArray())
-//                .andExpect(jsonPath("$.memberTermResponses[0].termSeq").value(availableResponses.getMemberTermResponses().get(0).getTermSeq()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].name").value(availableResponses.getMemberTermResponses().get(0).getName()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm1").value(availableResponses.getMemberTermResponses().get(0).getChkTerm1().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm2").value(availableResponses.getMemberTermResponses().get(0).getChkTerm2().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm3").value(availableResponses.getMemberTermResponses().get(0).getChkTerm3().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm4").value(availableResponses.getMemberTermResponses().get(0).getChkTerm4().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm5").value(availableResponses.getMemberTermResponses().get(0).getChkTerm5().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termSeq").value(availableResponses.getMemberTermResponses().get(0).getTermSeq()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].name").value(availableResponses.getMemberTermResponses().get(0).getName()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm1").value(availableResponses.getMemberTermResponses().get(0).getChkTerm1().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm2").value(availableResponses.getMemberTermResponses().get(0).getChkTerm2().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm3").value(availableResponses.getMemberTermResponses().get(0).getChkTerm3().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm4").value(availableResponses.getMemberTermResponses().get(0).getChkTerm4().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm5").value(availableResponses.getMemberTermResponses().get(0).getChkTerm5().toString()))
 //                .andExpect(jsonPath("$.memberTermResponses[0].termEndDate").exists())
 //                .andExpect(jsonPath("$.memberTermResponses[0].termRegDate").exists())
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkUse").value(availableResponses.getMemberTermResponses().get(0).getChkUse().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond1").value(availableResponses.getMemberTermResponses().get(0).getTermCond1()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond2").value(availableResponses.getMemberTermResponses().get(0).getTermCond2()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond3").value(availableResponses.getMemberTermResponses().get(0).getTermCond3()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond4").value(availableResponses.getMemberTermResponses().get(0).getTermCond4()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond5").value(availableResponses.getMemberTermResponses().get(0).getTermCond5()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].termSeq").value(availableResponses.getMemberTermResponses().get(1).getTermSeq()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].name").value(availableResponses.getMemberTermResponses().get(1).getName()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].chkTerm1").value(availableResponses.getMemberTermResponses().get(1).getChkTerm1().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].chkTerm2").value(availableResponses.getMemberTermResponses().get(1).getChkTerm2().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].chkTerm3").value(availableResponses.getMemberTermResponses().get(1).getChkTerm3().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].chkTerm4").value(availableResponses.getMemberTermResponses().get(1).getChkTerm4().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].chkTerm5").value(availableResponses.getMemberTermResponses().get(1).getChkTerm5().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkUse").value(availableResponses.getMemberTermResponses().get(0).getChkUse().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond1").value(availableResponses.getMemberTermResponses().get(0).getTermCond1()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond2").value(availableResponses.getMemberTermResponses().get(0).getTermCond2()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond3").value(availableResponses.getMemberTermResponses().get(0).getTermCond3()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond4").value(availableResponses.getMemberTermResponses().get(0).getTermCond4()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond5").value(availableResponses.getMemberTermResponses().get(0).getTermCond5()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].termSeq").value(availableResponses.getMemberTermResponses().get(1).getTermSeq()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].name").value(availableResponses.getMemberTermResponses().get(1).getName()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].chkTerm1").value(availableResponses.getMemberTermResponses().get(1).getChkTerm1().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].chkTerm2").value(availableResponses.getMemberTermResponses().get(1).getChkTerm2().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].chkTerm3").value(availableResponses.getMemberTermResponses().get(1).getChkTerm3().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].chkTerm4").value(availableResponses.getMemberTermResponses().get(1).getChkTerm4().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].chkTerm5").value(availableResponses.getMemberTermResponses().get(1).getChkTerm5().toString()))
 //                .andExpect(jsonPath("$.memberTermResponses[1].termEndDate").exists())
 //                .andExpect(jsonPath("$.memberTermResponses[1].termRegDate").exists())
-//                .andExpect(jsonPath("$.memberTermResponses[1].chkUse").value(availableResponses.getMemberTermResponses().get(1).getChkUse().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].termCond1").value(availableResponses.getMemberTermResponses().get(1).getTermCond1()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].termCond2").value(availableResponses.getMemberTermResponses().get(1).getTermCond2()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].termCond3").value(availableResponses.getMemberTermResponses().get(1).getTermCond3()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].termCond4").value(availableResponses.getMemberTermResponses().get(1).getTermCond4()))
-//                .andExpect(jsonPath("$.memberTermResponses[1].termCond5").value(availableResponses.getMemberTermResponses().get(1).getTermCond5()));
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].chkUse").value(availableResponses.getMemberTermResponses().get(1).getChkUse().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].termCond1").value(availableResponses.getMemberTermResponses().get(1).getTermCond1()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].termCond2").value(availableResponses.getMemberTermResponses().get(1).getTermCond2()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].termCond3").value(availableResponses.getMemberTermResponses().get(1).getTermCond3()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].termCond4").value(availableResponses.getMemberTermResponses().get(1).getTermCond4()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[1].termCond5").value(availableResponses.getMemberTermResponses().get(1).getTermCond5()));
 //    }
 //
 //    @Test
@@ -219,32 +263,48 @@
 //        // 3개의 약관을 등록했다고 가정함. 이때, 1개의 약관은 사용 불가능한 약관
 //        // 서비스 객체 목킹
 //        // 서비스에서 사용 불가능한 모든 약관 조회시 등록한 1개의 약관 반환하게 만듦
-//        List<MemberTermResponse> memberTermResponseList = responsesFixture.getMemberTermResponses()
+//        List<MemberTermResponse> memberTermResponseList =
+// responsesFixture.getMemberTermResponses()
 //                                                                        .stream()
-//                                                                        .filter(memberTermResponse -> memberTermResponse.getChkUse().equals('N'))
+//                                                                        .filter(memberTermResponse
+// -> memberTermResponse.getChkUse().equals('N'))
 //                                                                        .toList();
-//        MemberTermResponses notAvailableResponses = new MemberTermResponses(memberTermResponseList);
+//        MemberTermResponses notAvailableResponses = new
+// MemberTermResponses(memberTermResponseList);
 //        when(memberTermsService.readNotAvailable()).thenReturn(notAvailableResponses);
 //
 //        // 컨트롤러에 요청 보내기, 응답 데이터 확인
 //        mockMvc.perform(get("/api/member-term/not-available"))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.memberTermResponses").isArray())
-//                .andExpect(jsonPath("$.memberTermResponses[0].termSeq").value(notAvailableResponses.getMemberTermResponses().get(0).getTermSeq()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].name").value(notAvailableResponses.getMemberTermResponses().get(0).getName()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm1").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm1().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm2").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm2().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm3").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm3().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm4").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm4().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkTerm5").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm5().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termSeq").value(notAvailableResponses.getMemberTermResponses().get(0).getTermSeq()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].name").value(notAvailableResponses.getMemberTermResponses().get(0).getName()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm1").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm1().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm2").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm2().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm3").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm3().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm4").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm4().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkTerm5").value(notAvailableResponses.getMemberTermResponses().get(0).getChkTerm5().toString()))
 //                .andExpect(jsonPath("$.memberTermResponses[0].termEndDate").exists())
 //                .andExpect(jsonPath("$.memberTermResponses[0].termRegDate").exists())
-//                .andExpect(jsonPath("$.memberTermResponses[0].chkUse").value(notAvailableResponses.getMemberTermResponses().get(0).getChkUse().toString()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond1").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond1()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond2").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond2()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond3").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond3()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond4").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond4()))
-//                .andExpect(jsonPath("$.memberTermResponses[0].termCond5").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond5()));
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].chkUse").value(notAvailableResponses.getMemberTermResponses().get(0).getChkUse().toString()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond1").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond1()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond2").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond2()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond3").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond3()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond4").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond4()))
+//
+// .andExpect(jsonPath("$.memberTermResponses[0].termCond5").value(notAvailableResponses.getMemberTermResponses().get(0).getTermCond5()));
 //
 //
 //    }
@@ -256,7 +316,8 @@
 //        // 약관 수정시 필요한 정상적인 요청 데이터 더미 생성
 //        // 서비스 객체 목킹
 //        MemberTermUpdateRequest request = MemberTermUpdateRequest.builder()
-//                                                                 .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'N', 'N'))
+//
+// .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'N', 'N'))
 //                                                                 .chkUse('N')
 //                                                                 .build();
 //
@@ -276,11 +337,13 @@
 //    void 약관_수정시_예외_발생_테스트() throws Exception{
 //        // 약관 수정시 예외가 발생하는 비정상적인 요청 데이터 더미 생성
 //        // 서비스 객체 목킹
-//        doNothing().when(memberTermsService).update(1L, MemberTermUpdateRequest.builder().build());
+//        doNothing().when(memberTermsService).update(1L,
+// MemberTermUpdateRequest.builder().build());
 //        // 컨트롤러에 요청 보내기, 응답 데이터 확인
 //        mockMvc.perform(patch("/api/member-term/1")
 //                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(MemberTermUpdateRequest.builder().build()))
+//
+// .content(objectMapper.writeValueAsString(MemberTermUpdateRequest.builder().build()))
 //                        .with(csrf())
 //                )
 //               .andExpect(status().isBadRequest());
@@ -305,8 +368,10 @@
 //    private void createMemberTermRequest() {
 //        requestFixture = MemberTermRequest.builder()
 //                                          .name("24년도회원약관A")
-//                                          .memberTermConditionCodes(List.of("TERMS001", "TERMS002", "TERMS003", "TERMS004", "TERMS005"))
-//                                          .memberTermConditionMandatoryOrNot(List.of('Y', 'Y', 'Y', 'Y', 'Y'))
+//                                          .memberTermConditionCodes(List.of("TERMS001",
+// "TERMS002", "TERMS003", "TERMS004", "TERMS005"))
+//                                          .memberTermConditionMandatoryOrNot(List.of('Y', 'Y',
+// 'Y', 'Y', 'Y'))
 //                                          .chkUse('Y')
 //                                          .build();
 //    }
@@ -394,4 +459,4 @@
 //
 //
 //
-//}
+// }

@@ -1,43 +1,43 @@
 package com.oreo.finalproject_5re5_be.audio;
 
-import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.oreo.finalproject_5re5_be.global.component.audio.AudioResample;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class AudioResampleTest {
 
     // 모노 오디오 포맷을 60kHz, 16비트로 설정
-    private static final AudioFormat monoFormat = new AudioFormat(
-            AudioFormat.Encoding.PCM_SIGNED,
-            60000, // 60kHz로 변환
-            16,    // 16비트
-            1,     // 모노
-            2,     // 2 bytes/frame
-            60000, // frame rate와 샘플링 레이트 일치
-            false  // 리틀 엔디안
-    );
+    private static final AudioFormat monoFormat =
+            new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    60000, // 60kHz로 변환
+                    16, // 16비트
+                    1, // 모노
+                    2, // 2 bytes/frame
+                    60000, // frame rate와 샘플링 레이트 일치
+                    false // 리틀 엔디안
+                    );
 
     // 스테레오 오디오 포맷을 60kHz, 16비트로 설정
-    private static final AudioFormat stereoFormat = new AudioFormat(
-            AudioFormat.Encoding.PCM_SIGNED,
-            60000, // 60kHz로 변환
-            16,    // 16비트
-            2,     // 스테레오
-            4,     // 4 bytes/frame
-            60000, // frame rate와 샘플링 레이트 일치
-            false  // 리틀 엔디안
-    );
+    private static final AudioFormat stereoFormat =
+            new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    60000, // 60kHz로 변환
+                    16, // 16비트
+                    2, // 스테레오
+                    4, // 4 bytes/frame
+                    60000, // frame rate와 샘플링 레이트 일치
+                    false // 리틀 엔디안
+                    );
 
     // 모노 리샘플링 설정 객체 생성
     AudioResample audioMonoResample = new AudioResample(monoFormat);
@@ -75,9 +75,8 @@ class AudioResampleTest {
         // 동일한 테스트 파일 두 개로 리스트 생성
         File file = new File("test.wav");
         File file2 = new File("test.wav");
-        List<AudioInputStream> audioInputStream = List.of(
-                AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2)
-        );
+        List<AudioInputStream> audioInputStream =
+                List.of(AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2));
 
         // 리스트 내 모든 오디오가 모노 포맷과 일치하는지 확인
         audioMonoResample
@@ -91,9 +90,8 @@ class AudioResampleTest {
         // 동일한 테스트 파일 두 개로 리스트 생성
         File file = new File("test.wav");
         File file2 = new File("test.wav");
-        List<AudioInputStream> audioInputStream = List.of(
-                AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2)
-        );
+        List<AudioInputStream> audioInputStream =
+                List.of(AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2));
 
         // 리스트 내 모든 오디오가 스테레오 포맷과 일치하지 않는지 확인
         audioMonoResample
@@ -131,9 +129,8 @@ class AudioResampleTest {
         // 동일한 테스트 파일 두 개로 리스트 생성
         File file = new File("test.wav");
         File file2 = new File("test.wav");
-        List<AudioInputStream> audioInputStream = List.of(
-                AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2)
-        );
+        List<AudioInputStream> audioInputStream =
+                List.of(AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2));
 
         // 리스트 내 모든 오디오가 스테레오 포맷과 일치하는지 확인
         audioStereoResample
@@ -147,9 +144,8 @@ class AudioResampleTest {
         // 동일한 테스트 파일 두 개로 리스트 생성
         File file = new File("test.wav");
         File file2 = new File("test.wav");
-        List<AudioInputStream> audioInputStream = List.of(
-                AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2)
-        );
+        List<AudioInputStream> audioInputStream =
+                List.of(AudioSystem.getAudioInputStream(file), AudioSystem.getAudioInputStream(file2));
 
         // 리스트 내 모든 오디오가 모노 포맷과 일치하지 않는지 확인
         audioStereoResample
