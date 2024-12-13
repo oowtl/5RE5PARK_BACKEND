@@ -1,8 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.service;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.*;
+import org.springframework.web.multipart.MultipartFile;
 
 public class AudioMultipartFile implements MultipartFile {
     private final byte[] data;
@@ -56,5 +55,4 @@ public class AudioMultipartFile implements MultipartFile {
             out.write(data);
         }
     }
-
 }

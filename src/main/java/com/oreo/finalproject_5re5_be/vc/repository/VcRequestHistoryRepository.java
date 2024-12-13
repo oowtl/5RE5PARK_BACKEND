@@ -5,5 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VcRequestHistoryRepository extends JpaRepository<VcRequestHistory, Long> {
-}
+public interface VcRequestHistoryRepository extends JpaRepository<VcRequestHistory, Long> {}

@@ -3,7 +3,6 @@ package com.oreo.finalproject_5re5_be.member.exception;
 import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
 
 import com.oreo.finalproject_5re5_be.global.exception.BusinessException;
-import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
 
 // 중복된 이메일 등록시 발생하는 예외
 public class MemberDuplicatedEmailException extends BusinessException {

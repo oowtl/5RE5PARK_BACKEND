@@ -1,47 +1,48 @@
-//package com.oreo.finalproject_5re5_be.member.controller;
+// package com.oreo.finalproject_5re5_be.member.controller;
 //
 //
-//import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
-//import static org.junit.jupiter.api.Assertions.assertNotNull;
-//import static org.mockito.Mockito.doNothing;
-//import static org.mockito.Mockito.when;
-//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+// import static com.oreo.finalproject_5re5_be.global.exception.ErrorCode.*;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.mockito.Mockito.doNothing;
+// import static org.mockito.Mockito.when;
+// import static
+// org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 //
 //
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
-//import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
-//import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
-//import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
-//import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
-//import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
-//import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
-//import com.oreo.finalproject_5re5_be.member.service.MemberTermsConditionServiceImpl;
-//import java.util.ArrayList;
-//import java.util.List;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.runner.RunWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.test.context.support.WithMockUser;
-//import org.springframework.test.context.TestPropertySource;
-//import org.springframework.test.context.junit4.SpringRunner;
-//import org.springframework.test.web.servlet.MockMvc;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import com.oreo.finalproject_5re5_be.global.exception.ErrorCode;
+// import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionRequest;
+// import com.oreo.finalproject_5re5_be.member.dto.request.MemberTermConditionUpdateRequest;
+// import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponse;
+// import com.oreo.finalproject_5re5_be.member.dto.response.MemberTermConditionResponses;
+// import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
+// import com.oreo.finalproject_5re5_be.member.exception.MemberTermsConditionNotFoundException;
+// import com.oreo.finalproject_5re5_be.member.service.MemberTermsConditionServiceImpl;
+// import java.util.ArrayList;
+// import java.util.List;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.junit.runner.RunWith;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.http.MediaType;
+// import org.springframework.security.test.context.support.WithMockUser;
+// import org.springframework.test.context.TestPropertySource;
+// import org.springframework.test.context.junit4.SpringRunner;
+// import org.springframework.test.web.servlet.MockMvc;
 //
-//@WebMvcTest(MemberTermConditionController.class)
-//class MemberTermConditionControllerTest {
+// @WebMvcTest(MemberTermConditionController.class)
+// class MemberTermConditionControllerTest {
 //
 //    @Autowired
 //    private MockMvc mockMvc;
@@ -76,8 +77,10 @@
 //                .law3("법률3")
 //                .build();
 //
-//        MemberTermsCondition savedMemberTermCondition = request.createMemberTermsConditionEntity();
-//        MemberTermConditionResponse response = new MemberTermConditionResponse(savedMemberTermCondition);
+//        MemberTermsCondition savedMemberTermCondition =
+// request.createMemberTermsConditionEntity();
+//        MemberTermConditionResponse response = new
+// MemberTermConditionResponse(savedMemberTermCondition);
 //
 //        // 요청 데이터 서비스에 전달하면 생성됐다고 반환하게 설정
 //        // 목킹 제대로 안되고 null 반환하는 경우 있음. 이 부분 equals, hashcode 구현해서 잡을 수 있음
@@ -146,13 +149,17 @@
 //        // 기대 결과 데이터 생성
 //        List<MemberTermConditionResponse> savedMemberTermsConditions = new ArrayList<>();
 //        for (MemberTermConditionRequest request : requests) {
-//            MemberTermsCondition memberTermsConditionEntity = request.createMemberTermsConditionEntity();
-//            MemberTermConditionResponse memberTermConditionResponse = new MemberTermConditionResponse(memberTermsConditionEntity);
+//            MemberTermsCondition memberTermsConditionEntity =
+// request.createMemberTermsConditionEntity();
+//            MemberTermConditionResponse memberTermConditionResponse = new
+// MemberTermConditionResponse(memberTermsConditionEntity);
 //            savedMemberTermsConditions.add(memberTermConditionResponse);
 //        }
 //
-//        MemberTermConditionResponses memberTermConditionResponses = new MemberTermConditionResponses(savedMemberTermsConditions);
-//        when(memberTermsConditionService.create(requests)).thenReturn(memberTermConditionResponses);
+//        MemberTermConditionResponses memberTermConditionResponses = new
+// MemberTermConditionResponses(savedMemberTermsConditions);
+//
+// when(memberTermsConditionService.create(requests)).thenReturn(memberTermConditionResponses);
 //
 //
 //        // 컨트롤러에 요청 보내고 응답 확인
@@ -162,7 +169,8 @@
 //                        .with(csrf())
 //                )
 //                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
+//
+// .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
 //    }
 //
 //    @DisplayName("회원 약관 조회 처리")
@@ -182,8 +190,10 @@
 //                .law3("법률3")
 //                .build();
 //
-//        MemberTermsCondition savedMemberTermCondition = request.createMemberTermsConditionEntity();
-//        MemberTermConditionResponse response = new MemberTermConditionResponse(savedMemberTermCondition);
+//        MemberTermsCondition savedMemberTermCondition =
+// request.createMemberTermsConditionEntity();
+//        MemberTermConditionResponse response = new
+// MemberTermConditionResponse(savedMemberTermCondition);
 //
 //        // 서비스 세팅
 //        when(memberTermsConditionService.read("mtc01")).thenReturn(response);
@@ -246,19 +256,22 @@
 //        // 서비스에서 응답할 데이터 생성
 //        List<MemberTermConditionResponse> savedMemberTermsConditions = new ArrayList<>();
 //        for (MemberTermConditionRequest request : dummy) {
-//            MemberTermsCondition memberTermsConditionEntity = request.createMemberTermsConditionEntity();
+//            MemberTermsCondition memberTermsConditionEntity =
+// request.createMemberTermsConditionEntity();
 //            MemberTermConditionResponse response = new MemberTermConditionResponse(
 //                    memberTermsConditionEntity);
 //            savedMemberTermsConditions.add(response);
 //        }
-//        MemberTermConditionResponses response = new MemberTermConditionResponses(savedMemberTermsConditions);
+//        MemberTermConditionResponses response = new
+// MemberTermConditionResponses(savedMemberTermsConditions);
 //        when(memberTermsConditionService.readAll()).thenReturn(response);
 //
 //        // 컨트롤러에 요청 보내기
 //        // 응답 데이터 확인
 //        mockMvc.perform(get("/api/member-term-condition/all"))
 //                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
+//
+// .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
 //    }
 //
 //    @DisplayName("사용 가능한 약관 항목 조회 처리")
@@ -308,12 +321,15 @@
 //        for (MemberTermConditionRequest request : dummy) {
 //            if (request.getChkUse().equals('N')) continue;
 //
-//            MemberTermsCondition memberTermsConditionEntity = request.createMemberTermsConditionEntity();
-//            MemberTermConditionResponse response = new MemberTermConditionResponse(memberTermsConditionEntity);
+//            MemberTermsCondition memberTermsConditionEntity =
+// request.createMemberTermsConditionEntity();
+//            MemberTermConditionResponse response = new
+// MemberTermConditionResponse(memberTermsConditionEntity);
 //            savedMemberTermsConditions.add(response);
 //        }
 //
-//        MemberTermConditionResponses response = new MemberTermConditionResponses(savedMemberTermsConditions);
+//        MemberTermConditionResponses response = new
+// MemberTermConditionResponses(savedMemberTermsConditions);
 //        when(memberTermsConditionService.readAvailable()).thenReturn(response);
 //
 //
@@ -321,7 +337,8 @@
 //        // 응답 데이터 확인
 //        mockMvc.perform(get("/api/member-term-condition/available"))
 //                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
+//
+// .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
 //
 //    }
 //
@@ -372,12 +389,15 @@
 //        for (MemberTermConditionRequest request : dummy) {
 //            if (request.getChkUse().equals('Y')) continue;
 //
-//            MemberTermsCondition memberTermsConditionEntity = request.createMemberTermsConditionEntity();
-//            MemberTermConditionResponse response = new MemberTermConditionResponse(memberTermsConditionEntity);
+//            MemberTermsCondition memberTermsConditionEntity =
+// request.createMemberTermsConditionEntity();
+//            MemberTermConditionResponse response = new
+// MemberTermConditionResponse(memberTermsConditionEntity);
 //            savedMemberTermsConditions.add(response);
 //        }
 //
-//        MemberTermConditionResponses response = new MemberTermConditionResponses(savedMemberTermsConditions);
+//        MemberTermConditionResponses response = new
+// MemberTermConditionResponses(savedMemberTermsConditions);
 //        when(memberTermsConditionService.readNotAvailable()).thenReturn(response);
 //
 //
@@ -385,7 +405,8 @@
 //        // 응답 데이터 확인
 //        mockMvc.perform(get("/api/member-term-condition/not-available"))
 //                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
+//
+// .andExpect(jsonPath("$.memberTermConditionResponses[0].condCode").value(savedMemberTermsConditions.get(0).getCondCode()));
 //
 //    }
 //
@@ -484,7 +505,8 @@
 //        // 예외 발생 시킬 더미 데이터 세팅
 //        String condCode = "mtc01";
 //        // 서비스에서 예외 발생하게 설정
-//        when(memberTermsConditionService.read(condCode)).thenThrow(new MemberTermsConditionNotFoundException());
+//        when(memberTermsConditionService.read(condCode)).thenThrow(new
+// MemberTermsConditionNotFoundException());
 //
 //        // 컨트롤러에 요청 보내기
 //        // 예외 처리 확인
@@ -492,6 +514,7 @@
 //                        .contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().is(MEMBER_TERM_NOT_FOUND_ERROR.getStatus()))
 //                .andExpect(jsonPath("$.status").value(MEMBER_TERM_NOT_FOUND_ERROR.getStatus()))
-//                .andExpect(jsonPath("$.response.message").value(MEMBER_TERM_NOT_FOUND_ERROR.getMessage()));
+//
+// .andExpect(jsonPath("$.response.message").value(MEMBER_TERM_NOT_FOUND_ERROR.getMessage()));
 //    }
-//}
+// }

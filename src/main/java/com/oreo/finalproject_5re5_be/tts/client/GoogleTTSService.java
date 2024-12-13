@@ -10,11 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class GoogleTTSService {
-    @Autowired
-    TextToSpeechClient ttsClient;
+    @Autowired TextToSpeechClient ttsClient;
 
     public byte[] make(SynthesisInput input, VoiceSelectionParams voice, AudioConfig audioConfig) {
-        if(checkInvalidParams(input, voice, audioConfig)) {
+        if (checkInvalidParams(input, voice, audioConfig)) {
             throw new InvalidTTSParamException("TTS 요청 파라미터가 부족합니다");
         }
 
@@ -25,20 +24,20 @@ public class GoogleTTSService {
         ByteString audioContents = response.getAudioContent();
 
         return audioContents.toByteArray();
-
     }
 
-
-    public MultipartFile makeToMultipartFile(SynthesisInput input, VoiceSelectionParams voice, AudioConfig audioConfig, String ttsFileName) {
+    public MultipartFile makeToMultipartFile(
+            SynthesisInput input,
+            VoiceSelectionParams voice,
+            AudioConfig audioConfig,
+            String ttsFileName) {
         byte[] result = make(input, voice, audioConfig);
-        return new ByteArrayMultipartFile(
-                result, ttsFileName + ".wav", "audio/wav"
-        );
+        return new ByteArrayMultipartFile(result, ttsFileName + ".wav", "audio/wav");
     }
 
     // tts 생성에 필요한 파라미터들 null 아닌지 검사
-    private boolean checkInvalidParams(SynthesisInput input, VoiceSelectionParams voice, AudioConfig audioConfig) {
+    private boolean checkInvalidParams(
+            SynthesisInput input, VoiceSelectionParams voice, AudioConfig audioConfig) {
         return input == null || voice == null || audioConfig == null;
     }
-
 }

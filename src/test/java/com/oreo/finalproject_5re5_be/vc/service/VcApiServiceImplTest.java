@@ -1,25 +1,25 @@
-//package com.oreo.finalproject_5re5_be.vc.service;
+// package com.oreo.finalproject_5re5_be.vc.service;
 //
-//import lombok.extern.slf4j.Slf4j;
-//import org.junit.jupiter.api.Disabled;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.condition.DisabledOnOs;
-//import org.junit.jupiter.api.condition.OS;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.mock.web.MockMultipartFile;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.web.multipart.MultipartFile;
+// import lombok.extern.slf4j.Slf4j;
+// import org.junit.jupiter.api.Disabled;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.condition.DisabledOnOs;
+// import org.junit.jupiter.api.condition.OS;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.mock.web.MockMultipartFile;
+// import org.springframework.transaction.annotation.Transactional;
+// import org.springframework.web.multipart.MultipartFile;
 //
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.IOException;
+// import java.io.File;
+// import java.io.FileInputStream;
+// import java.io.IOException;
 //
-//@SpringBootTest
-//@Slf4j
-//@Transactional
-//class VcApiServiceImplTest {
+// @SpringBootTest
+// @Slf4j
+// @Transactional
+// class VcApiServiceImplTest {
 //    @Autowired
 //    private VcApiService vcApiService;
 //
@@ -59,7 +59,8 @@
 //        saveMultipartFileToProjectRoot(file, "");
 //    }
 //    //파일 저장 테스트 확인용
-//    public String saveMultipartFileToProjectRoot(MultipartFile file, String fileName) throws IOException {
+//    public String saveMultipartFileToProjectRoot(MultipartFile file, String fileName) throws
+// IOException {
 //        // Spring 프로젝트 루트 디렉토리
 //        String projectRoot = System.getProperty("user.dir");
 //
@@ -99,7 +100,8 @@
 //                "audio/wav",                 // MIME 타입
 //                inputStream2                  // 파일 데이터
 //        );
-//        MultipartFile multipartFile1 = vcApiService.resultFileCreate(multipartFile2, s);//Trg Id 소스파일로 결과 파일 생성
+//        MultipartFile multipartFile1 = vcApiService.resultFileCreate(multipartFile2, s);//Trg Id
+// 소스파일로 결과 파일 생성
 //        saveMultipartFileToProjectRoot(multipartFile1, "result.mp3");//파일 저장
 //    }
-//}
+// }

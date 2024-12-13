@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.tts.dto.external.common;
 
-
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

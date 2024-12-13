@@ -14,8 +14,8 @@ public class MemberTermConditionResponses {
 
     List<MemberTermConditionResponse> memberTermConditionResponses;
 
-    public MemberTermConditionResponses(List<MemberTermConditionResponse> memberTermConditionResponses) {
+    public MemberTermConditionResponses(
+            List<MemberTermConditionResponse> memberTermConditionResponses) {
         this.memberTermConditionResponses = memberTermConditionResponses;
     }
-
 }

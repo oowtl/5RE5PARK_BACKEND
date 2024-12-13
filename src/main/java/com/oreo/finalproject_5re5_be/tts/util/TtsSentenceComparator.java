@@ -54,6 +54,4 @@ public class TtsSentenceComparator implements Comparator<TtsSentenceBatchInfo> {
         // 3. 양쪽의 시퀀스가 존재하는 경우 (그대로 비교)
         return firstSentence.getTsSeq().compareTo(secondSentence.getTsSeq());
     }
-
-
 }

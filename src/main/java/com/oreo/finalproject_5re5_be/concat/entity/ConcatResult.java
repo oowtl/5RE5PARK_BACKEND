@@ -2,10 +2,9 @@ package com.oreo.finalproject_5re5_be.concat.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
 
 @ToString
 @Getter
@@ -46,16 +45,17 @@ public class ConcatResult extends BaseEntity {
     @Column(name = "process_id")
     private String processId;
 
-    @Column
-    private Integer seperated;
+    @Column private Integer seperated;
 
     public void addBgmFile(BgmFile bgmFile) {
-        this.bgmFiles.add(BgmFile.builder()
-                .concatResult(this)
-                .audioUrl(bgmFile.getAudioUrl())
-                .fileName(bgmFile.getFileName())
-                .fileLength(bgmFile.getFileLength())
-                .extension(bgmFile.getExtension()).build());
+        this.bgmFiles.add(
+                BgmFile.builder()
+                        .concatResult(this)
+                        .audioUrl(bgmFile.getAudioUrl())
+                        .fileName(bgmFile.getFileName())
+                        .fileLength(bgmFile.getFileLength())
+                        .extension(bgmFile.getExtension())
+                        .build());
     }
 
     public void addBgmFiles(List<BgmFile> bgmFiles) {

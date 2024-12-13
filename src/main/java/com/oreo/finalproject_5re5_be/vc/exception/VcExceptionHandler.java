@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class VcExceptionHandler {
     @ExceptionHandler(value = Exception.class) // 어떤 예외클래스를 처리할건지 지정
     public ResponseEntity<ResponseDto<String>> handle(Exception e, HttpServletRequest request) {
-        log.error("VC RestController 내 handlerException 호출 , {} , {}",
-                request.getRequestURI(), e.getMessage());
+        log.error(
+                "VC RestController 내 handlerException 호출 , {} , {}",
+                request.getRequestURI(),
+                e.getMessage());
         return ResponseEntity.badRequest()
-                .body(new ResponseDto<> (HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+                .body(new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
     }
 }

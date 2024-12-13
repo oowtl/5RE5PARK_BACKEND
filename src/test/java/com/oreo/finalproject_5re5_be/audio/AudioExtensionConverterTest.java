@@ -1,18 +1,16 @@
 package com.oreo.finalproject_5re5_be.audio;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionChecker;
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
+import java.io.File;
+import java.io.IOException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.File;
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -35,6 +33,4 @@ class AudioExtensionConverterTest {
 
         assertThat(wavExtension).isTrue();
     }
-
-
 }

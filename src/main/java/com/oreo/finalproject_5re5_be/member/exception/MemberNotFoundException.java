@@ -14,5 +14,4 @@ public class MemberNotFoundException extends BusinessException {
     public MemberNotFoundException(String message) {
         super(message, MEMBER_NOT_FOUND_ERROR);
     }
-
 }

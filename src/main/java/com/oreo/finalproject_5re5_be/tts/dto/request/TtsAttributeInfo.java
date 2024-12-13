@@ -21,36 +21,45 @@ public class TtsAttributeInfo {
     @NotNull(message = "volume 는 필수 입력값입니다.")
     @Min(value = -10, message = "volume 는 -10이상 부터 설정할 수 있습니다.")
     @Max(value = 10, message = "volume 는 10이하 까지 설정할 수 있습니다.")
-    private Integer volume;            // 음성 크기
+    private Integer volume; // 음성 크기
 
     @Schema(description = "음성 속도", example = "1.0")
     @Positive(message = "speed 는 0.25이상 부터 설정할 수 있습니다.") // 양수 허용
-    private Float speed;           // 음성 속도
+    private Float speed; // 음성 속도
 
     @Schema(description = "시작 음성 높낮이", example = "0")
     @Min(value = -20, message = "stPitch 는 -20이상 부터 설정할 수 있습니다.")
     @Max(value = 20, message = "stPitch 는 20이하 까지 설정할 수 있습니다.")
-    private Integer stPitch;           // 시작 음성 높낮이
+    private Integer stPitch; // 시작 음성 높낮이
 
     @Schema(description = "감정 구분", example = "neutral")
-    private String emotion;        // 감정 구분
+    private String emotion; // 감정 구분
 
     @Schema(description = "감정 강도", example = "100")
-    private Integer emotionStrength;   // 감정 강도
+    private Integer emotionStrength; // 감정 강도
 
     @Schema(description = "샘플 속도", example = "16000")
-    private Integer sampleRate;        // 샘플 속도
+    private Integer sampleRate; // 샘플 속도
 
     @Schema(description = "음색", example = "0")
-    private Integer alpha;             // 음색
+    private Integer alpha; // 음색
 
     @Schema(description = "마지막 음성 높낮이", example = "0")
-    private Float endPitch;        // 마지막 음성 높낮이
+    private Float endPitch; // 마지막 음성 높낮이
 
     @Schema(description = "오디오 파일 포맷", example = "wav")
-    private String audioFormat;    // 오디오 파일 포맷
+    private String audioFormat; // 오디오 파일 포맷
 
-    public static TtsAttributeInfo of(Integer volume, Float speed, Integer stPitch, String emotion, Integer emotionStrength, Integer sampleRate, Integer alpha, Float endPitch, String audioFormat) {
+    public static TtsAttributeInfo of(
+            Integer volume,
+            Float speed,
+            Integer stPitch,
+            String emotion,
+            Integer emotionStrength,
+            Integer sampleRate,
+            Integer alpha,
+            Float endPitch,
+            String audioFormat) {
         return TtsAttributeInfo.builder()
                 .volume(volume)
                 .speed(speed)

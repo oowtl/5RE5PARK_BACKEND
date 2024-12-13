@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.tts.dto.response;
 
-
 import com.oreo.finalproject_5re5_be.tts.entity.TtsSentence;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +16,6 @@ public class TtsSentenceDto {
     public static TtsSentenceDto of(TtsSentence ttsSentence) {
         SentenceInfo sentence = SentenceInfo.of(ttsSentence);
 
-        return TtsSentenceDto.builder()
-                .sentence(sentence)
-                .build();
+        return TtsSentenceDto.builder().sentence(sentence).build();
     }
 }

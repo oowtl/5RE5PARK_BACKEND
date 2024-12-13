@@ -31,14 +31,11 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TestGetSentenceList {
 
-    @Autowired
-    private TtsSentenceService ttsSentenceService;
+    @Autowired private TtsSentenceService ttsSentenceService;
 
-    @MockBean
-    private TtsSentenceRepository ttsSentenceRepository;
+    @MockBean private TtsSentenceRepository ttsSentenceRepository;
 
-    @MockBean
-    private ProjectRepository projectRepository;
+    @MockBean private ProjectRepository projectRepository;
 
     /*
     테스트 시나리오: getSentenceList 메서드
@@ -84,15 +81,20 @@ class TestGetSentenceList {
         Project mockProject = Project.builder().proSeq(projectSeq).build();
 
         // TtsSentence 리스트 생성
-        List<TtsSentence> ttsSentenceList = IntStream.range(0, repeatCount)
-            .mapToObj(i -> TtsSentence.builder()
-                .tsSeq((long) i)
-                .text("Sentence " + i).project(mockProject)
-                .build())
-            .toList();
+        List<TtsSentence> ttsSentenceList =
+                IntStream.range(0, repeatCount)
+                        .mapToObj(
+                                i ->
+                                        TtsSentence.builder()
+                                                .tsSeq((long) i)
+                                                .text("Sentence " + i)
+                                                .project(mockProject)
+                                                .build())
+                        .toList();
 
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(mockProject));
-        when(ttsSentenceRepository.findAllByProjectOrderBySortOrder(mockProject)).thenReturn(ttsSentenceList);
+        when(ttsSentenceRepository.findAllByProjectOrderBySortOrder(mockProject))
+                .thenReturn(ttsSentenceList);
 
         // when
         TtsSentenceListDto result = ttsSentenceService.getSentenceList(projectSeq);
@@ -100,10 +102,10 @@ class TestGetSentenceList {
         // then
         assertNotNull(result); // 결과가 null이 아님
         assertEquals(repeatCount, result.getSentenceList().size()); // 반환된 리스트의 크기 검증
-        assertEquals("Sentence 1",
-            result.getSentenceList().get(1).getSentence().getText()); // 첫 번째 문장의 텍스트 검증
-        assertEquals("Sentence 2",
-            result.getSentenceList().get(2).getSentence().getText()); // 두 번째 문장의 텍스트 검증
+        assertEquals(
+                "Sentence 1", result.getSentenceList().get(1).getSentence().getText()); // 첫 번째 문장의 텍스트 검증
+        assertEquals(
+                "Sentence 2", result.getSentenceList().get(2).getSentence().getText()); // 두 번째 문장의 텍스트 검증
     }
 
     // 2. 프로젝트를 찾을 수 없음
@@ -115,11 +117,11 @@ class TestGetSentenceList {
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.empty());
 
         // when, then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-            () -> ttsSentenceService.getSentenceList(projectSeq));
+        EntityNotFoundException exception =
+                assertThrows(
+                        EntityNotFoundException.class, () -> ttsSentenceService.getSentenceList(projectSeq));
 
-        assertEquals("Project not found with id: " + projectSeq,
-            exception.getMessage()); // 예외 메시지 검증
+        assertEquals("Project not found with id: " + projectSeq, exception.getMessage()); // 예외 메시지 검증
     }
 
     // 3. TtsSentence 리스트가 없음
@@ -131,7 +133,8 @@ class TestGetSentenceList {
         Project mockProject = Project.builder().proSeq(projectSeq).build();
 
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(mockProject));
-        when(ttsSentenceRepository.findAllByProjectOrderBySortOrder(mockProject)).thenReturn(List.of()); // 빈 리스트 반환
+        when(ttsSentenceRepository.findAllByProjectOrderBySortOrder(mockProject))
+                .thenReturn(List.of()); // 빈 리스트 반환
 
         // when
         TtsSentenceListDto result = ttsSentenceService.getSentenceList(projectSeq);
@@ -149,9 +152,7 @@ class TestGetSentenceList {
         Long projectSeq = null;
 
         // when, then
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.getSentenceList(projectSeq));
-
+        assertThrows(
+                ConstraintViolationException.class, () -> ttsSentenceService.getSentenceList(projectSeq));
     }
-
 }

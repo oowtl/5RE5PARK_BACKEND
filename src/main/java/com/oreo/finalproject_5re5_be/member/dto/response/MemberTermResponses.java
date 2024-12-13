@@ -17,5 +17,4 @@ public class MemberTermResponses {
     public MemberTermResponses(List<MemberTermResponse> memberTermResponses) {
         this.memberTermResponses = memberTermResponses;
     }
-
 }

@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.code.service;
 
-
 import com.oreo.finalproject_5re5_be.code.dto.request.CodeRequest;
 import com.oreo.finalproject_5re5_be.code.dto.request.CodeUpdateRequest;
 import com.oreo.finalproject_5re5_be.code.dto.response.CodeResponse;
@@ -45,9 +44,7 @@ public class CodeServiceImpl {
         // 모든 코드 엔티티를 조회
         List<Code> foundCodes = codeRepository.findAll();
         // 리스트로 변환
-        List<CodeResponse> codeResponseList = foundCodes.stream()
-                                                     .map(CodeResponse::of)
-                                                     .toList();
+        List<CodeResponse> codeResponseList = foundCodes.stream().map(CodeResponse::of).toList();
 
         // 조회된 엔티티를 response로 변환하여 반환한다
         return CodeResponses.of(codeResponseList);
@@ -69,15 +66,12 @@ public class CodeServiceImpl {
         return CodeResponse.of(foundCode);
     }
 
-
     // 각 파트별 사용 가능한 코드 조회
     public CodeResponses readAvailableCodeByCateNum(String cateNum) {
         // 전달 받은 파트에 해당하는 사용 가능한 모든 코드 엔티티를 조회한다
         List<Code> foundCodes = codeRepository.findAvailableCodesByCateNum(cateNum);
         // 리스트에 담는다
-        List<CodeResponse> codeResponseList = foundCodes.stream()
-                                                        .map(CodeResponse::of)
-                                                        .toList();
+        List<CodeResponse> codeResponseList = foundCodes.stream().map(CodeResponse::of).toList();
         // 조회된 엔티티를 responses로 변환하여 반환한다
         return CodeResponses.of(codeResponseList);
     }
@@ -87,13 +81,10 @@ public class CodeServiceImpl {
         // 전달 받은 파트에 해당하는 모든 코드 엔티티를 조회한다
         List<Code> foundCodes = codeRepository.findCodesByCateNum(cateNum);
         // 리스트에 담는다
-        List<CodeResponse> codeResponseList = foundCodes.stream()
-                .map(CodeResponse::of)
-                .toList();
+        List<CodeResponse> codeResponseList = foundCodes.stream().map(CodeResponse::of).toList();
         // 조회된 엔티티를 responses로 변환하여 반환한다
         return CodeResponses.of(codeResponseList);
     }
-
 
     // 코드 수정
     public void update(Long codeSeq, CodeUpdateRequest request) {
@@ -124,5 +115,4 @@ public class CodeServiceImpl {
         // 조회된 엔티티를 삭제한다
         codeRepository.delete(foundCode);
     }
-
 }

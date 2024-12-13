@@ -36,20 +36,14 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class MemberSecurityConfigTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private LoginAuthenticationSuccessHandler successHandler;
+    @Autowired private LoginAuthenticationSuccessHandler successHandler;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @Autowired private PasswordEncoder passwordEncoder;
 
-    @MockBean
-    private MemberServiceImpl memberService;
-    @MockBean
-    private MemberRepository memberRepository;
-
+    @MockBean private MemberServiceImpl memberService;
+    @MockBean private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
@@ -57,46 +51,52 @@ class MemberSecurityConfigTest {
         assertNotNull(memberService);
     }
 
-//    @Test
-//    @DisplayName("로그인 성공 테스트")
-//    void 로그인_성공() throws Exception {
-//        // 회원 약관 동의 정보 생성
-//        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
-//        // 회원 가입 정보 생성
-//        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
-//                memberTermCheckOrNotRequests);
-//        // 가입 정보로 부터 회원 엔티티 생성
-//        Member foundMember = memberRegisterRequest.createMemberEntity();
-//        // 비밀번호 암호화 처리 후 저장
-//        String notEncodedPassword = foundMember.getPassword();
-//        String encodedPassword = passwordEncoder.encode(foundMember.getPassword());
-//        foundMember.setPassword(encodedPassword);
-//
-//        // 반환할 UserDetails 객체 생성
-//        UserDetails foundMemberDetails = User.withUsername(foundMember.getId())
-//                                             .password(encodedPassword)
-//                                             .build();
-//
-//        // 목객체 동작 지정
-//        when(memberRepository.findById(foundMember.getId())).thenReturn(foundMember); // 회원 조회시 가입 정보로 부터 만든 회원 엔티티 반환
-//        when(memberService.loadUserByUsername(foundMember.getId())).thenReturn(foundMemberDetails); // 회원 아이디(이름)으로 로드시 이전에 만들었던 UserDetails 반환
-//
-//        // 로그인 요청
-//        mockMvc.perform(formLogin("/api/member/login")
-//                        .user(memberRegisterRequest.getId())
-//                        .password(memberRegisterRequest.getPassword()))  // 실제 인코딩 전 비밀번호 전달
-//                .andExpect(status().isOk());
-//
-//    }
+    //    @Test
+    //    @DisplayName("로그인 성공 테스트")
+    //    void 로그인_성공() throws Exception {
+    //        // 회원 약관 동의 정보 생성
+    //        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests =
+    // retryableCreateMemberMemberTerms();
+    //        // 회원 가입 정보 생성
+    //        MemberRegisterRequest memberRegisterRequest =
+    // retryableCreateMemberMemberRegisterRequest(
+    //                memberTermCheckOrNotRequests);
+    //        // 가입 정보로 부터 회원 엔티티 생성
+    //        Member foundMember = memberRegisterRequest.createMemberEntity();
+    //        // 비밀번호 암호화 처리 후 저장
+    //        String notEncodedPassword = foundMember.getPassword();
+    //        String encodedPassword = passwordEncoder.encode(foundMember.getPassword());
+    //        foundMember.setPassword(encodedPassword);
+    //
+    //        // 반환할 UserDetails 객체 생성
+    //        UserDetails foundMemberDetails = User.withUsername(foundMember.getId())
+    //                                             .password(encodedPassword)
+    //                                             .build();
+    //
+    //        // 목객체 동작 지정
+    //        when(memberRepository.findById(foundMember.getId())).thenReturn(foundMember); // 회원 조회시
+    // 가입 정보로 부터 만든 회원 엔티티 반환
+    //
+    // when(memberService.loadUserByUsername(foundMember.getId())).thenReturn(foundMemberDetails); //
+    // 회원 아이디(이름)으로 로드시 이전에 만들었던 UserDetails 반환
+    //
+    //        // 로그인 요청
+    //        mockMvc.perform(formLogin("/api/member/login")
+    //                        .user(memberRegisterRequest.getId())
+    //                        .password(memberRegisterRequest.getPassword()))  // 실제 인코딩 전 비밀번호 전달
+    //                .andExpect(status().isOk());
+    //
+    //    }
 
     @Test
     @DisplayName("로그인 실패 테스트, 로그인 실패시 로그인 페이지로 리디렉션")
     void 로그인_실패() throws Exception {
         // 회원 약관 동의 정보 생성
-        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests = retryableCreateMemberMemberTerms();
+        List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests =
+                retryableCreateMemberMemberTerms();
         // 회원 가입 정보 생성
-        MemberRegisterRequest memberRegisterRequest = retryableCreateMemberMemberRegisterRequest(
-                memberTermCheckOrNotRequests);
+        MemberRegisterRequest memberRegisterRequest =
+                retryableCreateMemberMemberRegisterRequest(memberTermCheckOrNotRequests);
         // 가입 정보로 부터 회원 엔티티 생성
         Member foundMember = memberRegisterRequest.createMemberEntity();
         // 비밀번호 암호화 처리 후 저장
@@ -104,18 +104,21 @@ class MemberSecurityConfigTest {
         foundMember.setPassword(encodedPassword);
 
         // 반환할 UserDetails 객체 생성
-        UserDetails foundMemberDetails = User.withUsername(foundMember.getId())
-                .password(encodedPassword)
-                .build();
+        UserDetails foundMemberDetails =
+                User.withUsername(foundMember.getId()).password(encodedPassword).build();
 
         // 목객체 동작 지정
-        when(memberRepository.findById(foundMember.getId())).thenReturn(foundMember); // 회원 조회시 가입 정보로 부터 만든 회원 엔티티 반환
-        when(memberService.loadUserByUsername(foundMember.getId())).thenReturn(foundMemberDetails); // 회원 아이디(이름)으로 로드시 이전에 만들었던 UserDetails 반환
+        when(memberRepository.findById(foundMember.getId()))
+                .thenReturn(foundMember); // 회원 조회시 가입 정보로 부터 만든 회원 엔티티 반환
+        when(memberService.loadUserByUsername(foundMember.getId()))
+                .thenReturn(foundMemberDetails); // 회원 아이디(이름)으로 로드시 이전에 만들었던 UserDetails 반환
 
         // 로그인 요청
-        mockMvc.perform(formLogin("/api/member/login")
-                        .user(memberRegisterRequest.getId())
-                        .password("wrong password"))
+        mockMvc
+                .perform(
+                        formLogin("/api/member/login")
+                                .user(memberRegisterRequest.getId())
+                                .password("wrong password"))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -142,31 +145,32 @@ class MemberSecurityConfigTest {
         // 프론트엔드 로그인 페이지 요청 경로 정해지면 테스트하기
     }
 
-
     // 로그아웃할 경우, 세션 무효화
     @Test
     @DisplayName("로그아웃 시 세션이 무효화되고 홈으로 리디렉션된다.")
     void 로그아웃() throws Exception {
-        mockMvc.perform(get("/api/member/logout"))
+        mockMvc
+                .perform(get("/api/member/logout"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
 
     private MemberRegisterRequest retryableCreateMemberMemberRegisterRequest(
             List<MemberTermCheckOrNotRequest> memberTermCheckOrNotRequests) {
-        var request = MemberRegisterRequest.builder()
-                .id("qwerfde2312")
-                .password("asdf12341234@")
-                .email("asdf3214@gmail.com")
-                .name("홍길동")
-                .userRegDate(LocalDateTime.now())
-                .chkValid('Y')
-                .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
-                .normAddr("서울시 강남구")
-                .passAddr("서초대로 59-32")
-                .locaAddr("서초동")
-                .detailAddr("서초동 123-456")
-                .build();
+        var request =
+                MemberRegisterRequest.builder()
+                        .id("qwerfde2312")
+                        .password("asdf12341234@")
+                        .email("asdf3214@gmail.com")
+                        .name("홍길동")
+                        .userRegDate(LocalDateTime.now())
+                        .chkValid('Y')
+                        .memberTermCheckOrNotRequests(memberTermCheckOrNotRequests)
+                        .normAddr("서울시 강남구")
+                        .passAddr("서초대로 59-32")
+                        .locaAddr("서초동")
+                        .detailAddr("서초동 123-456")
+                        .build();
 
         return request;
     }
@@ -176,34 +180,19 @@ class MemberSecurityConfigTest {
         // 약관 동의 내용 설정
         memberTermCheckOrNotRequests = new ArrayList<>();
         memberTermCheckOrNotRequests.add(
-                MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(1L)
-                        .agreed('Y')
-                        .build());
+                MemberTermCheckOrNotRequest.builder().termCondCode(1L).agreed('Y').build());
 
         memberTermCheckOrNotRequests.add(
-                MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(2L)
-                        .agreed('Y')
-                        .build());
+                MemberTermCheckOrNotRequest.builder().termCondCode(2L).agreed('Y').build());
 
         memberTermCheckOrNotRequests.add(
-                MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(3L)
-                        .agreed('Y')
-                        .build());
+                MemberTermCheckOrNotRequest.builder().termCondCode(3L).agreed('Y').build());
 
         memberTermCheckOrNotRequests.add(
-                MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(4L)
-                        .agreed('N')
-                        .build());
+                MemberTermCheckOrNotRequest.builder().termCondCode(4L).agreed('N').build());
 
         memberTermCheckOrNotRequests.add(
-                MemberTermCheckOrNotRequest.builder()
-                        .termCondCode(5L)
-                        .agreed('N')
-                        .build());
+                MemberTermCheckOrNotRequest.builder().termCondCode(5L).agreed('N').build());
 
         return memberTermCheckOrNotRequests;
     }

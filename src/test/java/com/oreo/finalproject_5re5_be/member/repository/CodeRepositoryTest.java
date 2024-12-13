@@ -13,14 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 class CodeRepositoryTest {
 
-
-    @Autowired
-    private CodeRepository codeRepository;
+    @Autowired private CodeRepository codeRepository;
 
     private List<Code> dummy = new ArrayList<>();
 
@@ -50,7 +47,6 @@ class CodeRepositoryTest {
 
         // 결과 동일한지 비교
         assertTrue(isSameCode(expectedCode, foundCode));
-
     }
 
     @DisplayName("각 파트별 사용 가능한 코드 조회")
@@ -59,16 +55,16 @@ class CodeRepositoryTest {
         // 회원 파트 여러 더미 데이터 생성 및 저장
         // 해당 파트의 사용 가능한 코드 조회
         List<Code> foundCodes = codeRepository.findAvailableCodesByCateNum("M");
-        List<Code> expectedCodes = dummy.stream()
-                                        .filter(c -> c.getCateNum().equals("M") && c.getChkUse().equals("Y"))
-                                        .toList();
+        List<Code> expectedCodes =
+                dummy.stream()
+                        .filter(c -> c.getCateNum().equals("M") && c.getChkUse().equals("Y"))
+                        .toList();
 
         // 결과 동일한지 비교
         assertTrue(foundCodes.size() == expectedCodes.size());
         for (int i = 0; i < foundCodes.size(); i++) {
             assertTrue(isSameCode(expectedCodes.get(i), foundCodes.get(i)));
         }
-
     }
 
     @DisplayName("각 파트별 모든 코드 조회")
@@ -81,38 +77,18 @@ class CodeRepositoryTest {
         // 결과 동일한지 비교
         assertTrue(foundCodes.size() == dummy.size());
 
-
         for (int i = 0; i < foundCodes.size(); i++) {
             assertTrue(isSameCode(dummy.get(i), foundCodes.get(i)));
         }
-
     }
 
     private void createDummy() {
         // 더미 데이터 생성
-        Code code1 = Code.builder()
-                .code("MS001")
-                .cateNum("M")
-                .name("신규회원")
-                .chkUse("Y")
-                .ord(1)
-                .build();
+        Code code1 = Code.builder().code("MS001").cateNum("M").name("신규회원").chkUse("Y").ord(1).build();
 
-        Code code2 = Code.builder()
-                .code("MS002")
-                .cateNum("M")
-                .name("VIP회원")
-                .chkUse("N")
-                .ord(2)
-                .build();
+        Code code2 = Code.builder().code("MS002").cateNum("M").name("VIP회원").chkUse("N").ord(2).build();
 
-        Code code3 = Code.builder()
-                .code("MS003")
-                .cateNum("M")
-                .name("비활성회원")
-                .chkUse("Y")
-                .ord(3)
-                .build();
+        Code code3 = Code.builder().code("MS003").cateNum("M").name("비활성회원").chkUse("Y").ord(3).build();
 
         dummy.add(code1);
         dummy.add(code2);
@@ -127,5 +103,4 @@ class CodeRepositoryTest {
                 && expected.getChkUse().equals(actual.getChkUse())
                 && expected.getOrd().equals(actual.getOrd());
     }
-
 }

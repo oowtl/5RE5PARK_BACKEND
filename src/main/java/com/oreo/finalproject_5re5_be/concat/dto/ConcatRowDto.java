@@ -17,7 +17,6 @@ public class ConcatRowDto {
     private Float silence;
     private Integer rowIndex;
 
-
     // concatRow 엔티티 정보로 ConcatRowDto 객체 생성하는 메서드
     public static ConcatRowDto of(ConcatRow concatRow) {
         return ConcatRowDto.builder()

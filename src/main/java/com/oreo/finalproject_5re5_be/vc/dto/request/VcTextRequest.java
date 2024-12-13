@@ -12,7 +12,7 @@ public class VcTextRequest {
     private Long seq;
     private String text;
 
-    public static VcTextRequest of(Long seq, String text){
+    public static VcTextRequest of(Long seq, String text) {
         return new VcTextRequest(seq, text);
     }
 }

@@ -4,11 +4,10 @@ import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
 import com.oreo.finalproject_5re5_be.concat.entity.ConcatResult;
 import com.oreo.finalproject_5re5_be.concat.repository.BgmFileRepository;
 import com.oreo.finalproject_5re5_be.concat.repository.ConcatResultRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Log4j2
 @Service
@@ -23,8 +22,10 @@ public class BgmFileService {
     }
 
     public BgmFile getBgmFileByUrl(String bgmFileUrl) {
-        return bgmFileRepository.findByAudioUrl(bgmFileUrl)
-                .orElseThrow(() -> new IllegalArgumentException("BGM File not found with URL: " + bgmFileUrl));
+        return bgmFileRepository
+                .findByAudioUrl(bgmFileUrl)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("BGM File not found with URL: " + bgmFileUrl));
     }
 
     public BgmFile saveBgmFile(BgmFile bgmFile) {
@@ -43,13 +44,16 @@ public class BgmFileService {
 
         // 첫 번째 결과에 대해서만 처리
         BgmFile bgmFile = bgmFiles.get(0);
-        ConcatResult concatResult = concatResultRepository.findById(concatResultSeq)
-                .orElseThrow(() -> new IllegalArgumentException("ConcatResult not found for id: " + concatResultSeq));
+        ConcatResult concatResult =
+                concatResultRepository
+                        .findById(concatResultSeq)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "ConcatResult not found for id: " + concatResultSeq));
         bgmFile.setConcatResult(concatResult);
         bgmFileRepository.save(bgmFile);
 
         log.info("[updateBgmFileWithConcatResult] Updated BgmFile with ConcatResult: {}", bgmFile);
     }
-
-
 }

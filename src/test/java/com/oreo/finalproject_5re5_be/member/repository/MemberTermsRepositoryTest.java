@@ -18,11 +18,9 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class MemberTermsRepositoryTest {
 
-    @Autowired
-    private MemberTermsRepository memberTermsRepository;
+    @Autowired private MemberTermsRepository memberTermsRepository;
 
-    @Autowired
-    private MemberTermConditionRepository memberTermConditionRepository;
+    @Autowired private MemberTermConditionRepository memberTermConditionRepository;
 
     private List<MemberTermsCondition> dummy = new ArrayList<>();
 
@@ -53,11 +51,16 @@ class MemberTermsRepositoryTest {
         MemberTerms term3 = new MemberTerms();
 
         // TERMS001 ~ TERMS005까지로 약관 항목들 조회
-        MemberTermsCondition termCond1 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS001");
-        MemberTermsCondition termCond2 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS002");
-        MemberTermsCondition termCond3 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS003");
-        MemberTermsCondition termCond4 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS004");
-        MemberTermsCondition termCond5 = memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS005");
+        MemberTermsCondition termCond1 =
+                memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS001");
+        MemberTermsCondition termCond2 =
+                memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS002");
+        MemberTermsCondition termCond3 =
+                memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS003");
+        MemberTermsCondition termCond4 =
+                memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS004");
+        MemberTermsCondition termCond5 =
+                memberTermConditionRepository.findMemberTermsConditionByCondCode("TERMS005");
 
         // 1번 약관 만들기 : Y - Y - N - N - Y
         // 약관에 약관 항목들 세팅
@@ -115,13 +118,11 @@ class MemberTermsRepositoryTest {
         term3.setChkUse('Y');
         term3.setTermCode("TERMS003");
 
-
         // 약관 저장
         savedMemberTerms1 = memberTermsRepository.save(term1);
         savedMemberTerms2 = memberTermsRepository.save(term2);
         savedMemberTerms3 = memberTermsRepository.save(term3);
         assertTrue(3 == memberTermsRepository.count());
-
     }
 
     @DisplayName("사용 가능한 가장 최근 약관 조회")
@@ -164,95 +165,97 @@ class MemberTermsRepositoryTest {
         MemberTerms foundMemberTerms = memberTermsRepository.findMemberTermsByName("24년도회원약관A");
         // 내용 비교
         assertTrue(isSameMemberTerm(savedMemberTerms1, foundMemberTerms));
-
     }
 
     private void createDummy() {
-        dummy.add(MemberTermsCondition.builder()
-                .condCode("TERMS001")
-                .name("서비스 이용약관")
-                .shortCont("서비스 이용에 관한 짧은 내용")
-                .longCont("서비스 이용에 관한 자세한 내용")
-                .chkUse('Y')
-                .ord(1)
-                .termCondDate(LocalDateTime.now())
-                .termCondUpDate(LocalDateTime.now())
-                .law1("개인정보보호법")
-                .law2("전자상거래법")
-                .law3("소비자보호법")
-                .build());
+        dummy.add(
+                MemberTermsCondition.builder()
+                        .condCode("TERMS001")
+                        .name("서비스 이용약관")
+                        .shortCont("서비스 이용에 관한 짧은 내용")
+                        .longCont("서비스 이용에 관한 자세한 내용")
+                        .chkUse('Y')
+                        .ord(1)
+                        .termCondDate(LocalDateTime.now())
+                        .termCondUpDate(LocalDateTime.now())
+                        .law1("개인정보보호법")
+                        .law2("전자상거래법")
+                        .law3("소비자보호법")
+                        .build());
 
-        dummy.add(MemberTermsCondition.builder()
-                .condCode("TERMS002")
-                .name("개인정보 수집 및 이용")
-                .shortCont("개인정보 수집에 대한 짧은 설명")
-                .longCont("개인정보 수집 및 이용에 대한 자세한 설명")
-                .chkUse('Y')
-                .ord(2)
-                .termCondDate(LocalDateTime.now())
-                .termCondUpDate(LocalDateTime.now())
-                .law1("정보통신망법")
-                .law2("개인정보보호법")
-                .law3("없음")
-                .build());
+        dummy.add(
+                MemberTermsCondition.builder()
+                        .condCode("TERMS002")
+                        .name("개인정보 수집 및 이용")
+                        .shortCont("개인정보 수집에 대한 짧은 설명")
+                        .longCont("개인정보 수집 및 이용에 대한 자세한 설명")
+                        .chkUse('Y')
+                        .ord(2)
+                        .termCondDate(LocalDateTime.now())
+                        .termCondUpDate(LocalDateTime.now())
+                        .law1("정보통신망법")
+                        .law2("개인정보보호법")
+                        .law3("없음")
+                        .build());
 
-        dummy.add(MemberTermsCondition.builder()
-                .condCode("TERMS003")
-                .name("위치정보 이용 약관")
-                .shortCont("위치 정보 이용에 대한 짧은 설명")
-                .longCont("위치 정보 이용에 대한 자세한 설명")
-                .chkUse('Y')
-                .ord(3)
-                .termCondDate(LocalDateTime.now())
-                .termCondUpDate(LocalDateTime.now())
-                .law1("위치정보법")
-                .law2("없음")
-                .law3("없음")
-                .build());
+        dummy.add(
+                MemberTermsCondition.builder()
+                        .condCode("TERMS003")
+                        .name("위치정보 이용 약관")
+                        .shortCont("위치 정보 이용에 대한 짧은 설명")
+                        .longCont("위치 정보 이용에 대한 자세한 설명")
+                        .chkUse('Y')
+                        .ord(3)
+                        .termCondDate(LocalDateTime.now())
+                        .termCondUpDate(LocalDateTime.now())
+                        .law1("위치정보법")
+                        .law2("없음")
+                        .law3("없음")
+                        .build());
 
-        dummy.add(MemberTermsCondition.builder()
-                .condCode("TERMS004")
-                .name("쿠키 사용 약관")
-                .shortCont("쿠키 사용에 대한 짧은 설명")
-                .longCont("쿠키 사용에 대한 자세한 설명")
-                .chkUse('Y')
-                .ord(4)
-                .termCondDate(LocalDateTime.now())
-                .termCondUpDate(LocalDateTime.now())
-                .law1("정보통신망법")
-                .law2("개인정보보호법")
-                .law3("없음")
-                .build());
+        dummy.add(
+                MemberTermsCondition.builder()
+                        .condCode("TERMS004")
+                        .name("쿠키 사용 약관")
+                        .shortCont("쿠키 사용에 대한 짧은 설명")
+                        .longCont("쿠키 사용에 대한 자세한 설명")
+                        .chkUse('Y')
+                        .ord(4)
+                        .termCondDate(LocalDateTime.now())
+                        .termCondUpDate(LocalDateTime.now())
+                        .law1("정보통신망법")
+                        .law2("개인정보보호법")
+                        .law3("없음")
+                        .build());
 
-        dummy.add(MemberTermsCondition.builder()
-                .condCode("TERMS005")
-                .name("마케팅 정보 수신 동의")
-                .shortCont("마케팅 정보 수신에 대한 짧은 설명")
-                .longCont("마케팅 정보 수신에 대한 자세한 설명")
-                .chkUse('Y')
-                .ord(5)
-                .termCondDate(LocalDateTime.now())
-                .termCondUpDate(LocalDateTime.now())
-                .law1("개인정보보호법")
-                .law2("광고법")
-                .law3("없음")
-                .build());
-
+        dummy.add(
+                MemberTermsCondition.builder()
+                        .condCode("TERMS005")
+                        .name("마케팅 정보 수신 동의")
+                        .shortCont("마케팅 정보 수신에 대한 짧은 설명")
+                        .longCont("마케팅 정보 수신에 대한 자세한 설명")
+                        .chkUse('Y')
+                        .ord(5)
+                        .termCondDate(LocalDateTime.now())
+                        .termCondUpDate(LocalDateTime.now())
+                        .law1("개인정보보호법")
+                        .law2("광고법")
+                        .law3("없음")
+                        .build());
     }
 
     private boolean isSameMemberTerm(MemberTerms mt1, MemberTerms mt2) {
-        return mt1.getChkTerm1().equals(mt2.getChkTerm1()) &&
-                mt1.getChkTerm2().equals(mt2.getChkTerm2()) &&
-                mt1.getChkTerm3().equals(mt2.getChkTerm3()) &&
-                mt1.getChkTerm4().equals(mt2.getChkTerm4()) &&
-                mt1.getChkTerm5().equals(mt2.getChkTerm5()) &&
-                mt1.getName().equals(mt2.getName()) &&
-                mt1.getChkUse().equals(mt2.getChkUse()) &&
-                mt1.getTermCond1().equals(mt2.getTermCond1()) &&
-                mt1.getTermCond2().equals(mt2.getTermCond2()) &&
-                mt1.getTermCond3().equals(mt2.getTermCond3()) &&
-                mt1.getTermCond4().equals(mt2.getTermCond4()) &&
-                mt1.getTermCond5().equals(mt2.getTermCond5());
+        return mt1.getChkTerm1().equals(mt2.getChkTerm1())
+                && mt1.getChkTerm2().equals(mt2.getChkTerm2())
+                && mt1.getChkTerm3().equals(mt2.getChkTerm3())
+                && mt1.getChkTerm4().equals(mt2.getChkTerm4())
+                && mt1.getChkTerm5().equals(mt2.getChkTerm5())
+                && mt1.getName().equals(mt2.getName())
+                && mt1.getChkUse().equals(mt2.getChkUse())
+                && mt1.getTermCond1().equals(mt2.getTermCond1())
+                && mt1.getTermCond2().equals(mt2.getTermCond2())
+                && mt1.getTermCond3().equals(mt2.getTermCond3())
+                && mt1.getTermCond4().equals(mt2.getTermCond4())
+                && mt1.getTermCond5().equals(mt2.getTermCond5());
     }
-
 }

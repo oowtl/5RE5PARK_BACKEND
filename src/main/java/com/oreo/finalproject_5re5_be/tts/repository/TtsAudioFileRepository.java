@@ -5,5 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TtsAudioFileRepository extends JpaRepository<TtsAudioFile, Long> {
-}
+public interface TtsAudioFileRepository extends JpaRepository<TtsAudioFile, Long> {}

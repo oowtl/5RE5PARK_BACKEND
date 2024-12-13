@@ -1,8 +1,7 @@
 package com.oreo.finalproject_5re5_be.concat.dto.request;
 
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
@@ -23,5 +22,4 @@ public class SelectedConcatRowRequest {
         private String audioUrl; // S3 URL 또는 파일 경로
         private float silenceInterval; // 해당 행 뒤에 삽입될 무음 간격
     }
-
 }

@@ -1,14 +1,11 @@
 package com.oreo.finalproject_5re5_be.member.dto.response;
 
 import com.oreo.finalproject_5re5_be.member.entity.MemberTermsCondition;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -40,14 +37,14 @@ public class MemberTermConditionResponse {
 
     public static MemberTermConditionResponse of(MemberTermsCondition memberTermsCondition) {
         return MemberTermConditionResponse.builder()
-                                          .condCode(memberTermsCondition.getCondCode())
-                                          .shortCont(memberTermsCondition.getShortCont())
-                                          .longCont(memberTermsCondition.getLongCont())
-                                          .chkUse(memberTermsCondition.getChkUse())
-                                          .ord(memberTermsCondition.getOrd())
-                                          .law1(memberTermsCondition.getLaw1())
-                                          .law2(memberTermsCondition.getLaw2())
-                                          .law3(memberTermsCondition.getLaw3())
-                                          .build();
+                .condCode(memberTermsCondition.getCondCode())
+                .shortCont(memberTermsCondition.getShortCont())
+                .longCont(memberTermsCondition.getLongCont())
+                .chkUse(memberTermsCondition.getChkUse())
+                .ord(memberTermsCondition.getOrd())
+                .law1(memberTermsCondition.getLaw1())
+                .law2(memberTermsCondition.getLaw2())
+                .law3(memberTermsCondition.getLaw3())
+                .build();
     }
 }

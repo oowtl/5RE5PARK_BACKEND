@@ -1,13 +1,12 @@
 package com.oreo.finalproject_5re5_be.concat.repository;
 
 import com.oreo.finalproject_5re5_be.concat.entity.BgmFile;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface BgmFileRepository extends JpaRepository<BgmFile, Long> {
@@ -23,5 +22,4 @@ public interface BgmFileRepository extends JpaRepository<BgmFile, Long> {
 
     // 특정 audioUrl로 모든 BgmFile 조회
     List<BgmFile> findAllByAudioUrl(String audioUrl);
-
 }

@@ -7,25 +7,30 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query( "SELECT m " +
-            "FROM Member m " +
-            "WHERE m.seq = :memberSeq " )
+    @Query("SELECT m " + "FROM Member m " + "WHERE m.seq = :memberSeq ")
     public Member findBySeq(Long memberSeq);
+
     public Member findByEmail(String email);
+
     public Member findById(String id);
+
     public boolean existsByEmail(String email);
+
     public boolean existsById(String id);
-    @Query( "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END " +
-            "FROM Member m " +
-            "WHERE m.seq <> :memberSeq " +
-            "AND m.id = :id" )
-    public boolean existsByIdNotContainingMemberSeq(@Param("memberSeq") Long memberSeq, @Param("id") String id);
 
-    @Query( "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END " +
-            "FROM Member m " +
-            "WHERE m.seq <> :memberSeq " +
-            "AND m.email = :email" )
-    public boolean existsByEmailNotContainingMemberSeq(@Param("memberSeq")Long memberSeq, @Param("email") String email);
+    @Query(
+            "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END "
+                    + "FROM Member m "
+                    + "WHERE m.seq <> :memberSeq "
+                    + "AND m.id = :id")
+    public boolean existsByIdNotContainingMemberSeq(
+            @Param("memberSeq") Long memberSeq, @Param("id") String id);
 
-
+    @Query(
+            "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END "
+                    + "FROM Member m "
+                    + "WHERE m.seq <> :memberSeq "
+                    + "AND m.email = :email")
+    public boolean existsByEmailNotContainingMemberSeq(
+            @Param("memberSeq") Long memberSeq, @Param("email") String email);
 }

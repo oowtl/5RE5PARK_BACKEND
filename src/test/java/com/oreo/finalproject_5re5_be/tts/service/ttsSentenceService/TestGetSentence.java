@@ -26,11 +26,9 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TestGetSentence {
 
-    @Autowired
-    private TtsSentenceService ttsSentenceService;
+    @Autowired private TtsSentenceService ttsSentenceService;
 
-    @MockBean
-    private TtsSentenceRepository ttsSentenceRepository;
+    @MockBean private TtsSentenceRepository ttsSentenceRepository;
 
     /*
     테스트 시나리오: getSentence 메서드
@@ -70,10 +68,11 @@ class TestGetSentence {
         Long tsSeq = 1L;
         String ttsText = "Test Sentence";
 
-        TtsSentence mockSentence = TtsSentence.builder()
-            .tsSeq(tsSeq) // tsSeq 설정
-            .text(ttsText) // 텍스트 설정
-            .build();
+        TtsSentence mockSentence =
+                TtsSentence.builder()
+                        .tsSeq(tsSeq) // tsSeq 설정
+                        .text(ttsText) // 텍스트 설정
+                        .build();
 
         // findById 메서드가 Optional로 Mock TtsSentence를 반환하도록 설정
         when(ttsSentenceRepository.findById(tsSeq)).thenReturn(Optional.of(mockSentence));
@@ -97,8 +96,9 @@ class TestGetSentence {
         when(ttsSentenceRepository.findById(tsSeq)).thenReturn(Optional.empty());
 
         // when, then: getSentence 호출 시 EntityNotFoundException 발생 여부 검증
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-            () -> ttsSentenceService.getSentence(1L, tsSeq));
+        EntityNotFoundException exception =
+                assertThrows(
+                        EntityNotFoundException.class, () -> ttsSentenceService.getSentence(1L, tsSeq));
 
         // 예외 메시지 검증
         assertEquals("TtsSentence not found with id: " + tsSeq, exception.getMessage());
@@ -112,8 +112,8 @@ class TestGetSentence {
         Long tsSeq = null;
 
         // when, then: getSentence 호출 시 IllegalArgumentException 발생 여부 검증
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.getSentence(1L, tsSeq));
+        assertThrows(
+                ConstraintViolationException.class, () -> ttsSentenceService.getSentence(1L, tsSeq));
     }
 
     // 4. 유효하지 않은 tsSeq
@@ -124,8 +124,9 @@ class TestGetSentence {
         Long tsSeq = -1L;
 
         // when, then: getSentence 호출 시 EntityNotFoundException 발생 여부 검증
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-            () -> ttsSentenceService.getSentence(1L, tsSeq));
+        EntityNotFoundException exception =
+                assertThrows(
+                        EntityNotFoundException.class, () -> ttsSentenceService.getSentence(1L, tsSeq));
 
         // 예외 메시지 검증
         assertEquals("TtsSentence not found with id: " + tsSeq, exception.getMessage());

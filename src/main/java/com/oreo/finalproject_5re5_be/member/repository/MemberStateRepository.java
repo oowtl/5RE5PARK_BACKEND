@@ -9,17 +9,20 @@ public interface MemberStateRepository extends JpaRepository<MemberState, Long> 
 
     public List<MemberState> findAllByMemberSeq(Long seq);
 
-    @Query(value = " SELECT ms " +
-                   " FROM MemberState ms " +
-                   " WHERE ms.member.seq = :seq " +
-                   " AND ms.code.code = :state ")
+    @Query(
+            value =
+                    " SELECT ms "
+                            + " FROM MemberState ms "
+                            + " WHERE ms.member.seq = :seq "
+                            + " AND ms.code.code = :state ")
     public List<MemberState> findByMemberSeq(Long seq, String state);
 
-    @Query( "SELECT ms " +
-            "FROM MemberState ms " +
-            "WHERE ms.member.seq = :memberSeq " +
-            "AND ms.stateSeq = (SELECT MAX(subMS.stateSeq) " +
-            "                   FROM MemberState subMS " +
-            "                   WHERE subMS.member.seq = :memberSeq)")
+    @Query(
+            "SELECT ms "
+                    + "FROM MemberState ms "
+                    + "WHERE ms.member.seq = :memberSeq "
+                    + "AND ms.stateSeq = (SELECT MAX(subMS.stateSeq) "
+                    + "                   FROM MemberState subMS "
+                    + "                   WHERE subMS.member.seq = :memberSeq)")
     public MemberState findLatestHistoryByMemberSeq(Long memberSeq);
 }

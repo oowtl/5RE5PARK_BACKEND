@@ -11,17 +11,6 @@ import com.oreo.finalproject_5re5_be.concat.repository.AudioFileRepository;
 import com.oreo.finalproject_5re5_be.concat.service.helper.AudioFileHelper;
 import com.oreo.finalproject_5re5_be.global.component.S3Service;
 import com.oreo.finalproject_5re5_be.global.exception.DataNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -44,7 +42,8 @@ public class AudioFileService {
 
     // audioFile seq로 audioFile 정보 조회 (1개)
     public AudioFile getAudioFile(Long audioFileSeq) {
-        return audioFileRepository.findById(audioFileSeq)
+        return audioFileRepository
+                .findById(audioFileSeq)
                 .orElseThrow(() -> new RuntimeException("Audio file not found"));
     }
 
@@ -55,52 +54,60 @@ public class AudioFileService {
 
     // audioFile Url로 audioFile 정보 조회 (1개)
     public AudioFile getAudioFileByUrl(Long audioSeq) {
-        return audioFileRepository.findByAudioFileSeq(audioSeq)
-                .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with URL: " + audioSeq));
+        return audioFileRepository
+                .findByAudioFileSeq(audioSeq)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("AudioFile not found with URL: " + audioSeq));
     }
 
     // audioFile Name으로 audioFile 정보 조회 (1개)
     public AudioFile getAudioFileByName(String fileName) {
-        return audioFileRepository.findByFileName(fileName)
-                .orElseThrow(() -> new IllegalArgumentException("AudioFile not found with fileName: " + fileName));
+        return audioFileRepository
+                .findByFileName(fileName)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("AudioFile not found with fileName: " + fileName));
     }
-
 
     // concatRow의 seq를 받아서 그에 매칭되는 audioFile 정보 조회 (1개)
     public AudioFile getAudioFileByRowSeq(Long rowSeq) {
-        return audioFileRepository.findByRowSeq(rowSeq)
-                .orElseThrow(() -> new IllegalArgumentException("AudioFile not found for concatRowSeq: " + rowSeq));
+        return audioFileRepository
+                .findByRowSeq(rowSeq)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("AudioFile not found for concatRowSeq: " + rowSeq));
     }
 
     // concatRow의 seq를 받아서 그에 매칭되는 audioFile 정보 조회 (n개)
     public List<AudioFileDto> getAudioFileByRowSeq(List<Long> rowSeq) {
         return audioFileRepository.findAllByConcatRowSeqs(rowSeq).stream()
-                .map(this::convertToAudioFileDto).toList();
+                .map(this::convertToAudioFileDto)
+                .toList();
     }
-
 
     // 날짜를 받아서 매칭되는 audioFile 정보 조회 (N개)
     public List<AudioFile> getAudioFilesByCreatedDate(LocalDate date) {
-        //매칭되는 오디오파일을 리스트로 저장
+        // 매칭되는 오디오파일을 리스트로 저장
         List<AudioFile> audioFiles = audioFileRepository.findByCreatedDateOnly(date);
         if (audioFiles.isEmpty()) {
-            throw new IllegalArgumentException("No AudioFiles found with the specified created date: " + date);
+            throw new IllegalArgumentException(
+                    "No AudioFiles found with the specified created date: " + date);
         }
         return audioFiles;
     }
 
-
     // 파일확장자로 오디오파일들을 페이징처리해서 조회 (N개)
-    public List<ConcatUrlResponse> findAudioFilesByExtensionWithPaging(String extension, int page, int size) {
+    public List<ConcatUrlResponse> findAudioFilesByExtensionWithPaging(
+            String extension, int page, int size) {
         Pageable pageable = PageRequest.of(page, size); // 페이지 번호와 크기를 설정
         Page<AudioFile> audioFilePage = audioFileRepository.findByExtension(extension, pageable);
 
         // AudioFile -> ConcatUrlResponse 변환
         return audioFilePage.getContent().stream()
-                .map(file -> ConcatUrlResponse.builder()
-                        .seq(file.getAudioFileSeq())
-                        .url(file.getAudioUrl())
-                        .build())
+                .map(
+                        file ->
+                                ConcatUrlResponse.builder()
+                                        .seq(file.getAudioFileSeq())
+                                        .url(file.getAudioUrl())
+                                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -109,10 +116,9 @@ public class AudioFileService {
         return audioFiles.stream().map(this::convertToAudioFileDto).collect(Collectors.toList());
     }
 
-
     // AudioFile seq로 삭제 (1개)
     public void deleteAudioFileBySeq(Long audioFileSeq) {
-        //만약 존재하지 않으면 예외
+        // 만약 존재하지 않으면 예외
         if (!audioFileRepository.existsById(audioFileSeq)) {
             throw new IllegalArgumentException("Audio file not found with seq: " + audioFileSeq);
         }
@@ -122,7 +128,7 @@ public class AudioFileService {
     // AudioFile seq로 삭제 (N개)
     public void deleteAudioFilesBySeq(List<Long> audioFileSeqList) {
         for (Long seq : audioFileSeqList) {
-            //만약 존재하지 않으면 예외
+            // 만약 존재하지 않으면 예외
             if (!audioFileRepository.existsById(seq)) {
                 throw new IllegalArgumentException("Audio file not found with seq: " + seq);
             }
@@ -135,7 +141,8 @@ public class AudioFileService {
         return audioFileRepository.findConcatRowSeqsByAudioFileSeqs(audioFileSeqs);
     }
 
-    public List<AudioFileRequestDto> checkExtension(List<AudioFileRequestDto> audioDto) throws IOException {
+    public List<AudioFileRequestDto> checkExtension(List<AudioFileRequestDto> audioDto)
+            throws IOException {
 
         List<AudioFileRequestDto> notSupported = new ArrayList<>();
 
@@ -146,33 +153,37 @@ public class AudioFileService {
                 continue;
             }
 
-            notSupported.add(new AudioFileRequestDto(audioFileRequestDto.getAudioFile().getOriginalFilename()));
+            notSupported.add(
+                    new AudioFileRequestDto(audioFileRequestDto.getAudioFile().getOriginalFilename()));
             log.info("checkExtension : [{}]", "AUDIO_FILE_CHECK_FAIL");
         }
         return notSupported;
     }
 
-    //s3 업로드
-    public List<OriginAudioRequest> saveAudioFile(List<AudioFileRequestDto> audioDto) throws IOException {
+    // s3 업로드
+    public List<OriginAudioRequest> saveAudioFile(List<AudioFileRequestDto> audioDto)
+            throws IOException {
         if (audioDto.isEmpty()) {
             throw new IllegalArgumentException("[AudioFileService.saveAudioFile] 오디오 파일이 비어있습니다.");
         }
         if (checkExtension(audioDto).isEmpty()) {
-            return audioDto.stream().map(dto -> {
-                // S3 업로드
-                String audioUrl = s3Service.upload(dto.getAudioFile(), "concat/audio");
+            return audioDto.stream()
+                    .map(
+                            dto -> {
+                                // S3 업로드
+                                String audioUrl = s3Service.upload(dto.getAudioFile(), "concat/audio");
 
-                // AudioFile 엔티티 생성
-                try {
-                    return prepareDto(dto, audioUrl);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }).toList();
+                                // AudioFile 엔티티 생성
+                                try {
+                                    return prepareDto(dto, audioUrl);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                    .toList();
         }
         throw new DataNotFoundException("파일 형식이 올바르지 않습니다.");
     }
-
 
     public void saveAudioFiles(List<AudioFile> audioFiles) {
         audioFileHelper.batchInsert(audioFiles);
@@ -192,20 +203,22 @@ public class AudioFileService {
         }
     }
 
-    //사용자의 오디오 파일 전체 조회
+    // 사용자의 오디오 파일 전체 조회
     public List<AudioFileDto> getMemberAudioFile(Long memberSeq, Pageable pageable) {
         List<AudioFile> memberAudios = audioFileRepository.findAudioFileByMember(memberSeq, pageable);
-        if (memberAudios.isEmpty()) {//페이지 범위를 벗어나면 null을 반환 하므로 가장 뒤의 페이지를 반환
+        if (memberAudios.isEmpty()) { // 페이지 범위를 벗어나면 null을 반환 하므로 가장 뒤의 페이지를 반환
             log.info("요청 가능한 페이지 번호 초과, PageNumber : [{}]", pageable.getPageNumber());
             int maxPageNumber = getAudioFilePages(memberSeq, pageable.getPageSize()).size() - 1;
-            Pageable maxPageable = PageRequest.of(maxPageNumber, pageable.getPageSize(), pageable.getSort());
-            List<AudioFile> maxMemberAudios = audioFileRepository.findAudioFileByMember(memberSeq, maxPageable);
+            Pageable maxPageable =
+                    PageRequest.of(maxPageNumber, pageable.getPageSize(), pageable.getSort());
+            List<AudioFile> maxMemberAudios =
+                    audioFileRepository.findAudioFileByMember(memberSeq, maxPageable);
             return maxMemberAudios.stream().map(this::convertToAudioFileDto).toList();
         }
         return memberAudios.stream().map(this::convertToAudioFileDto).toList();
     }
 
-    //사용자 오디오 파일 페이지 배열 반환
+    // 사용자 오디오 파일 페이지 배열 반환
     public List<Integer> getAudioFilePages(Long memberSeq, int size) {
         long totalCount = audioFileRepository.countByMemberSeq(memberSeq);
         int totalPages = (int) Math.ceil((double) totalCount / size);
@@ -229,7 +242,6 @@ public class AudioFileService {
         }
     }
 
-
     public static boolean isAudioFile(File file) {
         try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file)) {
             return true; // 파일이 오디오 형식으로 처리 가능
@@ -247,14 +259,15 @@ public class AudioFileService {
     }
 
     public static boolean isAudioFile(byte[] stream) {
-        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(stream))) {
+        try (AudioInputStream audioInputStream =
+                AudioSystem.getAudioInputStream(new ByteArrayInputStream(stream))) {
             return true; // 파일이 오디오 형식으로 처리 가능
         } catch (UnsupportedAudioFileException | IOException e) {
             return false; // 오디오 파일이 아니거나 지원하지 않는 형식
         }
     }
 
-    //AudioFileDto변환기
+    // AudioFileDto변환기
     private AudioFileDto convertToAudioFileDto(AudioFile audioFile) {
         return AudioFileDto.builder()
                 .audioFileSeq(audioFile.getAudioFileSeq())

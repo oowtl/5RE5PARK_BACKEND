@@ -21,14 +21,11 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class MemberChangeHistoryRepositoryTest {
 
-    @Autowired
-    private MemberChangeHistoryRepository memberChangeHistoryRepository;
+    @Autowired private MemberChangeHistoryRepository memberChangeHistoryRepository;
 
-    @Autowired
-    private CodeRepository codeRepository;
+    @Autowired private CodeRepository codeRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @Autowired private MemberRepository memberRepository;
 
     private List<MemberChangeHistory> dummy = new ArrayList<>();
 
@@ -55,8 +52,6 @@ class MemberChangeHistoryRepositoryTest {
 
         assertNotNull(code);
         assertNotNull(member);
-
-
     }
 
     @Test
@@ -67,9 +62,11 @@ class MemberChangeHistoryRepositoryTest {
         List<MemberChangeHistory> memberChangeHistories = memberChangeHistoryRepository.saveAll(dummy);
         assertEquals(dummy.size(), memberChangeHistories.size());
 
-
         // 가장 최근 이력을 조회하는 쿼리 실행
-        MemberChangeHistory foundLatestHistory = memberChangeHistoryRepository.findLatestHistoryByIdAndCode(member.getSeq(),code.getCode()).get();
+        MemberChangeHistory foundLatestHistory =
+                memberChangeHistoryRepository
+                        .findLatestHistoryByIdAndCode(member.getSeq(), code.getCode())
+                        .get();
 
         // 결과 비교
         assertNotNull(foundLatestHistory);
@@ -78,7 +75,8 @@ class MemberChangeHistoryRepositoryTest {
     }
 
     private void createCode() {
-        Code dummy = Code.builder()
+        Code dummy =
+                Code.builder()
                         .codeSeq(1L)
                         .cateNum("MB")
                         .code("MF001")
@@ -94,17 +92,18 @@ class MemberChangeHistoryRepositoryTest {
     }
 
     private void createMember() {
-        Member dummy = Member.builder()
-                            .id("qwerfde2312")
-                            .password("asdf12341234@")
-                            .email("qwefghnm1212@gmail.com")
-                            .name("홍길동")
-                            .normAddr("서울시 강남구")
-                            .locaAddr("서울시")
-                            .detailAddr("서초동 123-456")
-                            .passAddr("서초대로 59-32")
-                            .chkValid('Y')
-                            .build();
+        Member dummy =
+                Member.builder()
+                        .id("qwerfde2312")
+                        .password("asdf12341234@")
+                        .email("qwefghnm1212@gmail.com")
+                        .name("홍길동")
+                        .normAddr("서울시 강남구")
+                        .locaAddr("서울시")
+                        .detailAddr("서초동 123-456")
+                        .passAddr("서초대로 59-32")
+                        .chkValid('Y')
+                        .build();
         Member savedMember = memberRepository.save(dummy);
         assertNotNull(savedMember);
         member = savedMember;
@@ -122,36 +121,38 @@ class MemberChangeHistoryRepositoryTest {
         String formattedDateTime = now.format(formatter);
         String formattedEnd = end.format(formatter);
 
-
         // 더미 데이터 생성
-        dummy.add(MemberChangeHistory.builder()
-                                    .member(member)
-                                    .chngFieldCode(code)
-                                    .befVal("qwerfde2312")
-                                    .aftVal("(1)new qwerfde2312")
-                                    .chngFieldCode(code)
-                                    .applDate(formattedDateTime)
-                                    .endDate(formattedEnd)
-                                    .build());
+        dummy.add(
+                MemberChangeHistory.builder()
+                        .member(member)
+                        .chngFieldCode(code)
+                        .befVal("qwerfde2312")
+                        .aftVal("(1)new qwerfde2312")
+                        .chngFieldCode(code)
+                        .applDate(formattedDateTime)
+                        .endDate(formattedEnd)
+                        .build());
 
-        dummy.add(MemberChangeHistory.builder()
-                                    .member(member)
-                                    .chngFieldCode(code)
-                                    .befVal("(1)new qwerfde2312")
-                                    .aftVal("(2)new qwerfde2312")
-                                    .chngFieldCode(code)
-                                    .applDate(formattedDateTime)
-                                    .endDate(formattedEnd)
-                                    .build());
+        dummy.add(
+                MemberChangeHistory.builder()
+                        .member(member)
+                        .chngFieldCode(code)
+                        .befVal("(1)new qwerfde2312")
+                        .aftVal("(2)new qwerfde2312")
+                        .chngFieldCode(code)
+                        .applDate(formattedDateTime)
+                        .endDate(formattedEnd)
+                        .build());
 
-        dummy.add(MemberChangeHistory.builder()
-                                    .member(member)
-                                    .chngFieldCode(code)
-                                    .befVal("(2)new qwerfde2312")
-                                    .aftVal("(3)new qwerfde2312")
-                                    .chngFieldCode(code)
-                                    .applDate(formattedDateTime)
-                                    .endDate(formattedEnd)
-                                    .build());
+        dummy.add(
+                MemberChangeHistory.builder()
+                        .member(member)
+                        .chngFieldCode(code)
+                        .befVal("(2)new qwerfde2312")
+                        .aftVal("(3)new qwerfde2312")
+                        .chngFieldCode(code)
+                        .applDate(formattedDateTime)
+                        .endDate(formattedEnd)
+                        .build());
     }
 }

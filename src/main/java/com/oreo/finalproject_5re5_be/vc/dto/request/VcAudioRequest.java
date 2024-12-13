@@ -13,6 +13,7 @@ import lombok.*;
 public class VcAudioRequest {
     @NotNull(message = "seq 필드는 null 일 수 없습니다.")
     private Long seq;
+
     @Size(max = 255, message = "name 필드는 최대 255자 까지 가능합니다.")
     @NotNull(message = "name 필드는 null 일 수 없습니다.")
     private String name;
@@ -21,7 +22,7 @@ public class VcAudioRequest {
     @NotNull(message = "fileUrl 필드는 null 일 수 없습니다.")
     private String fileUrl;
 
-//    @Positive(message = "length 필드는 양수여야 합니다.") //길이가 없을경우 오류나서 잠시 닫음
+    //    @Positive(message = "length 필드는 양수여야 합니다.") //길이가 없을경우 오류나서 잠시 닫음
     @NotNull(message = "length 필드는 null 일 수 없습니다.")
     private Integer length;
 
@@ -33,8 +34,8 @@ public class VcAudioRequest {
     @NotNull(message = "extension 필드는 null 일 수 없습니다.")
     private String extension;
 
-    public static VcAudioRequest of(Long seq, String name, String fileUrl, Integer length,
-                                    String size, String extension){
+    public static VcAudioRequest of(
+            Long seq, String name, String fileUrl, Integer length, String size, String extension) {
         return new VcAudioRequest(seq, name, fileUrl, length, size, extension);
     }
 }

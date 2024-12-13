@@ -1,35 +1,38 @@
 package com.oreo.finalproject_5re5_be.global.component.audio;
 
-
-import javax.sound.sampled.*;
 import java.io.*;
+import javax.sound.sampled.*;
 
 public class AudioExtensionConverter {
 
     private static final int DEFAULT_BIT_DEPTH = 16;
 
     public static byte[] mp3ToWav(AudioInputStream audioInputStream) {
-        AudioFormat baseFormat = audioInputStream.getFormat();// WAV 포맷으로 변환할 대상 포맷 설정
+        AudioFormat baseFormat = audioInputStream.getFormat(); // WAV 포맷으로 변환할 대상 포맷 설정
         AudioFormat decodedFormat = getDecodedFormat(baseFormat);
         try {
             AudioInputStream finalStream = getAudioInputStream(decodedFormat, audioInputStream);
 
-            ByteArrayOutputStream wavOutputStream = new ByteArrayOutputStream();//메모리에 저장할 ByteArray
-            AudioSystem.write(finalStream, AudioFileFormat.Type.WAVE, wavOutputStream);// 메모리 내에서 WAV 형식으로 변환 및 저장
-            return wavOutputStream.toByteArray();// 바이트 배열 반환
+            ByteArrayOutputStream wavOutputStream = new ByteArrayOutputStream(); // 메모리에 저장할 ByteArray
+            AudioSystem.write(
+                    finalStream, AudioFileFormat.Type.WAVE, wavOutputStream); // 메모리 내에서 WAV 형식으로 변환 및 저장
+            return wavOutputStream.toByteArray(); // 바이트 배열 반환
 
         } catch (IOException e) {
-            throw new RuntimeException("오디오 변환에 문제가 발생 했습니다." ,e);
+            throw new RuntimeException("오디오 변환에 문제가 발생 했습니다.", e);
         }
     }
 
     public static byte[] mp3ToWav(File file) throws UnsupportedAudioFileException, IOException {
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);// 파일을 AudioInputStream으로 읽기
+        AudioInputStream audioInputStream =
+                AudioSystem.getAudioInputStream(file); // 파일을 AudioInputStream으로 읽기
         return mp3ToWav(audioInputStream);
     }
 
-    public static byte[] mp3ToWav(InputStream inputStream) throws UnsupportedAudioFileException, IOException {
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputStream);// 파일을 AudioInputStream으로 읽기
+    public static byte[] mp3ToWav(InputStream inputStream)
+            throws UnsupportedAudioFileException, IOException {
+        AudioInputStream audioInputStream =
+                AudioSystem.getAudioInputStream(inputStream); // 파일을 AudioInputStream으로 읽기
         return mp3ToWav(audioInputStream);
     }
 
@@ -41,8 +44,7 @@ public class AudioExtensionConverter {
                 baseFormat.getChannels(),
                 baseFormat.getChannels() * 2,
                 baseFormat.getSampleRate(),
-                false
-        );
+                false);
     }
 
     private static AudioInputStream getAudioInputStream(
@@ -62,15 +64,13 @@ public class AudioExtensionConverter {
         return getAudioInputStream(decodedFormat, byteArrayOutputStream);
     }
 
-    private static AudioInputStream getAudioInputStream(AudioFormat decodedFormat,
-                                                        ByteArrayOutputStream byteArrayOutputStream) {
+    private static AudioInputStream getAudioInputStream(
+            AudioFormat decodedFormat, ByteArrayOutputStream byteArrayOutputStream) {
         byte[] pcmData = byteArrayOutputStream.toByteArray();
 
         // 새로운 AudioInputStream 생성하여 길이 지정
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pcmData);
         return new AudioInputStream(
-                byteArrayInputStream, decodedFormat, pcmData.length / decodedFormat.getFrameSize()
-        );
+                byteArrayInputStream, decodedFormat, pcmData.length / decodedFormat.getFrameSize());
     }
 }
-

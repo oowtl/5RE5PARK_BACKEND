@@ -9,11 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler (
-            InvalidProjectNameException.class
-    )
+    @ExceptionHandler(InvalidProjectNameException.class)
     public ResponseEntity<String> handleInvalidProjectNameException(InvalidProjectNameException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
-
 }

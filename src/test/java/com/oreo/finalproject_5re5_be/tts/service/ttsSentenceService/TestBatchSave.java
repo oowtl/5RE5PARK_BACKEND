@@ -1,5 +1,10 @@
 package com.oreo.finalproject_5re5_be.tts.service.ttsSentenceService;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
 import com.oreo.finalproject_5re5_be.global.constant.BatchProcessType;
 import com.oreo.finalproject_5re5_be.global.exception.EntityNotFoundException;
 import com.oreo.finalproject_5re5_be.project.entity.Project;
@@ -19,6 +24,8 @@ import com.oreo.finalproject_5re5_be.tts.repository.TtsSentenceRepository;
 import com.oreo.finalproject_5re5_be.tts.repository.VoiceRepository;
 import com.oreo.finalproject_5re5_be.tts.service.TtsSentenceService;
 import jakarta.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,33 +35,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TestBatchSave {
 
-    @Autowired
-    private TtsSentenceService ttsSentenceService;
+    @Autowired private TtsSentenceService ttsSentenceService;
 
-    @MockBean
-    private TtsSentenceRepository ttsSentenceRepository;
+    @MockBean private TtsSentenceRepository ttsSentenceRepository;
 
-    @MockBean
-    private ProjectRepository projectRepository;
+    @MockBean private ProjectRepository projectRepository;
 
-    @MockBean
-    private VoiceRepository voiceRepository;
+    @MockBean private VoiceRepository voiceRepository;
 
-    @MockBean
-    private TtsProgressStatusRepository ttsProgressStatusRepository;
+    @MockBean private TtsProgressStatusRepository ttsProgressStatusRepository;
 
     /*
     1. 성공 케이스 테스트
@@ -136,27 +130,29 @@ class TestBatchSave {
 
         TtsSentenceBatchRequest batchRequest = createBatchRequest(); // 유효한 batchRequest 생성
 
-        TtsSentence ttsSentence = TtsSentence.builder()
-            .tsSeq(1L)
-            .text("Test text")
-            .sortOrder(1)
-            .volume(100)
-            .speed(1.0f)
-            .startPitch(0)
-            .emotion("normal")
-            .emotionStrength(0)
-            .sampleRate(16000)
-            .alpha(0)
-            .endPitch(0.0f)
-            .audioFormat("wav")
-            .project(mock(Project.class))
-            .voice(mock(Voice.class))
-            .build();
+        TtsSentence ttsSentence =
+                TtsSentence.builder()
+                        .tsSeq(1L)
+                        .text("Test text")
+                        .sortOrder(1)
+                        .volume(100)
+                        .speed(1.0f)
+                        .startPitch(0)
+                        .emotion("normal")
+                        .emotionStrength(0)
+                        .sampleRate(16000)
+                        .alpha(0)
+                        .endPitch(0.0f)
+                        .audioFormat("wav")
+                        .project(mock(Project.class))
+                        .voice(mock(Voice.class))
+                        .build();
 
-        TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()
-            .ttsSentence(ttsSentence)
-            .progressStatus(TtsProgressStatusCode.CREATED)
-            .build();
+        TtsProgressStatus ttsProgressStatus =
+                TtsProgressStatus.builder()
+                        .ttsSentence(ttsSentence)
+                        .progressStatus(TtsProgressStatusCode.CREATED)
+                        .build();
 
         // 프로젝트가 존재한다고 설정
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
@@ -174,7 +170,7 @@ class TestBatchSave {
 
         // then: 반환된 결과 검증
         assertNotNull(result); // 결과가 null이 아님
-//        assertFalse(result.getSentenceList().isEmpty()); // 리스트가 비어 있지 않음
+        //        assertFalse(result.getSentenceList().isEmpty()); // 리스트가 비어 있지 않음
     }
 
     // 2. 유효성 검증 실패 테스트 - sentenceList가 null
@@ -182,12 +178,13 @@ class TestBatchSave {
     @DisplayName("batchSaveSentence - sentenceList가 null")
     void batchSaveSentence_SentenceListNull() {
         // given: sentenceList가 null인 batchRequest 생성
-        TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(
-            null); // sentenceList가 null로 설정
+        TtsSentenceBatchRequest batchRequest =
+                new TtsSentenceBatchRequest(null); // sentenceList가 null로 설정
 
         // when, then: 예외 발생 검증
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
+        assertThrows(
+                ConstraintViolationException.class,
+                () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
     }
 
     // 3. 유효성 검증 실패 테스트 - sentenceInfo가 null
@@ -199,9 +196,10 @@ class TestBatchSave {
         TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of(batchInfo));
 
         // when, then: 예외 발생 검증
-//        assertThrows(TtsSentenceInValidInput.class,
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
+        //        assertThrows(TtsSentenceInValidInput.class,
+        assertThrows(
+                ConstraintViolationException.class,
+                () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
     }
 
     // 4. 잘못된 BatchProcessType 테스트
@@ -213,8 +211,9 @@ class TestBatchSave {
         TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of(batchInfo));
 
         // when, then: 예외 발생 검증
-        assertThrows(TtsSentenceInValidInput.class,
-            () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
+        assertThrows(
+                TtsSentenceInValidInput.class,
+                () -> ttsSentenceService.batchSaveSentence(1L, batchRequest));
     }
 
     // 5. 리소스 존재하지 않음 테스트 - projectSeq가 존재하지 않음
@@ -229,8 +228,9 @@ class TestBatchSave {
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.empty());
 
         // when, then: 예외 발생 검증
-        assertThrows(EntityNotFoundException.class,
-            () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
     }
 
     // 6. 빈 sentenceList 테스트
@@ -242,8 +242,9 @@ class TestBatchSave {
         TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(List.of());
 
         // when, then: batchSaveSentence 메서드 호출
-        assertThrows(ConstraintViolationException.class,
-            () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
+        assertThrows(
+                ConstraintViolationException.class,
+                () -> ttsSentenceService.batchSaveSentence(projectSeq, batchRequest));
     }
 
     // 7. 정렬 테스트
@@ -253,13 +254,14 @@ class TestBatchSave {
         // given: 정렬되지 않은 sentenceList가 포함된 batchRequest 생성
 
         // 정렬되지 않은 sentenceList 생성
-        TtsSentenceBatchRequest request = new TtsSentenceBatchRequest(List.of(
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 3),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 4)
-        ));
+        TtsSentenceBatchRequest request =
+                new TtsSentenceBatchRequest(
+                        List.of(
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 3),
+                                createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
+                                createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 4)));
 
         // when
         // 정렬된 sentenceList 생성
@@ -278,13 +280,14 @@ class TestBatchSave {
     @DisplayName("batchSaveSentence - 정렬 테스트 - order 중복")
     void batchSaveSentence_SortOrder_Duplicate() {
         // given: 중복된 order가 포함된 sentenceList가 포함된 batchRequest 생성
-        TtsSentenceBatchRequest request = new TtsSentenceBatchRequest(List.of(
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 3),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 2),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 3)
-        ));
+        TtsSentenceBatchRequest request =
+                new TtsSentenceBatchRequest(
+                        List.of(
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 3),
+                                createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
+                                createBatchInfoWithOrder(BatchProcessType.UPDATE, 2),
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 3)));
 
         // when
         // 정렬된 sentenceList 생성
@@ -303,13 +306,14 @@ class TestBatchSave {
     @DisplayName("batchSaveSentence - 정렬 테스트 - order 미설정")
     void batchSaveSentence_SortOrder_NotSet() {
         // given: order가 설정되지 않은 sentenceList가 포함된 batchRequest 생성
-        TtsSentenceBatchRequest request = new TtsSentenceBatchRequest(List.of(
-            createBatchInfoWithOrder(BatchProcessType.CREATE, null),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, null),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 4)
-        ));
+        TtsSentenceBatchRequest request =
+                new TtsSentenceBatchRequest(
+                        List.of(
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, null),
+                                createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, null),
+                                createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
+                                createBatchInfoWithOrder(BatchProcessType.CREATE, 4)));
 
         // when
         // 정렬된 sentenceList 생성
@@ -333,40 +337,41 @@ class TestBatchSave {
         Project project = Project.builder().proSeq(projectSeq).build();
         Voice voice = Voice.builder().voiceSeq(1L).build();
 
-
         // List<TtsSentenceBatchInfo> 생성
-        List<TtsSentenceBatchInfo> reqList = List.of(
-            createBatchInfoWithOrder(BatchProcessType.DELETE, 3),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
-            createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
-            createBatchInfoWithOrder(BatchProcessType.CREATE, 4)
-        );
+        List<TtsSentenceBatchInfo> reqList =
+                List.of(
+                        createBatchInfoWithOrder(BatchProcessType.DELETE, 3),
+                        createBatchInfoWithOrder(BatchProcessType.UPDATE, 1),
+                        createBatchInfoWithOrder(BatchProcessType.CREATE, 2),
+                        createBatchInfoWithOrder(BatchProcessType.UPDATE, 5),
+                        createBatchInfoWithOrder(BatchProcessType.CREATE, 4));
 
         // batchRequest 생성
         TtsSentenceBatchRequest batchRequest = new TtsSentenceBatchRequest(reqList);
 
-        TtsSentence ttsSentence = TtsSentence.builder()
-            .tsSeq(1L)
-            .text("Test text")
-            .sortOrder(1)
-            .volume(100)
-            .speed(1.0f)
-            .startPitch(0)
-            .emotion("normal")
-            .emotionStrength(0)
-            .sampleRate(16000)
-            .alpha(0)
-            .endPitch(0.0f)
-            .audioFormat("wav")
-            .project(mock(Project.class))
-            .voice(mock(Voice.class))
-            .build();
+        TtsSentence ttsSentence =
+                TtsSentence.builder()
+                        .tsSeq(1L)
+                        .text("Test text")
+                        .sortOrder(1)
+                        .volume(100)
+                        .speed(1.0f)
+                        .startPitch(0)
+                        .emotion("normal")
+                        .emotionStrength(0)
+                        .sampleRate(16000)
+                        .alpha(0)
+                        .endPitch(0.0f)
+                        .audioFormat("wav")
+                        .project(mock(Project.class))
+                        .voice(mock(Voice.class))
+                        .build();
 
-        TtsProgressStatus ttsProgressStatus = TtsProgressStatus.builder()
-            .ttsSentence(ttsSentence)
-            .progressStatus(TtsProgressStatusCode.CREATED)
-            .build();
+        TtsProgressStatus ttsProgressStatus =
+                TtsProgressStatus.builder()
+                        .ttsSentence(ttsSentence)
+                        .progressStatus(TtsProgressStatusCode.CREATED)
+                        .build();
 
         // 프로젝트가 존재한다고 설정
         when(projectRepository.findById(projectSeq)).thenReturn(Optional.of(project));
@@ -384,11 +389,13 @@ class TestBatchSave {
 
         // when
         // 정렬된 sentenceList 생성
-        TtsSentenceListDto batchResponse = ttsSentenceService.batchSaveSentence(projectSeq, batchRequest);
+        TtsSentenceListDto batchResponse =
+                ttsSentenceService.batchSaveSentence(projectSeq, batchRequest);
 
         // then: 반환된 결과 검증
         verify(ttsSentenceRepository, times(1)).delete(any());
-//        assertEquals(reqList.size() - 1, batchResponse.getSentenceList().size()); // delete 로 인한 갯수 감소반영 확인
+        //        assertEquals(reqList.size() - 1, batchResponse.getSentenceList().size()); // delete 로
+        // 인한 갯수 감소반영 확인
     }
 
     /*
@@ -398,55 +405,60 @@ class TestBatchSave {
     // 유효한 TtsSentenceBatchRequest 생성
     private TtsSentenceBatchRequest createBatchRequest() {
 
-        SentenceInfo updateSentenceInfo1 = SentenceInfo.builder()
-            .tsSeq(1L)
-            .voiceSeq(1L)
-            .order(1)
-            .text("Test text")
-            .ttsAttributeInfo(createAttribute())
-            .build();
+        SentenceInfo updateSentenceInfo1 =
+                SentenceInfo.builder()
+                        .tsSeq(1L)
+                        .voiceSeq(1L)
+                        .order(1)
+                        .text("Test text")
+                        .ttsAttributeInfo(createAttribute())
+                        .build();
 
-        SentenceInfo updateSentenceInfo2 = SentenceInfo.builder()
-            .tsSeq(1L)
-            .voiceSeq(1L)
-            .order(2)
-            .text("Test text")
-            .ttsAttributeInfo(createAttribute())
-            .build();
+        SentenceInfo updateSentenceInfo2 =
+                SentenceInfo.builder()
+                        .tsSeq(1L)
+                        .voiceSeq(1L)
+                        .order(2)
+                        .text("Test text")
+                        .ttsAttributeInfo(createAttribute())
+                        .build();
 
-        SentenceInfo createSentenceInfo3 = SentenceInfo.builder()
-            .voiceSeq(1L)
-            .order(3)
-            .text("Test text")
-            .ttsAttributeInfo(createAttribute())
-            .build();
+        SentenceInfo createSentenceInfo3 =
+                SentenceInfo.builder()
+                        .voiceSeq(1L)
+                        .order(3)
+                        .text("Test text")
+                        .ttsAttributeInfo(createAttribute())
+                        .build();
 
-        SentenceInfo createSentenceInfo4 = SentenceInfo.builder()
-            .voiceSeq(1L)
-            .order(4)
-            .text("Test text")
-            .ttsAttributeInfo(createAttribute())
-            .build();
+        SentenceInfo createSentenceInfo4 =
+                SentenceInfo.builder()
+                        .voiceSeq(1L)
+                        .order(4)
+                        .text("Test text")
+                        .ttsAttributeInfo(createAttribute())
+                        .build();
 
-        TtsSentenceBatchInfo batchInfo1 = new TtsSentenceBatchInfo(BatchProcessType.UPDATE,
-            updateSentenceInfo1);
-        TtsSentenceBatchInfo batchInfo2 = new TtsSentenceBatchInfo(BatchProcessType.UPDATE,
-            updateSentenceInfo2);
-        TtsSentenceBatchInfo batchInfo3 = new TtsSentenceBatchInfo(BatchProcessType.CREATE,
-            createSentenceInfo3);
-        TtsSentenceBatchInfo batchInfo4 = new TtsSentenceBatchInfo(BatchProcessType.CREATE,
-            createSentenceInfo4);
+        TtsSentenceBatchInfo batchInfo1 =
+                new TtsSentenceBatchInfo(BatchProcessType.UPDATE, updateSentenceInfo1);
+        TtsSentenceBatchInfo batchInfo2 =
+                new TtsSentenceBatchInfo(BatchProcessType.UPDATE, updateSentenceInfo2);
+        TtsSentenceBatchInfo batchInfo3 =
+                new TtsSentenceBatchInfo(BatchProcessType.CREATE, createSentenceInfo3);
+        TtsSentenceBatchInfo batchInfo4 =
+                new TtsSentenceBatchInfo(BatchProcessType.CREATE, createSentenceInfo4);
         return new TtsSentenceBatchRequest(List.of(batchInfo1, batchInfo2, batchInfo3, batchInfo4));
     }
 
-    private TtsSentenceBatchInfo createBatchInfoWithOrder(BatchProcessType batchProcessType,
-        Integer orderIndex) {
-        SentenceInfo sentenceInfo = SentenceInfo.builder()
-            .voiceSeq(1L)
-            .order(orderIndex)
-            .text("Test text")
-            .ttsAttributeInfo(createAttribute())
-            .build();
+    private TtsSentenceBatchInfo createBatchInfoWithOrder(
+            BatchProcessType batchProcessType, Integer orderIndex) {
+        SentenceInfo sentenceInfo =
+                SentenceInfo.builder()
+                        .voiceSeq(1L)
+                        .order(orderIndex)
+                        .text("Test text")
+                        .ttsAttributeInfo(createAttribute())
+                        .build();
         return new TtsSentenceBatchInfo(batchProcessType, sentenceInfo);
     }
 

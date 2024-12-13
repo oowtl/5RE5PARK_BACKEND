@@ -33,7 +33,7 @@ public class Style extends BaseEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="server")
+    @Column(name = "server")
     private ServerCode server;
 
     @Column(name = "enabled")

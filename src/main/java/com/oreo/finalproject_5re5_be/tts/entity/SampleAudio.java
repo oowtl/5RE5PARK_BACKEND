@@ -2,10 +2,9 @@ package com.oreo.finalproject_5re5_be.tts.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "sample_audio")
@@ -16,7 +15,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 파라미터가 없는 생성자를 만들어주는 어노테이션, PROTECTED 접근 제어자
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 전체 파라미터를 가지는 생성자를 만들어주는 어노테이션, PRIVATE 접근 제어자
 // equals()와 hashCode() 메소드를 자동으로 생성해주는 어노테이션
-@EqualsAndHashCode(callSuper = false, exclude = {"createdAt"}) // callSuper = false : 부모 클래스의 필드를 비교하지 않는다.
+@EqualsAndHashCode(
+        callSuper = false,
+        exclude = {"createdAt"}) // callSuper = false : 부모 클래스의 필드를 비교하지 않는다.
 public class SampleAudio extends BaseEntity {
     @Id
     @Column(name = "smpl_aud_seq")

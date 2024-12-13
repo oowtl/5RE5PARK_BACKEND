@@ -36,7 +36,6 @@ public class CodeRequest {
 
     private String comt;
 
-
     public Code createCodeEntity() {
         return Code.builder()
                 .cateNum(cateNum)
@@ -47,5 +46,4 @@ public class CodeRequest {
                 .comt(comt)
                 .build();
     }
-
 }

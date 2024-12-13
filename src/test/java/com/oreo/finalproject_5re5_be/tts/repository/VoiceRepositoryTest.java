@@ -1,10 +1,14 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.oreo.finalproject_5re5_be.tts.entity.Language;
 import com.oreo.finalproject_5re5_be.tts.entity.ServerCode;
 import com.oreo.finalproject_5re5_be.tts.entity.Style;
 import com.oreo.finalproject_5re5_be.tts.entity.Voice;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,24 +16,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class VoiceRepositoryTest {
-    @Autowired
-    private VoiceRepository voiceRepository;
+    @Autowired private VoiceRepository voiceRepository;
 
-    @Autowired
-    private LanguageRepository languageRepository;
+    @Autowired private LanguageRepository languageRepository;
 
-    @Autowired
-    private StyleRepository styleRepository;
+    @Autowired private StyleRepository styleRepository;
 
     private static String TEST_NAME = "TEST_NAME";
 
@@ -57,7 +51,6 @@ public class VoiceRepositoryTest {
     1. 삭제 테스트 - 전체 데이터 삭제
      */
 
-
     // 1. 생성 테스트 - 전체 데이터 입력
     @Test
     @DisplayName("VoiceRepository 생성 테스트 - 전체 데이터 입력")
@@ -73,10 +66,7 @@ public class VoiceRepositoryTest {
 
         // 3. Voice 객체 생성 (연관 관계 매핑 포함)
         Voice createVoice = createVoiceWithoutMappings();
-        createVoice.toBuilder()
-                .language(language)
-                .style(style)
-                .build();
+        createVoice.toBuilder().language(language).style(style).build();
 
         // when
         // 4. Voice 객체 저장
@@ -107,12 +97,13 @@ public class VoiceRepositoryTest {
         Style style = styleRepository.save(createStyle);
 
         // 3. Voice 객체 생성 및 저장 (연관 관계 매핑 포함)
-        Voice createVoice = Voice.builder()
-                .name("TEST_NAME") // name 을 제외한 나머지 비 필수 값 제외
-                .server(ServerCode.GOOGLE_CLOUD) // 필수 값
-                .language(language)
-                .style(style)
-                .build();
+        Voice createVoice =
+                Voice.builder()
+                        .name("TEST_NAME") // name 을 제외한 나머지 비 필수 값 제외
+                        .server(ServerCode.GOOGLE_CLOUD) // 필수 값
+                        .language(language)
+                        .style(style)
+                        .build();
 
         // when
         // 4. Voice 객체 저장
@@ -143,11 +134,12 @@ public class VoiceRepositoryTest {
         Style style = styleRepository.save(createStyle);
 
         // 3. Voice 객체 생성 및 저장 (연관 관계 매핑 포함)
-        Voice createVoice = Voice.builder()
-                .name("TEST_NAME") // name 을 제외한 나머지 비 필수 값 제외
-                .language(language)
-                .style(style)
-                .build();
+        Voice createVoice =
+                Voice.builder()
+                        .name("TEST_NAME") // name 을 제외한 나머지 비 필수 값 제외
+                        .language(language)
+                        .style(style)
+                        .build();
 
         // when, then
         // 4. 필수 값이 없을 때, DataIntegrityViolationException 이 발생하는지 확인
@@ -168,15 +160,14 @@ public class VoiceRepositoryTest {
         Style style = styleRepository.save(createStyle);
 
         // 3. Voice 객체 생성 (데이터 없음 - 전체 null)
-        Voice createVoice = Voice.builder()
-                .build();
+        Voice createVoice = Voice.builder().build();
 
         // when, then
         // 4. 전체 값이 null 일 때, DataIntegrityViolationException 이 발생하는지 확인
         assertThrows(DataIntegrityViolationException.class, () -> voiceRepository.save(createVoice));
     }
 
-    //5. 생성 테스트 - 연관 관계 매핑 없이 생성
+    // 5. 생성 테스트 - 연관 관계 매핑 없이 생성
     @Test
     @DisplayName("VoiceRepository 생성 테스트 - 연관 관계 매핑 없이 생성")
     public void createVoiceWithoutMappingsTest() {
@@ -214,10 +205,7 @@ public class VoiceRepositoryTest {
 
         // 3. Voice 객체 생성 및 저장 (연관 관계 매핑 포함)
         Voice createVoice = createVoiceWithoutMappings();
-        createVoice.toBuilder()
-                .language(language)
-                .style(style)
-                .build();
+        createVoice.toBuilder().language(language).style(style).build();
 
         // 4. Voice 객체 저장
         Voice savedVoice = voiceRepository.save(createVoice);
@@ -232,7 +220,6 @@ public class VoiceRepositoryTest {
         Voice researchedVoice = optionalResearchedVoice.get();
         assertEquals(createVoice, researchedVoice);
     }
-
 
     // 2. 조회 테스트 - 조건에 맞는 단건 데이터 조회
     @Test
@@ -249,10 +236,7 @@ public class VoiceRepositoryTest {
 
         // 3. Voice 객체 생성 및 저장 (연관 관계 매핑 포함)
         Voice createVoice = createVoiceWithoutMappings();
-        createVoice.toBuilder()
-                .language(language)
-                .style(style)
-                .build();
+        createVoice.toBuilder().language(language).style(style).build();
 
         // 4. Voice 객체 저장
         Voice savedVoice = voiceRepository.save(createVoice);
@@ -349,10 +333,7 @@ public class VoiceRepositoryTest {
 
         // 3. Voice 객체 생성 (연관 관계 매핑 포함)
         Voice createVoice = createVoiceWithoutMappings();
-        createVoice.toBuilder()
-                .language(language)
-                .style(style)
-                .build();
+        createVoice.toBuilder().language(language).style(style).build();
 
         // 4. Voice 객체 저장
         Voice savedVoice = voiceRepository.save(createVoice);
@@ -368,19 +349,20 @@ public class VoiceRepositoryTest {
 
         // 7. Voice 객체 수정 및 저장
         Long createVoiceSeq = savedVoice.getVoiceSeq();
-        Voice updateVoice = Voice.builder()
-                .voiceSeq(createVoiceSeq)
-                .name(updateName)
-                .gender(updateGender)
-                .age(updateAge)
-                .description(updateDescription)
-                .enabled(updateEnabled)
-                .server(updateServer)
-                .language(savedNewLanguage)
-                .style(savedNewStyle)
-                .useCnt(updateUseCnt)
-                .isRecommend(updateRecommend)
-                .build();
+        Voice updateVoice =
+                Voice.builder()
+                        .voiceSeq(createVoiceSeq)
+                        .name(updateName)
+                        .gender(updateGender)
+                        .age(updateAge)
+                        .description(updateDescription)
+                        .enabled(updateEnabled)
+                        .server(updateServer)
+                        .language(savedNewLanguage)
+                        .style(savedNewStyle)
+                        .useCnt(updateUseCnt)
+                        .isRecommend(updateRecommend)
+                        .build();
 
         // when
         // 8. 수정된 Voice 객체 저장
@@ -418,14 +400,15 @@ public class VoiceRepositoryTest {
         // when
         // 2. Voice 객체 수정 및 저장
         Long createVoiceSeq = savedVoice.getVoiceSeq();
-        Voice updateVoice = Voice.builder()
-                .voiceSeq(createVoiceSeq)
-                .name(updateName)
-                .gender(updateGender)
-                .description(updateDescription)
-                .enabled(updateEnabled)
-                .server(createVoice.getServer()) // server 는 변경하지 않음
-                .build();
+        Voice updateVoice =
+                Voice.builder()
+                        .voiceSeq(createVoiceSeq)
+                        .name(updateName)
+                        .gender(updateGender)
+                        .description(updateDescription)
+                        .enabled(updateEnabled)
+                        .server(createVoice.getServer()) // server 는 변경하지 않음
+                        .build();
 
         Voice manipulatedVoice = voiceRepository.save(updateVoice);
         assertNotNull(manipulatedVoice);
@@ -458,10 +441,7 @@ public class VoiceRepositoryTest {
 
         // 3. Voice 객체 생성 (연관 관계 매핑 포함)
         Voice createVoice = createVoiceWithoutMappings();
-        createVoice.toBuilder()
-                .language(language)
-                .style(style)
-                .build();
+        createVoice.toBuilder().language(language).style(style).build();
 
         // 4. Voice 객체 저장
         Voice savedVoice = voiceRepository.save(createVoice);
@@ -484,17 +464,18 @@ public class VoiceRepositoryTest {
         char savedEnabled = savedVoice.getEnabled();
         ServerCode savedServer = savedVoice.getServer();
 
-        Voice updateVoice = Voice.builder()
-                .voiceSeq(savedVoiceSeq)
-                .name(updateName)
-                .gender(savedGender)
-                .age(savedAge)
-                .description(savedDescription)
-                .enabled(savedEnabled)
-                .server(savedServer)
-                .language(savedNewLanguage)
-                .style(savedNewStyle)
-                .build();
+        Voice updateVoice =
+                Voice.builder()
+                        .voiceSeq(savedVoiceSeq)
+                        .name(updateName)
+                        .gender(savedGender)
+                        .age(savedAge)
+                        .description(savedDescription)
+                        .enabled(savedEnabled)
+                        .server(savedServer)
+                        .language(savedNewLanguage)
+                        .style(savedNewStyle)
+                        .build();
 
         Voice manipulatedVoice = voiceRepository.save(updateVoice);
         assertNotNull(manipulatedVoice);
@@ -537,15 +518,16 @@ public class VoiceRepositoryTest {
         char savedEnabled = savedVoice.getEnabled();
         ServerCode savedServer = savedVoice.getServer();
 
-        Voice updateVoice = Voice.builder()
-                .voiceSeq(savedVoiceSeq)
-                .name(updateName)
-                .gender(savedGender)
-                .age(savedAge)
-                .description(savedDescription)
-                .enabled(savedEnabled)
-                .server(savedServer)
-                .build();
+        Voice updateVoice =
+                Voice.builder()
+                        .voiceSeq(savedVoiceSeq)
+                        .name(updateName)
+                        .gender(savedGender)
+                        .age(savedAge)
+                        .description(savedDescription)
+                        .enabled(savedEnabled)
+                        .server(savedServer)
+                        .build();
 
         Voice manipulatedVoice = voiceRepository.save(updateVoice);
         assertNotNull(manipulatedVoice);
@@ -578,15 +560,16 @@ public class VoiceRepositoryTest {
         // 2. Voice 객체 수정 및 저장
         Long savedVoiceSeq = savedVoice.getVoiceSeq();
 
-        Voice updateVoice = Voice.builder()
-                .voiceSeq(savedVoiceSeq)
-                .name(null)
-                .gender(null)
-                .age(null)
-                .description(null)
-                .enabled('\u0000')
-                .server(null)
-                .build();
+        Voice updateVoice =
+                Voice.builder()
+                        .voiceSeq(savedVoiceSeq)
+                        .name(null)
+                        .gender(null)
+                        .age(null)
+                        .description(null)
+                        .enabled('\u0000')
+                        .server(null)
+                        .build();
 
         // then
         // 3. Voice 객체 수정 시, null 값이 들어가면 DataIntegrityViolationException 이 발생하는지 확인

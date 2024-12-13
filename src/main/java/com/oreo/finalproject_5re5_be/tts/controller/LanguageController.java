@@ -29,9 +29,7 @@ public class LanguageController {
         // 언어 전체 조회 결과 가져오기
         LanguageListDto languageList = languageService.getLanguageList();
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseDto<>(HttpStatus.OK.value(), languageList));
     }
-
 }

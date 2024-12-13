@@ -1,12 +1,11 @@
 package com.oreo.finalproject_5re5_be.vc.entity;
 
-import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import com.oreo.finalproject_5re5_be.code.entity.Code;
+import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vc_request_history")
@@ -26,7 +25,6 @@ public class VcRequestHistory extends BaseEntity {
     @CreatedDate
     private LocalDateTime requestDate;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "code")
     private Code ccSeq;
@@ -34,6 +32,7 @@ public class VcRequestHistory extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "src_seq")
     private VcSrcFile srcSeq;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trg_seq")
     private VcTrgFile trgSeq;

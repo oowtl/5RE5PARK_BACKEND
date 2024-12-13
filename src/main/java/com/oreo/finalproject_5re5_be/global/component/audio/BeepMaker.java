@@ -1,20 +1,17 @@
 package com.oreo.finalproject_5re5_be.global.component.audio;
 
-
+import java.io.ByteArrayInputStream;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
-import java.io.ByteArrayInputStream;
 
-/**
- * 파라미터로 전달된 주파수의 오디오를 생성한다.
- */
+/** 파라미터로 전달된 주파수의 오디오를 생성한다. */
 public class BeepMaker {
     /**
      * 주어진 주파수로 지정된 길이의 비프 오디오 스트림을 생성합니다.
      *
      * @param frequency 주파수 (Hz)
-     * @param duration  지속 시간 (초)
-     * @param format    대상 오디오 포맷
+     * @param duration 지속 시간 (초)
+     * @param format 대상 오디오 포맷
      * @return 비프 오디오 스트림
      */
     public static AudioInputStream makeSound(int frequency, float duration, AudioFormat format) {
@@ -44,16 +41,17 @@ public class BeepMaker {
 
     /**
      *
+     *
      * <table class="striped">
      * <caption>기본 병합 클래스</caption>
      * </table>
      *
-     * @param duration  지속 시간 (초)
-     * @param format    대상 오디오 포맷
+     * @param duration 지속 시간 (초)
+     * @param format 대상 오디오 포맷
      * @return 무음 오디오 스트림
      */
 
-    //무음 오디오 생성
+    // 무음 오디오 생성
     public static AudioInputStream makeSound(float duration, AudioFormat format) {
         return makeSound(0, duration, format);
     }

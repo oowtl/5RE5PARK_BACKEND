@@ -66,7 +66,7 @@ public class TtsSentence extends BaseEntity {
     @JoinColumn(name = "voice_seq", nullable = false)
     private Voice voice;
 
-    public static TtsSentence of (Project project, Voice voice, String text, Integer sortOrder) {
+    public static TtsSentence of(Project project, Voice voice, String text, Integer sortOrder) {
         return TtsSentence.builder()
                 .project(project)
                 .voice(voice)

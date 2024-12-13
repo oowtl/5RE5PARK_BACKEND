@@ -2,9 +2,8 @@ package com.oreo.finalproject_5re5_be.concat.entity;
 
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @ToString
 @Getter
@@ -28,5 +27,4 @@ public class ConcatRowLog extends BaseEntity {
     private String RequestContext;
     private Character selected;
     private Float silence;
-
 }

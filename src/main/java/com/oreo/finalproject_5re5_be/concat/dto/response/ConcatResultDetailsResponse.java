@@ -9,14 +9,14 @@ import lombok.Setter;
 @Builder
 public class ConcatResultDetailsResponse {
 
-    private Long concatTabSeq; //객체가 아닌 seq를 반환
-    private Long concatOptionSeq; //객체가 아닌 seq를 반환
+    private Long concatTabSeq; // 객체가 아닌 seq를 반환
+    private Long concatOptionSeq; // 객체가 아닌 seq를 반환
     private String audioUrl;
     private String extension;
     private Float fileLength;
     private String fileName;
 
-    //format 관련 필드
+    // format 관련 필드
     private String encoding;
     private Float sampleRate;
     private Integer sampleSizeBit;
@@ -24,6 +24,4 @@ public class ConcatResultDetailsResponse {
     private Integer frameSize;
     private Float frameRate;
     private Character isBigEndian;
-
-
 }

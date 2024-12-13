@@ -21,19 +21,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
@@ -56,27 +54,25 @@ public class ConcatWithBgmController {
             summary = "Row 오디오와 BGM 파일 병합",
             description = "선택된 Row 오디오 파일과 BGM 파일을 병합하여 S3에 업로드합니다.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공적으로 병합된 오디오 URL을 반환합니다.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ConcatResponseDto.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "병합 작업 중 오류 발생",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseDto.class)
-                            )
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "성공적으로 병합된 오디오 URL을 반환합니다.",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = ConcatResponseDto.class))),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "병합 작업 중 오류 발생",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = ResponseDto.class)))
+            })
     @PostMapping("/execute-with-bgm")
     public ResponseEntity<ResponseDto<ConcatResponseDto>> executeConcatWithBgm(
-            @Parameter(description = "저장할 결과파일 이름", required = true) @RequestParam String concatResultFileName,
+            @Parameter(description = "저장할 결과파일 이름", required = true) @RequestParam
+                    String concatResultFileName,
             @RequestBody TabRowUpdateRequestDto requestDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
@@ -90,18 +86,22 @@ public class ConcatWithBgmController {
             float frontSilence = concatTab.getFrontSilence();
             String bgmFileUrl = concatTab.getBgmFileList().get(0).getAudioUrl();
 
-            log.info("concatTab:{}",concatTabSeq);
+            log.info("concatTab:{}", concatTabSeq);
 
-            projectService.projectCheck(customUserDetails.getMember().getSeq(), requestDto.getConcatTab().getTabId());
+            projectService.projectCheck(
+                    customUserDetails.getMember().getSeq(), requestDto.getConcatTab().getTabId());
 
-            IntervalConcatenator intervalConcatenator = new StereoIntervalConcatenator(defaultAudioFormat);
+            IntervalConcatenator intervalConcatenator =
+                    new StereoIntervalConcatenator(defaultAudioFormat);
 
             List<AudioProperties> audioProperties = audioStreamService.loadAudioFiles(concatRows);
 
             // 2. 병합된 오디오 생성
-            ByteArrayOutputStream concatenatedAudioBuffer = intervalConcatenator.intervalConcatenate(audioProperties, frontSilence);
+            ByteArrayOutputStream concatenatedAudioBuffer =
+                    intervalConcatenator.intervalConcatenate(audioProperties, frontSilence);
 
-            AudioInputStream concatenatedAudioStream = audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
+            AudioInputStream concatenatedAudioStream =
+                    audioStreamService.createAudioInputStream(concatenatedAudioBuffer, defaultAudioFormat);
 
             // BGM 작업 1: BGM 스트림 로드 및 버퍼링
             AudioInputStream bufferedBgmStream = audioStreamService.loadAsBufferedStream(bgmFileUrl);
@@ -115,13 +115,17 @@ public class ConcatWithBgmController {
             bufferedBgmStream = BgmProcessor.adjustBgmLength(bufferedBgmStream, targetFrames, bgmFrames);
 
             // 4. 믹싱
-            AudioInputStream mixedAudioStream = BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
+            AudioInputStream mixedAudioStream =
+                    BgmProcessor.mixAudio(concatenatedAudioStream, bufferedBgmStream);
 
             // 결과파일 S3 업로드
-            String resultAudioUrl = s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
+            String resultAudioUrl =
+                    s3Service.uploadAudioStream(mixedAudioStream, "concat/result", concatResultFileName);
 
             // DB 저장1. ConcatResult DB
-            ConcatUrlResponse concatResultResponse = concatResultService.saveConcatResult(concatTabSeq, resultAudioUrl, concatResultFileName, mixedAudioStream);
+            ConcatUrlResponse concatResultResponse =
+                    concatResultService.saveConcatResult(
+                            concatTabSeq, resultAudioUrl, concatResultFileName, mixedAudioStream);
 
             OriginAudioRequest bgmRequest = concatTab.getBgmFileList().get(0);
 
@@ -136,21 +140,27 @@ public class ConcatWithBgmController {
             materialAudioService.saveMaterialsForConcatRows(concatRows, concatResultResponse);
 
             // 응답에 들어갈 concatRowFiles 생성
-            List<OriginAudioRequest> concatRowFiles = concatRows.getConcatRowRequests().stream()
-                    .map(row -> {
-                        AudioFile audioFile = audioFileService.getAudioFileByUrl(row.getOriginAudioRequest().getSeq());
-                        return audioFile;
-                    })
-                    .map(this::convertToOriginAudioRequest)
-                    .peek(originAudioRequest -> log.info("Converted to OriginAudioRequest: {}", originAudioRequest))
-                    .toList();
+            List<OriginAudioRequest> concatRowFiles =
+                    concatRows.getConcatRowRequests().stream()
+                            .map(
+                                    row -> {
+                                        AudioFile audioFile =
+                                                audioFileService.getAudioFileByUrl(row.getOriginAudioRequest().getSeq());
+                                        return audioFile;
+                                    })
+                            .map(this::convertToOriginAudioRequest)
+                            .peek(
+                                    originAudioRequest ->
+                                            log.info("Converted to OriginAudioRequest: {}", originAudioRequest))
+                            .toList();
 
             // 응답 생성
-            ConcatResponseDto responseDto = ConcatResponseDto.builder()
-                    .audioUrl(resultAudioUrl)
-                    .bgmFile(bgmRequest)
-                    .concatRowFiles(concatRowFiles)
-                    .build();
+            ConcatResponseDto responseDto =
+                    ConcatResponseDto.builder()
+                            .audioUrl(resultAudioUrl)
+                            .bgmFile(bgmRequest)
+                            .concatRowFiles(concatRowFiles)
+                            .build();
 
             return new ResponseDto<>(HttpStatus.OK.value(), responseDto).toResponseEntity();
         } catch (Exception e) {
@@ -158,7 +168,6 @@ public class ConcatWithBgmController {
             return createErrorResponse();
         }
     }
-
 
     private OriginAudioRequest convertToOriginAudioRequest(AudioFile audioFile) {
         return OriginAudioRequest.builder()
@@ -172,12 +181,13 @@ public class ConcatWithBgmController {
     }
 
     private ResponseEntity<ResponseDto<ConcatResponseDto>> createErrorResponse() {
-        return new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                ConcatResponseDto.builder()
-                        .audioUrl(null) // 결과 파일 URL 없음
-                        .bgmFile(null) // BGM 파일 정보 없음
-                        .concatRowFiles(new ArrayList<>()) // ConcatRow 파일 정보 없음
-                        .build()
-        ).toResponseEntity();
+        return new ResponseDto<>(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        ConcatResponseDto.builder()
+                                .audioUrl(null) // 결과 파일 URL 없음
+                                .bgmFile(null) // BGM 파일 정보 없음
+                                .concatRowFiles(new ArrayList<>()) // ConcatRow 파일 정보 없음
+                                .build())
+                .toResponseEntity();
     }
 }

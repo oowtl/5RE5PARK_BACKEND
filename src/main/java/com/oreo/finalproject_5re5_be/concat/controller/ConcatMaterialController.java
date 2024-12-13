@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "Concat", description = "Concat 관련 API")
 @RestController
@@ -31,7 +30,8 @@ public class ConcatMaterialController {
     private final MaterialAudioService materialAudioService;
     private final ProjectService projectService;
 
-    public ConcatMaterialController(MaterialAudioService materialAudioService, ProjectService projectService) {
+    public ConcatMaterialController(
+            MaterialAudioService materialAudioService, ProjectService projectService) {
         this.materialAudioService = materialAudioService;
         this.projectService = projectService;
     }
@@ -44,32 +44,36 @@ public class ConcatMaterialController {
         projectService.projectCheck(userDetails.getMember().getSeq(), concatResultSeq);
 
         // ConcatResult에서 결과 파일 URL 조회
-        String resultAudioUrl = materialAudioService.findResultAudioUrlByConcatResultSeq(concatResultSeq);
+        String resultAudioUrl =
+                materialAudioService.findResultAudioUrlByConcatResultSeq(concatResultSeq);
 
         // BGM 파일 조회
         BgmFile bgmFile = materialAudioService.findBgmFileByConcatResultSeq(concatResultSeq);
         OriginAudioRequest bgmFileResponse = null;
         if (bgmFile != null) {
-            bgmFileResponse = OriginAudioRequest.builder()
-                    .seq(bgmFile.getBgmFileSeq())
-                    .audioUrl(bgmFile.getAudioUrl())
-                    .extension(bgmFile.getExtension())
-                    .fileSize(bgmFile.getFileSize())
-                    .fileLength(bgmFile.getFileLength())
-                    .fileName(bgmFile.getFileName())
-                    .build();
+            bgmFileResponse =
+                    OriginAudioRequest.builder()
+                            .seq(bgmFile.getBgmFileSeq())
+                            .audioUrl(bgmFile.getAudioUrl())
+                            .extension(bgmFile.getExtension())
+                            .fileSize(bgmFile.getFileSize())
+                            .fileLength(bgmFile.getFileLength())
+                            .fileName(bgmFile.getFileName())
+                            .build();
         }
 
         // 재료 오디오 파일 조회
-        List<OriginAudioRequest> materialAudioFiles = materialAudioService.findMaterialAudioFilesByConcatResultSeq(concatResultSeq);
+        List<OriginAudioRequest> materialAudioFiles =
+                materialAudioService.findMaterialAudioFilesByConcatResultSeq(concatResultSeq);
 
         // 응답 생성
-        ConcatResultResponse response = ConcatResultResponse.builder()
-                .concatResultSeq(concatResultSeq)
-                .audioUrl(resultAudioUrl)
-                .bgmFile(bgmFileResponse)
-                .materialAudioFiles(materialAudioFiles)
-                .build();
+        ConcatResultResponse response =
+                ConcatResultResponse.builder()
+                        .concatResultSeq(concatResultSeq)
+                        .audioUrl(resultAudioUrl)
+                        .bgmFile(bgmFileResponse)
+                        .materialAudioFiles(materialAudioFiles)
+                        .build();
 
         return new ResponseDto<>(HttpStatus.OK.value(), response).toResponseEntity();
     }
@@ -84,11 +88,12 @@ public class ConcatMaterialController {
         projectService.projectCheck(userDetails.getMember().getSeq(), concatResultSeq);
 
         // resultSeq로 재료가 된 concatRowList 얻어오기
-        List<ConcatRow> materialConcatRowList = materialAudioService.findConcatRowListByResultSeq(concatResultSeq);
+        List<ConcatRow> materialConcatRowList =
+                materialAudioService.findConcatRowListByResultSeq(concatResultSeq);
 
         // 응답
-        return new ResponseDto<>(HttpStatus.OK.value(), ConcatRowListDto.of(materialConcatRowList)).toResponseEntity();
+        return new ResponseDto<>(HttpStatus.OK.value(), ConcatRowListDto.of(materialConcatRowList))
+                .toResponseEntity();
         // 조회 결과 응답 DTO로 변환
     }
-
 }

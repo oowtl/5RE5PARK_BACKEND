@@ -1,8 +1,13 @@
 package com.oreo.finalproject_5re5_be.tts.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.oreo.finalproject_5re5_be.project.entity.Project;
 import com.oreo.finalproject_5re5_be.project.repository.ProjectRepository;
 import com.oreo.finalproject_5re5_be.tts.entity.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,24 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TtsProgressStatusRepositoryTest {
-    @Autowired
-    private TtsProgressStatusRepository ttsProgStatRepository;
-    @Autowired
-    private TtsSentenceRepository ttsSentenceRepository;
-    @Autowired
-    private VoiceRepository voiceRepository;
+    @Autowired private TtsProgressStatusRepository ttsProgStatRepository;
+    @Autowired private TtsSentenceRepository ttsSentenceRepository;
+    @Autowired private VoiceRepository voiceRepository;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    @Autowired private ProjectRepository projectRepository;
+
     /*
      *  [TtsProgressStatus 생성 테스트]
      *  1. 모든 필드 값 입력 후 추가 => 성공
@@ -65,7 +61,6 @@ class TtsProgressStatusRepositoryTest {
 
         TtsProgressStatus getTpsStatus = foundTpsStatus.get();
         assertEquals(ttsProgressStatus, getTpsStatus);
-
     }
 
     @Test
@@ -83,12 +78,11 @@ class TtsProgressStatusRepositoryTest {
 
         // 필수 필드 누락된 TtsProgressStatus 엔티티 생성
         TtsProgressStatus ttsProgressStatus =
-                TtsProgressStatus.builder()
-                        .ttsSentence(savedTtsSentence)
-                        .build();
+                TtsProgressStatus.builder().ttsSentence(savedTtsSentence).build();
 
         // 필수 필드 누락된 엔티티 DB에 저장시 예외 발생
-        assertThrows(DataIntegrityViolationException.class ,() -> ttsProgStatRepository.save(ttsProgressStatus));
+        assertThrows(
+                DataIntegrityViolationException.class, () -> ttsProgStatRepository.save(ttsProgressStatus));
     }
 
     @Test
@@ -99,7 +93,8 @@ class TtsProgressStatusRepositoryTest {
 
         // 빈 엔티티 저장시 예외 발생
         // 엔티티 DB에 저장시 예외 발생
-        assertThrows(DataIntegrityViolationException.class ,() -> ttsProgStatRepository.save(ttsProgressStatus));
+        assertThrows(
+                DataIntegrityViolationException.class, () -> ttsProgStatRepository.save(ttsProgressStatus));
     }
 
     /*
@@ -156,7 +151,7 @@ class TtsProgressStatusRepositoryTest {
         // TtsProgressStatus 리스트 생성 및 저장
         List<TtsProgressStatus> ttsProgressStatusList = new ArrayList<>();
         int cnt = 10;
-        for(int i=0; i<cnt; i++) {
+        for (int i = 0; i < cnt; i++) {
             TtsProgressStatus newTtsProgStat = createTtsProgStatus(savedTtsSentence, i);
             ttsProgressStatusList.add(newTtsProgStat);
             assertNotNull(ttsProgStatRepository.save(newTtsProgStat));
@@ -169,7 +164,6 @@ class TtsProgressStatusRepositoryTest {
 
         assertTrue(ttsProgressStatusList.containsAll(foundTpsStatusList));
     }
-
 
     // Voice 엔티티 생성 메서드
     private Voice createVoice() {
@@ -188,7 +182,6 @@ class TtsProgressStatusRepositoryTest {
         return Project.builder().build();
     }
 
-
     // TtsSentence 엔티티 생성 메서드
     private TtsSentence createTtsSentence(Voice voice, Project project) {
         return TtsSentence.builder()
@@ -203,10 +196,9 @@ class TtsProgressStatusRepositoryTest {
 
     // TtsProgressStatus 엔티티 생성 메서드
     private TtsProgressStatus createTtsProgStatus(TtsSentence ttsSentence, int n) {
-        return  TtsProgressStatus.builder()
+        return TtsProgressStatus.builder()
                 .progressStatus(TtsProgressStatusCode.values()[n % 4])
                 .ttsSentence(ttsSentence)
                 .build();
     }
-
 }

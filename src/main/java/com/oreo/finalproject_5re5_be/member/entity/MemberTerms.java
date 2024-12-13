@@ -10,9 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -23,16 +21,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Table(name = "member_terms")
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class MemberTerms extends BaseEntity{
+public class MemberTerms extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,8 +55,8 @@ public class MemberTerms extends BaseEntity{
     @Column(name = "chk_term_5")
     private Character chkTerm5;
 
-//    @Column(name = "term_end_date")
-//    private LocalDateTime termEndDate;
+    //    @Column(name = "term_end_date")
+    //    private LocalDateTime termEndDate;
 
     @Column(name = "term_reg_date", nullable = false)
     private LocalDateTime termRegDate;
@@ -96,7 +94,8 @@ public class MemberTerms extends BaseEntity{
         this.setChkUse(chk);
 
         // 약관 필수 여부 변경
-        List<Character> memberTermConditionMandatoryOrNot = request.getMemberTermConditionMandatoryOrNot();
+        List<Character> memberTermConditionMandatoryOrNot =
+                request.getMemberTermConditionMandatoryOrNot();
         this.setChkTerm1(memberTermConditionMandatoryOrNot.get(0));
         this.setChkTerm2(memberTermConditionMandatoryOrNot.get(1));
         this.setChkTerm3(memberTermConditionMandatoryOrNot.get(2));
@@ -108,5 +107,4 @@ public class MemberTerms extends BaseEntity{
 
         this.setTermRegDate(now);
     }
-
 }

@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberTermsHistoryRepository extends JpaRepository<MemberTermsHistory, Long> {
     public List<MemberTermsHistory> findByMemberSeq(Long seq);
-
 }

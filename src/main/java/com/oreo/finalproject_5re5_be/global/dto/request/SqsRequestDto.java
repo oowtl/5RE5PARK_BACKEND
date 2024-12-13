@@ -9,5 +9,4 @@ import lombok.Getter;
 public class SqsRequestDto {
     MessageType messageType;
     String message;
-
 }

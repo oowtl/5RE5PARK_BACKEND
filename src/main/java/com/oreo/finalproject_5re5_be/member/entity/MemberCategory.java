@@ -1,6 +1,5 @@
 package com.oreo.finalproject_5re5_be.member.entity;
 
-
 import com.oreo.finalproject_5re5_be.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +13,8 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "member_category")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 public class MemberCategory extends BaseEntity {
 
@@ -22,8 +22,10 @@ public class MemberCategory extends BaseEntity {
     @Column(name = "cate_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cateCode;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "comt")
     private String comt;
 }

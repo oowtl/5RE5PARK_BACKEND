@@ -1,15 +1,13 @@
 package com.oreo.finalproject_5re5_be.concat.dto.lambda.response;
 
-
 import com.oreo.finalproject_5re5_be.global.component.audio.AudioExtensionConverter;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.sound.sampled.AudioInputStream;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -20,7 +18,8 @@ public class AudioInfo {
     private float contentLength;
     private String contentType;
 
-    public AudioInfo(AudioInputStream audioData, String fileName, float contentLength, String contentType) {
+    public AudioInfo(
+            AudioInputStream audioData, String fileName, float contentLength, String contentType) {
         this.audioData = AudioExtensionConverter.mp3ToWav(audioData);
         this.fileName = fileName;
         this.contentLength = contentLength;
@@ -40,9 +39,7 @@ public class AudioInfo {
         return (long) audioData.length;
     }
 
-
-
     public InputStream toInputStream() {
-            return new ByteArrayInputStream(audioData);
+        return new ByteArrayInputStream(audioData);
     }
 }

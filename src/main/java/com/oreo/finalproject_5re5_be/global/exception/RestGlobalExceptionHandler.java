@@ -14,7 +14,6 @@ public class RestGlobalExceptionHandler {
         return new ResponseDto<>(HttpStatus.NOT_FOUND.value(), ex.getMessage()).toResponseEntity();
     }
 
-
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<ResponseDto<String>> handleMultipartException(MultipartException ex) {
         return new ResponseDto<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage()).toResponseEntity();
